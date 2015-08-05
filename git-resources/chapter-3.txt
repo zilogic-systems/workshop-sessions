@@ -1,0 +1,51 @@
+15 Years of Free Software
+
+by Richard M. Stallman
+
+It is now just over 15 years since the beginning of the Free Software
+Movement and the GNU Project. We have come a long way.
+
+In ????, it was impossible to use a modern computer without installing
+a proprietary operating system, which you would have to obtain under a
+restrictive license. No one was allowed to share software freely with
+fellow computer users, and hardly anyone could change software to fit
+his or her own needs. The owners of software had erected walls to
+divide us from each other.
+
+The GNU Project was founded to change all that. Its first goal: to
+develop a Unix-compatible portable operating system that would be 100%
+free software. Not 95% free, not 99.5%, but 100%—so that users would
+be free to redistribute the whole system, and free to change and
+contribute to any part of it. The name of the system, GNU, is a
+recursive acronym meaning “GNU's Not Unix”—a way of paying tribute to
+Unix, while at the same time saying that GNU is something
+different. Technically, GNU is like Unix. But unlike Unix, GNU gives
+its users freedom.
+
+It took many years of work, by hundreds of programmers, to develop
+this operating system. Some were paid by the Free Software Foundation
+and by free software companies; most were volunteers. A few have
+become famous; most are known mainly within their profession, by other
+hackers who use or work on their code. All together have helped to
+liberate the potential of the computer network for all humanity.
+
+In 1991, the last major essential component of a Unix-like system was
+developed: Linux, the free kernel written by Linus Torvalds. Today,
+the combination of GNU and Linux is used by millions of people around
+the world, and its popularity is growing. This month, we announced
+release 1.0 of GNOME, the GNU graphical desktop, which we hope will
+make the GNU/Linux system as easy to use as any other operating
+system.
+
+But our freedom is not permanently assured. The world does not stand
+still, and we cannot count on having freedom five years from now, just
+because we have it today. Free software faces difficult challenges and
+dangers. It will take determined efforts to preserve our freedom, just
+as it took to obtain freedom in the first place. Meanwhile, the
+operating system is just the beginning—now we need to add free
+applications to handle the whole range of jobs that users want to do.
+
+In future columns, I will be writing about the specific challenges
+facing the free software community, and other issues affecting freedom
+for computer users, as well as developments affecting the GNU/Linux
+operating system.

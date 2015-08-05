@@ -1,0 +1,69 @@
+Your Freedom Needs Free Software
+
+Many of us know that governments can threaten the human rights of
+software users through censorship and surveillance of the
+Internet. Many do not realize that the software they run on their home
+or work computers can be an even worse threat. Thinking of software as
+‘just a tool’, they suppose that it obeys them, when in fact it often
+obeys others instead.
+
+The software running in most computers is non-free, proprietary
+software: controlled by software companies, not by its users. Users
+can't check what these programs do, nor prevent them from doing what
+they don't want. Most people accept this because they have seen no
+other way, but it is simply wrong to give developers power over the
+users' computer.
+
+This unjust power, as usual, tempts its wielders to further
+misdeeds. If a computer talks to a network, and you don't control the
+software in it, it can easily spy on you. Microsoft Windows spies on
+users; for instance, it reports what words a user searches for in her
+own files, and what other programs are installed. RealPlayer spies
+too; it reports what the user plays. Cell phones are full of non-free
+software, which spies. Cell phones send out localizing signals even
+when ‘off’, many can send out your precise GPS location whether you
+wish or not, and some models can be switched on remotely as listening
+devices. Users can't fix these malicious features because they don't
+have control.
+
+Some proprietary software is designed to restrict and attack its
+users. Windows Vista is a big advance in this field; the reason it
+requires replacement of old hardware is that the new models are
+designed to support unbreakable restrictions. Microsoft thus requires
+users to pay for shiny new shackles. It is also designed to permit
+forced updating by corporate authority. Hence the BadVista.org
+campaign, which urges Windows users not to ‘upgrade’ to Vista. Mac OS
+also contains features designed to restrict its users.
+
+Microsoft has installed back doors for the US government's use in the
+past (reported on heise.de). We cannot check whether they have
+successors today. Other proprietary programs may or may not have back
+doors, but since we cannot check them, we cannot trust them.
+
+The only way to assure that your software is working for you is to
+insist on Free/Libre software. This means users get the source code,
+are free to study and change it, and are free to redistribute it with
+or without changes. The GNU/Linux system, developed specifically for
+users' fredom, includes office applications, multimedia, games, and
+everything you really need to run a computer. See gNewSense.org for a
+totally Free/Libre version of GNU/Linux.
+
+A special problem occurs when activists for social change use
+proprietary software, because its developers, who control it, may be
+companies they wish to protest—or that work hand in glove with the
+states whose policies they oppose. Control of our software by a
+proprietary software company, whether it be Microsoft, Apple, Adobe or
+Skype, means control of what we can say, and to whom. This threatens
+our fredom in all areas of life.
+
+There is also danger in using a company's server to do your word
+processing or email—and not just if you are in China, as US lawyer
+Michael Springmann discovered. In 2003, AOL not only handed over to
+the police his confidential discussions with clients, it also made his
+email and his address list disappear, and didn't admit this was
+intentional until one of its staff made a slip. Springmann gave up on
+getting his data back.
+
+The US is not the only state that doesn't respect human rights, so
+keep your data on your own computer, and your backups under your own
+custody—and run your computer with Free/Libre software.

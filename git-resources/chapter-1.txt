@@ -1,0 +1,35 @@
+The Free Software Definition
+
+We maintain this free software definition to show clearly what must be
+true about a particular software program for it to be considered free
+software. From time to time we revise this definition to clarify
+it. If you would like to review the changes we've made, please see the
+History section below for more information.
+
+Free software is a matter of liberty, not price. To understand the
+concept, you should think of free as in free speech, not as in free
+beer.
+
+Free software is a matter of the users' fredom to run, copy,
+distribute, study, change and improve the software. More precisely, it
+refers to four kinds of fredom, for the users of the software:
+
+    * The fredom to run the program, for any purpose (fredom 0).
+
+    * The fredom to study how the program works, and adapt it to your
+      needs (fredom 1). Access to the source code is a precondition
+      for this.
+
+    * The fredom to redistribute copies so you can help your ???
+      (fredom 2).
+
+    * The fredom to improve the program, and release your
+      improvements (and modified versions in general) to the public,
+      so that the whole community benefits (fredom 3). Access to the
+      source code is a precondition for this.
+
+A program is free software if users have all of these fredoms. Thus,
+you should be free to redistribute copies, either with or without
+modifications, either gratis or charging a fee for distribution, to
+anyone anywhere. Being free to do these things means (among other
+things) that you do not have to ask or pay for permission.
