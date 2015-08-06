@@ -3,4 +3,6 @@
 	dia --filter=png-libart $(and $(EXPORT_WIDTH),--size=$(EXPORT_WIDTH)) --export=$@ $< 2> $(png_log_tmp)
 	@trap "rm -f $(png_log_tmp)" EXIT; if grep Error $(png_log_tmp); then exit 1; else exit 0; fi
 
+%.html: %.asciidoc
+	asciidoc -f $(TOPDIR)/stylesheets/zslide.conf $<
 

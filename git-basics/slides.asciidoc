@@ -298,3 +298,84 @@ image::figures/merged.png[]
 
   * The new changes on the branch can be merged in to the current
     branch using the same command
+
+== Track and Untrack Files
+
+=== Start Tracking Files
+
+  * Create a file called `chapter-4.txt`.
+
+  * Tell Git to start tracking the file.
++
+-----
+$ git add chapter-4.txt
+-----
++
+  * Commit the newly added file.
++
+-----
+$ git commit -a -m "Added a Chapter 4."
+-----
+
+=== Stop Tracking Files
+
+  * Remove the file `chapter-4.txt`.
++
+------
+$ rm chapter-4.txt
+------
++
+  * Commit the removal of the file.
++
+------
+$ git commit -a -m "Removed Chapter 4."
+------
+
+=== What about Directories?
+
+  * Not possible to add an empty directory.
+
+  * Only files can be added using `add`.
++
+-----
+$ mkdir subdir
+$ git add subdir
+$ git status
+$ echo "Hello World" > subdir/test.txt
+$ git add subdir
+$ git status
+-----
+
+== Creating a New Repository
+
+=== Initializing an Empty Repo
+
+  * Create a new project folder
++
+-----
+$ mkdir proj
+$ cd proj
+-----
++
+  * Create a Git repository
++
+-----
+$ git init
+-----
+
+=== Populate the repository
+
+  * Create files and add them.
++
+-----
+$ echo "Hello World" > hello.txt
+$ echo "Goodbye World" > goodbye.txt
+$ git add hello.txt goodbye.txt
+-----
++
+  * Make the initial commit
++
+-----
+$ git commit -a -m "Initial project folder."
+$ git log
+-----
