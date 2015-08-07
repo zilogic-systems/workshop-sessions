@@ -21,7 +21,22 @@ body
   height: 100%;
   color: black;
   background-color: white;
-  /* font-family: "Gill Sans MT", "Gill Sans", GillSans, sans-serif; */
+  font-family: "rosario", sans-serif;
+}
+
+/* Title font. */
+h1, h2, h3, h4, h5, h6,
+div.title, caption.title,
+thead, p.table.header,
+#toctitle,
+#author, #revnumber, #revdate, #revremark,
+#footer {
+  font-family: "oswald stencil", sans-serif;
+}
+
+tt {
+  font-family: "lucida console", monospace;
+  font-size: 90%;
 }
 
 div.toolbar {
@@ -104,7 +119,7 @@ div.slide {
   right: 0;
   line-height: 120%;
   background-color: transparent;
-  font-size: 140%;
+  font-size: 2.5vw;
 }
 
 div.background {
@@ -479,14 +494,24 @@ li {
 
 div.two-column div.left {
     float: left;
-    width: 45%;
+    width: 49%;
+    overflow: auto;
 }
 
 div.two-column div.right {
     float: right;
-    width: 45%;
+    width: 49%;
+    overflow: auto;
 }
 
 li {
     line-height: 1.5em;
+}
+
+div.imageblock img {
+    max-width: 80%;
+}
+
+pre {
+    overflow: auto;
 }

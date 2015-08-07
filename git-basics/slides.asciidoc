@@ -18,7 +18,7 @@ Zilogic Systems <training@zilogic.com>
 [style="two-column"]
 === Bug Fixing Releases
 
-image::figures/bug-fix.png[style="left",align="center"]
+image::figures/bug-fix.png[style="left",align="center",width="60%"]
 
 [style="right"]
   * Software is released to the customer
@@ -83,7 +83,7 @@ image::figures/bug-fix.png[style="left",align="center"]
 [style="two-column"]
 === Getting Started
 
-image::figures/git-repo.png[style="left",align="center"]
+image::figures/git-repo.png[style="left",align="center",width="50%"]
 
 [style="right"]
   * In a project tracked by Git, the project directory has both the
@@ -224,10 +224,10 @@ $ git checkout my-old-branch
 
 ------
 $ git checkout -b bug-fix
-$ git commit -m "Fixed missing year in Chapter 3."
+$ git commit -m "..."
 ------
 
-image::figures/branch-1.png[style="right",align="center"]
+image::figures/branch-1.png[style="right",align="center",width="60%"]
 
 [style="left"]
   * `chapter-3.txt` has an year missing, in line 8
@@ -237,7 +237,6 @@ image::figures/branch-1.png[style="right",align="center"]
   * Insert `1984` instead of `???` in line 8
 
   * Commit the changes
-
 
 === Creating Branch from Revision
 
@@ -266,11 +265,6 @@ $ git merge my-new-branch
 [style="two-column"]
 === Try Out
 
-------
-$ git checkout master
-$ git commit -m "Fixed incorrect spelling of long in Chapter 3."
-------
-
 image::figures/branch-2.png[style="right",align="center"]
 
 [style="left"]
@@ -279,20 +273,23 @@ image::figures/branch-2.png[style="right",align="center"]
   * Fix the spelling of the word `long` in `chapter-3.txt`, line 6
 
   * Commit the change
-
++
+------
+$ git checkout master
+$ git commit -m "..."
+------
 
 [style="two-column"]
 === Try Out
-
-------
-$ git merge year-fix
-------
 
 image::figures/merged.png[style="right",align="center"]
 
 [style="left"]
   * Merge changes from the `year-fix` branch into master
-
++
+------
+$ git merge year-fix
+------
 
 === Growing Branches
 
