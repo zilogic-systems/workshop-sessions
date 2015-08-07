@@ -1,5 +1,5 @@
-= Git Basics
-Zilogic Systems
+= Getting Started with Git
+Zilogic Systems <training@zilogic.com>
 
 == Introduction to Version Control
 

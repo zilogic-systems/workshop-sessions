@@ -118,15 +118,48 @@ div.handout {
   margin-right: 20px;
 }
 
-div.slide.titlepage {
-  text-align: center;
-}
+div.slide div.presentation-info {
+    display: block; 
+    line-height: 1.2em;
+    background: transparent;
+    font-size: 100%;
+    text-align:center;
 
-div.slide.titlepage.h1 {
-  padding-top: 10%;
+    max-width: 100em;
+    height: 5em;
+
+    position: absolute;
+    margin: auto;
+    bottom: 0px; top: 0px;
+    left: 0px; right: 0px;
 }
 
 div.slide h1 {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    font-size: 300%;
+}
+
+div.slide h2 {
+    display: block; 
+    font-size: 200%;
+    line-height: 1.2em;
+    background: transparent;
+    border: 0;
+    text-align:center;
+
+    max-width: 16em;
+    height: 2em;
+
+    position: absolute;
+    margin: auto;
+    bottom: 0px; top: 0px;
+    left: 0px; right: 0px;
+}
+
+div.slide h3 {
+  float: none;
   padding-left: 0;
   padding-right: 20pt;
   padding-top: 4pt;
@@ -420,6 +453,9 @@ div.initial_prompt { display: none; visibility: hidden }
   div.slide { page-break-before: always }
   /* :first-child isn't reliable for print media */
   div.slide.first-slide { page-break-before: avoid }
+
+  div.slide div.metadata { position: static }
+  div.slide h2 { position: static }
 }
 
 
