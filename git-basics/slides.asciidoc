@@ -15,10 +15,12 @@ Zilogic Systems <training@zilogic.com>
   * If it doesn't we would like to undo
   * Discard all changes and go back
 
+[style="two-column"]
 === Bug Fixing Releases
 
-image::figures/bug-fix.png[]
+image::figures/bug-fix.png[style="left",align="center"]
 
+[style="right"]
   * Software is released to the customer
   * Development work starts for the next release
   * Mid-way through customer, reports a bug
@@ -78,10 +80,12 @@ image::figures/bug-fix.png[]
   * Git is a Distributed Version Control System
 
 
+[style="two-column"]
 === Getting Started
 
-image::figures/git-repo.png[]
+image::figures/git-repo.png[style="left",align="center"]
 
+[style="right"]
   * In a project tracked by Git, the project directory has both the
     working copy and the repo.
 
@@ -147,8 +151,7 @@ $ git diff HEAD
   * Commit the changes made to the files
 
 
-=== Viewing History
-class: segue dark nobackground
+== Viewing History
 
 
 === Who did What?
@@ -216,11 +219,17 @@ $ git checkout -b my-new-branch
 $ git checkout my-old-branch
 ------
 
-
+[style="two-column"]
 === Try Out
 
-image::figures/branch-1.png
+------
+$ git checkout -b bug-fix
+$ git commit -m "Fixed missing year in Chapter 3."
+------
 
+image::figures/branch-1.png[style="right",align="center"]
+
+[style="left"]
   * `chapter-3.txt` has an year missing, in line 8
 
   * Create a bug-fix branch called `year-fix`
@@ -228,11 +237,6 @@ image::figures/branch-1.png
   * Insert `1984` instead of `???` in line 8
 
   * Commit the changes
-
-------
-$ git checkout -b bug-fix
-$ git commit -m "Fixed missing year in Chapter 3."
-------
 
 
 === Creating Branch from Revision
@@ -259,7 +263,7 @@ $ git checkout -b my-new-branch a75b1b0
 $ git merge my-new-branch
 ------
 
-
+[style="two-column"]
 === Try Out
 
 ------
@@ -267,8 +271,9 @@ $ git checkout master
 $ git commit -m "Fixed incorrect spelling of long in Chapter 3."
 ------
 
-image::figures/branch-2.png[]
+image::figures/branch-2.png[style="right",align="center"]
 
+[style="left"]
   * Switch to `master` branch
 
   * Fix the spelling of the word `long` in `chapter-3.txt`, line 6
@@ -276,14 +281,16 @@ image::figures/branch-2.png[]
   * Commit the change
 
 
+[style="two-column"]
 === Try Out
 
 ------
 $ git merge year-fix
 ------
 
-image::figures/merged.png[]
+image::figures/merged.png[style="right",align="center"]
 
+[style="left"]
   * Merge changes from the `year-fix` branch into master
 
 

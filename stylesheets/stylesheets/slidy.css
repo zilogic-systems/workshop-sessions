@@ -21,10 +21,7 @@ body
   height: 100%;
   color: black;
   background-color: white;
-/*
-  font-family: "Gill Sans MT", "Gill Sans", GillSans, sans-serif;
-*/
-  font-size: 14pt;
+  /* font-family: "Gill Sans MT", "Gill Sans", GillSans, sans-serif; */
 }
 
 div.toolbar {
@@ -107,6 +104,7 @@ div.slide {
   right: 0;
   line-height: 120%;
   background-color: transparent;
+  font-size: 140%;
 }
 
 div.background {
@@ -122,7 +120,6 @@ div.slide div.presentation-info {
     display: block; 
     line-height: 1.2em;
     background: transparent;
-    font-size: 100%;
     text-align:center;
 
     max-width: 100em;
@@ -132,18 +129,19 @@ div.slide div.presentation-info {
     margin: auto;
     bottom: 0px; top: 0px;
     left: 0px; right: 0px;
+
+    padding: 1em;
 }
 
 div.slide h1 {
     border: 0;
     padding: 0;
+    padding-bottom: 0.5em;
     margin: 0;
-    font-size: 300%;
 }
 
 div.slide h2 {
     display: block; 
-    font-size: 200%;
     line-height: 1.2em;
     background: transparent;
     border: 0;
@@ -169,7 +167,6 @@ div.slide h3 {
   margin-right: 60pt;
   margin-bottom: 0.5em;
   display: block; 
-  font-size: 160%;
   line-height: 1.2em;
   background: transparent;
 }
@@ -478,4 +475,18 @@ ul > li > *, ol > li > * { color: black; }
 li {
   margin-top: 0.5em;
   margin-bottom: 0.5em;
+}
+
+div.two-column div.left {
+    float: left;
+    width: 45%;
+}
+
+div.two-column div.right {
+    float: right;
+    width: 45%;
+}
+
+li {
+    line-height: 1.5em;
 }
