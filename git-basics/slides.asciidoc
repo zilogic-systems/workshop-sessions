@@ -223,7 +223,7 @@ $ git checkout my-old-branch
 === Try Out
 
 ------
-$ git checkout -b bug-fix
+$ git checkout -b year-fix
 $ git commit -m "..."
 ------
 
@@ -234,7 +234,7 @@ image::figures/branch-1.png[style="right",align="center",width="60%"]
 
   * Create a bug-fix branch called `year-fix`
 
-  * Insert `1984` instead of `???` in line 8
+  * Insert `1984` instead of `????` in line 8
 
   * Commit the changes
 
@@ -295,13 +295,28 @@ $ git merge year-fix
 
   * A branch can grow after it has been merged
 
-  * The user doesn't have to do any extra book keept to deal with such
-    branches
+  * The user doesn't have to do any extra book keeping to deal with
+    such branches
 
   * Git intenally keeps track of what changes have been merged
 
   * The new changes on the branch can be merged in to the current
     branch using the same command
+
+=== Merge Growing Branches
+
+------
+$ git checkout year-fix
+$ ... Edit chapter-3.txt ...
+$ git commit -m "..."
+$ git checkout master
+$ git merge year-fix
+------
+
+  * Checkout `year-fix`
+  * In chapter 3, insert `1991` instead of `????` in line 32, and commit
+  * Checkout `master`
+  * Merge the changes from `year-fix`.
 
 == Track and Untrack Files
 

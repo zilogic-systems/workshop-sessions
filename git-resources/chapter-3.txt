@@ -29,7 +29,7 @@ become famous; most are known mainly within their profession, by other
 hackers who use or work on their code. All together have helped to
 liberate the potential of the computer network for all humanity.
 
-In 1991, the last major essential component of a Unix-like system was
+In ????, the last major essential component of a Unix-like system was
 developed: Linux, the free kernel written by Linus Torvalds. Today,
 the combination of GNU and Linux is used by millions of people around
 the world, and its popularity is growing. This month, we announced
