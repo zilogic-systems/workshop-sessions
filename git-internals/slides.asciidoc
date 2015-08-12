@@ -1,0 +1,267 @@
+= Git Internals
+Zilogic Systems <training@zilogic.com>
+
+== Simple Single File Model
+
+=== Basic Requirements
+
+  * Store each revision of the project.
+
+  * Retrieve the state of the project at a specified revision
+
+[role="two-column"]
+=== Single File Model
+
+[role="left"]
+------
+proj/
++ .git/
+| + objects/
+| | + file.txt.v1
+| | + file.txt.v2
+| | + file.txt.v3
+| + master
+|
++ file.txt
+------
+
+[role="right"]
+  * Repository has directory called `objects`
+  * When user wants to take a snapshot: copy `file.txt` into `objects`
+  * The filename is suffixed with revision no. of the file
+
+[role="two-column"]
+=== Single File Model (Contd.)
+
+[role="left"]
+------
+proj/
++ .git/
+| + objects/
+| | + file.txt.v1
+| | + file.txt.v2
+| | + file.txt.v3
+| + master
+|
++ file.txt
+------
+ 
+[role="right"]
+  * When a new version is added the file will have the suffix `.v4`
+  * `master` holds the name of the latest revision
+
+=== DVCS
+
+image::figures/dvcs.png[align="center",width="60%"]
+
+[width="50%"]
+Distributed versions control systems allows each user to create
+commits, in their local repo.
+
+=== SHA1
+
+  * Idea: Use SHA1 sum of the content to identify the file.
+  * SHA1 is similar to checksum algorithms: but 20-bytes long
+  * Interesting property: no two files will have the same
+    checksum. (very low probability)
+  * Depicted as a 40 digit hex number: 4c7be7b2c3641a5e489c4ce667699eeee4e994c9
+  * Only first 7 digits are shown: 4c7be7b
+
+=== SHA1 Demo
+
+------
+$ echo "Hello World" > test.txt
+$ sha1sum test.txt
+648a6a6ffffdaa0badb23b8baf90b6168dd16b3a  test.txt
+
+$ echo "Hallo World" > test.txt
+$ sha1sum test.txt
+c54c65218154f15c32ca252946786e0ad09aa99b  test.txt
+------
+
+[role="tip"]
+=== //
+
+SHA1 Collision: http://stackoverflow.com/q/1867191
+
+=== Using SHA1
+
+image::figures/dvcs-sha1.png[align="center"]
+
+== SHA1 Single File Model
+
+[role="two-column"]
+=== Storing file using SHA1
+
+[role="left"]
+------
+proj/
++ .git/
+| + objects/
+| | + 4c7be7b...
+| | + c9360f5...
+| | + da39a3e...
+| + master
+|
++ file.txt
+------
+
+[role="right"]
+  * Using SHA1 avoids collision
+
+  * But the ordering of the commits is lost
+
+  * Lastest revision is in `master`
+
+  * But previous revision is not known!
+
+  * No meta information about the changes: who? why? when?
+
+=== Ordering Lost
+
+image::figures/no-commit-objects.png[align="center",width="40%"]
+
+=== Commit Object
+
+  * Regular files stored in the repo are called "blob"s
+
+  * Objects representing commits are stored in the repo: commit object
+  
+  * Each commit object gets its own SHA1
+
+  * Contains the following information
+    - log message
+    - author name
+    - time of commit
+    - SHA1 of the blob, that belongs to the commit
+    - SHA1 of the parent commit object
+
+=== Ordering Regained
+
+image::figures/commit-objects.png[align="center",width="40%"]
+
+== Ordered Single File Model
+
+[role="two-column"]
+=== Blobs + Commit Objects
+
+[role="left"]
+------
+proj/
++ .git/
+| + objects/
+| | + 4c7be7b... # B
+| | + c9360f5... # B
+| | + da39a3e... # B
+| | + 5d7be7c... # C
+| | + da470f6... # C
+| | + cb2aa3f... # C
+| |
+| + master
+|
++ file.txt
+------
+
+[role="right"]
+  * Repo stores commit objects and blobs.
+
+  * The `master` contains SHA1 of the commit object, now.
+
+== Detached Head Model
+
+=== Where is my head?
+
+  * If latest revision is checked out, the model works file
+
+  * If an older revision is checked out, we need to keep track of it
+
+  * This is required for example, when a diff is done
+
+[role="two-column"]
+=== Tracking Head
+
+[role="left"]
+------
+proj/
++ .git/
+| + objects/
+| | + 4c7be7b...
+| | + c9360f5...
+| | + da39a3e...
+| | + 5d7be7c...
+| | + da470f6...
+| | + cb2aa3f...
+| |
+| + master
+| + HEAD
+|
++ file.txt
+------
+
+[role="right"]
+  * `master` should always point to the latest revision
+
+  * Expand our model, with a another file `HEAD`
+
+    - Contains the text `master`, if working copy is the latest revision
+    - Contains the SHA1SUM of the commit, otherwise
+
+== Multi-Branch Model
+
+[role="two-column"]
+=== Storing Branches 
+
+[role="left"]
+------
+proj/
++ .git/
+| + objects/
+| | + 4c7be7b...
+| |   ...
+| |
+| + refs
+| | + heads
+| |   + master
+| |   + year-fix
+| |
+| + HEAD
+|
++ file.txt
+------
+
+[role="right"]
+  * A directory called `refs/heads` contains one file for each branch
+  * Each file contains the SHA1 of the latest commit
+  * HEAD contains
+    - The path to the current branch
+    - Or the SHA1 of a commit, if detached
+
+[role="two-column"]
+=== Storing Branches (Contd.)
+
+[role="left"]
+------
+proj/
++ .git/
+| + objects/
+| | + 4c7be7b...
+| |   ...
+| |
+| + refs
+| | + heads
+| |   + master
+| |   + year-fix
+| |
+| + HEAD
+|
++ file.txt
+------
+
+[role="right"]
+  * HEAD specifies the branch to advance when a commit is done
+  * Branches are extremely light weight.
+  * Branch creation: creating a file, with the SHA1 of commit.
+
+== Merge Model
+
+== Multi-File Model
