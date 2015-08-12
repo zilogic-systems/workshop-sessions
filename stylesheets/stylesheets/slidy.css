@@ -515,3 +515,18 @@ div.imageblock img {
 pre {
     overflow: auto;
 }
+
+div.tip h3 {
+    display: none;
+}
+
+div.tip p {
+    text-align:center;
+    max-width: 80vw;
+    height: 2em;
+
+    position: absolute;
+    margin: auto;
+    bottom: 0px; top: 0px;
+    left: 0px; right: 0px;
+}
