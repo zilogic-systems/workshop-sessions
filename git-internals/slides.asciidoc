@@ -121,6 +121,13 @@ proj/
 
 image::figures/no-commit-objects.png[align="center",width="40%"]
 
+== Ordered Single File Model
+
+[role="tip"]
+=== //
+
+Add support for storing commit objects.
+
 === Commit Object
 
   * Regular files stored in the repo are called "blob"s
@@ -139,8 +146,6 @@ image::figures/no-commit-objects.png[align="center",width="40%"]
 === Ordering Regained
 
 image::figures/commit-objects.png[align="center",width="40%"]
-
-== Ordered Single File Model
 
 [role="two-column"]
 === Blobs + Commit Objects
@@ -169,7 +174,12 @@ proj/
 
 == Detached Head Model
 
-=== Where is my head?
+[role="tip"]
+=== //
+
+Add support for tracking current checkout revision.
+
+=== Which is my head?
 
   * If latest revision is checked out, the model works file
 
@@ -207,6 +217,11 @@ proj/
     - Contains the SHA1SUM of the commit, otherwise
 
 == Multi-Branch Model
+
+[role="tip"]
+=== //
+
+Add support for tracking multiple branches.
 
 [role="two-column"]
 === Storing Branches 
@@ -262,6 +277,70 @@ proj/
   * Branches are extremely light weight.
   * Branch creation: creating a file, with the SHA1 of commit.
 
-== Merge Model
+== Merge Commit Model
+
+[role="tip"]
+=== //
+
+Add support for tracking branch merges.
+
+[role="two-column"]
+=== Branch Merges
+
+[role="left"]
+image::figures/merged.png[align="center"]
+
+[role="right"]
+  * When two branches that have diverged are merged, a merge commit is
+    created
+
+  * Unlike regular commit objects, the merge commit will have more
+    than one parent
+
+  * The commit objects, will store the SHA1 of both the parent
+    commits
 
 == Multi-File Model
+
+[role="tip"]
+=== //
+
+Add support for handling multiple files.
+
+[role="two-column"]
+=== Multiple Files
+
+[role="left"]
+image::figures/tree.png[align="center"]
+
+[role="right"]
+  * Mutiple files are present in the project
+
+  * Each file is stored in the object database just as before
+
+  * Another object called the Tree object, is used to group the files
+
+  * The Tree object, contains the filenames and their SHA1s
+
+  * Commit object refers to the Tree object
+
+[role="two-column"]
+=== Hierarchy of Files and Directories
+
+[role="left"]
+image::figures/sub-tree.png[align="center"]
+
+[role="right"]
+  * Tree object can be used recursively to store a hierarchy of files
+    and directories
+
+  * A single SHA1 represents the state of entire project hierarchy
++
+------
+proj/
+  a.txt
+  b.txt
+  mydir/
+    c.txt
+    d.txt
+------
