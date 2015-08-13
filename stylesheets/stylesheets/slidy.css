@@ -31,7 +31,8 @@ thead, p.table.header,
 #toctitle,
 #author, #revnumber, #revdate, #revremark,
 #footer {
-  font-family: "oswald stencil", sans-serif;
+  font-family: "hagane", sans-serif;
+  font-weight: normal;
 }
 
 tt {
@@ -153,6 +154,7 @@ div.slide h1 {
     padding: 0;
     padding-bottom: 0.5em;
     margin: 0;
+    font-size: 1.6em;
 }
 
 div.slide h2 {
