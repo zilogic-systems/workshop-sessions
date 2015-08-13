@@ -290,6 +290,9 @@ image::figures/merged.png[style="right",align="center"]
 ------
 $ git merge year-fix
 ------
++
+  * A merge commit is created that represents the new state of the
+    project
 
 === Growing Branches
 
