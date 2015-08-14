@@ -288,7 +288,7 @@ Add support for tracking branch merges.
 === Branch Merges
 
 [role="left"]
-image::figures/merged.png[align="center"]
+image::figures/merge-commit.png[align="center"]
 
 [role="right"]
   * When two branches that have diverged are merged, a merge commit is
@@ -328,14 +328,6 @@ image::figures/tree.png[align="center"]
 === Hierarchy of Files and Directories
 
 [role="left"]
-image::figures/sub-tree.png[align="center"]
-
-[role="right"]
-  * Tree object can be used recursively to store a hierarchy of files
-    and directories
-
-  * A single SHA1 represents the state of entire project hierarchy
-+
 ------
 proj/
   a.txt
@@ -343,4 +335,56 @@ proj/
   mydir/
     c.txt
     d.txt
+------
+
+[role="right"]
+  * Tree object can be used recursively to store a hierarchy of files
+    and directories
+
+  * A single SHA1 specifies the state of entire project hierarchy
+
+[role="two-column"]
+=== Hierarchy of Files and Directories
+
+[role="left"]
+image::figures/sub-tree.png[align="center",width="80%"]
+
+[role="right"]
+  * Tree object can be used recursively to store a hierarchy of files
+    and directories
+
+  * A single SHA1 specifies the state of entire project hierarchy
+
+[role="two-column"]
+=== Space Savings
+
+[role="left"]
+image::figures/duplicate-files.png[align="center"]
+
+[role="right"]
+  * SHA1 of files with duplicate content is the same
+
+  * Duplicate files are stored only once
+
+=== Space Savings Across Commits
+
+image::figures/duplicate-files-across-commits.png[align="center",width="50%"]
+
+== Exploring a Git Repo
+
+=== Initial Contents
+
+------
+$ mkdir proj
+$ cd proj
+$ git init
+$ find .git
+.git
+...
+.git/refs/heads
+...
+.git/HEAD
+...
+.git/objects
+...
 ------
