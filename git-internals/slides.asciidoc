@@ -379,12 +379,56 @@ $ mkdir proj
 $ cd proj
 $ git init
 $ find .git
-.git
-...
-.git/refs/heads
-...
-.git/HEAD
-...
-.git/objects
-...
 ------
+
+=== Exploring a Commit
+
+------
+$ echo "This is a simple hello world file." > hello.txt
+$ git add hello.txt
+$ git commit -a -m "Added hello.txt."
+$ find .git
+------
+
+  * Use `git show --pretty=raw <sha1>` to view the commit object
+  * Use `git ls-tree <sha1>` to view the tree object
+  * Use `git show` to view the blob
+
+=== Handling Duplicates
+
+  * Create a copy of `hello.txt` and commit it
++
+------
+$ cp hello.txt world.txt
+$ git add world.txt
+$ git commit -a -m "Added world.txt."
+------
++
+  * Verify that there is only one object for in the object database,
+    for both the `hello.txt` and `world.txt`
+
+=== Branches
+
+  * Find out the current commit SHA1, using `git log`
+  * Create a branch called `my-branch`
++
+------
+$ git checkout -b my-branch
+------
++
+  * Verify that a branch has been using the `find` command
+
+  * Verify the file `.git/refs/heads/mybranch`, contains the current
+    commit SHA1
+
+  * Verify `.git/HEAD` points to the branch
+
+=== Merges
+
+  * Create commit on the branch
+
+  * Checkout `master` and create another commit
+
+  * Merge the branch
+
+  * Verify that the commit object has two parents
