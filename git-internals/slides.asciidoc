@@ -432,3 +432,76 @@ $ git checkout -b my-branch
   * Merge the branch
 
   * Verify that the commit object has two parents
+
+== Staging
+
+=== Tangled Working Copy Problem
+
+  * You are working on Chapter 3, of the book
+
+  * Adding a paragraph at the beginning that provides an overview of
+    the chapter
+
+  * You are not happy with the changes made
+
+  * It's late into the night, you turn-off your computer and go to
+    sleep
+
+=== Tangled Working Copy Problem (Contd.)
+
+  * You wake-up next morning, and review the contents of the book,
+    while sipping your morning coffee
+
+  * You notice that there is a spelling mistake in every chapter of
+    the book. 
+
+  * The word "software" is spelled out as "softwere"
+
+  * You immediately do a find and replace on the word and correct the
+    spelling mistake
+
+=== Tangled Working Copy Problem (Contd.)
+
+  * You want to commit this spelling mistake fix, and you do a diff to
+    verify before the commit
+
+  * It is now that you realize that you were already working on a
+    change, to Chapter 3.
+
+  * You do not want to commit the paragraph that you added to Chapter
+    3, but you want commit the spelling fixes
+
+[role="tip"]
+=== //
+
+This situation is what we call the "Tangled Working Copy Problem."
+
+
+[role="tip"]
+=== //
+
+Blog Article: http://2ndscale.com/rtomayko/2008/the-thing-about-git
+
+=== Staging
+
+  * Git's staging feature addresses exactly this problem
+
+  * Changes to be part of the commit can be "staged"
+
+  * And staged changes can be committed
+
+=== Using Staging (1)
+
+image::figures/stage-1.png[align="center"]
+
+=== Using Staging (2)
+
+image::figures/stage-2.png[align="center"]
+
+=== Using Staging (3)
+
+image::figures/stage-3.png[align="center"]
+
+=== Using Staging (4)
+
+image::figures/stage-4.png[align="center"]
