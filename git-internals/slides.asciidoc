@@ -505,3 +505,87 @@ image::figures/stage-3.png[align="center"]
 === Using Staging (4)
 
 image::figures/stage-4.png[align="center"]
+
+=== Staging Commands
+
+  * Files can be staged using `git stage`
++
+------
+$ git stage chapter-1.txt
+------
++
+  * Staged files can be committed using, `git commit`, without the
+    `-a` option.
++
+------
+$ git commit
+------
+
+=== Staging Commands
+
+  * View files that have been staged
++
+------
+$ git status
+------
++
+  * Show the following categories of files
+
+    - Files that have been staged
+    - Files that have been changed but not staged
+    - Files that are not tracked
+
+=== Staging Hunks
+
+  * `chapter-2.txt` has two unrelated changes in a single file
+
+  * Specific hunks in a file can be staged using `--patch` option
++
+------
+$ git stage --patch chapter-2.txt
+------
++
+  * The file to be committed will have only those changes
+
+
+=== Staging Hunks (2)
+
+  * For each modified hunk, Git will prompt
++
+------
+Stage this hunk [y,n,q,a,d,/,K,j,J,g,e,?]?
+------
++
+    - `y` - stage the hunk
+    - `n` - do not stage the hunk
+    - `q` - do not stage this hunk, and any of the remaining ones
+    - `a` - stage this hunk, and all later hunks in the file
+    - `s` - split the hunk into smaller hunks
+
+=== Unstaging Files and Hunks
+
+  * Files can be unstaged using `git reset`
++
+------
+git reset chapter-2.txt
+------
++
+  * Hunks in a file can be unstaged using
++
+------
+git reset --patch chapter-2.txt
+------
+    
+=== Three Diff Types
+
+image::figures/diff.png[align="center"]
+
+[role="tip"]
+=== //
+
+`git add` == `git stage`
+
+[role="tip"]
+=== //
+
+staging == index == cache
