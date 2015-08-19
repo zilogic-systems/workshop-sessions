@@ -437,7 +437,7 @@ $ git checkout -b my-branch
 
 === Tangled Working Copy Problem
 
-  * You are working on Chapter 3, of the book
+  * You are working on Chapter 2, of the book
 
   * Adding a paragraph at the beginning that provides an overview of
     the chapter
@@ -452,10 +452,10 @@ $ git checkout -b my-branch
   * You wake-up next morning, and review the contents of the book,
     while sipping your morning coffee
 
-  * You notice that there is a spelling mistake in every chapter of
-    the book. 
+  * You notice that there is a spelling mistake in `chapter-1.txt` and
+    `chapter-2.txt`.
 
-  * The word "software" is spelled out as "softwere"
+  * The word "freedom" is spelled out as "fredom"
 
   * You immediately do a find and replace on the word and correct the
     spelling mistake
@@ -466,10 +466,10 @@ $ git checkout -b my-branch
     verify before the commit
 
   * It is now that you realize that you were already working on a
-    change, to Chapter 3.
+    change, to Chapter 2.
 
   * You do not want to commit the paragraph that you added to Chapter
-    3, but you want commit the spelling fixes
+    2, but you want commit the spelling fixes
 
 [role="tip"]
 === //
