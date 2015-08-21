@@ -1,0 +1,270 @@
+= Git Collaboration
+Zilogic Systems <training@zilogic.com>
+
+== Merging
+
+=== Three Merge Scenarios
+
+  * Up-to-date Merge
+
+  * Fast-Forward Merge
+
+  * True Merge
+
+[role="two-column"]
+=== Up-to-date Merge Scenario
+
+[role="left"]
+image::figures/git-merge-1.png[width="50%",align="center"]
+
+[role="right"]
+------
+$ git checkout bug-fix
+$ git merge master
+------
+
+[role="two-column"]
+=== Fast-Forward Merge Scenario
+
+[role="left"]
+image::figures/git-merge-2.png[width="50%",align="center"]
+
+[role="right"]
+------
+$ git checkout master
+$ git merge bug-fix
+------
+
+[role="two-column"]
+=== Fast-Forward Merge Scenario (1)
+
+[role="left"]
+image::figures/git-merged-2.png[width="50%",align="center"]
+
+[role="right"]
+------
+$ git checkout master
+$ git merge bug-fix
+------
+
+[role="two-column"]
+=== True Merge Scenario
+
+[role="left"]
+image::figures/git-merge-3.png[width="50%",align="center"]
+
+[role="right"]
+------
+$ git checkout master
+$ git merge bug-fix
+------
+
+[role="two-column"]
+=== True Merge Scenario (1)
+
+[role="left"]
+image::figures/git-merged-3.png[width="50%",align="center"]
+
+[role="right"]
+------
+$ git checkout master
+$ git merge bug-fix
+------
+
+=== Merge Conflicts
+
+== Remote Repositories
+
+[role="two-column"]
+=== Git Clone
+
+[role="left"]
+image::figures/clone.png[align="center",width="50%"]
+
+[role="right"]
+  * Shared repository can be hosted in a public server
+
+  * Each user has to 'clone' the repository
+
+  * After a clone, a completely identical copy is available to the
+    user in the local system
+
+[role="two-column"]
+=== Linux Kernel Git Repostiroy
+
+[role="left"]
+image::figures/linux-git-screenshot.png[align="center"]
+
+[role="right"]
+  * The repository to be cloned, is specified using a URL
+
+  * The URL specifies
+    - The remote server address
+    - The path to the repository
+    - The transport protocol
+
+=== Git Protocol
+
+------
+git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+------
+
+  * `git://` specifies the "Git" protocol
+  * `git.kernel.org` specifies the server address
+  * `/pub/scm/linux/kernel/git/torvalds/linux.git` specifies the path
+    in the server
+
+=== HTTP Protocol
+
+------
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+------
+
+  * `https://` specifies the HTTP protocol
+  * `git.kernel.org` specifies the server address
+  * `/pub/scm/linux/kernel/git/torvalds/linux.git` specifies the path
+    in the server
+
+=== File Protocol
+
+------
+file:///home/userA/book.git
+------
+
+  * `file://` specifes that the repository is located in the same
+    system
+
+  * `/home/userA/book.git` specifies the path to the repository
+
+=== Try Out
+
+  * Create three folders `public`, `userA`, `userB`
+  * Changed directory to `public` and extract `book.git.tar.gz`
+  * The final folder structure should be
++
+------
++ public/
+| + book.git/
++ userA/
++ userB/
+------
+
+=== Try Out
+
+  * Change directory to `userA` and clone the book repository present
+    in `public`
++
+------
+$ git clone file:///path/to/repo/public/book.git
+------
++
+  * Examine the cloned repository:
++
+------
+$ cd book
+$ ls
+$ git log
+$ git branch
+------
+
+=== Remotes
+
+  * Typing Git URLs can be hard and tedious
+
+  * It is also possible to work with multiple remote Git repositories
+    in the same project
+
+  * Git makes it easy by assigning short names for each remote repository
++
+------
+$ git remote -v
+------
++
+  * `origin` is the default name given to the repository from which
+    the current repository was cloned
+
+=== Sharing Changes
+
+  * Local commits can be published to the remote repository using `git
+    push <remote-name> <local-branch-name>:<remote-branch-name>`
+
+  * Fix the spelling of the word `freedom` in `chapter-1.txt` and
+    `chapter-2.txt`, and commit.
+
+  * Publish the changes using
++
+------
+$ git push origin master:master
+------
+
+=== Visualizing Push
+
+image::figures/push-1.png[]
+
+=== Visualizing Push (2)
+
+image::figures/push-2.png[]
+
+=== Verifying the Push
+
+  * Change directory to `userB` and clone the `public` book repository
+
+  * Verify that there are two commits in the cloned repository
+
+=== Updates from the Repo
+
+image::figures/central-repo.png[width="60%",align="center"]
+
+=== Fetching Changes
+
+  * Change back to `userA` book repository
+
+  * Fix the missing year in line 8 of `chapter-3.txt` and make a
+    commit
+
+  * Push the changes to the `public` book repository
+
+  * Go back to `userB` book repository
+
+  * Fetch the changes from the repository using
++
+------
+$ git fetch origin master
+------
+
+=== Visualizing Fetch
+
+image::figures/fetch-1.png[align="center"]
+
+=== Visualizing Fetch (2)
+
+image::figures/fetch-2.png[align="center"]
+
+=== Verifying Fetch
+
+  * Do a `git log` to verify the changes were fetched
+
+  * The log does not show the latest commit made
+
+  * The changes were fetched but do not appear in the `master` branch
+
+=== Remote Tracking Branch
+
+  * Run `git branch` with `-r` option
+
+  * This will show additional branches, called remote tracking branches
+
+  * These are local branches that represent the state of the remote
+    branches
+
+  * They are named as `<remote-name>/<branch-name>`
+
+  * Example: `origin/master`
+
+  * These branches cannot be committed to, AKA read-only
+
+  * `git fetch` updates only these branches
+
+=== Visualizing Fetch (3)
+
+image::figures/fetch-3.png[align="center"]
