@@ -344,7 +344,7 @@ $ git commit -a -m "Added a Chapter 4."
   * Remove the file `chapter-4.txt`.
 +
 ------
-$ rm chapter-4.txt
+$ git rm chapter-4.txt
 ------
 +
   * Commit the removal of the file.
