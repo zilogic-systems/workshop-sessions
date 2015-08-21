@@ -111,7 +111,7 @@ proj/
 
   * But the ordering of the commits is lost
 
-  * Lastest revision is in `master`
+  * Latest revision is in `master`
 
   * But previous revision is not known!
 
@@ -181,7 +181,7 @@ Add support for tracking current checkout revision.
 
 === Which is my head?
 
-  * If latest revision is checked out, the model works file
+  * If latest revision is checked out, the model works fine
 
   * If an older revision is checked out, we need to keep track of it
 
@@ -314,7 +314,7 @@ Add support for handling multiple files.
 image::figures/tree.png[align="center"]
 
 [role="right"]
-  * Mutiple files are present in the project
+  * Multiple files are present in the project
 
   * Each file is stored in the object database just as before
 
