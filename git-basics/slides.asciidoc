@@ -370,6 +370,27 @@ $ git status
 
 == Creating a New Repository
 
+=== Set-up
+
+  * Tell Git your name and email address
+
+  * This will be included in the commit 
++
+------
+$ git config --global user.name "Your Name"
+$ git config --global user.email "you@example.org"
+------
++
+  * The global config is stored in `~/.gitconfig`
+
+  * Per project config is stored in `.git/config`
+
+[role="tip"]
+=== //
+
+In Windows, use `git config --global --edit` to figure where exactly
+the global config is stored.
+
 === Initializing an Empty Repo
 
   * Create a new project folder

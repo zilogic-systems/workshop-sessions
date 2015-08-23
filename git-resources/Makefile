@@ -7,6 +7,8 @@ book-git: $(files)
 	mkdir book
 	cp $^ book
 	cd book; git init
+	cd book; git config user.name "User"
+	cd book; git config user.email user@example.com
 	cd book; git add $^
 	cd book; git commit -a -m "Initial book project."
 
