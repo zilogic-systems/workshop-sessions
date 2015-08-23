@@ -297,5 +297,38 @@ image::figures/fetch-3.png[align="center"]
 
 === Merging Remote Tracking Branch
 
-TBD
+  * We have two branches `master` and `origin/master`
+
+  * We want changes from one branch to be integrated into another
+    branch
+
+  * The changes can be integrated using a merge
++
+------
+$ git checkout master
+$ git merge origin/master
+------
+
+=== Adding Remotes
+
+  * Multiple public repository scenario -- GitHub
+
+  * Each user pushes to his own public repository
+
+  * A user can fetch from any public repository
+
+  * Each remote repository can be added with its own name
++
+------
+$ git remote add <name> <url>
+$ git fetch <remote-name>
+------ 
+
+=== Listing Remotes
+
+  * Remotes can be listed using
++
+------
+$ git remote -vv
+------
 
