@@ -327,6 +327,8 @@ $ git merge year-fix
 
   * Create a file called `chapter-4.txt`.
 
+  * `git status` will indicate that the file is untracked
+
   * Tell Git to start tracking the file.
 +
 -----
@@ -338,6 +340,8 @@ $ git add chapter-4.txt
 -----
 $ git commit -a -m "Added a Chapter 4."
 -----
++
+  * `chapter-4.txt` is no longer indicated as untracked
 
 === Stop Tracking Files
 
