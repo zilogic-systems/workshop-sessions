@@ -5,11 +5,35 @@ Zilogic Systems <training@zilogic.com>
 
 === Three Merge Scenarios
 
+  * True Merge
+
   * Up-to-date Merge
 
   * Fast-Forward Merge
 
-  * True Merge
+[role="two-column"]
+=== True Merge Scenario
+
+[role="left"]
+image::figures/git-merge-3.png[width="50%",align="center"]
+
+[role="right"]
+------
+$ git checkout master
+$ git merge bug-fix
+------
+
+[role="two-column"]
+=== True Merge Scenario (1)
+
+[role="left"]
+image::figures/git-merged-3.png[width="50%",align="center"]
+
+[role="right"]
+------
+$ git checkout master
+$ git merge bug-fix
+------
 
 [role="two-column"]
 === Up-to-date Merge Scenario
@@ -47,31 +71,33 @@ $ git checkout master
 $ git merge bug-fix
 ------
 
-[role="two-column"]
-=== True Merge Scenario
+=== Try Out
 
-[role="left"]
-image::figures/git-merge-3.png[width="50%",align="center"]
+  * Extract a fresh copy of `book.tar.gz`
 
-[role="right"]
-------
-$ git checkout master
-$ git merge bug-fix
-------
+  * Create a branch `year-fix`
 
-[role="two-column"]
-=== True Merge Scenario (1)
+  * Fix the missing year in line 8, in `chapter-3.txt`, and commit
 
-[role="left"]
-image::figures/git-merged-3.png[width="50%",align="center"]
+  * View the status of the branches using `git branch -v`
 
-[role="right"]
-------
-$ git checkout master
-$ git merge bug-fix
-------
+=== Try Out (Contd.)
+
+  * Try merging changes from `master` branch
+
+  * The merge command indicates no changes were made
+
+  * Verify that using `git branch -v`
+
+  * Checkout `master` and try merging changes from `year-fix` branch
+
+  * The merge command inidcates a fast-forward was done
+
+  * Verify that using `git branch -v`
 
 === Merge Conflicts
+
+TBD
 
 == Remote Repositories
 
@@ -268,3 +294,8 @@ image::figures/fetch-2.png[align="center"]
 === Visualizing Fetch (3)
 
 image::figures/fetch-3.png[align="center"]
+
+=== Merging Remote Tracking Branch
+
+TBD
+
