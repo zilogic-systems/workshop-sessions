@@ -376,13 +376,17 @@ $ git status
 
 === Set-up
 
-  * Tell Git your name and email address
+  * Tell Git your name, email address and your default editor
 
-  * This will be included in the commit 
+  * The name and email address will be included in the commit 
+
+  * The editor will be used when Git wants multi-line input from the
+    user, like when the commit message is not specified
 +
 ------
 $ git config --global user.name "Your Name"
 $ git config --global user.email "you@example.org"
+$ git config --global core.editor your-favourite-editor
 ------
 +
   * The global config is stored in `~/.gitconfig`
