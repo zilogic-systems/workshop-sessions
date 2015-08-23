@@ -97,7 +97,33 @@ $ git merge bug-fix
 
 === Merge Conflicts
 
-TBD
+  * Extract a fresh copy of `book.tar.gz`
+
+  * Create a branch `year-fix`
+
+  * Fix the missing year in line 8, in `chapter-3.txt` with the number
+    `1984`, and commit
+
+  * Checkout `master`
+
+  * Fix the missing year in line 8, in `chapter-3.txt` with the number
+    `1983`, and commit
+
+  * Merge changes from `year-fix`
+
+=== Merge Conflicts (Contd.)
+
+  * `git status` will indicate the conflicted files
+
+  * Two options
+
+    - abort merge
+    - conflict can be resolved
+
+  * To abort merge `git merge --abort`
+
+  * To resolve conflict keep the required change, remove conflict
+    markers, and do a `git add`, and then `git commit`.
 
 == Remote Repositories
 
