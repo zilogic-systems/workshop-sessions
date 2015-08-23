@@ -224,7 +224,7 @@ $ git checkout my-old-branch
 
 ------
 $ git checkout -b year-fix
-$ git commit -m "..."
+$ git commit -a -m "..."
 ------
 
 image::figures/branch-1.png[style="right",align="center",width="60%"]
@@ -276,7 +276,7 @@ image::figures/branch-2.png[style="right",align="center"]
 +
 ------
 $ git checkout master
-$ git commit -m "..."
+$ git commit -a -m "..."
 ------
 
 [style="two-column"]
@@ -311,7 +311,7 @@ $ git merge year-fix
 ------
 $ git checkout year-fix
 $ ... Edit chapter-3.txt ...
-$ git commit -m "..."
+$ git commit -a -m "..."
 $ git checkout master
 $ git merge year-fix
 ------
