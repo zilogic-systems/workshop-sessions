@@ -498,12 +498,18 @@ div.two-column div.left {
     float: left;
     width: 49%;
     overflow: auto;
+    padding-left: 0.5%;
+    padding-right: 0.5%;
+    margin: 0;
 }
 
 div.two-column div.right {
     float: right;
     width: 49%;
     overflow: auto;
+    padding-left: 0.5%;
+    padding-right: 0.5%;
+    margin: 0;
 }
 
 li {
