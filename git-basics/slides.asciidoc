@@ -53,7 +53,7 @@ image::figures/bug-fix.png[style="left",align="center",width="60%"]
   * Can be instructed to take snapshot of source code - *revisions*
   * Process of making a snapshot - *commit*
   * Previous revisions can be retrieved at any time
-  * Revisions released to customers can be *tag*ged
+  * Revisions released to customers can be *tag*-ged
   * Multiple branches can be tracked
   * The data store containing the previous revisions is called a
     repository or *repo*
