@@ -1,0 +1,493 @@
+= Building a Root FS
+Zilogic Systems <training@zilogic.com>
+
+== Using Qemu
+
+[role="two-column"]
+=== Qemu, Introduction
+
+[role="left"]
+image::figures/qemu.png[align="center"]
+
+[role="right"]
+  * Emulates a full system -- processor and peripherals
+
+  * Can emulate various architectures including x86, ARM, SPARC,
+    PowerPC
+
+  * Operating Systems like Linux and Windows can be run within the
+    emulated system
+
+  * Useful for testing and developing Embedded Systems
+
+  * Android emulator is a modified version of Qemu
+
+[role="two-column"]
+=== ARM Emulation
+
+[role="left"]
+image::figures/gumstix.jpg[align="center"]
+
+[role="right"]
+  * Supported ARM SoCs include Exynos4210, PXA255, PXA270, OMAP2420,
+    LM3S811
+
+  * Versatile Platform Baseboard -- an extensible system from ARM,
+    will be used for development
+
+  * By default Versatile Platform Board emulation uses an ARM926EJ-S
+    core
+
+[role="two-column"]
+=== Comparison to VirtualBox
+
+[role="left"]
+image::figures/virtualbox-logo.png[align="center"]
+
+[role="right"]
+  * Support non-native architectures unlike VirtualBox
+
+  * Qemu relies on KVM, for acceleration
+
+  * Runs slow on Windows compared to VirtualBox
+
+[role="two-column"]
+=== Built-in Bootloader
+
+[role="left"]
+image::figures/kernel-boot.png[align="center"]
+
+[role="right"]
+  * Bootloader -- loads Operating System kernel from disk to memory,
+    and transfers control it
+
+  * Qemu has a built-in bootloader
+
+  * Given a kernel, Qemu copies it to memory, and sets the Program
+    Counter to the kernel's entry point
+
+  * Boot arguments to the kernel can be specified
+
+=== Booting Linux
+
+[source,shell]w
+------
+include::cmd/boot-prebuilt.sh[]
+------
+
+`-M`:: Specifies the machine type. `versatilepb` for Versatile Platform Board.
+`-hda`:: Specifies the hard disk image.
+
+=== Booting Linux (Contd.)
+
+[source,shell]
+------
+include::cmd/boot-prebuilt.sh[]
+------
+
+`-kernel`:: Specifies the kernel image filename
+
+`-append`:: Specifies the kernel boot argument. `root=/dev/sda rw`
+            specifies the root should be mounted from the harddisk
+
+
+== Minimal Filesystem V0
+
+=== //
+
+[role="tip"]
+Rootfs contains only a Hello World program.
+
+[role="two-column"]
+=== Directories
+
+[role="left"]
+------
+yp
+ + pre-built
+   + zImage
+   + disk.img
+ + dl
+   + bash-4.3.tar.gz
+   + coreutils-6.7.tar.bz2
+ + manual
+   + rootfs
+   + disk.img
+-------
+
+[role="right"]
+  * `~/yp/pre-built`: contains pre-built kernel and root filesystem images
+  * `~/yp/dl`: contains files downloaded from the Internet
+  * `~/yp/manual`: the manual build directory
+  * `~/yp/manual/rootfs`: contains the root filesystem
+
+=== Setup Environment
+
+Setup the following environment variables, to save typing.
+
+[source,shell]
+------
+include::cmd/setup-env.sh[]
+------
+
+=== Create Hello World Program
+
+Create `~/yp/manual/hello.c`, with the following content, using a text editor.
+
+[source,c]
+------
+include::cmd/hello.c[]
+------
+
+=== Cross-Compile Hello World
+
+  * The cross-compiler toolchain has the prefix
+    `arm-none-linux-gnueabi-`
++
+[source,shell]
+------
+include::cmd/build-hello.sh[]
+------
++
+  * `-static` specifies that the program should be linked statically
+  * All library functions will be included into the executable
+
+=== Create the Rootfs
+
+  * Copy the `hello` executable into the root filesystem
++
+[source,shell]
+------
+include::cmd/copy-hello.sh[]
+------
++
+  * Create EXT2 filesystem image using `genext2fs`
++
+[source,shell]
+------
+include::cmd/create-hello-rootfs.sh[]
+------
++
+  * `-b` option specifies the size of the rootfs in blocks (of size
+    1024 bytes)
+
+  * `-d` specifies the directory containing the rootfs
+
+=== Boot the Kernel with Hello 
+
+  * Boot the kernel with new disk image.
++
+[source,shell]
+------
+include::cmd/boot-hello-rootfs.sh[]
+------
++
+  * `init` boot arguments is set to `/bin/hello`
+  * Kernel will execute the program specified in `init` after boot-up
+
+== Minimal Filesystem V1
+
+=== //
+
+[role="tip"]
+Rootfs contains only the shell.
+
+=== Building Bash
+
+  * Very very minimal system -- kernel boots up and runs the shell
+
+  * Download bash from http://ftp.gnu.org/gnu/bash/bash-4.3.tar.gz
++
+[source,shell]
+------
+include::cmd/download-bash.sh[]
+------
++
+  * Unpack the source tar ball
++
+[source,shell]
+------
+include::cmd/unpack-bash.sh[]
+------
+
+=== Building Bash (2)
+
+  * Configure for cross-compilation
++
+[source,shell]
+------
+include::cmd/configure-bash.sh[]
+------
++
+  * Building the programs
++
+[source,shell]
+------
+include::cmd/build-bash.sh[]
+------
+
+=== Install Bash
+
+  * Installing into root filesystem
++
+[source,shell]
+------
+include::cmd/install-bash.sh[]
+------
++
+  * Shell scripts expect to find `bash` in `/bin/bash` or `/bin/sh`.
+
+  * But `bash` is located in `/usr/bin/bash`. Link it into `/bin`
++
+[source,shell]
+------
+include::cmd/link-bash.sh[]
+------
+
+=== Determine the Dependencies
+
+  * The `bash` executable requires certain libraries to execute --
+    `libc.so.6` and `libdl.so.2`.
++
+[source,shell]
+-----
+include::cmd/check-bash-deps.sh[]
+-----
+
+=== Copy the Dependencies
+
+  * Available from the toolchain location
++
+[source,shell]
+-----
+include::cmd/cp-bash-deps.sh[]
+-----
+
+=== Copy the Dependencies (2)
+
+  * Any program using dynamic libraries requires the dynamic linker
+    `ld-linux.so.3`
++
+[source,shell]
+------
+include::cmd/copy-ld.sh[]
+------
+
+=== Add Required Directories
+
+[source,shell]
+------
+include::cmd/make-dev-tmp.sh[]
+------
+
+  * `/dev` is required for device files
+  * `/tmp` is required for creating temporary files
+
+=== Create the Harddisk Image
+
+  * Create EXT2 filesystem image using `genext2fs`
++
+[source,shell]
+------
+include::cmd/create-bash-rootfs.sh[]
+------
+
+=== Boot the Kernel Image
+
+  * Boot the kernel with new disk image.
++
+[source,shell]
+------
+include::cmd/boot-bash-rootfs.sh[]
+------
++
+  * Basic navigation command works, but `ls` doesn't.
+
+  * Use `echo *` instead!
+
+== Minimal Filesystem V2
+
+=== //
+
+[role="tip"]
+Add basic filesystem commands like `ls`.
+
+=== Improvements
+
+  * A filesystem without `ls` is pretty hard to work with.
+
+  * Let's get `ls` to work.
+
+  * `ls` is part of the `coreutils` package.
+
+=== Download and Install `coreutils`
+
+[source,shell]
+------
+include::cmd/build-coreutils.sh[]
+------
+
+=== Recreate Disk Image
+
+  * Recreate the disk image and boot.
++
+[source,shell]
+------
+include::cmd/create-ls-rootfs.sh[]
+------
++
+  * Try the new root filesystem. Check if `ls` works.
+
+=== //
+
+[role="tip"]
+Oops! What did we miss?
+
+=== Determine the Dependencies
+
+  * Determine the dependencies a copy them to the root filesystem
++
+[source,shell]
+------
+include::cmd/check-ls-deps.sh[]
+------
++
+  * Rebuild the image, and boot
+
+=== //
+
+[role="tip"]
+Still missing something?
+
+=== Libraries Have Dependencies
+
+  * `librt` depends on `libpthread`!
+
+  * Copy `libpthread`, rebuild the image and boot
+
+  * Phew!
+
+== Minimal Filesystem V3
+
+=== //
+
+[role="tip"]
+Add support for the `less` pager
+
+=== Support for `less`
+
+  * `less` is not a terribly important tool
+
+  * But we will be building it to demonstrate library dependencies
+
+=== Download and Configure `less`
+
+------
+include::cmd/build-less-fail.sh[]
+------
+
+  * Configure fails due to a missing dependency on `libncurses`.
+
+  * `libncurses` is not provided as part of the toolchain.
+
+=== Download and Install `libncurses`
+
+------
+include::cmd/build-ncurses.sh[]
+------
+
+=== Re-configure `less`
+
+------
+include::cmd/build-less-fail-2.sh[]
+------
+
+=== Locating Header Files and Libraries
+
+  * The build system is not able to find `libncurses`
+  * The header files and library files are not on the standard search
+    path
+  * Additional paths need to specified using `-I` and `-L` options to
+    the preprocessor and linker
+
+=== Include and Library Path
+
+Create a file called `~/yp/manual/hello-ncurses.c`, with the following content.
+
+[source,c]
+------
+include::cmd/hello-ncurses.c[]
+------
+
+=== Include and Library Path (2)
+
+  * Try compiling with the cross-compiler
++
+[source,shell]
+------
+include::cmd/build-hello-ncurses.sh[]
+------
++
+  * The header file is installed in `$ROOTFS/usr/include`, the library
+    file is installed in `$ROOTFS/usr/lib`
++
+[source,shell]
+------
+include::cmd/check-ncurses-location.sh[]
+------
+
+=== Include and Library Path (3)
+
+   * Add these paths to the preprocessor and linker search paths
++
+[source,shell]
+------
+include::cmd/build-hello-ncurses-2.sh[]
+------
++
+   * These paths needs to added while running the `configure` script
+
+=== Re-configure `less`
+
+  * Configure allows additional variables to be set in the command
+    line.
++
+------
+./configure --help
+Usage: ./configure [OPTION]... [VAR=VALUE]...
+------
++
+  * Variables `CPPFLAGS` and `LDFLAGS` can be set, to pass
+    preprocessor and linker options
+
+  * Add location of `libncurses` header files by setting
+    `CPPFLAGS=$ROOTFS/usr/include`.
+
+  * Add location of `libncurses` library files by setting
+    `LDFLAGS=$ROOTFS/usr/lib`
+
+=== Re-configure `less` (2)
+
+[source,shell]
+------
+include::cmd/build-less.sh[]
+------
+
+=== Boot and Test `less`
+
+  * Rebuild the disk image, and boot
+  * Test `less` as indicated below
+
+------
+ls /dev | less
+------
+
+== Credits
+
+=== Photo Credits
+
+  * Gumstix board photo is from
+    https://commons.wikimedia.org/wiki/Category:Gumstix#/media/File:Overo_with_coin.jpg
+
+  * Android Emulator screenshot is from
+    https://commons.wikimedia.org/wiki/File:Android_screenshot.png
