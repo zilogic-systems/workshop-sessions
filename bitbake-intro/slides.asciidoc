@@ -1,0 +1,72 @@
+= BitBake, Introduction
+Zilogic Systems
+
+== Integration Build
+
+=== Makefile to Build Bash
+
+[source,Makefile]
+------
+include::code/Makefile.bash[]
+------
+
+=== Limitations
+
+  * Every time `make` is invoked, all the steps are re-run
+
+    - Non-local dependencies
+    - Multiple output files
+    - Build variable / rule changes
+
+=== Non-Local Dependencies
+
+  * Timestamp is used to determine if a rule is to be re-run
+
+  * Integration build, requires for example to download files off the
+    Internet
+
+  * Make's timestamp mechanism is not sufficient
+
+=== Multiple Output Files
+
+  * Single build step, in a integration build can produce multiple
+    output files
+
+  * For example, configuring the bash source tree, produces multiple
+    output files like `config.h`, `Makefile`, etc.
+
+  * The generated files in some cases are not even known before hand
+
+  * For example, extracting bash source tar ball
+
+  * Make is not designed to handle multiple output files in a rule
+
+=== Build Variable / Rule Changes
+
+  * If a build rule changes, the rule will not be re-run
+
+  * Make, tracks *only* the timestamps
+
+  * Also changes to build variables are not tracked. 
+
+=== BitBake
+
+  * Make designed for building a single application
+
+  * BitBake designed for building a whole stack of applications --
+    integration build
+
+    - Creates *stamp files* to identify if a task has been completed
+
+    - Generates and stores *checksums* of tasks and build variables
+
+    - Uses checksums to determine changes in build environment and
+      trigger a re-build
+
+    - *Caches* and reuses data from previous builds
+
+  * Build a complete Embedded Linux Distribution: OpenEmbedded, Yocto
+    Project
+
+== Using BitBake
+
