@@ -27,6 +27,7 @@ Zilogic Systems
 === Try Out
 
   * Setup bitbake first
+  * Setup `BBPATH`
   * Build and install bash
   * Verify in `tmp/rootfs`
   * Build and install coreutils
@@ -91,6 +92,7 @@ Zilogic Systems
 === Try Out
 
   * Setup bitbake first
+  * Setup `BBPATH`
   * Add a recipe for libncurses
   * Add a recipe for less
 
