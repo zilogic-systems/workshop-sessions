@@ -228,8 +228,9 @@ ls $ROOTFS/usr/lib
 
 ### START: build-hello-ncurses-2.sh
 arm-none-linux-gnueabi hello-ncurses.c \
-    -I $ROOTFS/usr/include            \
-    -L $ROOTFS/usr/lib
+    -I $ROOTFS/usr/include             \
+    -L $ROOTFS/usr/lib                 \
+    -lncurses
 ### END: build-hello-ncurses-2.sh
 
 ### START: build-less.sh
