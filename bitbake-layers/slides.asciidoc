@@ -1,0 +1,43 @@
+= BitBake with Layers
+Zilogic Systems
+
+== Layers
+
+=== Overview
+
+  * Layers are powerful feature of BitBake
+
+  * It allows related meta data to be clumped together
+
+  * Along with BitBake's other features, layers
+    can extend / override meta data in other layers
+
+=== Use Case: Recipe Collection
+
+  * Layer provids a way of distributing a collection of recipes
+
+  * Collection of recipes providing a feature, like GTK+ GUI, can be
+    distributed as a layer
+
+=== Use Case: BSP Support
+
+  * Layer provies a way of adding support for a particular hardware
+
+  * Recipes and configuration, to enable support for various
+    hardware peripherals
+
+=== Use Case: Customization
+
+  * Important since, may layers are distributed by other vendors
+
+  * Hard to convince a vendor to include a change, might not be
+    applicable to all users
+
+  * A mechanism is required to modify a layer, without directly
+    changing it's source
+
+  * A local custom layer, is used for this purpose
+
+== Using Layers
+
+=== Sandwich with Layers
