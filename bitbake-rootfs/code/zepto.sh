@@ -37,14 +37,14 @@ WORKDIR = "${TMPDIR}/${PN}/${PV}"
 
 ROOTFS = "${TMPDIR}/rootfs"
 DISKIMG = "${TMPDIR}/disk.img"
-DL_DIR = "~/yp/dl"
+DL_DIR = "${HOME}/yp/dl"
 TOOLCHAIN_DIR = "/usr/share/gcc-arm-linux"
 BB_NUMBER_THREADS = "2"
 EOF
 
 cat > ~/yp/zepto/classes/base.bbclass <<"EOF"
 addtask fetch
-addtask unpack after do_download
+addtask unpack after do_fetch
 addtask configure after do_unpack
 addtask compile after do_configure
 addtask install after do_compile
