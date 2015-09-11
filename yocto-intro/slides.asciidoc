@@ -1,0 +1,583 @@
+= Getting Started with Yocto
+Zilogic Systems <training@zilogic.com>
+
+== Preface
+
+=== Limitations of Zepto
+
+ * The project zepto which has been developed previously, builds 3
+   software components and has further more recipes to create a rootfs
+   image with it.
+
+ * For a bigger embedded linux projects these 3 components would not
+   be sufficient and it may require us to write recipes for huge list
+   of softwares.
+
+[style="two-column"]
+=== Solution
+
+[style="right"]
+ * To address these issues developers of bitbake had developed recipes
+   for many opensource projects and supportive infrastructure to
+   create different filesystem images.
+
+ * Bitbake developers grouped these recipes in meta layers and
+   complete this build infrastructure was called as open-embedded
+   build system.
+
+image::figures/oe-logo.png[style="left",align="center"]  
+
+=== History of Yocto
+
+ * Poky & Angstrom are two embedded distribution which were built
+   using open-embedded build system.
+ 
+ * Poky was a build system used OpenedHand Project, After Intel taking
+   over the openHanded project, Poky was adopted by Linux Foundation
+   for its Yocto Project.
+
+ * Yocto's goal was to provide complete development and test
+   environment to the embedded linux developers and vendor neutral
+   collaboration environment.
+
+== Introduction to Yocto
+
+[style="two-column"]
+=== What is Yocto 
+
+[style="right"]
+
+ * Is an Umbrella project, involves developing build tools to
+   facilitate building of custom distribuion for the embedded devices.
+
+ * More than build system, it focusses on complete build cycle
+   involving compiling, debugging, testing on simulated hardware.
+
+image::figures/yocto-project-transp.png[style="left",align="center"]  
+
+=== What is Yocto 
+
+ * Supports sufficient infrastructure to perform post build analysis
+   on the build artifacts, for their size, depdendency, quality and
+   licenses .
+
+ * Builds atomic layers to segregate and maintain software from
+   different providers separately.
+
+[style="two-column"]
+=== Yocto Vs Buildroot 
+
+[style="right"]
+  * Supports list of well tested open source softwares.
+
+  * Allows to build a managed rootfs with deb/rpm/ipk packages.
+
+  * Proivdes a complete embedded development environment.
+
+  * Well organized as layers and easily extendable
+
+  * Allows to test software on emulators without a real target device.
+
+image::figures/yocto-environment.png[style="left",align="center"]  
+
+===  Yocto internal projects
+
+Yocto develops several projects to improve build infrastructure
+
+ * Poky - reference build system
+
+ * Autobuilder - build and test automation tool
+
+ * ADT - Plugins for Eclipse/Anjuta IDE
+ 
+ * Pseudo, cross-prelink - tools required to improve build
+
+ * Hob & Toaster - UI tools to manage yocto build and their results
+
+ * Documentation - Detailed manuals to use yocto for various embedded
+   build scenarios.
+
+ * Yocto project components are maintained in git repo
+   https://git.yoctoproject.org/
+
+[style="two-column"]
+=== Poky
+
+[style="right"]
+
+ * Poky is an independent open source project, Yocto uses Poky as its
+   reference system.
+
+ * Yocto tests and provides the Poky build environment as part of its
+   releases, which when built, provides Poky reference distribution by
+   default.
+
+ * Over openembedded build system, Poky builds SDK and debugger as IDE
+   plugins, integrates QEMU for target simulation.
+
+image::figures/Poky-Logo.jpg[style="left",align="center"]  
+
+=== OpenEmbedded
+
+ * Openembedded is a independent project for embedded linux build
+   system. 
+
+ * Yocto and Openembedded share bitbake and a specific metadata(set of
+   recipes) called openembedded-core.
+
+ * Over openembedded community, Yocto ensures that oe-core meta-data
+   are well-tested and interoperable with platforms supported by
+   Yocto.
+
+ * Openembedded maintains bitbake and other recipes in
+   http://cgit.openembedded.org/
+
+ * New changes in bitbake and openembedded-core layers are merged
+   first into open-embedded repository and later pulled by Poky repo.
+
+[style="two-column"]
+=== OE Vs Poky Repo
+
+image::figures/oe-repo-cropped.png[style="left",align="center"]
+image::figures/poky-repo-cropped.png[style="right",align="center"]
+
+== Working with Yocto
+
+=== Setting up Yocto
+
+ * Install dependencies for Yocto build
+
+[source,shell]
+----
+ $ sudo apt-get install --no-install-recommends 
+            build-essential patch \
+ 	    diffstat git gawk chrpath  \
+            cpio texinfo libsdl-dev vim
+----
+
+ * Create a project directory and download yocto
+
+[source,shell]
+----
+$ mkdir -p yocto-project
+$ cd yocto-project
+$ wget -c \
+  http://downloads.yoctoproject.org/releases/yocto/yocto-1.8/poky-fido-13.0.0.tar.bz2
+----
+
+ * Unpack the poky build environment as
+
+[source,shell]
+----
+$ tar -x -f poky-fido-13.0.0.tar.bz2
+$ cd poky-fido-13.0.0
+$ ls
+----
+
+ * Extracted folder has bitbake, meta layers, scripts & oe-init
+   scripts
+
+=== Setting Up Yocto
+
+ * Set up the yocto build environment by sourcing _oe-init-build-env_
+   script file with your project name as argument.
+
+[source,shell]
+------
+$ source oe-init-build-env
+
+------
+
+ * The script creates and switches to a directory build, in which the
+   further builds would happen
+
+ * To start building, We should provide the target board (machine) for
+   which the kernel and rootfs has to be built by Poky.
+
+ * For our experiment we are going to use an arm target board emulated
+   through QEMU. 
+
+ * Which can be cofigured by exporting a shell variable as shown
+   below.
+
+[source,shell]
+------
+$ export MACHINE=qemuarm
+------
+
+=== Managing Configurations in File
+
+ * There are configurations other than MACHINE, which may need to be
+   passed to the poky build environment.
+
+ * Passing all required configurations through environment variables
+   would be inconvenient.
+
+ * And also the Poky accepts only limited configurations through
+   environment variables.
+
+ * To manage this the Poky provides a mechanism of passing
+   configurations through file.
+
+ * One such high level user manageable configuration file is
+   local.conf
+
+[source,shell]
+------
+$ nano build/conf/local.conf
+------
+
+ * Other parameters like number of threads to use, location for
+   downloading the sources, etc., can be given through local.conf
+
+=== Reducing Build Time
+
+ * Since yocto build would take huge build space, build time and
+   download bandwidth, it has facility to cache and reuse the build
+   state and download directories
+
+ * We can reuse the download dir and state-cache made available by us
+   in /opt by adding below information to the
+   build/conf/local.conf
+
+------
+DL_DIR = "/opt/downloads"
+SSTATE_DIR = "/opt/sstate-cache"
+------
+
+=== Building Minimal Rootfs
+
+ * To build the rootfs image, image name to be built has to be given
+   as argument to bitbake.
+
+ * core-image-minimal is a minimal console-only rootfs supported by
+   poky and which can be built as shown below.
+
+[source,shell]
+------
+$ bitbake core-image-minimal
+------
+
+ * Built kernel and rootfs images would be available in
+  build/tmp/deploy/images/${MACHINE} directory.
+
+ * Along with the images you may also find manifest files describing
+   the packages available in rootfs.
+
+ * The build should get completed in fewer minutes as it tries to
+   reuse state-cache
+
+ * After successful completion of the build the kernel image and
+   rootfs images would be available in the tmp/deploy/images/qemuarm
+
+[source,shell]
+--------------
+$ ls tmp/deploy/images/qemuarm/
+--------------
+
+ * The list of packages in rootfs can be read from manifest file
+
+=== Booting the the Image
+
+ * Copy the zImage to shared folder /media/sf_share and
+   core-image-minimal-qemuarm.ext4 as disk.img in /media/sf_share
+
+ * Now we can boot our new images using qemu arm as shown
+
+[source,shell]
+------
+$ ./runqemu.sh 
+------
+
+=== Customizing the Build
+
+* It is possible customize the Poky build, to add a package to image
+  or to exclude a package from the build through configuration.
+
+* We can add a package to image by appending package name to he
+  IMAGE_INSTALL variable.
+
+* We can exclude a package from the build by appending the package
+  name to PACKAGE_EXCLUDE variable.
+
+* let's check the packages built in core-image-minimal by using -g
+  option 
+
+
+[source,shell]
+------
+$ bitbake -g core-image-minimal
+------
+
+* Which generates a file named _pn-buildlist_ which has list of
+  packages that would be built by core-image-minimal.
+
+[source,shell]
+------
+$ nano pn-buildlist
+------
+
+* From this list we can find that, bash is not be built by
+  core-image-minimal.
+
+* We can enable building bash by adding below line to local.conf
+
+------
+IMAGE_INSTALL += bash
+------
+
+* Any changes made in buid/conf/local.conf is temporary and it cannot
+  me maintained, shared or version controlled.
+
+* Better practise is to maintain all our permanent changes in separate
+  layer, which can be maintained in versioning system.
+
+== Do It Yourself
+
+=== Tiny Rootfs
+
+As an experiment we can try to build the rootfs, which we had built
+earlier with zepto, now using yocto.
+
+This would involve 
+
+ * building bash, coreutils & less.
+
+ * building the ext formatted rootfs
+
+=== Creating Our Own Meta Layer
+
+ * The better practise while working with yocto, is creating your own
+   layer to hold your changes
+
+ * We can run the below command to create a layer called tiny-fs
+
+[source,shell]
+------
+$ yocto-layer create tiny-fs
+------
+
+ * It prompts for various options which you can leave to default and
+   this creates a directory meta-tiny-fs in the current directory.
+
+
+=== Creating Our Own Distribution
+
+ * By yocto convention, we may need to create a _distribution_ which has
+   information about the policies to be athered whiling building the
+   individual components.
+
+  * Distro configurations affects how the packages are configured and
+    built rather than what packages are built.
+
+  * Some of the distro configurations chooses how the system and
+    packages has to be started in boot (sysv init or systemd)
+
+  * Whether QT like UI components has to be compiled with X11 support
+    or directfb support.
+
+=== Creating Our Own Distribution
+
+  * We can create a new distribution called tiny-distro in our meta-tiny-fs
+    layer 
+
+  * Inside the meta-tiny-fs/conf create a file tiny-distro.conf and
+    write below given distro descriptions to it.
+
+[source,shell]
+------
+$ nano meta-tiny-fs/conf/tiny-distro.conf
+
+
+DISTRO = "tiny-distro"
+DISTRO_VERSION = "1.0"
+PACKAGE_CLASS = "package_deb"
+------
+
+ * since we don't have big policies thought out for our tiny
+   distribution.
+
+=== Creating Rootfs Image
+
+ * As we know that Yocto expects that the list of packages to be built
+   should be provided through a variable IMAGE_INSTALL through a
+   recipe or conf file.
+
+ * core-image-minimal.bb was packing in lots of packages into rootfs
+
+ * for our tiny-fs, we need only three packages bash, coreutils and
+   less. It is better to create our recipe to build rootfs image.
+
+ * Yocto provides core-image class which can be inheritted to used
+   already defined definitions to build rootfs image.
+
+ * sticking to yocto's convention, we can create a our image recipe
+   named core-image-tiny.bb in meta-tiny-fs/recipes-core/images/
+
+[source,shell]
+------
+$ mkdir -p meta-tiny-fs/recipes-core/images/
+------
+
+ * in this image recipe file we can define the list of packages to be
+   built into the rootfs image.
+
+[source,shell]
+------
+$ nano meta-tiny-fs/recipes-core/images/core-image-tiny.bb
+
+
+SUMMARY = "A tiny image just capable of allowing a device to boot."
+IMAGE_INSTALL = "bash coreutils less"
+IMAGE_FEATURES = "doc-pkgs"
+inherit core-image
+------
+
+ * The packages that would be built from current configuration can be
+   verified using
+
+[source,shell]
+----------
+$ bitbake -s
+----------
+
+=== Adding Our Layer to Yocto 
+
+ * The new layer created has distro configuration and the core-image
+   recipe.
+
+ * The meta-tiny-fs layer has to be added to the yocto build as
+
+[source,shell]
+------
+$ bitbake-layers add-layer meta-tiny-fs
+------
+
+=== Customizing the Build
+
+ * Atlast the configurations for the current build has to be updated
+   to the build/conf/local.conf
+
+ * For our build we may need to provide two information target MACHINE
+   for which this build performed the and what is the DISTRO build
+   policy should be adhered
+
+ * We are going to build the rootfs for the qemu emulated arm target,
+   which can be specified as MACHINE = "qemuarm"
+
+ * By default the distribution is built using opkg packages which is
+   openembedded's packaging format, we can override that by declaring
+   the PACKAGE_CLASS as package_deb
+
+ * The yocto expects the version of the current configuration to be
+   provided usig CONF_VERSION
+
+[source,shell]
+------
+S nano conf/local.conf
+
+
+MACHINE = "qemuarm"
+DISTRO = "tiny-fs"
+PACKAGE_CLASSES = "package_deb"
+CONF_VERSION = "1"
+------
+
+=== Building Tiny-fs Image
+
+ * Now we can start building the tiny-fs image by invoking
+
+[source,shell]
+--------
+$ bitbake core-image-tiny
+--------
+
+ * The build should get completed in fewer minutes as it tries to
+   reuse state-cache
+
+ * After successful completion of the build the kernel image and
+   rootfs images would be available in the tmp-glibc/deploy/images/qemuarm
+
+[source,shell]
+--------------
+$ ls tmp-glibc/deploy/images/qemuarm/
+--------------
+
+ * The list of packages in rootfs can be read from manifest file
+
+[source,shell]
+---------
+$ nano tmp/deploy/images/qemuarm/core-image-tiny-qemuarm.rootfs.manifest
+---------
+
+=== Booting the the tiny-fs Image
+
+ * Copy the zImage to shared folder /media/sf_share and
+   core-image-tiny-qemuarm.ext4 as disk.img in /media/sf_share
+
+ * Now we can boot our new images using qemu arm as shown
+
+[source,shell]
+------
+$ ./runqemu.sh 
+------
+
+== Miscellaneous
+
+=== Machine
+
+  * _Machine_ is the target board for which the image is built.
+
+  * The machine related configurations are available in {MACHINE}.conf
+    file in a machine specific layer called as bsp layer.
+
+  * BSP layer may also have formfactor configurations like display
+    resolution, input devices to configure X11 features etc.
+
+  * BSP layer would also have the linux kernel compilation recipe
+    which would have default config for the target board.
+
+  * a minimal machine configuration file is given below
+
+------
+KERNEL_IMAGETYPE = "zImage"
+SERIAL_CONSOLE = "115200 ttyAMA0"
+MACHINE_FEATURES = "alsa bluetooth usbgadget"
+PREFERRED_PROVIDER_virtual/kernel ?= "linux-yocto"
+PREFERRED_VERSION_linux-yocto ?= "3.19%"
+------
+
+=== Package Groups 
+
+ * Poky allows to create special recipes which can build related group
+   packages.
+
+ * Poky has several predefined packagegroups like
+   packagegroup-core-boot, package-group-base etc.,
+
+ * It is possible to create custom package group by inheritting
+   packagegroup class.
+
+=== SSTATE CACHE
+
+ * Yocto creates hash map of the build envinronment of each recipe and
+   archives the build artifact of the recipe in sstate-cache.
+
+ * When we try to build again if the hash map generated for the recipe
+   matched what already in exist state cache, the archived artifact is
+   restored in the new build directory by setscene task.
+
+ * We can find mostly *setscene tasks in the build log.
+
+=== Extending & Overriding Recipes
+
+ * If a already existing recipe has to be just modified for few
+   parameters instead of writing a the recipe again,
+
+ * Just the newer modifications can be written in recipe file with
+   extension .bbappend and sticking to file name as same as the main
+   recipe.
+
+ * Even if main and append recipes are placed in different layers,
+   bitbake can resolve them.
+
