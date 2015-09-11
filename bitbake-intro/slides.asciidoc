@@ -118,6 +118,8 @@ do_task1() {
 addtask task1
 ------
 
+  * Tasks can be written in shell or in Python
+
 === Variables
 
   * Variables can be set using the following syntax
