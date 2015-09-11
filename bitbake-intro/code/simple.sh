@@ -2,49 +2,157 @@
 
 set -e -x -u
 
-cd ~/yp/dl
-wget -c http://git.openembedded.org/bitbake/snapshot/bitbake-1.17.0.tar.gz
+source sandwich.sh
 
-mkdir -p ~/yp/bitbake
-cd ~/yp/bitbake
-tar -x -f ~/yp/dl/bitbake-1.17.0.tar.gz
-cd bitbake-1.17.0
-python setup.py build
+### START: bbsetup.sh
+cd ~/yp/sandwich
+source setup-bitbake.sh
+### END: bbsetup.sh
 
-cd ~/yp/bitbake/bitbake-1.17.0/build/scripts*
-export PATH=$PWD:$PATH
+### START: bbpath.sh
+export BBPATH=~/yp/sandwich
+### END: bbpath.sh
 
-set +u
-cd ~/yp/bitbake/bitbake-1.17.0/build/lib*
-export PYTHONPATH=$PWD:$PYTHONPATH
-set -u
+cd ~/yp/sandwich
+rm -fr tmp
+### START: run-get.sh
+bitbake -c get bread
+cat ~/yp/sandwich/tmp/bread.txt
+### END: run-get.sh
 
-mkdir -p ~/yp/simple
-mkdir -p ~/yp/simple/conf
-mkdir -p ~/yp/simple/classes
+bitbake -c cook bread
+cat ~/yp/sandwich/tmp/bread.txt
 
-cat > ~/yp/simple/conf/bitbake.conf <<"EOF"
-TMPDIR = "${TOPDIR}/tmp"
-CACHE = "${TMPDIR}/cache"
-STAMP = "${TMPDIR}/stamps/"
-T = "${TMPDIR}/work"
-B = "${TMPDIR}"
+cat > ~/yp/sandwich/bread.bb <<"EOF"
+PN = "bread"
+
+do_get() {
+        echo ${PN}: wheat > bread.txt
+        echo ${PN}: salt  >> bread.txt
+        echo ${PN}: sugar >> bread.txt
+        echo ${PN}: water >> bread.txt
+        sleep 1
+}
+addtask get
+
+do_cook() {
+        echo "${PN}: bake for 20 - 25 minutes" >> bread.txt
+        sleep 2
+        echo "${PN}: ready" >> bread.txt
+}
+addtask cook after do_get
 EOF
 
-touch ~/yp/simple/classes/base.bbclass
+cd ~/yp/sandwich
+rm -fr tmp
+bitbake -c cook bread
+cat ~/yp/sandwich/tmp/bread.txt
+
+cat > ~/yp/sandwich/omlet.bb <<"EOF"
+### START: omlet.bb
+PN = "omlet"
+
+do_get() {
+        echo ${PN}: egg > omlet.txt
+        echo ${PN}: pepper  >> omlet.txt
+        sleep 1
+}
+addtask get
+
+do_cook() {
+        echo ${PN}: fry >> omlet.txt
+        sleep 2
+        echo ${PN}: ready >> omlet.txt
+}
+addtask cook after do_get
+### END: omlet.bb
+EOF
+
+cd ~/yp/sandwich
+rm -fr tmp
+bitbake -c cook omlet
+cat ~/yp/sandwich/tmp/omlet.txt
+
+cat > ~/yp/sandwich/sandwich.bb <<"EOF"
+### START: sandwich.bb
+PN = "sandwich"
+
+do_get() {
+        cat bread.txt > sandwich.txt
+        cat omlet.txt  >> sandwich.txt
+        sleep 1
+}
+addtask get
+
+do_cook() {
+        echo "${PN}: toast bread and serve" >> sandwich.txt
+        sleep 2
+        echo "${PN}: ready" >> sandwich.txt
+}
+addtask cook after do_get
+### END: sandwich.bb
+EOF
+
+set +e
+cd ~/yp/sandwich
+rm -fr tmp
+bitbake -c cook sandwich
+set -e
+
+cat > ~/yp/sandwich/sandwich.bb <<"EOF"
+PN = "sandwich"
+
+DEPENDS = "bread omlet"
+do_get[deptask] = "do_cook"
+
+do_get() {
+        cat bread.txt > sandwich.txt
+        cat omlet.txt  >> sandwich.txt
+        sleep 1
+}
+addtask get
+
+do_cook() {
+        echo "${PN}: toast bread and serve" >> sandwich.txt
+        sleep 2
+        echo "${PN}: ready" >> sandwich.txt
+}
+addtask cook after do_get
+EOF
+
+cd ~/yp/sandwich
+rm -fr tmp
+bitbake -c cook sandwich
+cat ~/yp/sandwich/tmp/sandwich.txt
+
+#
+# Discuss BB_NUMBER_THREADS
+# Discuss base.bbclass
+#
+#
+# Give recipes for bash, coreutils, image,
+# Simplify recipes using autotools class
+# Ask student to add recipe for libncurses
+# Ask student to add recipe for less
+#
 
 cat > ~/yp/simple/bash.bb <<EOF
 PN = "bash"
 
+do_download() {
+        cd ~/yp/dl; wget -c http://ftp.gnu.org/gnu/bash/bash-4.3.tar.gz
+}
+addtask download
+
 do_unpack() {
         tar -x -f ~/yp/dl/bash-4.3.tar.gz
 }
-addtask unpack
+addtask unpack after do_download
 EOF
 
-export BBPATH=~/yp/simple
-
 cd ~/yp/simple
+rm -fr tmp
+bitbake -c download bash
 bitbake -c unpack bash
 ls ~/yp/simple/tmp/
 
@@ -78,7 +186,178 @@ do_compile() {
 }
 addtask compile after do_configure
 
-do_install_deps() { 
+do_install() {
+	cd bash-4.3
+        make install DESTDIR=${ROOTFS}
+	mkdir -p ${ROOTFS}/bin
+	ln -f -s /usr/bin/bash ${ROOTFS}/bin/bash
+	ln -f -s /usr/bin/bash ${ROOTFS}/bin/sh
+}
+addtask install after do_compile
+
+do_rootfs() {
+	mkdir -p ${ROOTFS}/lib
+	cp ${TOOLCHAIN}/arm-none-linux-gnueabi/libc/lib/libc.so.6 \
+	   ${ROOTFS}/lib
+	cp ${TOOLCHAIN}/arm-none-linux-gnueabi/libc/lib/libdl.so.2 \
+	   ${ROOTFS}/lib
+	cp ${TOOLCHAIN}/arm-none-linux-gnueabi/libc/lib/ld-linux.so.3 \
+	   ${ROOTFS}/lib
+
+	mkdir -p ${ROOTFS}/dev ${ROOTFS}/tmp
+	genext2fs -b 131072 -d ${ROOTFS} ${DISKIMG}
+}
+addtask rootfs after do_install
+EOF
+
+cd ~/yp/simple
+rm -fr tmp
+bitbake -c rootfs bash
+ls ~/yp/simple/tmp/rootfs
+
+qemu-system-arm                 \
+  -M versatilepb                \
+  -kernel ~/yp/pre-built/zImage \
+  -append "root=/dev/sda rw"    \
+  -hda ~/yp/simple/tmp/disk.img
+
+cat >> ~/yp/simple/conf/bitbake.conf <<"EOF"
+TOOLCHAIN = "/usr/share/gcc-arm-linux"
+ROOTFS = "~/yp/simple/tmp/rootfs"
+DISKIMG = "~/yp/simple/tmp/disk.img"
+EOF
+
+cat > ~/yp/simple/bash.bb <<"EOF"
+do_download() {
+	cd ~/yp/dl; wget -c http://ftp.gnu.org/gnu/bash/bash-4.3.tar.gz
+}
+addtask download
+
+do_unpack() {
+	tar -x -f ~/yp/dl/bash-4.3.tar.gz
+}
+addtask unpack after do_download
+
+do_configure() {
+	cd bash-4.3
+        ./configure --prefix=/usr           \
+            --host=arm-none-linux-gnueabi   \
+            --build=i686-pc-linux-gnu
+}
+addtask configure after do_unpack
+
+do_compile() {
+	cd bash-4.3
+        make
+}
+addtask compile after do_configure
+
+do_install() {
+	cd bash-4.3
+        make install DESTDIR=${ROOTFS}
+	mkdir -p ${ROOTFS}/bin
+	ln -f -s /usr/bin/bash ${ROOTFS}/bin/bash
+	ln -f -s /usr/bin/bash ${ROOTFS}/bin/sh
+}
+addtask install after do_compile
+EOF
+
+cat > ~/yp/simple/image.bb <<"EOF"
+DEPENDS = "bash"
+
+do_rootfs() {
+	mkdir -p ${ROOTFS}/dev ${ROOTFS}/tmp
+	mkdir -p ${ROOTFS}/lib
+	cp ${TOOLCHAIN}/arm-none-linux-gnueabi/libc/lib/libc.so.6 \
+	   ${ROOTFS}/lib
+	cp ${TOOLCHAIN}/arm-none-linux-gnueabi/libc/lib/libdl.so.2 \
+	   ${ROOTFS}/lib
+	cp ${TOOLCHAIN}/arm-none-linux-gnueabi/libc/lib/ld-linux.so.3 \
+	   ${ROOTFS}/lib
+
+	genext2fs -b 131072 -d ${ROOTFS} ${DISKIMG}
+}
+addtask rootfs
+EOF
+
+
+
+cat > ~/yp/simple/classes/autotools.class <<"EOF"
+do_download() {
+	cd ~/yp/dl
+	wget -c ${SRC_URI}
+}
+addtask download
+
+do_unpack() {
+	tar -x -f ~/yp/dl/${PN}-${PV}.tar.bz2
+}
+addtask unpack after do_download
+
+do_configure() {
+	cd ${PN}-${PV}
+        ./configure --prefix=/usr           \
+            --host=arm-none-linux-gnueabi   \
+            --build=i686-pc-linux-gnu
+}
+addtask configure after do_unpack
+
+do_compile() {
+	cd ${PN}-${PV}
+        make
+}
+addtask compile after do_configure
+
+do_install() {
+	cd bash-4.3
+        make install DESTDIR=${ROOTFS}
+	mkdir -p ${ROOTFS}/bin
+	ln -f -s /usr/bin/bash ${ROOTFS}/bin/bash
+	ln -f -s /usr/bin/bash ${ROOTFS}/bin/sh
+}
+addtask install after do_compile
+
+do_rootfs() {
+	mkdir -p ${ROOTFS}/dev ${ROOTFS}/tmp
+	genext2fs -b 131072 -d ${ROOTFS} ${DISKIMG}
+}
+addtask rootfs after do_install
+EOF
+
+cat > ~/yp/simple/bash.bb <<"EOF"
+PN = "bash"
+
+do_download() {
+	cd ~/yp/dl; wget -c http://ftp.gnu.org/gnu/bash/bash-4.3.tar.gz
+}
+addtask download
+
+do_unpack() {
+	tar -x -f ~/yp/dl/bash-4.3.tar.gz
+}
+addtask unpack after do_download
+
+do_configure() {
+	cd bash-4.3
+        ./configure --prefix=/usr           \
+            --host=arm-none-linux-gnueabi   \
+            --build=i686-pc-linux-gnu
+}
+addtask configure after do_unpack
+
+do_compile() {
+	cd bash-4.3
+        make
+}
+addtask compile after do_configure
+
+do_install() {
+	cd bash-4.3
+        make install DESTDIR=${ROOTFS}
+	mkdir -p ${ROOTFS}/bin
+	ln -f -s /usr/bin/bash ${ROOTFS}/bin/bash
+	ln -f -s /usr/bin/bash ${ROOTFS}/bin/sh
+
 	mkdir -p ${ROOTFS}/lib
 	cp ${TOOLCHAIN}/arm-none-linux-gnueabi/libc/lib/libc.so.6 \
 	   ${ROOTFS}/lib
@@ -87,29 +366,11 @@ do_install_deps() {
 	cp ${TOOLCHAIN}/arm-none-linux-gnueabi/libc/lib/ld-linux.so.3 \
 	   ${ROOTFS}/lib
 }
-addtask install_deps after do_compile
+addtask install after do_compile
 
-do_install() {
-	cd $BDIR; make install DESTDIR=${ROOTFS}
-	mkdir -p ${ROOTFS}/bin
-	ln -f -s /usr/bin/bash ${ROOTFS}/bin/bash
-	ln -f -s /usr/bin/bash ${ROOTFS}/bin/sh
-}
-addtask install after do_install_deps
-
-do_disk_image() {
+do_rootfs() {
 	mkdir -p ${ROOTFS}/dev ${ROOTFS}/tmp
 	genext2fs -b 131072 -d ${ROOTFS} ${DISKIMG}
 }
-addtask disk_image after do_install
+addtask rootfs after do_install
 EOF
-
-cd ~/yp/simple
-bitbake -c disk_image bash
-ls ~/yp/simple/tmp/rootfs
-
-qemu-system-arm                 \
-  -M versatilepb                \
-  -kernel ~/yp/pre-built/zImage \
-  -append "root=/dev/sda rw"    \
-  -hda ~/yp/simple/tmp/disk.img
