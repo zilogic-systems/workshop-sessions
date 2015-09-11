@@ -256,7 +256,11 @@ var[flag] = "value"
 
 [source,shell]
 ------
-include::code/simple/bitbake.conf[]
+TMPDIR = "${TOPDIR}/tmp"
+CACHE = "${TMPDIR}/cache"
+STAMP = "${TMPDIR}/stamps/${PN}"
+T = "${TMPDIR}/work"
+B = "${TMPDIR}"
 ------
 
   * `TOPDIR` is automatically set by `bitbake` to the folder from which
