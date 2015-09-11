@@ -36,8 +36,10 @@ B = "${TMPDIR}"
 WORKDIR = "${TMPDIR}/${PN}/${PV}"
 
 ROOTFS = "${TMPDIR}/rootfs"
+DISKIMG = "${TMPDIR}/disk.img"
 DL_DIR = "~/yp/dl"
 TOOLCHAIN_DIR = "/usr/share/gcc-arm-linux"
+BB_NUMBER_THREADS = "2"
 EOF
 
 cat > ~/yp/zepto/classes/base.bbclass <<"EOF"
@@ -46,6 +48,10 @@ addtask unpack after do_download
 addtask configure after do_unpack
 addtask compile after do_configure
 addtask install after do_compile
+addtask rootfs after do_install
+
+do_configure[deptask] = "do_install"
+do_rootfs[rdeptask] = "do_install"
 
 PF = "${PN}"
 
@@ -144,6 +150,9 @@ do_install() {
 EOF
 
 cat > ~/yp/zepto/core-image-minimal.bb <<"EOF"
+PN = "core-image-minimal"
+RDEPENDS = "libc bash coreutils"
+
 do_rootfs() {
 	mkdir -p ${ROOTFS}/dev ${ROOTFS}/tmp
 	genext2fs -b 131072 -d ${ROOTFS} ${DISKIMG}
