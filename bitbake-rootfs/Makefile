@@ -7,10 +7,7 @@ images_png = $(images_dia:.dia=.png)
 
 all: slides.html
 
-slides.html: zepto-split code/zepto.sh $(images_png) 
-
-zepto-split:
-	python $(TOPDIR)/scripts/split.py code/zepto.sh
+slides.html: $(images_png) 
 
 clean:
 	rm -f $(images_png)

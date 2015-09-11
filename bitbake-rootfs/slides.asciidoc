@@ -1,0 +1,104 @@
+= Rootfs with BitBake
+Zilogic Systems
+
+== Intro to Zepto
+
+=== Building Models
+
+  * Complex systems can be easily understood by building simple
+    working models
+
+  * Scientists and engineers do this often
+
+  * Models highlight the essence of the system
+
+  * Removes away the clutter, the tiny implementation details
+
+  * Zepto, a working prototype of Yocto
+
+== Zepto V1
+
+=== Overview
+
+  * Bash and Coreutils build are written as recipes
+  * `ROOTFS` is set in `bitbake.conf`
+  * Common recipe code is put up in `base.bbclass`
+
+=== Try Out
+
+  * Setup bitbake first
+  * Build and install bash
+  * Verify in `tmp/rootfs`
+  * Build and install coreutils
+  * Verify in `tmp/rootfs`
+
+== Zepto V2
+
+=== Issue
+
+  * Lot of common build instructions in `configure`, `compile` and
+    `install` tasks.
+
+  * Same for all packages using autotools.
+
+=== Solution
+
+  * BitBake allows creating additional class files
+
+  * Classes can be selectively included using `inherit` directive
+
+  * Tasks common to subset of recipes can be shared
+
+=== Overview
+
+  * `classes/autotools.bbclass` contains generic version of
+    `configure`, `compile` and `install` tasks.
+
+  * `PN` and `PV` are used to make the tasks generic
+
+  * Recipes `inherit` and use tasks from autotools class
+
+  * If need be tasks can be redefined, or appended to
+
+== Zepto V3
+
+=== Simplify Download
+
+  * BitBake provides helper functions that can simplify fetching
+    source code
+
+  * Unified interface to fetch from various sources
+
+  * Support to check for corruption / tampering of source
+
+  * Support for mirrors to reduce download times
+
+  * Support for unpacking source files in various formats
+
+=== Overview
+
+  * `classes/base.bbclass` contains generic versions of `fetch` and
+    `unpack`
+
+  * Written as Python tasks, invokes the `Fetcher` module provided by
+    BitBake
+
+  * Modified to use a per-package work directory, where source code
+    will be extracted
+
+  * The `DL_DIR` specifies the location for downloaded source code
+
+=== Try Out
+
+  * Setup bitbake first
+  * Add a recipe for libncurses
+  * Add a recipe for less
+
+== Zepto V4
+
+=== Overview
+
+  * Support creation of images
+  * Separate recipe to copy libraries from toolchain directory
+
+
