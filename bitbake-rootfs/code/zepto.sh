@@ -88,9 +88,12 @@ EOF
 cat > ~/yp/zepto/classes/autotools.bbclass <<"EOF"
 do_configure() {
 	cd ${WORKDIR}/${PN}-${PV}
-        ./configure --prefix=/usr           \
-            --host=arm-none-linux-gnueabi   \
-            --build=i686-pc-linux-gnu
+        ./configure --prefix=/usr               \
+            --host=arm-none-linux-gnueabi       \
+            --build=i686-pc-linux-gnu           \
+            LDFLAGS=-L${ROOTFS}/usr/lib	        \
+            CPPFLAGS=-I${ROOTFS}/usr/include	\
+
 }
 
 do_compile() {
@@ -127,6 +130,24 @@ do_install_append() {
 }
 EOF
 
+cat > ~/yp/zepto/ncurses.bb <<"EOF"
+inherit autotools
+
+PN = "ncurses"
+PV = "5.9"
+SRC_URI = "http://ftp.gnu.org/gnu/ncurses/ncurses-5.9.tar.gz"
+EOF
+
+cat > ~/yp/zepto/less.bb <<"EOF"
+inherit autotools
+
+PN = "less"
+PV = "458"
+SRC_URI = "http://www.greenwoodsoftware.com/less/less-458.tar.gz"
+DEPENDS = "ncurses"
+
+EOF
+
 cat > ~/yp/zepto/libc.bb <<"EOF"
 PN = "libc"
 PV = "2.5"
@@ -151,7 +172,7 @@ EOF
 
 cat > ~/yp/zepto/core-image-minimal.bb <<"EOF"
 PN = "core-image-minimal"
-RDEPENDS = "libc bash coreutils"
+RDEPENDS = "libc bash coreutils less"
 
 do_rootfs() {
 	mkdir -p ${ROOTFS}/dev ${ROOTFS}/tmp
