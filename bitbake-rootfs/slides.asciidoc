@@ -16,6 +16,8 @@ Zilogic Systems
 
   * Zepto, a working prototype of Yocto
 
+  * Built incrementally, introducing only one feature at a time
+
 == Zepto V1
 
 === Overview
