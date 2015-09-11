@@ -56,9 +56,11 @@ include::code/Makefile.bash[]
   * BitBake designed for building a whole stack of applications --
     integration build
 
-    - Creates *stamp files* to identify if a task has been completed
+    - Creates *stamp files* to identify if a build step has been
+      completed
 
-    - Generates and stores *checksums* of tasks and build variables
+    - Generates and stores *checksums* of commands in build step and
+      the build variables
 
     - Uses checksums to determine changes in build environment and
       trigger a re-build
