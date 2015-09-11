@@ -5,13 +5,13 @@ Zilogic Systems <training@zilogic.com>
 
 === Limitations of Zepto
 
- * The project zepto which has been developed previously, builds 3
+ * The project Zepto which has been developed previously, builds 3
    software components and has further more recipes to create a rootfs
    image with it.
 
- * For a bigger embedded linux projects these 3 components would not
+ * For a bigger embedded Linux projects these 3 components would not
    be sufficient and it may require us to write recipes for huge list
-   of softwares.
+   of software.
 
 [style="two-column"]
 === Solution
@@ -33,7 +33,7 @@ image::figures/oe-logo.png[style="left",align="center"]
    using open-embedded build system.
  
  * Poky was a build system used OpenedHand Project, After Intel taking
-   over the openHanded project, Poky was adopted by Linux Foundation
+   over the openedHand project, Poky was adopted by Linux Foundation
    for its Yocto Project.
 
  * Yocto's goal was to provide complete development and test
@@ -48,9 +48,9 @@ image::figures/oe-logo.png[style="left",align="center"]
 [style="right"]
 
  * Is an Umbrella project, involves developing build tools to
-   facilitate building of custom distribuion for the embedded devices.
+   facilitate building of custom distribution for the embedded devices.
 
- * More than build system, it focusses on complete build cycle
+ * More than build system, it focuses on complete build cycle
    involving compiling, debugging, testing on simulated hardware.
 
 image::figures/yocto-project-transp.png[style="left",align="center"]  
@@ -58,7 +58,7 @@ image::figures/yocto-project-transp.png[style="left",align="center"]
 === What is Yocto 
 
  * Supports sufficient infrastructure to perform post build analysis
-   on the build artifacts, for their size, depdendency, quality and
+   on the build artifacts, for their size, dependency, quality and
    licenses .
 
  * Builds atomic layers to segregate and maintain software from
@@ -68,11 +68,11 @@ image::figures/yocto-project-transp.png[style="left",align="center"]
 === Yocto Vs Buildroot 
 
 [style="right"]
-  * Supports list of well tested open source softwares.
+  * Supports list of well tested open source software.
 
   * Allows to build a managed rootfs with deb/rpm/ipk packages.
 
-  * Proivdes a complete embedded development environment.
+  * Provides a complete embedded development environment.
 
   * Well organized as layers and easily extendable
 
@@ -92,9 +92,9 @@ Yocto develops several projects to improve build infrastructure
  
  * Pseudo, cross-prelink - tools required to improve build
 
- * Hob & Toaster - UI tools to manage yocto build and their results
+ * Hob & Toaster - UI tools to manage Yocto build and their results
 
- * Documentation - Detailed manuals to use yocto for various embedded
+ * Documentation - Detailed manuals to use Yocto for various embedded
    build scenarios.
 
  * Yocto project components are maintained in git repo
@@ -126,7 +126,7 @@ image::figures/Poky-Logo.jpg[style="left",align="center"]
    recipes) called openembedded-core.
 
  * Over openembedded community, Yocto ensures that oe-core meta-data
-   are well-tested and interoperable with platforms supported by
+   are well-tested and inter-operable with platforms supported by
    Yocto.
 
  * Openembedded maintains bitbake and other recipes in
@@ -155,7 +155,7 @@ image::figures/poky-repo-cropped.png[style="right",align="center"]
             cpio texinfo libsdl-dev vim
 ----
 
- * Create a project directory and download yocto
+ * Create a project directory and download Yocto
 
 [source,shell]
 ----
@@ -197,7 +197,7 @@ $ source oe-init-build-env
  * For our experiment we are going to use an arm target board emulated
    through QEMU. 
 
- * Which can be cofigured by exporting a shell variable as shown
+ * Which can be configured by exporting a shell variable as shown
    below.
 
 [source,shell]
@@ -364,7 +364,7 @@ $ yocto-layer create tiny-fs
 === Creating Our Own Distribution
 
  * By yocto convention, we may need to create a _distribution_ which has
-   information about the policies to be athered whiling building the
+   information about the policies to be adhered whiling building the
    individual components.
 
   * Distro configurations affects how the packages are configured and
@@ -408,10 +408,10 @@ PACKAGE_CLASS = "package_deb"
  * for our tiny-fs, we need only three packages bash, coreutils and
    less. It is better to create our recipe to build rootfs image.
 
- * Yocto provides core-image class which can be inheritted to used
+ * Yocto provides core-image class which can be inherited to used
    already defined definitions to build rootfs image.
 
- * sticking to yocto's convention, we can create a our image recipe
+ * sticking to Yocto's convention, we can create a our image recipe
    named core-image-tiny.bb in meta-tiny-fs/recipes-core/images/
 
 [source,shell]
@@ -455,7 +455,7 @@ $ bitbake-layers add-layer meta-tiny-fs
 
 === Customizing the Build
 
- * Atlast the configurations for the current build has to be updated
+ * At-last the configurations for the current build has to be updated
    to the build/conf/local.conf
 
  * For our build we may need to provide two information target MACHINE
@@ -470,7 +470,7 @@ $ bitbake-layers add-layer meta-tiny-fs
    the PACKAGE_CLASS as package_deb
 
  * The yocto expects the version of the current configuration to be
-   provided usig CONF_VERSION
+   provided using CONF_VERSION
 
 [source,shell]
 ------
@@ -531,7 +531,7 @@ $ ./runqemu.sh
   * The machine related configurations are available in {MACHINE}.conf
     file in a machine specific layer called as bsp layer.
 
-  * BSP layer may also have formfactor configurations like display
+  * BSP layer may also have form-factor configurations like display
     resolution, input devices to configure X11 features etc.
 
   * BSP layer would also have the linux kernel compilation recipe
@@ -560,7 +560,7 @@ PREFERRED_VERSION_linux-yocto ?= "3.19%"
 
 === SSTATE CACHE
 
- * Yocto creates hash map of the build envinronment of each recipe and
+ * Yocto creates hash map of the build environment of each recipe and
    archives the build artifact of the recipe in sstate-cache.
 
  * When we try to build again if the hash map generated for the recipe
