@@ -1,0 +1,321 @@
+= BitBake, Introduction
+Zilogic Systems
+
+== Integration Build
+
+=== Makefile to Build Bash
+
+[source,Makefile]
+------
+include::code/Makefile.bash[]
+------
+
+=== Limitations
+
+  * Every time `make` is invoked, all the steps are re-run
+
+    - Non-local dependencies
+    - Multiple output files
+    - Build variable / rule changes
+
+=== Non-Local Dependencies
+
+  * Timestamp is used to determine if a rule is to be re-run
+
+  * Integration build, requires for example to download files off the
+    Internet
+
+  * Make's timestamp mechanism is not sufficient
+
+=== Multiple Output Files
+
+  * Single build step, in a integration build can produce multiple
+    output files
+
+  * Example: configuring the bash source tree, produces multiple
+    output files like `config.h`, `Makefile`, etc.
+
+  * The generated files in some cases are not even known before hand
+
+  * Example: extracting bash source tar ball
+
+  * Make is not designed to handle multiple output files in a rule
+
+=== Build Variable / Rule Changes
+
+  * If a build rule changes, the rule will not be re-run
+
+  * Make, tracks *only* the timestamps
+
+  * Also changes to build variables are not tracked. 
+
+=== BitBake
+
+  * Make designed for building a single application
+
+  * BitBake designed for building a whole stack of applications --
+    integration build
+
+    - Creates *stamp files* to identify if a task has been completed
+
+    - Generates and stores *checksums* of tasks and build variables
+
+    - Uses checksums to determine changes in build environment and
+      trigger a re-build
+
+    - *Caches* and reuses data from previous builds
+
+  * Build a complete Embedded Linux Distribution: OpenEmbedded, Yocto
+    Project
+
+== Using BitBake
+
+=== Setting Up BitBake
+
+[source,shell]
+------
+include::code/simple/bbsetup.sh[]
+------
+
+  * Downloads BitBake, and unpacks it
+
+  * BitBake is written in Python
+
+  * Python is invoked to build and setup BitBake
+
+  * BitBake is not installed in the standard `PATH`
+
+  * Env. variables are setup to point to BitBake location
+
+
+=== Simple Sandwich Project
+
+  * Contains 2 files required by BitBake
+    - `conf/bitbake.conf`
+    - `classes/base.bbclass`
+
+  * `bread.bb` is a recipe contains build instructions
+
+  * Contents of `conf/bitbake.conf` will be discussed later-on
+
+=== Tasks
+
+  * The smallest unit of execution in BitBake is a task
+
+  * Similar to rules in `make`
+
+  * Task names start with `do_` prefix
+
+  * General syntax is shown below
++
+------
+do_task1() {
+    cmd1
+    cmd2
+}
+addtask task1
+------
+
+=== Variables
+
+  * Variables can be set using the following syntax
++
+------
+var = "value"
+------
++
+  * All variables are string variables
+  * The value should be in double quotes
+  * Some variables are special to BitBake
+
+=== Baking Bread
+
+  * Two tasks
+    - `do_get`
+    - `do_cook`
+
+  * Variable
+    - `PN` - name for the recipe (package name)
+
+=== Invoking BitBake
+
+  * Setup `BBPATH` to point to the project folder
++
+[source,shell]
+------
+include::code/simple/bbpath.sh[]
+------
++
+  * Run the `do_get` task
+  * Argument to `bitbake` specifies the recipe name
+  * Option `-c` specifies the task name
++
+[source,shell]
+------
+include::code/simple/run-get.sh[]
+------
+
+=== Invoking BitBake (2)
+
+  * Commands run with `tmp` folder as current working directory
+
+  * Run the `do_cook` task
+
+  * Check the contents of `tmp/bread.txt`
+
+=== Stamp Files
+
+  * Try re-run of `do_cook`
+
+  * Tasks if tried to re-run will not get executed
+
+  * Stamp files are created in `tmp/stamps`
+
+  * If stamp file is present the task will not be re-run
+
+  * Delete `tmp`, and re-run `do_get` and `do_cook`
+
+=== Ordering of Tasks
+
+  * `do_get` should be executed before `do_cook`
+
+  * Task ordering can be enforced by specifying in `addtask` directive
++
+------
+addtask cook after do_get
+------
++
+  * Modify `bread.bb`, delete `tmp` and re-run `bitbake`
+
+=== Add Recipe for Omlet
+
+------
+include::code/simple/omlet.bb[]
+------
+
+=== Make Omlet
+
+  * Try running the recipe's tasks
+
+  * Check the output of the tasks
+
+== Inter-Recipe Dependencies
+
+=== Task Dependencies
+
+  * Dependencies within a recipe, specified in `addtask`
+
+  * Task in one recipe might depend upon task in other recipes
+
+  * Create a recipe for a Sandwich
+
+=== Add Recipe for Sandwich
+
+------
+include::code/simple/sandwich.bb[]
+------
+
+=== Make Sandwich
+
+  * Delete `tmp`, and run `do_cook` of `sandwich`
+
+  * Fails since `bread.txt` and `omlet.txt` required by `sandwich` is
+    not present
+
+  * Add to `sandwich.bb` the following
++
+------
+DEPENDS = "bread omlet"
+do_get[deptask] = "do_cook"
+------
++
+  * Specifes that `do_get` of `sandwich` depends on `do_cook` of
+    `bread` and `omlet`.
+
+=== Variable and Task Flags
+
+  * BitBake can assosiate flags with variables and tasks
+
+  * General syntax is
++
+------
+var[flag] = "value"
+------
++
+  * `deptask` is a flag, the specifies that a particular task of
+    recipes specified in `DEPENDS` should be executed first
+
+== Configuration
+
+=== BitBake Configuration
+
+[source,shell]
+------
+include::code/simple/bitbake.conf[]
+------
+
+  * `TOPDIR` is automatically set by `bitbake` to the folder from which
+    it is invoked
+
+  * `TMPDIR` specifies locations where build output is stored.
+
+=== Build Directories
+
+`CACHE`:: directory to store parsed recipes
+
+`STAMP`:: specifies location where stamp files are created
+
+`T`:: specifies locations where logs and scripts are stored
+
+`B`:: specifies location where tasks are executed
+
+=== Executing Parallel Tasks
+
+  * BitBake can execute multiple tasks in parallel
+
+  * `BB_NUMBER_THREADS` specifies the max. number of tasks to run in
+    parallel.
+
+  * Set the variable in `bitbake.conf`.
+
+  * Delete `tmp` folder and re-run the build of sandwich.
+
+== Sharing Between Recipes
+
+=== Base Class
+
+  * `base.bbclass` is parsed for before each recipe is read
+
+  * Common tasks and directives can be shared, in `base.bbclass`
++
+------
+PF = "${PN}"
+
+addtask get
+addtask cook after do_get
+
+do_get[deptask] = "do_cook"
+------
++
+   * `PF` -- sort of Package Fullname, in Yocto contains the package
+     name and version
+
+=== Sharing Between Recipes
+
+------
+PN = "sandwich"
+
+DEPENDS = "bread omlet"
+
+do_get() {
+        cat bread.txt > sandwich.txt
+        cat omlet.txt  >> sandwich.txt
+        sleep 1
+}
+
+do_cook() {
+        echo "${PN}: toast bread and serve" >> sandwich.txt
+        sleep 2
+        echo "${PN}: ready" >> sandwich.txt
+}
+------
