@@ -138,6 +138,7 @@ var = "value"
 
   * Variable
     - `PN` - name for the recipe (package name)
+    - Recipes are identified by the `PN` rather than by filename
 
 === Invoking BitBake
 
