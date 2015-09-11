@@ -461,10 +461,10 @@ Usage: ./configure [OPTION]... [VAR=VALUE]...
     preprocessor and linker options
 
   * Add location of `libncurses` header files by setting
-    `CPPFLAGS=$ROOTFS/usr/include`.
+    `CPPFLAGS="-I $ROOTFS/usr/include"`.
 
   * Add location of `libncurses` library files by setting
-    `LDFLAGS=$ROOTFS/usr/lib`
+    `LDFLAGS="-L $ROOTFS/usr/lib"`
 
 === Re-configure `less` (2)
 
