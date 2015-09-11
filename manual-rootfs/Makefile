@@ -10,7 +10,7 @@ all: cmd-split slides.html
 slides.html: $(images_png) 
 
 cmd-split:
-	python split.py cmd.sh
+	python $(TOPDIR)/scripts/split.py cmd.sh
 
 clean:
 	rm -f $(images_png)
