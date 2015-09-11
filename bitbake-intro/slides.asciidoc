@@ -187,13 +187,13 @@ addtask cook after do_get
 +
   * Modify `bread.bb`, delete `tmp` and re-run `bitbake`
 
-=== Add Recipe for Omlet
+=== Add Recipe for Omelet
 
 ------
-include::code/simple/omlet.bb[]
+include::code/simple/omelet.bb[]
 ------
 
-=== Make Omlet
+=== Make Omelet
 
   * Try running the recipe's tasks
 
@@ -219,18 +219,18 @@ include::code/simple/sandwich.bb[]
 
   * Delete `tmp`, and run `do_cook` of `sandwich`
 
-  * Fails since `bread.txt` and `omlet.txt` required by `sandwich` is
+  * Fails since `bread.txt` and `omelet.txt` required by `sandwich` is
     not present
 
   * Add to `sandwich.bb` the following
 +
 ------
-DEPENDS = "bread omlet"
+DEPENDS = "bread omelet"
 do_get[deptask] = "do_cook"
 ------
 +
   * Specifes that `do_get` of `sandwich` depends on `do_cook` of
-    `bread` and `omlet`.
+    `bread` and `omelet`.
 
 === Variable and Task Flags
 
@@ -305,11 +305,11 @@ do_get[deptask] = "do_cook"
 ------
 PN = "sandwich"
 
-DEPENDS = "bread omlet"
+DEPENDS = "bread omelet"
 
 do_get() {
         cat bread.txt > sandwich.txt
-        cat omlet.txt  >> sandwich.txt
+        cat omelet.txt  >> sandwich.txt
         sleep 1
 }
 

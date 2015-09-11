@@ -48,30 +48,30 @@ rm -fr tmp
 bitbake -c cook bread
 cat ~/yp/sandwich/tmp/bread.txt
 
-cat > ~/yp/sandwich/omlet.bb <<"EOF"
-### START: omlet.bb
-PN = "omlet"
+cat > ~/yp/sandwich/omelet.bb <<"EOF"
+### START: omelet.bb
+PN = "omelet"
 
 do_get() {
-        echo ${PN}: egg > omlet.txt
-        echo ${PN}: pepper  >> omlet.txt
+        echo ${PN}: egg > omelet.txt
+        echo ${PN}: pepper  >> omelet.txt
         sleep 1
 }
 addtask get
 
 do_cook() {
-        echo ${PN}: fry >> omlet.txt
+        echo ${PN}: fry >> omelet.txt
         sleep 2
-        echo ${PN}: ready >> omlet.txt
+        echo ${PN}: ready >> omelet.txt
 }
 addtask cook after do_get
-### END: omlet.bb
+### END: omelet.bb
 EOF
 
 cd ~/yp/sandwich
 rm -fr tmp
-bitbake -c cook omlet
-cat ~/yp/sandwich/tmp/omlet.txt
+bitbake -c cook omelet
+cat ~/yp/sandwich/tmp/omelet.txt
 
 cat > ~/yp/sandwich/sandwich.bb <<"EOF"
 ### START: sandwich.bb
@@ -79,7 +79,7 @@ PN = "sandwich"
 
 do_get() {
         cat bread.txt > sandwich.txt
-        cat omlet.txt  >> sandwich.txt
+        cat omelet.txt  >> sandwich.txt
         sleep 1
 }
 addtask get
@@ -102,12 +102,12 @@ set -e
 cat > ~/yp/sandwich/sandwich.bb <<"EOF"
 PN = "sandwich"
 
-DEPENDS = "bread omlet"
+DEPENDS = "bread omelet"
 do_get[deptask] = "do_cook"
 
 do_get() {
         cat bread.txt > sandwich.txt
-        cat omlet.txt  >> sandwich.txt
+        cat omelet.txt  >> sandwich.txt
         sleep 1
 }
 addtask get
