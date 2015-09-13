@@ -41,3 +41,113 @@ Zilogic Systems
 == Using Layers
 
 === Sandwich with Layers
+
+  * Demonstration of layers is done using simple recipes, just as
+    before
+
+  * Lunch -- Sandwich project re-written with layers
+
+[role="two-column"]
+=== Layer Config. Processing
+
+[role="left"]
+image::layerconf.png[]
+
+[role="right"]
+  * If `BBPATH` is not set, BitBake looks for `conf/bblayers.conf`, in
+    the current directory
+
+  * The file sets up `BBLAYERS` to specify a list of layer directories
+
+  * For each layer in `BBLAYERS`, the `conf/layer.conf` is read
+
+  * `conf/layer.conf` file sets up `BBPATH` and `BBFILES`
+
+  * `bitbake.conf` is searched in `BBPATH`, and read
+
+=== Making Lunch
+
+  * Layer for sandwich is called `meta`
+
+  * Contains the recipe for building sandwich
+
+  * Build and verify sandwich
+
+== Adding New Layers
+
+=== Adding a Burger Layer
+
+  * Create new layer for burger calld `meta-burger`
++
+------
+cd ~/yp/lunch
+mkdir meta-burger
+------
+
+=== Adding a Layer Conf
+
+  * Create `conf/layer.conf`
++
+------
+BBPATH .= ":${LAYERDIR}"
+
+BBFILES += "${LAYERDIR}/*.bb ${LAYERDIR}/*.bbappend"
+
+BBFILE_COLLECTIONS += "burger"
+BBFILE_PATTERN_burger := "^${LAYERDIR}/"
+------
+
+=== Adding a Burger Recipe
+
+  * Create `meta-burger/burger.bb`
++
+------
+PN = "burger"
+
+DEPENDS = "omelet"
+
+do_get() {
+        echo ${PN}: bun > burger.txt
+        echo ${PN}: cheese >> burger.txt
+        cat omelet.txt  >> burger.txt
+        sleep 1
+}
+
+do_cook() {
+        echo "${PN}: toast bread and serve" >> burger.txt
+        sleep 2
+        echo "${PN}: ready" >> burger.txt
+}
+------
+
+=== Add the Layer
+
+  * Add the layer to `conf/bblayers.conf`
++
+------
+BBLAYERS = "            \
+  ${TOPDIR}/meta        \
+  ${TOPDIR}/meta-burger \
+"
+------
+
+=== Make the Burger
+
+  * Try building burger using the new layer
+
+== Customization using Layers
+
+=== Using Append Files
+
+  * Modify omlete to have less pepper
+
+  * Add a file called `omelet.bbappend` in `meta-burger`
++
+------
+do_get() {
+        echo ${PN}: less pepper > omelet.txt
+        echo ${PN}: egg >> omelet.txt
+}
+------
++
+  * Delete `tmp`, and rebuild burger now
