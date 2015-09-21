@@ -248,6 +248,8 @@ $ export MACHINE=qemuarm
  * To manage this the Poky provides a mechanism of passing
    configurations through file.
 
+=== Managing Configurations in File
+
  * One such high level user manageable configuration file is
    local.conf
 
@@ -288,10 +290,12 @@ $ bitbake core-image-minimal
 ------
 
  * Built kernel and rootfs images would be available in
-  build/tmp/deploy/images/${MACHINE} directory.
+   build/tmp/deploy/images/${MACHINE} directory.
 
  * Along with the images you may also find manifest files describing
    the packages available in rootfs.
+
+=== Building Minimal Rootfs
 
  * The build should get completed in fewer minutes as it tries to
    reuse state-cache
@@ -329,9 +333,10 @@ $ ./runqemu.sh
 * We can exclude a package from the build by appending the package
   name to PACKAGE_EXCLUDE variable.
 
-* let's check the packages built in core-image-minimal by using -g
-  option 
+=== Knowing Packages and Their Dependencies
 
+* let's check the packages built in core-image-minimal by using -g
+  option
 
 [source,shell]
 ------
@@ -349,6 +354,8 @@ $ nano pn-buildlist
 * From this list we can find that, bash is not built by
   core-image-minimal recipe.
 
+=== Adding Package to a Build
+
 * We can enable building bash by adding below line to local.conf
 
 ------
@@ -357,7 +364,6 @@ IMAGE_INSTALL += bash
 
 * Build the new rootfs image using core-image-minimal again and check
   whether the bash is built.
-
 
 === Need for Layer
 
@@ -398,7 +404,7 @@ $ yocto-layer create tiny-fs
  * We can find the layer.conf file inside the conf folder of
    meta-tiny-fs.
 
-=== Creating Rootfs Image
+=== Need for Custom Image
 
  * As we know that Yocto expects that the list of packages to be built
    should be provided through a variable IMAGE_INSTALL through a
@@ -408,6 +414,8 @@ $ yocto-layer create tiny-fs
 
  * for our tiny-fs, we need only three packages bash, coreutils and
    less. It is better to create our recipe to build rootfs image.
+
+=== Creating Custom Image
 
  * Yocto provides core-image class which can be inherited to used
    already defined definitions to build rootfs image.
@@ -428,6 +436,8 @@ BBFILES += "${LAYERDIR}/recipes-*/*/*.bb"
 $ mkdir -p meta-tiny-fs/recipes-core/images/
 ------
 
+=== Knowing Supported Packages
+
  * The packages that are available in currently added layers can be
    obtained using
 
@@ -439,7 +449,10 @@ $ bitbake -s | grep -i bash
  * From which we can get the package names for bash, coreutils and
    less.
 
- * in this image recipe file we can define the list of packages to be
+
+=== Adding Packages to Recipe
+
+ * In the image recipe file we can define the list of packages to be
    built into the rootfs image.
 
 [source,shell]
@@ -481,6 +494,8 @@ $ bitbake-layers add-layer meta-tiny-fs
    openembedded's packaging format, we can override that by declaring
    the PACKAGE_CLASSES as package_deb
 
+=== Minimal local.conf
+
  * The yocto expects the version of the current configuration to be
    provided using CONF_VERSION
 
@@ -511,6 +526,8 @@ $ bitbake core-image-tiny
    rootfs images would be available in the
    tmp-glibc/deploy/images/qemuarm
 
+=== Checking Our Tiny-FS Image
+
 [source,shell]
 --------------
 $ ls tmp-glibc/deploy/images/qemuarm/
@@ -523,7 +540,7 @@ $ ls tmp-glibc/deploy/images/qemuarm/
 $ nano tmp/deploy/images/qemuarm/core-image-tiny-qemuarm.rootfs.manifest
 ---------
 
-=== Booting the the Tiny-FS Image
+=== Booting the Tiny-FS Image
 
  * Copy the zImage to shared folder /media/sf_share and
    core-image-tiny-qemuarm.ext4 as disk.img in /media/sf_share
@@ -569,6 +586,8 @@ DISTRO_VERSION = "1.0"
 PACKAGE_CLASSES = "package_deb"
 ------
 
+=== Adding Our Distro to local.conf
+
  * Since we don't have big policies thought out for our tiny
    distribution, we can just choose packaging type for our distro.
 
@@ -576,7 +595,7 @@ PACKAGE_CLASSES = "package_deb"
 
 [source,shell]
 ------
-S vim conf/local.conf
+$ vim conf/local.conf
 
 
 MACHINE = "qemuarm"
@@ -621,16 +640,32 @@ CONF_VERSION = "1"
    to RDEPENDS, whose main recipe _packagegroup-core-tools-profile.bb_
    is available in _meta/recipes-core/packagegroups_
 
-=== Build Folder Structure
 
- * The tmp/work is the folder where all the packages are unpacked and
+=== Folders Structure for Build
+
+ * The _tmp/work_ is the folder where all the packages are unpacked and
    built.
 
- * for each package we would find a folder for target architecture
-   armv5e-oe-linux-gnueabi/${PN}/${PV}-${PR}/
+ * For each package we would find a folder inside target architecture
+   folder.
 
- * The source is unpacked patched in ${PN}-${PV} and compiled in
-   _build_ folder
+ * In our build the target architecture is _armv5e-oe-linux-gnueabi_
+
+ * The package build directory is available in
+
+-------
+   armv5e-oe-linux-gnueabi/${PN}/${PV}-${PR}
+------
+
+ * The source is unpacked and patched in 
+
+------
+   armv5e-oe-linux-gnueabi/${PN}/${PV}-${PR}/${PN}-${PV}
+------
+
+=== Folders for Package Creation
+
+ * The packages are compiled in _build_ directory.
 
  * The compiled artifacts are installed in _package_ folder, then it
    is analyzed and segregated in _packages-split_ as development, doc
@@ -639,13 +674,15 @@ CONF_VERSION = "1"
  * Meta data for building packages are available in _packagedata_
    folder.
 
+=== Folders for Build Logs
+
  * A _temp_ folder inside the package folder would have build logs
    which can be referred on build failures.
 
  * We can find the details on build steps involved in building the
    package in file _log.task_order_
 
-=== Machine Configuration
+=== Need for Machine Configuration
 
   * _Machine_ is the target board for which the image is built.
 
@@ -658,6 +695,8 @@ CONF_VERSION = "1"
 
   * BSP layer would also have the Linux kernel compilation recipe,
     which would have default configuration for the target board.
+
+=== Sample Machine Configuration
 
   * A minimal machine configuration file is given below
 
@@ -681,4 +720,4 @@ PREFERRED_VERSION_linux-yocto ?= "3.19%"
    matched what already in exist state cache, the archived artifact is
    restored in the new build directory by setscene task.
 
- * We can find mostly *setscene tasks in the build log.
+ * We can find mostly _*setscene_ tasks in the build log.
