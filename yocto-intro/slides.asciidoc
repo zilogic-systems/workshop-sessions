@@ -655,7 +655,7 @@ CONF_VERSION = "1"
 
 -------
    armv5e-oe-linux-gnueabi/${PN}/${PV}-${PR}
-------
+-------
 
  * The source is unpacked and patched in 
 
