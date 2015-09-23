@@ -25,19 +25,19 @@ Zilogic Systems <training@zilogic.com>
  * If we want to update a bug fix for one of our software, we may need
    to do a FOTA.
 
- * Whether we need to ship the whole rootfs which is in few MB or want
-   to ship only the particular software module.
+ * Whether we need to ship the whole rootfs which is around a few MBs
+   or want to ship only the particular software module.
 
 === Package Managed Rootfs
 
  * Managed Rootfs has to be built by installing software components as
    packages.
 
- * Each package has files to be installed on rootfs and meta data
-   which describes about the package and its dependencies.
+ * Each package has files to be installed on rootfs and metadata which
+   describes about the package and its dependencies.
 
  * Rootfs has a package database, on installation of packages, the
-   packagedb is updated.
+   package db is updated.
 
  * Where we can install, remove & update packages and their
    dependencies without affecting rest of the rootfs.
@@ -54,13 +54,13 @@ Zilogic Systems <training@zilogic.com>
    complete this build infrastructure was called as open-embedded
    build system.
 
-image::figures/oe-logo.png[style="left",align="center"]  
+image::figures/oe-logo.png[style="left",align="center"]
 
 === History of Yocto
 
  * Poky & Angstrom are two embedded distribution which were built
    using open-embedded build system.
- 
+
  * Poky was a build system used OpenedHand Project, After Intel taking
    over the OpenedHand project, Poky was adopted by Linux Foundation
    for its Yocto Project.
@@ -72,7 +72,7 @@ image::figures/oe-logo.png[style="left",align="center"]
 == Introduction to Yocto
 
 [style="two-column"]
-=== What is Yocto 
+=== What is Yocto
 
 [style="right"]
 
@@ -82,34 +82,34 @@ image::figures/oe-logo.png[style="left",align="center"]
  * More than build system, it focuses on complete build cycle
    involving compiling, debugging, testing on simulated hardware.
 
-image::figures/yocto-project-transp.png[style="left",align="center"]  
+image::figures/yocto-project-transp.png[style="left",align="center"]
 
-=== What is Yocto 
+=== What is Yocto
 
  * Supports sufficient infrastructure to perform post build analysis
    on the build artifacts, for their size, dependency, quality and
-   licenses .
+   licenses.
 
  * Builds atomic layers to segregate and maintain software from
    different providers separately.
 
 [style="two-column"]
-=== Yocto Vs Buildroot 
+=== Yocto Vs Buildroot
 
 [style="right"]
   * Supports list of well tested open source software.
 
-  * Allows to build a managed rootfs with deb/rpm/ipk packages.
+  * Allows building a managed rootfs with deb/rpm/ipk packages.
 
   * Provides a complete embedded development environment.
 
   * Well organized as layers and easily extendable
 
-  * Allows to test software on emulators without a real target device.
+  * Allows testing software on emulators without a real target device.
 
-image::figures/yocto-environment.png[style="left",align="center"]  
+image::figures/yocto-environment.png[style="left",align="center"]
 
-===  Yocto internal projects
+=== Yocto internal projects
 
 Yocto develops several projects to improve build infrastructure
 
@@ -118,7 +118,7 @@ Yocto develops several projects to improve build infrastructure
  * Autobuilder - build and test automation tool
 
  * ADT - Plugins for Eclipse/Anjuta IDE
- 
+
  * Pseudo, cross-prelink - tools required to improve build
 
  * Hob & Toaster - UI tools to manage Yocto build and their results
@@ -144,12 +144,12 @@ Yocto develops several projects to improve build infrastructure
  * Over openembedded build system, Poky builds SDK and debugger as IDE
    plugins, integrates QEMU for target simulation.
 
-image::figures/Poky-Logo.jpg[style="left",align="center"]  
+image::figures/Poky-Logo.jpg[style="left",align="center"]
 
 === OpenEmbedded
 
- * Openembedded is a independent project for embedded Linux build
-   system. 
+ * Openembedded is an independent project for embedded Linux build
+   system.
 
  * Yocto and Openembedded share bitbake and a specific metadata(set of
    recipes) called openembedded-core.
@@ -178,9 +178,9 @@ image::figures/poky-repo-cropped.png[style="right",align="center"]
 
 [source,shell]
 ----
- $ sudo apt-get install --no-install-recommends 
+ $ sudo apt-get install --no-install-recommends
             build-essential patch \
- 	    diffstat git gawk chrpath  \
+ 	    diffstat git gawk chrpath \
             cpio texinfo libsdl-dev vim
 ----
 
@@ -224,7 +224,7 @@ $ source oe-init-build-env
    which the kernel and rootfs has to be built by Poky.
 
  * For our experiment we are going to use an arm target board emulated
-   through QEMU. 
+   through QEMU.
 
  * Which can be configured by exporting a shell variable as shown
    below.
@@ -319,7 +319,7 @@ $ ls tmp/deploy/images/qemuarm/
 
 [source,shell]
 ------
-$ ./runqemu.sh 
+$ ./runqemu.sh
 ------
 
 === Customizing the Build
@@ -373,14 +373,14 @@ IMAGE_INSTALL += bash
 * Better practise is to maintain all our permanent changes in separate
   layer, which can be maintained in versioning system.
 
-== Build Your Own Layer & Image
+== Build Your Own Layer and Image
 
 === Tiny Rootfs
 
 As an experiment we can try to build the rootfs, which we had built
 earlier with Zepto, now using yocto.
 
-This would involve 
+This would involve
 
  * building bash, coreutils & less.
 
@@ -427,7 +427,7 @@ $ yocto-layer create tiny-fs
 BBFILES += "${LAYERDIR}/recipes-*/*/*.bb"
 ------
 
- * Sticking to Yocto's convention, we can create a our image recipe
+ * Sticking to Yocto's convention, we can create our image recipe
    named core-image-tiny.bb in meta-tiny-fs/recipes-core/images/
    folder
 
@@ -466,7 +466,7 @@ IMAGE_FEATURES = "doc-pkgs"
 inherit core-image
 ------
 
-=== Adding Our Layer to Yocto 
+=== Adding Our Layer to Yocto
 
  * The new layer created has distro configuration and the core-image
    recipe.
@@ -549,7 +549,7 @@ $ nano tmp/deploy/images/qemuarm/core-image-tiny-qemuarm.rootfs.manifest
 
 [source,shell]
 ------
-$ ./runqemu.sh 
+$ ./runqemu.sh
 ------
 
 === Creating Our Own Distribution
@@ -570,7 +570,7 @@ $ ./runqemu.sh
 === Creating Our Own Distribution
 
   * We can create a new distribution called tiny-distro in our meta-tiny-fs
-    layer 
+    layer
 
   * Inside the meta-tiny-fs/conf create a directory distro and file
     tiny-distro.conf inside it. Write below given distro descriptions
@@ -589,7 +589,7 @@ PACKAGE_CLASSES = "package_deb"
 === Adding Our Distro to local.conf
 
  * Since we don't have big policies thought out for our tiny
-   distribution, we can just choose packaging type for our distro.
+   distribution, we can just choose a packaging method for our distro.
 
  * Can edit the conf/local.conf to build our new distro as shown below
 
@@ -605,9 +605,9 @@ CONF_VERSION = "1"
 
  * Build the image and test the new distro on the target.
 
-== Things To Know 
+== Things To Know
 
-=== Package Groups 
+=== Package Groups
 
  * Poky allows to create special recipes which can build related group
    of packages.
@@ -622,13 +622,13 @@ CONF_VERSION = "1"
    meta/recipes-core/packagegroups/ is a fair example for a
    packagegroup.
 
-=== Extending & Overriding Recipes
+=== Extending and Overriding Recipes
 
- * If a already existing recipe has to be just modified for few
-   parameters instead of writing a the recipe again,
+ * If already existing recipe has to be just modified for few
+   parameters instead of writing the recipe again,
 
  * Just the newer modifications can be written in recipe file with
-   extension .bbappend and sticking to file name as same as the main
+   extension '.bbappend' and sticking to file name as same as the main
    recipe.
 
  * Even if main and append recipes are placed in different layers,
@@ -657,7 +657,7 @@ CONF_VERSION = "1"
    armv5e-oe-linux-gnueabi/${PN}/${PV}-${PR}
 -------
 
- * The source is unpacked and patched in 
+ * The source is unpacked and patched in
 
 ------
    armv5e-oe-linux-gnueabi/${PN}/${PV}-${PR}/${PN}-${PV}
@@ -671,7 +671,7 @@ CONF_VERSION = "1"
    is analyzed and segregated in _packages-split_ as development, doc
    and debug packages.
 
- * Meta data for building packages are available in _packagedata_
+ * Metadata for building packages are available in _packagedata_
    folder.
 
 === Folders for Build Logs
