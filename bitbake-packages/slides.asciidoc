@@ -1,0 +1,570 @@
+= Building and Using packages
+Zilogic Systems <training@zilogic.com>
+
+== Advantage of Managed Rootfs
+
+=== Managed Rootfs
+
+image::figures/packages.png[style="right",align="center",width="80%"]
+
+=== Advantages
+
+  * Easy installation and removal of packages
+  * List the packages installed in your system
+  * List files associated with a package
+
+
+== Packages
+
+=== Information in Packages
+
+ * Contents of the application like binaries, documentation & configuration
+ * Meta data about the application
+
+
+=== `ar` tool
+
+ * Tool to create, modify and extract from archives
+ * `ar` can be used to examine deb package
+
+=== Inside a deb package
+
+ * List files inside a deb package
++
+------
+$ cd ~/yp/packages/inside-deb
+$ ar t hello-world_2.8_all.deb
+debian-binary
+control.tar.gz
+data.tar.gz
+------
++
+ * Extract files using `ar x`
++
+------
+$ ar x hello-world_2.8_all.deb
+------
+
+=== `debian-binary`
+
+ * contains the debian package format version
++
+------
+$ file debian-binary
+$ cat debian-binary
+------
+
+=== `control.tar.gz`
+
+ * List contents of the archive
++
+------
+$ tar -tf control.tar.gz
+md5sums
+control
+------
++
+ * `md5sums` file contains the md5sum of all the application files
+ * `control` file contains the meta information
++
+------
+$ tar -xf control.tar.gz
+------
+
+=== `data.tar.gz`
+
+ * contains the package files
++
+------
+$ tar -tf data.tar.gz
+------
+
+== Creating deb packages using fpm
+
+=== fpm tool
+
+ * fpm - an easy way to create packages
++
+------
+$ cd ~/yp/packages/fpm
+$ fpm
+------
++
+------
+hello-world/
+`-- bin
+    `-- hello
+------
++
+------
+$ fpm -s dir -t deb
+------
+
+
+=== Creating the `hello-world` deb package
+
+[source,shell]
+------
+$ fpm -s dir -t deb -C hello-world
+------
+
+[source,shell]
+------
+$ fpm -s dir -t deb -C hello-world -n "hello-world"
+------
+
+
+=== Creating the `hello-world` deb package (Contd.)
+
+[source,shell]
+------
+$ fpm -s dir -t deb				\
+      -C hello-world -n "hello-world"		\
+      -v 2.2 -a all  				\
+      -d ""					\
+      --description "Hello World package"
+------
+
+ * `dpkg` can be used to install the package
+
+== Package creation in zepto
+
+=== Need for separate application directories
+
+ * All applications have been installed in `rootfs` directory
+ * For packaging, we need to have a separate directory for each application
+ * Add a variable `D` in `bitbake.conf`
++
+------
+D = "${WORKDIR}/dest"
+------
+
+=== Changes in `autotools.bbclass`
+
+ * Modify `install` task in `autotools.bbclass`
++
+[source,shell]
+------
+do_install() {
+	cd ${WORKDIR}/${PN}-${PV}
+        make install DESTDIR=${D}
+}
+------
+
+=== Test `install` task of recipes
+
+ * Now remove `tmp` directory and execute `install` of each recipe
++
+[source,shell]
+------
+$ rm -rf tmp/
+$ bitbake bash -c install
+$ bitbake coreutils -c install
+$ bitbake less -c install
+------
++
+ * `bash` and `coreutils` are installed in their respective `dest` directories
+
+
+===  Building `less` results in a configuration error
+
+ * `less` is not able to find the `ncurses` headers and libraries
+
+ * Change `ROOTFS` variable to `D` variable in `do_configure` task in `autotools.bbclass`
++
+[source,shell]
+------
+do_configure() {
+	    ....
+	    ....
+            LDFLAGS=-L${D}/usr/lib	        \
+            CPPFLAGS=-I${D}/usr/include		\
+}
+------
++
+------
+$ bitbake less -c install
+------
+
+=== Understanding the problem with `less` configuration
+
+ * `D` is different for each recipe
+ * During configuration of `less`, `D` points to the `dest` directory of `less` and not `ncurses`
+ * So we need a common directory to install libraries and headers required for build
+
+=== Separate directory to handle build-time dependencies
+
+ * Change `D` variable to `STAGING` in `do_configure` task
++
+[source,shell]
+------
+            LDFLAGS=-L${STAGING}/usr/lib        \
+            CPPFLAGS=-I${STAGING}/usr/include	\
+------
++
+ * Define it in `bitbake.conf`
++
+[source,shell]
+------
+STAGING = "${TMPDIR}/staging"
+------
+
+=== Copying relevant contents into the Staging directory
+
+ * Build time dependencies needs to be copied to the staging directory
+ * `less` has a build-time dependency `ncurses`
+ * `ncurses` should have a separate task to copy its libraries and headers into the staging directory
+
+=== Define a `staging` task in `base.bbclass`
+
+ * Add a `staging` task after `install` task
+ * Modify
++
+------
+addtask rootfs after do_install
+------
++
+ * to
++
+------
+addtask staging after do_install
+------
+
+=== Dependencies between `configure` and `staging` task
+
+ * staging of task of `ncurses` needs to be done before configuring `less`.
+
+ * Modify
++
+------
+do_configure[deptask] = "do_install"
+------
++
+ * to
++
+------
+do_configure[deptask] = "do_staging"
+------
+
+=== Defining the `staging` task in `ncurses.bb`
+
+ * Copy the include and library files to the staging directory
+ * Also Staging directory needs to present before the task runs.
++
+[source,shell]
+------
+do_staging[dirs] = "${STAGING}"
+do_staging() {
+	mkdir -p ${STAGING}/usr
+	cp -rf  ${D}/usr/lib/ ${D}/usr/include/ ${STAGING}/usr
+}
+------
++
+ * Now let's build less
++
+------
+$ bitbake less -c install
+------
+
+== Overview
+
+=== An overview of how to create the `Managed Rootfs`
+
+ * Isolation of the applications is complete.
+ * Solved build-time dependency problem using a separate directory called `staging`
+ * Package for each of these applications needs to be created.
+ * Created packages needs to be installed in the Rootfs
+
+== Packaging in Zepto
+
+=== Define package task in `base.bbclass`
+
+ * Add new task for packaging in `base.bbclass` after staging task
++
+------
+addtask package after do_staging
+------
+
+=== Define package task in `base.bbclass` (Contd.)
+
+ * Deb package is created in `do_package()` task.
+ * `-f` option is used to avoid error when recreating the package.
++
+[source,shell]
+------
+do_package() {
+	fpm -f -s dir -t deb			\
+	    -n ${PN} -v ${PV} 			\
+	    -a "arm" -C ${D} 			\
+	    --description "${DESCRIPTION}"
+}
+------
+
+=== Test `package` task for all recipes
+
+------
+$ bitbake bash -c package
+$ bitbake coreutils -c package
+$ bitbake less -c package
+------
+
+=== Fixing the `libc` recipe
+
+ * We also need `libc` in our Rootfs
+ * Change all `ROOTFS` to `D`
++
+------
+$ bitbake libc -c package
+------
+
+== Setting up Package Repo with reprepro
+
+=== `reprepro` tool
+
+ * Create and manage a local repository of debian packages
++
+------
+$ cd ~/yp/packages/repo
+$ reprepro
+------
++
+ * Configuration file
++
+[source,shell]
+------
+Suite: stable
+Codename: femto
+Architectures: amd64
+Components: main
+Description: femto deb packages
+------
+
+
+=== Create a Debian repository
+
+ * Basic command to create a debian repository
++
+------
+$ reprepro -V includedeb femto ../sample-pkgs/*.deb
+------
++
+ * `includedeb` is a subcommand to include deb packages in a particular distribution.
+
+
+== Repo creation in zepto
+
+=== Define `rootfs` task in `base.bbclass`
+
+ * Add Rootfs task in `base.bbclass` after packaging task
++
+------
+addtask rootfs after do_package
+do_rootfs[rdeptask] = "do_package"
+------
+
+=== Add `do_rootfs` task `core-image-minimal.bb`
+
+ * `do_rootfs` task in `core-image-minimal.bb` recipe creates the rootfs
++
+[source,shell]
+------
+do_rootfs () {
+	mkdir -p conf
+	cat << EOF > conf/distributions
+Suite: stable
+Codename: zepto
+Architectures: arm
+Components: main
+Description: zepto deb packages
+EOF
+	reprepro -V removematched zepto '*'
+	reprepro -V includedeb zepto *.deb
+
+	....
+	....
+}
+------
+
+=== Build the Rootfs
+
+------
+$ bitbake core-image-minimal -c rootfs
+------
+
+=== Fix `package` task failure in `core-image-minimal.bb`
+
+ * Add a dummy `do_package` task in `core-image-minimal.bb`
++
+------
+do_package() {
+        :
+}
+------
++
+ * Now run the `rootfs` task
++
+------
+$ bitbake core-image-minimal -c rootfs
+------
++
+ * The repository has been created in the `B` folder
+
+=== List the `ROOTFS` directory contents
+
+ * Rootfs directory should be an empty folder till this point
+ * Contains a `bin` folder with symbolic links
+ * Need to fix this issue in `bash.bb`
+ * Change all instances of `ROOTFS` to `D` in `do_install_append` task of `bash.bb`
++
+------
+$ bitbake core-image-minimal -c rootfs
+------
+
+== Installing packages in Rootfs with multistrap
+
+=== multistrap tool
+
+  * A `apt-get` like tool to create root filesystems.
++
+[source,shell]
+------
+$ /usr/sbin/multistrap -a <arch> -d <rootfs> -f <conf file>
+------
+
+=== `multistrap` configuration file
+
+[source,shell]
+------
+[General]
+noauth=true
+bootstrap=Packages
+
+[Packages]
+packages=hello-world
+source=copy:///home/user/yp/packages/repo
+suite=femto
+omitdebsrc=true
+------
+
+=== Create a Rootfs using `multistrap`
+
+[source,shell]
+------
+$ /usr/sbin/multistrap -a arm			\
+     		       -d rootfs/ 		\
+     		       -f conf/multistrap.conf
+------
+
+== Rootfs creation in zepto
+
+=== Packages list and repo path
+
+ * List of packages needs to be obtained from RDEPENDS variable
+
+ * Repository path needs to be obtained from B variable
+
+=== Update the `do_rootfs` task
+
+[source,shell]
+------
+do_rootfs() {
+	.....
+
+	cat << EOF > conf/multistrap.conf
+[General]
+noauth=true
+bootstrap=Packages
+
+[Packages]
+packages=${RDEPENDS}
+source=copy:///${B}
+suite=zepto
+omitdebsrc=true
+EOF
+
+	rm -rf ${ROOTFS}
+	/usr/sbin/multistrap	 \
+	    -a arm 		 \
+	    -d ${ROOTFS} 	 \
+	    -f conf/multistrap.conf
+}
+
+------
+
+== Testing our Rootfs
+
+=== Boot `disk.img` using Qemu
+
+[source,shell]
+------
+qemu-system-arm -M versatilepb       \
+  -hda ~/yp/zepto/tmp/disk.img	     \
+  -kernel ~/yp/pre-built/zImage      \
+  -append "root=/dev/sda rw"
+------
+
+ * Test all the commands
+
+== Run-time dependencies
+
+=== Handling run-time dependencies
+
+ * `less` has a run-time dependency on `ncurses`
+ * Need to create package for run-time dependencies
+ * Dependencies to be specified in `fpm` command
+
+=== `RDEPENDS` variable
+
+ * Specifies run-time dependencies
++
+------
+RDEPENDS_{PN} = "ncurses"
+------
+
+=== Update `package` task in `base.bbclass`
+
+[source,shell]
+------
+do_package() {
+	if [ ${PN} != 'less' ]
+	then
+		fpm -f -s dir -t deb -n ${PN} -v ${PV} -a "arm" \
+		    -C ${D} --description "${DESCRIPTION}"
+	else
+		fpm -f -s dir -t deb -n ${PN} -v ${PV} -a "arm" \
+		    -C ${D} --description "${DESCRIPTION}" 	\
+		    -d "${RDEPENDS_${PN}}"
+	fi
+}
+------
+
+=== Specify inter-task dependencies
+
+------
+do_package[rdeptask] = "do_package"
+------
+
+=== Recreate the Rootfs
+
+------
+$ rm tmp/stamps/*do_package
+$ rm tmp/stamps/*do_rootfs
+$ rm -rf tmp/rootfs
+$ bitbake core-image-minimal -c rootfs
+------
+
+== Testing final Rootfs
+
+=== Boot `disk.img` using Qemu
+
+[source,shell]
+------
+qemu-system-arm -M versatilepb       \
+  -hda ~/yp/zepto/tmp/disk.img	     \
+  -kernel ~/yp/pre-built/zImage      \
+  -append "root=/dev/sda rw"
+------
+
+ * Now test the `less` command
+
+== Thank you
