@@ -10,17 +10,21 @@ popd
 
 tar -x -f ~/yp/dl/bitbake-1.17.0.tar.gz
 
-cd bitbake-1.17.0
+pushd bitbake-1.17.0
 python setup.py build
+popd
 
-cd ~/yp/sandwich/bitbake-1.17.0/build/scripts*
+pushd ~/yp/sandwich/bitbake-1.17.0/build/scripts*
 export PATH=$PWD:$PATH
+popd
 
-cd ~/yp/sandwich/bitbake-1.17.0/build/lib*
+pushd ~/yp/sandwich/bitbake-1.17.0/build/lib*
 export PYTHONPATH=$PWD:$PYTHONPATH
+popd
 
-cd ~/yp/sandwich/bitbake-1.17.0/lib
+pushd ~/yp/sandwich/bitbake-1.17.0/lib
 export PYTHONPATH=$PWD:$PYTHONPATH
+popd
 EOF
 
 cat > ~/yp/sandwich/conf/bitbake.conf <<"EOF"
