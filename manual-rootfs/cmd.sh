@@ -227,7 +227,7 @@ ls $ROOTFS/usr/lib
 ### END: check-ncurses-location.sh
 
 ### START: build-hello-ncurses-2.sh
-arm-none-linux-gnueabi hello-ncurses.c \
+arm-none-linux-gnueabi-gcc hello-ncurses.c \
     -I $ROOTFS/usr/include             \
     -L $ROOTFS/usr/lib                 \
     -lncurses
@@ -239,7 +239,7 @@ cd ~/yp/manual/less-458
             --host=arm-none-linux-gnueabi \
             --build=i686-pc-linux-gnu     \
             LDFLAGS="-L $ROOTFS/usr/lib"  \
-            CPPFLAS="-I $ROOTFS/usr/include"
+            CPPFLAGS="-I $ROOTFS/usr/include"
 make
 make install DESTDIR=$ROOTFS
 ### END: build-less.sh

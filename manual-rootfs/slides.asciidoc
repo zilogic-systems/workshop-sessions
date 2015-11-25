@@ -70,7 +70,7 @@ image::figures/kernel-boot.png[align="center"]
 
 === Booting Linux
 
-[source,shell]w
+[source,shell]
 ------
 include::cmd/boot-prebuilt.sh[]
 ------
