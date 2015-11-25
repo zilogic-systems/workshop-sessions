@@ -184,7 +184,7 @@ include::code/simple/run-get.sh[]
 
   * `do_get` should be executed before `do_cook`
 
-  * Task ordering can be enforced by specifying in `addtask` directive
+  * Task ordering can be enforced by specifying the dependency in `addtask` directive
 +
 ------
 addtask cook after do_get
