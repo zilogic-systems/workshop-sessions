@@ -68,7 +68,9 @@ image::figures/kernel-boot.png[align="center"]
 
   * Boot arguments to the kernel can be specified
 
-=== Booting Linux
+=== Invoking Qemu
+
+Create a file in `~/shared` called `run-qemu.sh`.
 
 [source,shell]
 ------
@@ -78,7 +80,9 @@ include::cmd/boot-prebuilt.sh[]
 `-M`:: Specifies the machine type. `versatilepb` for Versatile Platform Board.
 `-hda`:: Specifies the hard disk image.
 
-=== Booting Linux (Contd.)
+=== Invoking Qemu (Contd.)
+
+Create a file in `~/shared` called `run-qemu.sh`.
 
 [source,shell]
 ------
@@ -90,6 +94,21 @@ include::cmd/boot-prebuilt.sh[]
 `-append`:: Specifies the kernel boot argument. `root=/dev/sda rw`
             specifies the root should be mounted from the harddisk
 
+=== Boot Prebuilt
+
+  * In the guest, copy the pre-built images to the shared folder
++
+[source,shell]
+------
+include::cmd/copy-prebuilt.sh[]
+------
++
+  * In the host, invoke Qemu
++
+[source,shell]
+------
+include::cmd/run-qemu.sh[]
+------
 
 == Minimal Filesystem V0
 
@@ -182,8 +201,8 @@ include::cmd/create-hello-rootfs.sh[]
 include::cmd/boot-hello-rootfs.sh[]
 ------
 +
-  * `init` boot arguments is set to `/bin/hello`
-  * Kernel will execute the program specified in `init` after boot-up
+  * Kernel after boot up checks for `/sbin/init`.
+  * If not found it tries to execute `/bin/sh`
 
 == Minimal Filesystem V1
 

@@ -2,12 +2,25 @@
 
 set -e -x -u
 
+cat <<EOF > run-qemu.sh
 ### START: boot-prebuilt.sh
-qemu-system-arm -M versatilepb       \
-  -hda ~/yp/pre-built/rootfs.img     \
-  -kernel ~/yp/pre-built/zImage      \
-  -append "root=/dev/sda rw"
+cd ~/shared
+qemu-system-arm -M versatilepb \
+                -hda disk.img  \
+		-kernel zImage \
+		-append "root=/dev/sda rw"
 ### END: boot-prebuilt.sh
+EOF
+
+### START: copy-prebuilt.sh
+cp ~/yp/pre-built/zImage /media/sf_shared
+cp ~/yp/pre-build/disk.img /media/sf_shared
+### END: copy-prebuilt.sh
+
+### START: run-qemu.sh
+cd ~/shared
+bash run-qemu.sh
+### END: run-qemu.sh
 
 ### START: setup-env.sh
 ROOTFS=~/yp/manual/rootfs
@@ -36,7 +49,7 @@ arm-none-linux-gnueabi-gcc -static hello.c -o hello
 
 ### START: copy-hello.sh
 mkdir -p $ROOTFS/bin
-cp hello $ROOTFS/bin
+cp hello $ROOTFS/bin/sh
 ### END: copy-hello.sh
 
 ### START: create-hello-rootfs.sh
@@ -44,11 +57,8 @@ genext2fs -b 131072 -d $ROOTFS $DISKIMG
 ### END: create-hello-rootfs.sh
 
 ### START: boot-hello-rootfs.sh
-qemu-system-arm                                 \
-  -M versatilepb                                \
-  -kernel ~/yp/pre-built/zImage                 \
-  -append "root=/dev/sda rw init=/bin/hello"    \
-  -hda $DISKIMG
+cd ~/shared
+bash run-qemu.sh
 ### END: boot-hello-rootfs.sh
 
 ### START: download-bash.sh
@@ -108,11 +118,8 @@ genext2fs -b 131072 -d $ROOTFS $DISKIMG
 ### END: create-bash-rootfs.sh
 
 ### START: boot-bash-rootfs.sh
-qemu-system-arm                 \
-  -M versatilepb                \
-  -kernel ~/yp/pre-built/zImage \
-  -append "root=/dev/sda rw"    \
-  -hda $DISKIMG
+cd ~/shared
+bash run-qemu.sh
 ### END: boot-bash-rootfs.sh
 
 ### START: build-coreutils.sh
@@ -132,11 +139,8 @@ make install DESTDIR=$ROOTFS
 genext2fs -b 131072 -d $ROOTFS $DISKIMG
 ### END: create-ls-rootfs.sh
 
-qemu-system-arm                 \
-  -M versatilepb                \
-  -kernel ~/yp/pre-built/zImage \
-  -append "root=/dev/sda rw"    \
-  -hda $DISKIMG
+cd ~/shared
+bash run-qemu.sh
 
 ### START: check-ls-deps.sh
 arm-none-linux-gnueabi-readelf -d $ROOTFS/usr/bin/ls
