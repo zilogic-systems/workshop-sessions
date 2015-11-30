@@ -71,6 +71,14 @@ image::layerconf.png[]
 
   * Contains the recipe for building sandwich
 
+  * For BitBake layer processing, `BBPATH` should not be set in env.
+
+  * Ensure the variable `BBPATH` is not set, from a previous exercise
++
+-------
+$ unset BBPATH
+-------
++
   * Build and verify sandwich
 
 == Adding New Layers
