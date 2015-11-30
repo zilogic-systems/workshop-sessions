@@ -1,0 +1,150 @@
+= Debian Packaging
+Zilogic Systems
+
+== Packages
+
+=== Distributing Software
+
+  * Binary software can be distributed as Tar / Zip Archive
+
+  * Firefox for example is distributed as Tar archive
+
+  * Tar archives are simple, can be extracted into some path in the
+    system
+
+  * Software can also be distributed as a package, `.deb` or `.rpm`
+
+  * Advantages of packages of Tar archives?
+
+=== Install and Remove
+
+  * Benefit 1: Package manager tracks packages installed in the system
++
+------
+$ sudo dpkg -i hello_1.0.0_all.deb
+$ hello
+$ dpkg --list
+$ dpkg --list | grep hello
+------
++
+  * Benefit 2: Packages can be easily uninstalled
++
+------
+$ sudo dpkg -r hello
+------
+
+=== Upgrade
+
+  * Benefit 3: Easy to upgrade the package to a new version
++
+------
+$ sudo dpkg -i hello_1.1.0_all.deb
+$ dpkg --list | grep hello
+$ hello
+------
+
+=== Dependencies
+
+  * Benefit 4: Packages can have dependencies and are verified during
+    installation
++
+------
+$ sudo dpkg -i abc_1.0.0_all.deb
+dpkg: dependency problems prevent configuration of abc:
+ abc depends on def; however:
+  Package def is not installed.
+
+$ sudo dpkg -i def_1.0.0_all.deb
+$ sudo dpkg -i abc_1.0.0_all.deb
+------
+
+=== Dependencies (Contd.)
+
+  * Benefit 5: Dependencies are verified during uninstallation
++
+------
+$ sudo dpkg -r def
+dpkg: dependency problems prevent removal of def:
+ abc depends on def.
+------
+
+=== Disecting a Package
+
+  * Debian packages use the "archive" format
+  * Extracting contents of "archive".
++
+------
+$ mkdir ~/yp/packaging/hello
+$ cd ~/yp/packaging/hello
+$ ar x ../hello_1.0.0_all.deb
+------
++
+  * `debian-binary`: version of `.deb` file format
+  * `control.tar.gz`: contains meta information like name, version,
+    dependencies, description, etc.
+  * `data.tar.gz`: contains the files to be installed.
+
+=== Creating Packages
+
+  * Create the folder structure.
++
+------
+$ mkdir -p ~/yp/fpm/xyz
+$ mkdir -p ~/yp/fpm/xyz/bin
+$ touch ~/yp/fpm/xyz/bin/x
+$ touch ~/yp/fpm/xyz/bin/y
+$ touch ~/yp/fpm/xyz/bin/z
+------
+
+=== Creating Packages (Contd.)
+
+  * Create the package using FPM
++
+------
+$ cd ~/yp/fpm
+$ fpm -s dir -t deb -C ~/yp/fpm/xyz
+------
++
+   * Specifying additional meta information
++
+------
+$ fpm -s dir -t deb -n "xyz" -v 1.0.0 -a all \
+      -C ~/yp/fpm/xyz                        \
+      --description "My first package."
+------
++
+  * FPM is a simple tool to create `.deb` and `.rpm` packages.
+  * Install and verify the files.
+
+== Package Repositories
+
+=== Understanding Repos
+
+=== Adding a Repo
+
+------
+$ cd ~/yp/repos/myrepo
+$ sudo add-apt-repository  "deb file://$PWD wheezy main"
+------
+
+=== Searching Cache
+
+------
+$ sudo apt-get update
+$ apt-cache search mypkg
+------
+
+=== Installing from Repo
+
+------
+$ sudo apt-get install mypkg1
+------
+
+=== Creating Repositories
+
+------
+$ 
+------
+
+== Building a RootFS
+
