@@ -1,6 +1,6 @@
 TOPDIR = ../
 
-EXPORT_WIDTH  = 1024
+EXPORT_WIDTH  = 2048
 
 images_dia = $(wildcard figures/*.dia)
 images_png = $(images_dia:.dia=.png)

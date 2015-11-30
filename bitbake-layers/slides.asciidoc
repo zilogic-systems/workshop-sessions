@@ -47,11 +47,15 @@ Zilogic Systems
 
   * Lunch -- Sandwich project re-written with layers
 
+=== Layer Directory Structure
+
+image::figures/layer-dir-tree.png[align="center"]
+
 [role="two-column"]
 === Layer Config. Processing
 
 [role="left"]
-image::layerconf.png[]
+image::figures/layerconf.png[align="center"]
 
 [role="right"]
   * If `BBPATH` is not set, BitBake looks for `conf/bblayers.conf`, in
