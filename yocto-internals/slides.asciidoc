@@ -1,0 +1,119 @@
+= Internals of Yocto
+Zilogic Systems <training@zilogic.com>
+
+== Things To Know
+
+=== Package Groups
+
+ * Poky allows to create special recipes which can build related group
+   of packages.
+
+ * Poky has several predefined packagegroups like
+   packagegroup-core-boot, package-group-base etc.,
+
+ * It is possible to create custom package group by inheriting
+   packagegroup class and providing the list of packages in RDEPENDS
+
+ * The packagegroup-core-eclipse-debug.bb available in
+   meta/recipes-core/packagegroups/ is a fair example for a simple
+   packagegroup.
+
+=== Extending and Overriding Recipes
+
+ * If already existing recipe has to be just modified for few
+   parameters instead of writing the recipe again,
+
+ * Just the newer modifications can be written in recipe file with
+   extension '.bbappend' and sticking to file name as same as the main
+   recipe.
+
+ * Even if main and append recipes are placed in different layers,
+   bitbake can resolve them.
+
+ * One example we could find is
+   _packagegroup-core-tools-profile.bbappend_ in
+   _meta-yocto-bsp/recipes-core/packagegroups_ just adds two packages
+   to RDEPENDS, whose main recipe _packagegroup-core-tools-profile.bb_
+   is available in _meta/recipes-core/packagegroups_
+
+
+=== Folders Structure for Build
+
+ * The _tmp/work_ is the folder where all the packages are unpacked and
+   built.
+
+ * For each package we would find a folder inside target architecture
+   folder.
+
+ * In our build the target architecture is _armv5e-oe-linux-gnueabi_
+
+ * The package build directory is available in
+
+-------
+   armv5e-oe-linux-gnueabi/${PN}/${PV}-${PR}
+-------
+
+ * The source is unpacked and patched in
+
+------
+   armv5e-oe-linux-gnueabi/${PN}/${PV}-${PR}/${PN}-${PV}
+------
+
+=== Folders for Package Creation
+
+ * The packages are compiled in _build_ directory.
+
+ * The compiled artifacts are installed in _package_ folder, then it
+   is analyzed and segregated in _packages-split_ as development, doc
+   and debug packages.
+
+ * Metadata for building packages are available in _packagedata_
+   folder.
+
+=== Folders for Build Logs
+
+ * A _temp_ folder inside the package folder would have build logs
+   which can be referred on build failures.
+
+ * We can find the details on build steps involved in building the
+   package in file _log.task_order_
+
+=== Need for Machine Configuration
+
+  * _Machine_ is the target board for which the image is built.
+
+  * The machine related configurations are available in
+    conf/machine/{MACHINE}.conf file in a machine specific layer
+    called as BSP layer.
+
+  * BSP layer may also have form-factor configurations like display
+    resolution, input devices to configure X11 features etc.
+
+  * BSP layer would also have the Linux kernel compilation recipe,
+    which would have default configuration for the target board.
+
+=== Sample Machine Configuration
+
+  * A minimal machine configuration file is given below
+
+------
+KERNEL_IMAGETYPE = "zImage"
+SERIAL_CONSOLE = "115200 ttyAMA0"
+MACHINE_FEATURES = "alsa bluetooth usbgadget"
+PREFERRED_PROVIDER_virtual/kernel ?= "linux-yocto"
+PREFERRED_VERSION_linux-yocto ?= "3.19%"
+------
+
+ * We can find a sample machine configuration file in
+   _meta-yocto-bsp/conf/machine/edgerouter.conf_
+
+=== SSTATE CACHE
+
+ * Yocto creates hash map of the build environment of each recipe and
+   archives the build artifact of the recipe in sstate-cache.
+
+ * When we try to build again if the hash map generated for the recipe
+   matched what already in exist state cache, the archived artifact is
+   restored in the new build directory by setscene task.
+
+ * We can find mostly _*setscene_ tasks in the build log.

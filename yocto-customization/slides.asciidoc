@@ -1,0 +1,232 @@
+= Custom Layers with Yocto
+Zilogic Systems <training@zilogic.com>
+
+== Build Your Own Layer and Image
+
+=== Tiny Rootfs
+
+ * As an experiment we can try to build the rootfs, which we had built
+   earlier with Zepto, now using yocto. This would involve,
+
+ ** building bash, coreutils & less.
+
+ ** building the ext formatted rootfs
+
+=== Creating Our Own Meta Layer
+
+ * The better practise while working with yocto, is creating your own
+   layer to hold your changes
+
+ * We can run the below command to create a layer called tiny-fs
+
+[source,shell]
+------
+$ yocto-layer create tiny-fs
+------
+
+ * It prompts for various options which you can leave to default and
+   this creates a directory meta-tiny-fs in the current directory.
+
+ * We can find the layer.conf file inside the conf folder of
+   meta-tiny-fs.
+
+=== Need for Custom Image
+
+ * As we know that Yocto expects that the list of packages to be built
+   should be provided through a variable IMAGE_INSTALL through a
+   recipe or conf file.
+
+ * core-image-minimal.bb was packing in lots of packages into rootfs
+
+ * for our tiny-fs, we need only three packages bash, coreutils and
+   less. It is better to create our own recipe to build rootfs image.
+
+=== Creating Custom Image
+
+ * Yocto provides core-image class which can be inherited to used
+   already defined definitions to build rootfs image.
+
+ * When we look on the layer.conf of our layer, we would find that the
+   recipes are added to BBFILES from particular folder hierarchy.
+
+------
+BBFILES += "${LAYERDIR}/recipes-*/*/*.bb"
+------
+
+ * Sticking to Yocto's convention, we can create our image recipe
+   named core-image-tiny.bb in meta-tiny-fs/recipes-core/images/
+   folder
+
+[source,shell]
+------
+$ mkdir -p meta-tiny-fs/recipes-core/images/
+------
+
+=== Knowing Supported Packages
+
+ * The packages that are available in currently added layers can be
+   obtained using
+
+[source,shell]
+----------
+$ bitbake -s | grep -i bash
+----------
+
+ * From which we can get the package names for bash, coreutils and
+   less.
+
+
+=== Adding Packages to Recipe
+
+ * In the image recipe file we can define the list of packages to be
+   built into the rootfs image.
+
+[source,shell]
+------
+$ vim meta-tiny-fs/recipes-core/images/core-image-tiny.bb
+
+
+SUMMARY = "A tiny image just capable of allowing a device to boot."
+IMAGE_INSTALL = " bash coreutils less "
+IMAGE_FEATURES = "doc-pkgs"
+inherit core-image
+------
+
+=== Adding Our Layer to Yocto
+
+ * The new layer created has distro configuration and the core-image
+   recipe.
+
+ * The meta-tiny-fs layer has to be added to the yocto build as
+
+[source,shell]
+------
+$ bitbake-layers add-layer meta-tiny-fs
+------
+
+=== High Level Configuration of the Build
+
+ * At-last the configurations for the current build has to be updated
+   to the `build/conf/local.conf`
+
+ * For our build we may need to provide two information target MACHINE
+   for which this build performed the and what is the DISTRO build
+   policy should be adhered
+
+ * We are going to build the rootfs for the qemu emulated arm target,
+   which can be specified as `MACHINE = "qemuarm"`
+
+ * By default the distribution is built using opkg packages which is
+   openembedded's packaging format, we can override that by declaring
+   the `PACKAGE_CLASSES` as `package_deb`
+
+=== Minimal local.conf
+
+ * The yocto expects the version of the current configuration to be
+   provided using CONF_VERSION
+
+[source,shell]
+------
+S nano conf/local.conf
+
+
+MACHINE = "qemuarm"
+DISTRO = "poky"
+PACKAGE_CLASSES = "package_deb"
+CONF_VERSION = "1"
+------
+
+=== Building Tiny-FS Image
+
+ * Now we can start building the tiny-fs image by invoking
+
+[source,shell]
+--------
+$ bitbake core-image-tiny
+--------
+
+ * The build should get completed in fewer minutes as it tries to
+   reuse state-cache
+
+ * After successful completion of the build the kernel image and
+   rootfs images would be available in the
+   tmp-glibc/deploy/images/qemuarm
+
+=== Checking Our Tiny-FS Image
+
+[source,shell]
+--------------
+$ ls tmp-glibc/deploy/images/qemuarm/
+--------------
+
+ * The list of packages in rootfs can be read from manifest file
+
+[source,shell]
+---------
+$ nano tmp/deploy/images/qemuarm/core-image-tiny-qemuarm.rootfs.manifest
+---------
+
+=== Booting the Tiny-FS Image
+
+ * Copy the zImage to shared folder /media/sf_share and
+   core-image-tiny-qemuarm.ext4 as disk.img in /media/sf_share
+
+ * Now we can boot our new images using qemu arm as shown
+
+[source,shell]
+------
+$ ./runqemu.sh
+------
+
+=== Creating Our Own Distribution
+
+ * By yocto convention, we may need to create a _distribution_ which has
+   information about the policies to be adhered whiling building the
+   individual components.
+
+  * Distro configurations affects how the packages are configured and
+    built, rather than what packages are built.
+
+  * Some of the distro configurations chooses how the system and
+    packages has to be started in boot (sysv init or systemd)
+
+  * Whether QT like UI components has to be compiled with X11 support
+    or directfb support.
+
+=== Creating Our Own Distribution
+
+  * We can create a new distribution called tiny-distro in our meta-tiny-fs
+    layer
+
+  * Inside the meta-tiny-fs/conf create a directory distro and file
+    tiny-distro.conf inside it. Write below given distro descriptions
+    to it.
+
+[source,shell]
+------
+$ vim meta-tiny-fs/conf/distro/tiny-distro.conf
+
+
+DISTRO = "tiny-distro"
+DISTRO_VERSION = "1.0"
+PACKAGE_CLASSES = "package_deb"
+------
+
+=== Adding Our Distro to local.conf
+
+ * Since we don't have big policies thought out for our tiny
+   distribution, we can just choose a packaging method for our distro.
+
+ * Can edit the conf/local.conf to build our new distro as shown below
+
+[source,shell]
+------
+$ vim conf/local.conf
+
+
+MACHINE = "qemuarm"
+DISTRO = "tiny-distro"
+CONF_VERSION = "1"
+------
+
+ * Build the image and test the new distro on the target.
