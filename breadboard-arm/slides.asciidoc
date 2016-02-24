@@ -1,5 +1,298 @@
-= Building an ARM Machine
+= Breadboard, ARMed and Dangerous
 
-== Powering Up
+== Introduction
 
-image::v1.png[]
+=== The Spectrum
+
+=== ARM
+
+=== Learning Embedded Systems
+
+=== LPC1114
+
+=== Goals
+
+  * Goal 1: LED + Serial
+    - Toggles a digital pin, every second
+    - Transmits a message on the serial port
+    - Connect an LED to the digital pin and observe state change
+    - Connect serial port to a PC and receive the data
+    
+  * Goal 2: Reprogram the ARM micro
+    - Download a new pre-built binary to the microcontroller
+
+  * Goal 3: Custom Application Development
+    - Write a custom program in C
+    - Compile the program, and download the binary
+
+== Goal 1: LED + Serial
+
+=== Power Up
+
+  * The microcontroller should be powered up first.
+
+  * What are the various sources of power, for electronic devices?
+
+=== Power Sources
+
+  * Two major sources of power for electronic devices:
+    - Battery
+    - Wall Power
+
+  * Each electronic device operates at a specific voltage.
+
+  * What is the voltage requirement for LPC1114?
+
+=== Battery
+
+  * Commonly available battery is AA battery.
+
+  * What is the voltage provided by the battery?
+
+  * How can we get the voltage required to operate the LPC1114.
++
+image::battery-block.png[align="center",width="10%"]
+
+[role="two-column"]
+=== Power Up with Battery
+
+[role="left"]
+image::v1.png[align="center"]
+
+[role="right"]
+  * Connect the power and ground, to the battery.
+
+  * Verify that the pin `0_7` is toggling using a multimeter.
+
+[role="two-column"]
+=== Connecting an LED
+
+[role="left"]
+image::v2.png[align="center"]
+
+[role="right"]
+  * Connect a Red LED with a 100 ohm current limiting resistor.
+
+  * Does the LED toggle?
+
+
+[role="two-column"]
+=== Characteristics of Power Sources
+
+[role="left"]
+image::socket.jpg[width="100%"]
+
+[role="right"]
+
+  * Two 3 pin sockets:
+    - Bigger socket at the top
+    - Smaller one at the bottom
+
+  * Apart from the size, what's the difference?
+
+[role="two-column"]
+=== Water Sources
+
+  * Same as the difference between a fire hose and water tap
+  * The amount of water that can be delivered
+  * In a power socket, the current that can be delivered
+
+[role="left"]
+image::water-tap.jpg[align="center"]
+
+[role="right"]
+image::fire-hose.jpg[align="center"]
+
+[role="tip"]
+=== //
+
+Caution: Drawing too much current than the power source can deliver, will burn
+the power source!
+
+=== Current Draw
+
+  * How much current can be drawn from the IO pins?
+
+  * The red LED has a forward voltage of 1.8V
+
+  * What is the current draw in our circuit?
+
+  * IO pins are designed for signalling rather than for providing
+    power
+
+=== Battery Capacity
+
+  * How long will the microcontroller run before the battery drains
+    out? This depends on two things.
+
+    - How much charge is stored in the battery?
+
+    - What is the total current draw of the circuit?
+
+=== Battery vs Wall Power
+
+  * Battery is generally used for mobile devices / remote devices
+
+  * Device should have low power consumption for longer life
+
+  * Rechargable batteries should be used to ensure continuous
+    operation
+
+  * Wall power is generally used for stationary devices
+
+[role="two-column"]
+=== Wall Power
+
+[role="left"]
+image::ac-adapter.jpg[align="center"]
+
+[role="right"]
+  * One common AC adapter is the mobile phone charger.
+
+  * Mobile phone chargers provide a 5V DC.
+  
+  * A 3.3V DC is required to operate the circuit
++
+image:usb-block.png[width="20%"]
+image:usb-breakout.jpg[width="50%"]
+
+
+[role="two-column"]
+=== Quiz
+
+[role="left"]
+image::stabilizer.jpg[align="center"]
+
+[role="right"]
+  * Do you recognize the device?
+  
+  * Where is it used?
+
+  * What is its purpose?
+
+[role="two-column"]
+=== Voltage Regulator
+
+[role="left"]
+image::regulator.jpg[align="center"]
+
+[role="right"]
+  * A voltage regulator serves the same purpose for an electronic circuit
+
+  * A 3.3 voltage regulator can takes a 5V input and provides a clean 3.3V
+    output
+
+  * Available for various fixed output voltages. We use LD1117V33
++
+image::regulator-block.png[width="20%",align="center"]
+
+=== From Battery Powered
+
+image::v2.png[align="center",width="50%"]
+
+=== To Wall Powered
+
+image::v3.png[align="center",width="50%"]
+
+[role="two-column"]
+=== Serial Comm.
+
+[role="left"]
+image::ftdi-breakout.jpg[align="center"]
+
+[role="right"]
+  * PC / Laptops generally today do not have a serial port
+
+  * USB serial ports are available
+
+  * Connect to PC USB port, visible a COM port in Windows
++
+image::ftdi-simple-block.png[width="30%",align="center"]
+
+=== Serial Comm.
+
+image::v4.png[align="center",width="50%"]
+
+[role="tip"]
+=== //
+
+Goal 1: LED + Serial is Complete!
+
+== Goal 2: Reprogram the ARM micro
+
+[role="two-column"]
+=== Programming Micros
+
+[role="left"]
+image::programmer.jpg[align="center"]
+
+[role="right"]
+  * Microcontroller used to have special programmers
+
+  * Required to remove from the circuit for programming
+
+  * Code is downloaded from the PC into micro, using the programmer
+
+  * Modern microcontrollers have In-System Programming (ISP) support
+
+=== How ISP Works
+
+  * The micro has an internal boot ROM
+
+  * When the ARM core is reset, the PC points to boot ROM
+
+  * It starts executing instructions from boot ROM
+
+  * The boot ROM has a boot loader
+
+  * Bootloader reads the state of pin `0_1` (in LPC1114)
+
+    - If high, executes code from Flash
+    - If low, goes into ISP mode
+    
+  * In ISP mode receives code through serial port and stores in Flash
+
+=== Automated ISP Entry
+
+  * Serial comm. circuit can be used to perform ISP
+
+  * Need to set `0_1` low, and reset the micro to enter ISP
+
+  * Can be simplified by connecting `RST` and `0_1` of micro to `DTR`
+    and `RTS` of FTDI
+
+  * `DTR` and `RTS` are extra signals available for MODEM handshake
+
+  * They can be controlled through host software
+
+  * The code download software
+    - Sets `RTS` low, to make `0_1` low (ISP enable)
+    - Toggle `DTR`, to reset micro
+    - Downloads the code
+
+=== Before Auto ISP
+
+image::v4.png[align="center",width="50%"]
+
+=== After Auto ISP
+
+image::v5.png[align="center",width="50%"]
+
+== Acknowledgements
+
+=== Photo Credits
+
+  * Stabilizer Photo:
+    http://www.flipkart.com/v-guard-vgd-30-voltage-stabilizer/p/itmdp955dr9r4sdk
+  
+  * Samsung Charger Photo:
+    http://www.flipkart.com/smartpro-travel-charger-samsung-all-other-mobile-phones-battery/p/itme37k7jz7n5xau
+
+  * LD1117V33 Photo:
+    https://www.sparkfun.com/products/526
+
+  * FTDI Breakout Photo:
+    http://www.rhydolabz.com/index.php?main_page=product_info&products_id=1090
+
+  * 8051 Programmer Photo:
+    http://findparts.in/view/8051+programmer/o5/i14176

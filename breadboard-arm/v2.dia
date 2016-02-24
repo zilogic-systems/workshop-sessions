@@ -63,7 +63,33 @@
     </dia:attribute>
   </dia:diagramdata>
   <dia:layer name="Background" visible="true" active="true">
-    <dia:object type="Standard - Image" version="0" id="O0">
+    <dia:object type="Standard - Box" version="0" id="O0">
+      <dia:attribute name="obj_pos">
+        <dia:point val="17,6"/>
+      </dia:attribute>
+      <dia:attribute name="obj_bb">
+        <dia:rectangle val="16.95,5.95;35,22.05"/>
+      </dia:attribute>
+      <dia:attribute name="elem_corner">
+        <dia:point val="17,6"/>
+      </dia:attribute>
+      <dia:attribute name="elem_width">
+        <dia:real val="17.950000000000003"/>
+      </dia:attribute>
+      <dia:attribute name="elem_height">
+        <dia:real val="16"/>
+      </dia:attribute>
+      <dia:attribute name="border_width">
+        <dia:real val="0.10000000149011612"/>
+      </dia:attribute>
+      <dia:attribute name="border_color">
+        <dia:color val="#ffffff"/>
+      </dia:attribute>
+      <dia:attribute name="show_background">
+        <dia:boolean val="true"/>
+      </dia:attribute>
+    </dia:object>
+    <dia:object type="Standard - Image" version="0" id="O1">
       <dia:attribute name="obj_pos">
         <dia:point val="18,7"/>
       </dia:attribute>
@@ -86,10 +112,10 @@
         <dia:boolean val="true"/>
       </dia:attribute>
       <dia:attribute name="file">
-        <dia:string>#lpc1114-block.png#</dia:string>
+        <dia:string>#././lpc1114-block.png#</dia:string>
       </dia:attribute>
     </dia:object>
-    <dia:object type="Standard - Image" version="0" id="O1">
+    <dia:object type="Standard - Image" version="0" id="O2">
       <dia:attribute name="obj_pos">
         <dia:point val="29,14"/>
       </dia:attribute>
@@ -112,10 +138,10 @@
         <dia:boolean val="true"/>
       </dia:attribute>
       <dia:attribute name="file">
-        <dia:string>#battery-block.png#</dia:string>
+        <dia:string>#././battery-block.png#</dia:string>
       </dia:attribute>
     </dia:object>
-    <dia:object type="Standard - ZigZagLine" version="1" id="O2">
+    <dia:object type="Standard - ZigZagLine" version="1" id="O3">
       <dia:attribute name="obj_pos">
         <dia:point val="23,14.5"/>
       </dia:attribute>
@@ -139,7 +165,7 @@
         <dia:boolean val="false"/>
       </dia:attribute>
     </dia:object>
-    <dia:object type="Standard - ZigZagLine" version="1" id="O3">
+    <dia:object type="Standard - ZigZagLine" version="1" id="O4">
       <dia:attribute name="obj_pos">
         <dia:point val="23,13.5"/>
       </dia:attribute>
@@ -165,18 +191,18 @@
         <dia:boolean val="false"/>
       </dia:attribute>
     </dia:object>
-    <dia:object type="Circuit - Horizontal Led (European)" version="1" id="O4">
+    <dia:object type="Circuit - Horizontal Led (European)" version="1" id="O5">
       <dia:attribute name="obj_pos">
-        <dia:point val="28,6.5"/>
+        <dia:point val="23,6.6"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="28,6.42929;31.4,8.08679"/>
+        <dia:rectangle val="23,6.52929;26.4,8.18679"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
-        <dia:point val="28,6.5"/>
+        <dia:point val="23,6.6"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
         <dia:real val="3.4000000000000021"/>
@@ -210,18 +236,18 @@
         <dia:real val="1"/>
       </dia:attribute>
     </dia:object>
-    <dia:object type="Circuit - Horizontal Resistor" version="1" id="O5">
+    <dia:object type="Circuit - Horizontal Resistor" version="1" id="O6">
       <dia:attribute name="obj_pos">
-        <dia:point val="23,7"/>
+        <dia:point val="26.4,7.1"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="23,6.87;28,7.93"/>
+        <dia:rectangle val="26.4,6.97;31.4,8.03"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
-        <dia:point val="23,7"/>
+        <dia:point val="26.4,7.1"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
         <dia:real val="4.9999999999999964"/>
@@ -267,16 +293,16 @@
         <dia:boolean val="false"/>
       </dia:attribute>
     </dia:object>
-    <dia:object type="Standard - ZigZagLine" version="1" id="O6">
+    <dia:object type="Standard - ZigZagLine" version="1" id="O7">
       <dia:attribute name="obj_pos">
-        <dia:point val="31.4,7.4"/>
+        <dia:point val="31.4,7.5"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="31.35,7.35;33.05,15.55"/>
+        <dia:rectangle val="31.35,7.45;33.05,15.55"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="31.4,7.4"/>
-        <dia:point val="33,7.4"/>
+        <dia:point val="31.4,7.5"/>
+        <dia:point val="33,7.5"/>
         <dia:point val="33,15.5"/>
         <dia:point val="31.5,15.5"/>
       </dia:attribute>
@@ -289,10 +315,10 @@
         <dia:boolean val="false"/>
       </dia:attribute>
       <dia:connections>
-        <dia:connection handle="0" to="O4" connection="1"/>
+        <dia:connection handle="0" to="O6" connection="1"/>
       </dia:connections>
     </dia:object>
-    <dia:object type="Standard - Ellipse" version="0" id="O7">
+    <dia:object type="Standard - Ellipse" version="0" id="O8">
       <dia:attribute name="obj_pos">
         <dia:point val="32.9,11.4"/>
       </dia:attribute>

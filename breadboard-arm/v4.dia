@@ -63,7 +63,33 @@
     </dia:attribute>
   </dia:diagramdata>
   <dia:layer name="Background" visible="true" active="true">
-    <dia:object type="Standard - Image" version="0" id="O0">
+    <dia:object type="Standard - Box" version="0" id="O0">
+      <dia:attribute name="obj_pos">
+        <dia:point val="17,6"/>
+      </dia:attribute>
+      <dia:attribute name="obj_bb">
+        <dia:rectangle val="16.95,5.95;35,29.05"/>
+      </dia:attribute>
+      <dia:attribute name="elem_corner">
+        <dia:point val="17,6"/>
+      </dia:attribute>
+      <dia:attribute name="elem_width">
+        <dia:real val="17.950000000000003"/>
+      </dia:attribute>
+      <dia:attribute name="elem_height">
+        <dia:real val="23"/>
+      </dia:attribute>
+      <dia:attribute name="border_width">
+        <dia:real val="0.10000000149011612"/>
+      </dia:attribute>
+      <dia:attribute name="border_color">
+        <dia:color val="#ffffff"/>
+      </dia:attribute>
+      <dia:attribute name="show_background">
+        <dia:boolean val="true"/>
+      </dia:attribute>
+    </dia:object>
+    <dia:object type="Standard - Image" version="0" id="O1">
       <dia:attribute name="obj_pos">
         <dia:point val="18,7"/>
       </dia:attribute>
@@ -86,10 +112,10 @@
         <dia:boolean val="true"/>
       </dia:attribute>
       <dia:attribute name="file">
-        <dia:string>#lpc1114-block.png#</dia:string>
+        <dia:string>#./lpc1114-block.png#</dia:string>
       </dia:attribute>
     </dia:object>
-    <dia:object type="Standard - Image" version="0" id="O1">
+    <dia:object type="Standard - Image" version="0" id="O2">
       <dia:attribute name="obj_pos">
         <dia:point val="29,14"/>
       </dia:attribute>
@@ -112,10 +138,10 @@
         <dia:boolean val="true"/>
       </dia:attribute>
       <dia:attribute name="file">
-        <dia:string>#battery-block.png#</dia:string>
+        <dia:string>#./battery-block.png#</dia:string>
       </dia:attribute>
     </dia:object>
-    <dia:object type="Standard - ZigZagLine" version="1" id="O2">
+    <dia:object type="Standard - ZigZagLine" version="1" id="O3">
       <dia:attribute name="obj_pos">
         <dia:point val="23,14.5"/>
       </dia:attribute>
@@ -135,7 +161,7 @@
         <dia:boolean val="false"/>
       </dia:attribute>
     </dia:object>
-    <dia:object type="Standard - ZigZagLine" version="1" id="O3">
+    <dia:object type="Standard - ZigZagLine" version="1" id="O4">
       <dia:attribute name="obj_pos">
         <dia:point val="23,13.5"/>
       </dia:attribute>
@@ -161,7 +187,7 @@
         <dia:boolean val="false"/>
       </dia:attribute>
     </dia:object>
-    <dia:object type="Standard - Image" version="0" id="O4">
+    <dia:object type="Standard - Image" version="0" id="O5">
       <dia:attribute name="obj_pos">
         <dia:point val="27,19"/>
       </dia:attribute>
@@ -184,20 +210,20 @@
         <dia:boolean val="true"/>
       </dia:attribute>
       <dia:attribute name="file">
-        <dia:string>#ftdi-block.png#</dia:string>
+        <dia:string>#./ftdi-block.png#</dia:string>
       </dia:attribute>
     </dia:object>
-    <dia:object type="Standard - ZigZagLine" version="1" id="O5">
+    <dia:object type="Standard - ZigZagLine" version="1" id="O6">
       <dia:attribute name="obj_pos">
-        <dia:point val="23,19.5"/>
+        <dia:point val="23,20.4"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="22.95,19.45;27.05,19.55"/>
+        <dia:rectangle val="22.95,19.45;27.05,20.45"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="23,19.5"/>
-        <dia:point val="23.05,19.5"/>
-        <dia:point val="26.95,19.5"/>
+        <dia:point val="23,20.4"/>
+        <dia:point val="25,20.4"/>
+        <dia:point val="25,19.5"/>
         <dia:point val="27,19.5"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
@@ -206,19 +232,19 @@
         <dia:enum val="0"/>
       </dia:attribute>
       <dia:attribute name="autorouting">
-        <dia:boolean val="true"/>
+        <dia:boolean val="false"/>
       </dia:attribute>
     </dia:object>
-    <dia:object type="Standard - ZigZagLine" version="1" id="O6">
+    <dia:object type="Standard - ZigZagLine" version="1" id="O7">
       <dia:attribute name="obj_pos">
-        <dia:point val="23,20.5"/>
+        <dia:point val="23,19.4"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="22.95,20.45;27.05,23.55"/>
+        <dia:rectangle val="22.95,19.35;27.05,23.55"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="23,20.5"/>
-        <dia:point val="24,20.5"/>
+        <dia:point val="23,19.4"/>
+        <dia:point val="24,19.4"/>
         <dia:point val="24,23.5"/>
         <dia:point val="27,23.5"/>
         <dia:point val="27,23.4886"/>
@@ -233,10 +259,10 @@
         <dia:boolean val="false"/>
       </dia:attribute>
       <dia:connections>
-        <dia:connection handle="1" to="O4" connection="3"/>
+        <dia:connection handle="1" to="O5" connection="3"/>
       </dia:connections>
     </dia:object>
-    <dia:object type="Standard - ZigZagLine" version="1" id="O7">
+    <dia:object type="Standard - ZigZagLine" version="1" id="O8">
       <dia:attribute name="obj_pos">
         <dia:point val="32,19.5"/>
       </dia:attribute>
@@ -258,7 +284,7 @@
         <dia:boolean val="false"/>
       </dia:attribute>
     </dia:object>
-    <dia:object type="Standard - Ellipse" version="0" id="O8">
+    <dia:object type="Standard - Ellipse" version="0" id="O9">
       <dia:attribute name="obj_pos">
         <dia:point val="32.9,15.4"/>
       </dia:attribute>

@@ -113,10 +113,10 @@
        id="linearGradient12426"
        gradientUnits="userSpaceOnUse"
        gradientTransform="translate(67.5,-83.747071)"
-       x1="179.1"
-       y1="174.86218"
-       x2="540.9"
-       y2="174.86218" />
+       x1="180"
+       y1="173.10925"
+       x2="585"
+       y2="173.10925" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -126,8 +126,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.70000001"
-     inkscape:cx="334.79894"
-     inkscape:cy="539.31592"
+     inkscape:cx="470.90076"
+     inkscape:cy="620.54292"
      inkscape:document-units="in"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -185,12 +185,12 @@
            y="178.07648" /></flowRegion><flowPara
          id="flowPara9098"
          style="font-size:14px">VDD</flowPara></flowRoot>    <rect
-       style="fill:url(#linearGradient12426);fill-opacity:1;stroke:#000000;stroke-width:1.8;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       style="fill:url(#linearGradient12426);fill-opacity:1;stroke:#000000;stroke-width:1.79999994999999990;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
        id="rect9100"
        width="405"
-       height="22.5"
+       height="27"
        x="247.5"
-       y="91.115112"
+       y="89.362183"
        rx="0"
        ry="0" />
     <flowRoot
@@ -744,7 +744,7 @@
          id="flowPara9098-9"
          style="font-size:14px">Voltage (Good): 1.5 V</flowPara><flowPara
          style="font-size:14px"
-         id="flowPara12820">Voltage (Dead): 1 V</flowPara></flowRoot>    <flowRoot
+         id="flowPara12820">Voltage (Dead): 1.0 V</flowPara></flowRoot>    <flowRoot
        xml:space="preserve"
        id="flowRoot9092-24-2"
        style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Droid Sans;-inkscape-font-specification:Droid Sans"

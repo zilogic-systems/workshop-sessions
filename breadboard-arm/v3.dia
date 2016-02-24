@@ -63,7 +63,33 @@
     </dia:attribute>
   </dia:diagramdata>
   <dia:layer name="Background" visible="true" active="true">
-    <dia:object type="Standard - Image" version="0" id="O0">
+    <dia:object type="Standard - Box" version="0" id="O0">
+      <dia:attribute name="obj_pos">
+        <dia:point val="17,6"/>
+      </dia:attribute>
+      <dia:attribute name="obj_bb">
+        <dia:rectangle val="16.95,5.95;35,22.05"/>
+      </dia:attribute>
+      <dia:attribute name="elem_corner">
+        <dia:point val="17,6"/>
+      </dia:attribute>
+      <dia:attribute name="elem_width">
+        <dia:real val="17.950000000000003"/>
+      </dia:attribute>
+      <dia:attribute name="elem_height">
+        <dia:real val="16"/>
+      </dia:attribute>
+      <dia:attribute name="border_width">
+        <dia:real val="0.10000000149011612"/>
+      </dia:attribute>
+      <dia:attribute name="border_color">
+        <dia:color val="#ffffff"/>
+      </dia:attribute>
+      <dia:attribute name="show_background">
+        <dia:boolean val="true"/>
+      </dia:attribute>
+    </dia:object>
+    <dia:object type="Standard - Image" version="0" id="O1">
       <dia:attribute name="obj_pos">
         <dia:point val="18,7"/>
       </dia:attribute>
@@ -86,15 +112,15 @@
         <dia:boolean val="true"/>
       </dia:attribute>
       <dia:attribute name="file">
-        <dia:string>#lpc1114-block.png#</dia:string>
+        <dia:string>#./././lpc1114-block.png#</dia:string>
       </dia:attribute>
     </dia:object>
-    <dia:object type="Standard - Image" version="0" id="O1">
+    <dia:object type="Standard - Image" version="0" id="O2">
       <dia:attribute name="obj_pos">
         <dia:point val="30.5,14"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="30.45,13.95;33.0882,19.0694"/>
+        <dia:rectangle val="30.45,13.95;33.0882,19.0766"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
         <dia:point val="30.5,14"/>
@@ -103,7 +129,7 @@
         <dia:real val="2.5381944179534912"/>
       </dia:attribute>
       <dia:attribute name="elem_height">
-        <dia:real val="5.0193507590990389"/>
+        <dia:real val="5.0266203179078941"/>
       </dia:attribute>
       <dia:attribute name="draw_border">
         <dia:boolean val="false"/>
@@ -112,31 +138,8 @@
         <dia:boolean val="true"/>
       </dia:attribute>
       <dia:attribute name="file">
-        <dia:string>#usb-block.png#</dia:string>
+        <dia:string>#././usb-block.png#</dia:string>
       </dia:attribute>
-    </dia:object>
-    <dia:object type="Standard - ZigZagLine" version="1" id="O2">
-      <dia:attribute name="obj_pos">
-        <dia:point val="23,14.4"/>
-      </dia:attribute>
-      <dia:attribute name="obj_bb">
-        <dia:rectangle val="22.95,14.35;25.5707,14.45"/>
-      </dia:attribute>
-      <dia:attribute name="orth_points">
-        <dia:point val="23,14.4"/>
-        <dia:point val="25.5,14.4"/>
-        <dia:point val="25.5,14.4"/>
-      </dia:attribute>
-      <dia:attribute name="orth_orient">
-        <dia:enum val="0"/>
-        <dia:enum val="1"/>
-      </dia:attribute>
-      <dia:attribute name="autorouting">
-        <dia:boolean val="false"/>
-      </dia:attribute>
-      <dia:connections>
-        <dia:connection handle="1" to="O9" connection="0"/>
-      </dia:connections>
     </dia:object>
     <dia:object type="Standard - ZigZagLine" version="1" id="O3">
       <dia:attribute name="obj_pos">
@@ -164,18 +167,167 @@
         <dia:boolean val="false"/>
       </dia:attribute>
     </dia:object>
-    <dia:object type="Circuit - Horizontal Led (European)" version="1" id="O4">
+    <dia:object type="Standard - ZigZagLine" version="1" id="O4">
       <dia:attribute name="obj_pos">
-        <dia:point val="28,6.5"/>
+        <dia:point val="31.4,7.5"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="28,6.42929;31.4,8.08679"/>
+        <dia:rectangle val="31.35,7.45;34.45,18.55"/>
+      </dia:attribute>
+      <dia:attribute name="orth_points">
+        <dia:point val="31.4,7.5"/>
+        <dia:point val="34.4,7.5"/>
+        <dia:point val="34.4,18.5"/>
+        <dia:point val="33,18.5"/>
+      </dia:attribute>
+      <dia:attribute name="orth_orient">
+        <dia:enum val="0"/>
+        <dia:enum val="1"/>
+        <dia:enum val="0"/>
+      </dia:attribute>
+      <dia:attribute name="autorouting">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:connections>
+        <dia:connection handle="0" to="O12" connection="1"/>
+      </dia:connections>
+    </dia:object>
+    <dia:object type="Standard - Ellipse" version="0" id="O5">
+      <dia:attribute name="obj_pos">
+        <dia:point val="34.3,11.4"/>
+      </dia:attribute>
+      <dia:attribute name="obj_bb">
+        <dia:rectangle val="34.2,11.3;34.6,11.7"/>
+      </dia:attribute>
+      <dia:attribute name="elem_corner">
+        <dia:point val="34.3,11.4"/>
+      </dia:attribute>
+      <dia:attribute name="elem_width">
+        <dia:real val="0.20000000000000284"/>
+      </dia:attribute>
+      <dia:attribute name="elem_height">
+        <dia:real val="0.20000000000000284"/>
+      </dia:attribute>
+      <dia:attribute name="border_width">
+        <dia:real val="0.20000000298023224"/>
+      </dia:attribute>
+      <dia:attribute name="inner_color">
+        <dia:color val="#000000"/>
+      </dia:attribute>
+    </dia:object>
+    <dia:object type="Standard - Image" version="0" id="O6">
+      <dia:attribute name="obj_pos">
+        <dia:point val="26,13"/>
+      </dia:attribute>
+      <dia:attribute name="obj_bb">
+        <dia:rectangle val="25.95,12.95;28.5882,16.0859"/>
+      </dia:attribute>
+      <dia:attribute name="elem_corner">
+        <dia:point val="26,13"/>
+      </dia:attribute>
+      <dia:attribute name="elem_width">
+        <dia:real val="2.5381944179534912"/>
+      </dia:attribute>
+      <dia:attribute name="elem_height">
+        <dia:real val="3.0358795979443718"/>
+      </dia:attribute>
+      <dia:attribute name="draw_border">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="keep_aspect">
+        <dia:boolean val="true"/>
+      </dia:attribute>
+      <dia:attribute name="file">
+        <dia:string>#././regulator-block.png#</dia:string>
+      </dia:attribute>
+    </dia:object>
+    <dia:object type="Standard - ZigZagLine" version="1" id="O7">
+      <dia:attribute name="obj_pos">
+        <dia:point val="30.5,14.7"/>
+      </dia:attribute>
+      <dia:attribute name="obj_bb">
+        <dia:rectangle val="28.45,14.65;30.55,15.65"/>
+      </dia:attribute>
+      <dia:attribute name="orth_points">
+        <dia:point val="30.5,14.7"/>
+        <dia:point val="29.5,14.7"/>
+        <dia:point val="29.5,15.6"/>
+        <dia:point val="28.5,15.6"/>
+      </dia:attribute>
+      <dia:attribute name="orth_orient">
+        <dia:enum val="0"/>
+        <dia:enum val="1"/>
+        <dia:enum val="0"/>
+      </dia:attribute>
+      <dia:attribute name="autorouting">
+        <dia:boolean val="true"/>
+      </dia:attribute>
+    </dia:object>
+    <dia:object type="Standard - Line" version="0" id="O8">
+      <dia:attribute name="obj_pos">
+        <dia:point val="23,14.4"/>
+      </dia:attribute>
+      <dia:attribute name="obj_bb">
+        <dia:rectangle val="22.95,14.35;26.05,14.45"/>
+      </dia:attribute>
+      <dia:attribute name="conn_endpoints">
+        <dia:point val="23,14.4"/>
+        <dia:point val="26,14.4"/>
+      </dia:attribute>
+      <dia:attribute name="numcp">
+        <dia:int val="1"/>
+      </dia:attribute>
+    </dia:object>
+    <dia:object type="Standard - Line" version="0" id="O9">
+      <dia:attribute name="obj_pos">
+        <dia:point val="28.5,13.4"/>
+      </dia:attribute>
+      <dia:attribute name="obj_bb">
+        <dia:rectangle val="28.45,13.35;34.45,13.45"/>
+      </dia:attribute>
+      <dia:attribute name="conn_endpoints">
+        <dia:point val="28.5,13.4"/>
+        <dia:point val="34.4,13.4"/>
+      </dia:attribute>
+      <dia:attribute name="numcp">
+        <dia:int val="1"/>
+      </dia:attribute>
+    </dia:object>
+    <dia:object type="Standard - Ellipse" version="0" id="O10">
+      <dia:attribute name="obj_pos">
+        <dia:point val="34.3,13.3"/>
+      </dia:attribute>
+      <dia:attribute name="obj_bb">
+        <dia:rectangle val="34.2,13.2;34.6,13.6"/>
+      </dia:attribute>
+      <dia:attribute name="elem_corner">
+        <dia:point val="34.3,13.3"/>
+      </dia:attribute>
+      <dia:attribute name="elem_width">
+        <dia:real val="0.20000000000000284"/>
+      </dia:attribute>
+      <dia:attribute name="elem_height">
+        <dia:real val="0.20000000000000284"/>
+      </dia:attribute>
+      <dia:attribute name="border_width">
+        <dia:real val="0.20000000298023224"/>
+      </dia:attribute>
+      <dia:attribute name="inner_color">
+        <dia:color val="#000000"/>
+      </dia:attribute>
+    </dia:object>
+    <dia:object type="Circuit - Horizontal Led (European)" version="1" id="O11">
+      <dia:attribute name="obj_pos">
+        <dia:point val="23,6.6"/>
+      </dia:attribute>
+      <dia:attribute name="obj_bb">
+        <dia:rectangle val="23,6.52929;26.4,8.18679"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
-        <dia:point val="28,6.5"/>
+        <dia:point val="23,6.6"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
         <dia:real val="3.4000000000000021"/>
@@ -209,18 +361,18 @@
         <dia:real val="1"/>
       </dia:attribute>
     </dia:object>
-    <dia:object type="Circuit - Horizontal Resistor" version="1" id="O5">
+    <dia:object type="Circuit - Horizontal Resistor" version="1" id="O12">
       <dia:attribute name="obj_pos">
-        <dia:point val="23,7"/>
+        <dia:point val="26.4,7.1"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="23,6.87;28,7.93"/>
+        <dia:rectangle val="26.4,6.97;31.4,8.03"/>
       </dia:attribute>
       <dia:attribute name="meta">
         <dia:composite type="dict"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
-        <dia:point val="23,7"/>
+        <dia:point val="26.4,7.1"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
         <dia:real val="4.9999999999999964"/>
@@ -264,204 +416,6 @@
       </dia:attribute>
       <dia:attribute name="custom:smd">
         <dia:boolean val="false"/>
-      </dia:attribute>
-    </dia:object>
-    <dia:object type="Standard - ZigZagLine" version="1" id="O6">
-      <dia:attribute name="obj_pos">
-        <dia:point val="31.4,7.4"/>
-      </dia:attribute>
-      <dia:attribute name="obj_bb">
-        <dia:rectangle val="31.35,7.35;34.45,18.55"/>
-      </dia:attribute>
-      <dia:attribute name="orth_points">
-        <dia:point val="31.4,7.4"/>
-        <dia:point val="34.4,7.4"/>
-        <dia:point val="34.4,18.5"/>
-        <dia:point val="33,18.5"/>
-      </dia:attribute>
-      <dia:attribute name="orth_orient">
-        <dia:enum val="0"/>
-        <dia:enum val="1"/>
-        <dia:enum val="0"/>
-      </dia:attribute>
-      <dia:attribute name="autorouting">
-        <dia:boolean val="false"/>
-      </dia:attribute>
-      <dia:connections>
-        <dia:connection handle="0" to="O4" connection="1"/>
-      </dia:connections>
-    </dia:object>
-    <dia:object type="Circuit - Vertical Zener Diode" version="1" id="O7">
-      <dia:attribute name="obj_pos">
-        <dia:point val="25,14.4"/>
-      </dia:attribute>
-      <dia:attribute name="obj_bb">
-        <dia:rectangle val="24.0683,14.4;26.9317,16.9"/>
-      </dia:attribute>
-      <dia:attribute name="meta">
-        <dia:composite type="dict"/>
-      </dia:attribute>
-      <dia:attribute name="elem_corner">
-        <dia:point val="25,14.4"/>
-      </dia:attribute>
-      <dia:attribute name="elem_width">
-        <dia:real val="0.99999998333865714"/>
-      </dia:attribute>
-      <dia:attribute name="elem_height">
-        <dia:real val="2.5"/>
-      </dia:attribute>
-      <dia:attribute name="line_width">
-        <dia:real val="0.10000000000000001"/>
-      </dia:attribute>
-      <dia:attribute name="line_colour">
-        <dia:color val="#000000"/>
-      </dia:attribute>
-      <dia:attribute name="fill_colour">
-        <dia:color val="#ffffff"/>
-      </dia:attribute>
-      <dia:attribute name="show_background">
-        <dia:boolean val="true"/>
-      </dia:attribute>
-      <dia:attribute name="line_style">
-        <dia:enum val="0"/>
-        <dia:real val="1"/>
-      </dia:attribute>
-      <dia:attribute name="flip_horizontal">
-        <dia:boolean val="false"/>
-      </dia:attribute>
-      <dia:attribute name="flip_vertical">
-        <dia:boolean val="false"/>
-      </dia:attribute>
-      <dia:attribute name="subscale">
-        <dia:real val="1"/>
-      </dia:attribute>
-    </dia:object>
-    <dia:object type="Standard - ZigZagLine" version="1" id="O8">
-      <dia:attribute name="obj_pos">
-        <dia:point val="25.5,16.9"/>
-      </dia:attribute>
-      <dia:attribute name="obj_bb">
-        <dia:rectangle val="25.45,16.85;30.5707,18.55"/>
-      </dia:attribute>
-      <dia:attribute name="orth_points">
-        <dia:point val="25.5,16.9"/>
-        <dia:point val="25.5,18.5"/>
-        <dia:point val="30.5,18.5"/>
-        <dia:point val="30.5,18.5"/>
-      </dia:attribute>
-      <dia:attribute name="orth_orient">
-        <dia:enum val="1"/>
-        <dia:enum val="0"/>
-        <dia:enum val="1"/>
-      </dia:attribute>
-      <dia:attribute name="autorouting">
-        <dia:boolean val="false"/>
-      </dia:attribute>
-      <dia:connections>
-        <dia:connection handle="0" to="O7" connection="1"/>
-      </dia:connections>
-    </dia:object>
-    <dia:object type="Circuit - Horizontal Resistor" version="1" id="O9">
-      <dia:attribute name="obj_pos">
-        <dia:point val="25.5,14"/>
-      </dia:attribute>
-      <dia:attribute name="obj_bb">
-        <dia:rectangle val="25.5,13.87;30.5,14.93"/>
-      </dia:attribute>
-      <dia:attribute name="meta">
-        <dia:composite type="dict"/>
-      </dia:attribute>
-      <dia:attribute name="elem_corner">
-        <dia:point val="25.5,14"/>
-      </dia:attribute>
-      <dia:attribute name="elem_width">
-        <dia:real val="4.9999999999999964"/>
-      </dia:attribute>
-      <dia:attribute name="elem_height">
-        <dia:real val="0.80000000000000071"/>
-      </dia:attribute>
-      <dia:attribute name="line_width">
-        <dia:real val="0.10000000000000001"/>
-      </dia:attribute>
-      <dia:attribute name="line_colour">
-        <dia:color val="#000000"/>
-      </dia:attribute>
-      <dia:attribute name="fill_colour">
-        <dia:color val="#ffffff"/>
-      </dia:attribute>
-      <dia:attribute name="show_background">
-        <dia:boolean val="true"/>
-      </dia:attribute>
-      <dia:attribute name="line_style">
-        <dia:enum val="0"/>
-        <dia:real val="1"/>
-      </dia:attribute>
-      <dia:attribute name="flip_horizontal">
-        <dia:boolean val="false"/>
-      </dia:attribute>
-      <dia:attribute name="flip_vertical">
-        <dia:boolean val="false"/>
-      </dia:attribute>
-      <dia:attribute name="subscale">
-        <dia:real val="1"/>
-      </dia:attribute>
-      <dia:attribute name="custom:id">
-        <dia:string>##</dia:string>
-      </dia:attribute>
-      <dia:attribute name="custom:ohms">
-        <dia:int val="0"/>
-      </dia:attribute>
-      <dia:attribute name="custom:power">
-        <dia:real val="0"/>
-      </dia:attribute>
-      <dia:attribute name="custom:smd">
-        <dia:boolean val="false"/>
-      </dia:attribute>
-    </dia:object>
-    <dia:object type="Standard - Ellipse" version="0" id="O10">
-      <dia:attribute name="obj_pos">
-        <dia:point val="34.3,11.4"/>
-      </dia:attribute>
-      <dia:attribute name="obj_bb">
-        <dia:rectangle val="34.2,11.3;34.6,11.7"/>
-      </dia:attribute>
-      <dia:attribute name="elem_corner">
-        <dia:point val="34.3,11.4"/>
-      </dia:attribute>
-      <dia:attribute name="elem_width">
-        <dia:real val="0.20000000000000284"/>
-      </dia:attribute>
-      <dia:attribute name="elem_height">
-        <dia:real val="0.20000000000000284"/>
-      </dia:attribute>
-      <dia:attribute name="border_width">
-        <dia:real val="0.20000000298023224"/>
-      </dia:attribute>
-      <dia:attribute name="inner_color">
-        <dia:color val="#000000"/>
-      </dia:attribute>
-    </dia:object>
-    <dia:object type="Standard - Ellipse" version="0" id="O11">
-      <dia:attribute name="obj_pos">
-        <dia:point val="25.4,14.3"/>
-      </dia:attribute>
-      <dia:attribute name="obj_bb">
-        <dia:rectangle val="25.3,14.2;25.7,14.6"/>
-      </dia:attribute>
-      <dia:attribute name="elem_corner">
-        <dia:point val="25.4,14.3"/>
-      </dia:attribute>
-      <dia:attribute name="elem_width">
-        <dia:real val="0.20000000000000284"/>
-      </dia:attribute>
-      <dia:attribute name="elem_height">
-        <dia:real val="0.20000000000000284"/>
-      </dia:attribute>
-      <dia:attribute name="border_width">
-        <dia:real val="0.20000000298023224"/>
-      </dia:attribute>
-      <dia:attribute name="inner_color">
-        <dia:color val="#000000"/>
       </dia:attribute>
     </dia:object>
   </dia:layer>
