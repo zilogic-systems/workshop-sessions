@@ -14,7 +14,7 @@ Zilogic Systems
 
   * Software can also be distributed as a package, `.deb` or `.rpm`
 
-  * Advantages of packages of Tar archives?
+  * Advantages of packages over Tar archives?
 
 === Install and Remove
 
@@ -120,31 +120,138 @@ $ fpm -s dir -t deb -n "xyz" -v 1.0.0 -a all \
 
 === Understanding Repos
 
+  * Installing packages with deps can be tedious
+
+  * Those deps can have further deps, and so on
+
+  * This is solved by
+
+    1. Repository of packages: APT repository
+    2. Tool to Automatically downloading and install packages and its
+       dependencies: `apt-get`
+
+=== Repo Structure
+
+image::figures/repo-structure.png[align="center"]
+
+`Releases`:: Contains information about the repository
+
+`Packages`:: Contains list of packages and their meta information
+
+=== Repo Commands
+
+Command are available for the following operations
+
+  * Adding a repostiory
+
+  * Updating the local APT cache
+
+  * Installing a package and its dependencies from the repo
+
+  * Searching the local APT cache, for packages
+
 === Adding a Repo
 
+  * Repository can be added using `add-apt-repository` command
+  * Repository information should be specified as
++
+------
+deb <repo-url> <distro> <component>...
+------
++
+  * Add the local repository of packages
++
 ------
 $ cd ~/yp/repos/myrepo
 $ sudo add-apt-repository  "deb file://$PWD wheezy main"
 ------
 
-=== Searching Cache
+=== Using the Repo
 
+  * Fetch packages list and meta information 
+  * Used later on for locating package dependencies
+  * Also used for searching packages matching a keyword
++
 ------
 $ sudo apt-get update
 $ apt-cache search mypkg
 ------
-
-=== Installing from Repo
-
++
+  * Install packages and their dependencies from the repo
++
 ------
 $ sudo apt-get install mypkg1
 ------
 
 === Creating Repositories
 
+  * Custom repositories can be created from a set of packages
+  * `mypkgs` contains the packages 
++
 ------
-$ 
+$ cd ~/yp/repos/
+$ ls mypkgs
+------
++
+  * Create the repository folder `myrepo2`
++
+------
+$ mkdir myrepo2
+------
+
+=== Creating Repositories (Contd.)
+
+  * Create a repository configuration file `conf/distributions`
++
+------
+Codename: wheezy
+Architectures: i386 amd64
+Components: main
+------
++
+  * Create the repository
++
+------
+$ reprepro --outdir ./myrepo2 includedeb wheezy mypkgs/*.deb
 ------
 
 == Building a RootFS
 
+=== Install into RootFS
+
+  * `dpkg` and `apt-get` install packages into system root
+
+  * `multistrap` installs packages into a directory
+
+  * Can be used for creating root filesystem from pre-built packages
+
+=== Multistrap
+
+`multistrap` requires a configuration file that specifies
+
+  * the APT repo location
+  * the packages to install
+
+Create a file called `~/yp/multistrap/multistrap.conf`
+
+[source,conf]
+------
+[General]
+noauth=true
+bootstrap=Packages
+
+[Packages]
+packages=bash coreutils
+source=copy:////home/vagrant/yp/multistrap/myrepo
+suite=mydistro
+omitdebsrc=true
+------
+
+=== Multistrap (Contd.)
+
+Invoke `multistrap`, to install the packages
+
+-------
+$ mkdir rootfs
+$ /usr/sbin/multistrap -a arm -d rootfs -f multistrap.conf
+-------
