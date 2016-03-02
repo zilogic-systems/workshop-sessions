@@ -17,4 +17,15 @@ by Zilogic.
 
 ## Dive Into Yocto, Workshop: Sessions
 
-TBD
+  * Autotools
+  * Manual Rootfs
+  * BitBake Intro
+  * BitBake Rootfs
+  * BitBake Layers
+  * Debian Packaging
+  * BitBake Data Model
+  * BitBake Packaging
+  * Yocto Introduction
+  * Yocto Getting Started
+  * Yocto Customization
+  * Yocto Internals
