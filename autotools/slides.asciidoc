@@ -1,0 +1,346 @@
+= Cross Compiling Apps
+Zilogic Systems
+
+== Root Filesystem
+
+=== Kernel Boot Sequence
+
+  * During boot up, kernel initializes its subsystems
+  * Mounts the root filesystem
+  * Executes `/sbin/init`, the first user space process
+
+=== Root Filesystem
+
+  * Contains the top level directories of the system
+    - `bin`
+    - `lib`
+    - `etc`
+    - `tmp`
+    - `var`
+
+  * Contains the first user space application, usually `init`
+  * And all its dependencies
+
+== Autotool Intro
+
+=== Autotools
+
+  * Most free software use the GNU Autotools for configuration and build.
+
+  * Configuration is primarily used for
+
+    . Automatic Feature Selection
+    . Manual Feature Selection
+
+== Automatic Feature Selection
+
+=== Unix Variants
+
+  * Unix-like operation systems
+    - Linux
+    - Solaris
+    - FreeBSD
+    - NetBSD
+
+  * Provide same set of commands and system calls
+  * But differ in minor ways
+  * Hard to write program that compiles / runs on all variants
+
+=== OS Variations
+
+  * Some systems do not have certain functions implemented, like
+    `memcpy()`.
+
+  * Some features are not supported in certain OS, like `mmap()`.
+
+  * Some features have alternate implementations in each OS, like
+    `poll()` and `select()`.
+
+=== Supporting Multiple OS
+
+  * Local implementation of functions not available.
+
+  * Fallback implementation for unsupported features.
+
+  * Choose specific feature provided by the OS.
+
+=== OS Specific Macros
+
+OS specific preprocessor macros to include / exclude code
+
+------
+#if defined(TINYBSD)
+void *memcpy(...)
+{
+    ...
+    ...
+}
+#endif
+------
+
+=== Problem
+
+Every time a new OS is to be supported code needs to be updated
+
+------
+#if defined(TINYBSD) || defined(NANOLINUX) || defined(USOLARIS)
+void *memcpy(...)
+{
+    ...
+    ...
+}
+#endif
+------
+
+=== Feature Macros
+
+Feature tests, a shell script checks for the presence of features
+and creates a `config.h` file.
+
+------
+#define HAVE_MEMCPY
+#define HAVE_MEMSET
+#define HAVE_SELECT
+#define HAVE_POLL
+------
+
+=== Feature Macros (Contd.)
+
+  * These macros can be used within the program to do the right thing
++
+------
+#ifndef HAVE_MEMCPY
+void *memcpy(...)
+{
+    ...
+    ...
+}
+#endif
+------
++
+  * Future proof, any new OS without `memcpy()` is already supported.
+
+=== Feature Probing
+
+The shell script creates tiny programs, and checks for compilation
+errors.
+
+------
+#include <string.h>
+#incldue <stdlib.h>
+
+int main()
+{
+  char a[2], b[2];
+  memcpy(a, b, 2);
+  return 0;
+}
+------
+
+=== Autotools
+
+  * Autotools generates a `configure` script to do feature probing
+
+  * Generates `config.h` with results of the probe
+
+  * Can also check for the presence of libraries
+
+  * If feature is optional, will continue with macro indicating
+    feature not available
+
+  * If feature is required, will halt indicating feature is missing
+
+=== Try Out
+
+  * Goto `~/yp/dl`
+  * Download bash from http://ftp.gnu.org/gnu/bash/bash-4.3.tar.gz
++
+[source,shell]
+------
+cd ~/yp/dl
+wget -c http://ftp.gnu.org/gnu/bash/bash-4.3.tar.gz
+------
+
+=== Try Out (Contd.)
+
+  * Goto `~/yp/auto`
+  * Extract `bash-4.3.tar.gz`
++
+[source,shell]
+------
+cd ~/yp/auto
+tar -x -f ~/yp/dl/bash-4.3.tar.gz
+------
++
+  * Change into `bash-4.3` and run `./configure`, check the contents
+    of `config.h`
+
+== Manual Feature Selection
+
+=== Manual Configuration
+
+  * Kernel can be configured using a menu interface
+
+  * Features required and not required can be selected
+
+  * Application programs also require some form of manual feature
+    selection.
+
+  * Example
+    - Build without GUI
+    - Select from alternate: GTK GUI or QT GUI
+
+=== Autotools
+
+  * `configure` script allows user to specify what features are
+    required through options.
+
+  * Example: `--enable-gui=no`, `--with-gtk=yes`, `--with-qt=no`
+
+  * These are recorded into `config.h` as well.
+
+=== Try Out
+
+  * Configure bash with history disabled 
++
+------
+./configure --enable-history=no
+------
++
+  * Is the `HISTORY` macro defined in `config.h`?
+  * Now try configuring with history enabled
+
+== Using Autotools
+
+=== Building Programs
+
+  * Programs that use Autotools can be built using the following
+    sequence of commands.
+
+------
+$ ./configure
+$ make
+$ make install
+------
+
+  * The configure script does automatic feature selection.
+
+  * Manual feature selection can be done by passing options to the
+    configure script.
+
+=== Cross Compilation
+
+  * Autotools naming convention
+    - `host` - system in which application will be executed (the
+      target system)
+    - `build` - system in which application is built
+
+  * Systems are identified by a canonical name: `arch-vendor-kernel-os`
+
+  * Example: `arm-none-linux-gnu`, `i686-pc-linux-gnu`, `sparc-sun-solaris`
+
+=== Cross Compilation (Contd.)
+
+  * The canononical name of the `host` is same as the prefix of the
+    cross compiler
+
+  * It is also recommended the `build` system also be specified during
+    cross compilation
++
+------
+$ ./configure --host=arm-none-linux-gnueabi --build=i686-pc-linux-gnu
+$ make
+$ make install
+------
+
+=== Try Out
+
+  * Reconfigure `bash` for cross compile and build
++
+------
+./configure --host=arm-none-linux-gnueabi --build=i686-pc-linux-gnu
+make
+------
++
+  * Check the binary file architecture, using `file` command.
+
+=== Program Prefix
+
+  * In a manual build, programs assume to be installed in `/usr/local`
+
+  * When the program wants to access it's data file, it does as
++
+------
+    fd = open("/usr/local/share/vlc/icon.png");
+------
++
+  * Package manager does not interfere with files present in
+    `/usr/local/`.
+
+=== Program Prefix (Contd.)
+
+  * The program to reside under `/usr`, the `--prefix` option can be
+    used
++
+------
+$ ./configure --prefix=/usr
+------
++
+  * Creates a `PREFIX` macro definition in `config.h`.
+
+  * All static data files are accessed relative to `PREFIX`.
++
+------
+    fd = open(PREFIX "/share/vlc/icon.png");
+------
+
+=== Try Out
+
+  * Check the binary of strings containing `/usr/local/share`
++
+------
+strings bash | grep '/usr/local/share'
+------
++
+  * Reconfigure bash with `/usr` prefix, and check strings for
+    `/usr/share`
+
+=== Install Directory
+
+  * Just `make install` installs into system folders
+
+  * In a cross compile, install should copy files to root filesystem.
+
+  * Specify the `DESTDIR` variable during `make install`.
++
+------
+$ make install DESTDIR=/path/to/root
+------
+
+=== Try Out
+
+  * Run `make install` (as non-root).
+
+  * Run `make install` with `DESTDIR` set.
++
+------
+make install DESTDIR=~/yp/auto/rootfs
+------
++
+  * Verify the contents of `~/yp/auto/rootfs`
+
+== Closing Notes
+
+=== Summary
+
+  * Many applications use the GNU Autotools build framework.
+
+  * Autotools allows for automatic and manual feature selection.
+
+  * Autotools supports cross-compilation through manual feature
+    selection.
+
+=== Further Reading
+
+  * The GNU Autoobook Autoconf, Automake, and Libtool. URL:
+    http://sources.redhat.com/autobook/autobook/autobook_13.html
