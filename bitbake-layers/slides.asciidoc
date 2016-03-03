@@ -1,5 +1,6 @@
 = BitBake with Layers
 Zilogic Systems
+:data-uri:
 
 == Layers
 

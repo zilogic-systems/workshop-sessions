@@ -1,5 +1,6 @@
 = Building a Root FS
 Zilogic Systems <training@zilogic.com>
+:data-uri:
 
 == Using Qemu
 
