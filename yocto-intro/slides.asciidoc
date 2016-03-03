@@ -1,17 +1,18 @@
 = Yocto - Introduction
 Zilogic Systems <training@zilogic.com>
+:data-uri:
 
 == Preface
 
 === Limitations of Zepto
 
  * The project Zepto which has been developed previously, builds only
-   3 software components and has some recipes, to create a rootfs
-   image with it.
+   3 software components and has recipes, to create a rootfs image
+   with it.
 
- * For a bigger embedded Linux projects these 3 components would not
+ * For a bigger embedded Linux projects, these 3 components would not
    be sufficient and it may require us to write recipes for huge list
-   of software.
+   of packages.
 
 
 [style="two-column"]
@@ -142,6 +143,11 @@ image::figures/Poky-Logo.jpg[style="left",align="center"]
  * Openembedded is an independent project for embedded Linux build
    system.
 
+ * Openembedded Classic is a massive project which has thousands of
+   recipes and hundreds of target boards.
+
+ * Which has become a much bloated and hard to maintain software.
+
  * Yocto and Openembedded share bitbake and a specific metadata(set of
    recipes) called openembedded-core.
 
@@ -194,7 +200,7 @@ image::figures/yocto-environment.png[style="left",align="center"]
    board and processor.
 
  * Image - handles list of packages to be installed into the rootfs
-   and type of the rootfs to built.
+   and type of the rootfs to be built.
 
 === Build Process
 
@@ -211,6 +217,8 @@ Build process involves
 * Archiving logs, manifests, packages and images in respective
   folders.
 
+* Caches parsed recipes and build artifacts states, for later reuse.
+
 === Fetch and Build Tasks
 
 * Uses the fetcher component to download, verify and unpack sources
@@ -222,13 +230,14 @@ Build process involves
   
  ** Local Projects - local folders
 
-* Later patches, configures, builds and installs the software
-  packages.
+* Later the available patches are applied over the unpacked source.
+
+* Then it configures, builds and installs the software packages.
 
 * Build outputs are analyzed and split into normal, dev, dbg & doc
-  packages.
+  packages and creates metadata for the packages.
 
-=== Quality Assurance Checks Tasks
+=== Quality Assurance Checks
 
 Can run through various quality assurance process through INSANE
 class. Checks the build outputs for
@@ -241,12 +250,20 @@ class. Checks the build outputs for
 
 === Package Feed and Images Tasks
 
+* Then the deb/rpm/ipk packages are built and placed into package feed
+  area.
+
 * The verified packages are available in separate architecture specific
   folders.
 
-* The target specific packages available in package feed, are
+* The target specific packages available in package feed, can be
   installed into the rootfs.
 
+* The packages need to be installed into rootfs and type of rootfs can
+  be controlled through image specific variables.
+
+* The image specific manifest files are created for further analysis.
+
 * The package feeds can be exposed as a repo through web server, so
-  the packages in the target system can updated at run-time.
+  the packages in the target system can be updated at run-time.
 
