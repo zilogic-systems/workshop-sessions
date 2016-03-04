@@ -7,6 +7,8 @@ images_png = $(images_dia:.dia=.png)
 
 all: slides.html
 
+figures/datastore.png: EXPORT_WIDTH = 2048
+
 slides.html: $(images_png) 
 
 clean:
