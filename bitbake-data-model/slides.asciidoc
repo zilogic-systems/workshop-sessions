@@ -1,4 +1,5 @@
 = BitBake Data Model
+Zilogic Systems <training@zilogic.com>
 :datauri:
 
 == Data Store
@@ -36,6 +37,15 @@ image::figures/conf-parsing.png[width="25%",align="center"]
 
 image::figures/recipe-parsing.png[width="25%",align="center"]
 
+=== Pro Tip
+
+  * Variable set in configuration files is visible to all recipes
+
+  * Variable set within a recipe is visible only to that recipe
+
+  * Variable set in class file is visible to all recipes inheriting
+    the class file
+
 == Improved Model
 
 === Data Store with Flags
@@ -48,7 +58,6 @@ do_get[deptask] = do_cook
 |======
 | Key		| Flag		| Value
 | PN		| _data		| sandwich
-| DEPENDS	| _data		| bread omelete
 .2+| do_get	| deptask	| do_cook
 | _data
 | echo $\{PN}: wheat > bread.txt +
