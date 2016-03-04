@@ -2,7 +2,7 @@ before_install:
   - sudo apt-get update -qq
 
 install:
-  - sudo apt-get install --no-install-recommends asciidoc dia inkscape
+  - sudo apt-get install --no-install-recommends python asciidoc dia inkscape source-highlight
 
 script:
   - make
