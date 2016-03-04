@@ -1,0 +1,181 @@
+= BitBake Data Model
+:datauri:
+
+== Data Store
+
+=== Recipe Data
+
+When recipes are read the all variables and task definitions are
+stored in a hash map
+
+[cols="25%m,75%m",options="header"]
+|======
+| Key		| Value
+| PN		| bread
+| do_get
+| echo $\{PN}: wheat > bread.txt +
+  echo $\{PN}: salt  >> bread.txt +
+  echo $\{PN}: sugar >> bread.txt +
+  echo $\{PN}: water >> bread.txt +
+  sleep 1
+| do_cook
+| echo $\{PN}: bake for 20 - 25 minutes >> bread.txt +
+  sleep 2 +
+  echo $\{PN}: ready >> bread.txt +
+|======
+
+=== Recipe Processing
+
+image::figures/datastore-no-finalize.png[align="center"]
+
+=== Config Parsing
+
+image::figures/conf-parsing.png[width="25%",align="center"]
+
+=== Recipe Parsing
+
+image::figures/recipe-parsing.png[width="25%",align="center"]
+
+== Improved Model
+
+=== Data Store with Flags
+
+------
+do_get[deptask] = do_cook
+------
+
+[cols="25%m,25%m,50%m",options="header"]
+|======
+| Key		| Flag		| Value
+| PN		| _data		| sandwich
+| DEPENDS	| _data		| bread omelete
+.2+| do_get	| deptask	| do_cook
+| _data
+| echo $\{PN}: wheat > bread.txt +
+  echo $\{PN}: salt  >> bread.txt +
+  echo $\{PN}: sugar >> bread.txt +
+  echo $\{PN}: water >> bread.txt +
+  sleep 1
+|======
+
+=== Recipe Processing with Finalize
+
+image::figures/datastore.png[align="center"]
+
+== Assignment Operators
+
+=== Default Value
+
+------
+a ?= b
+------
+
+On Assignment:
+
+------
+if a is not defined:
+    a = b
+------
+
+=== Weak Default Value
+
+------
+a ??= b
+------
+
+On Assignment:
+
+------
+a[_weakdefault] = b
+------
+
+On Finalize:
+
+------
+if a is not defined:
+   a = a[_weakdefault]
+------
+
+=== Appending
+
+------
+a += b
+------
+
+On Assignment:
+
+------
+a = a + " " + b
+------
+
+=== Prepending
+
+------
+a =+ b
+------
+
+On Assignment:
+
+------
+a = b + " " + a
+------
+
+=== Appending without Spaces
+
+------
+a .= b
+------
+
+On Assignment:
+
+------
+a = a + b
+------
+
+=== Prepending without Spaces
+
+------
+a =. b
+------
+
+On Assignment:
+
+------
+a = b + a
+------
+
+=== Appending after Finalize
+
+------
+a_append = b
+------
+
+On Assignment:
+
+------
+Add b to a[_append_list] 
+------
+
+On Finalize:
+
+-----
+for append in a[_append_list]:
+    a = a + append
+-----
+
+No spaces are added, if required should be provided a part of the
+value
+
+=== Immediate Assignment
+
+------
+b = "BitBake"
+a := "Hello ${b}"
+------
+
+On Assignment:
+
+------
+a = "Hello BitBake"
+------
+
