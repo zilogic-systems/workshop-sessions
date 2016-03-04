@@ -1,5 +1,6 @@
 = Getting Started with Yocto
 Zilogic Systems <training@zilogic.com>
+:data-uri:
 
 == Working with Yocto
 
@@ -19,11 +20,12 @@ Zilogic Systems <training@zilogic.com>
 
 [source,shell]
 ----
-$ mkdir -p yocto-project
-$ cd yocto-project
+$ cd ~/yp/dl
 $ wget -c \
   http://downloads.yoctoproject.org/releases/yocto/yocto-1.8/\
   poky-fido-13.0.0.tar.bz2
+$ cd ~/yp 
+$ mkdir -p yocto-project
 ----
 
 === Setting Up Yocto (1)
@@ -32,7 +34,7 @@ $ wget -c \
 
 [source,shell]
 ------
-$ tar -x -f poky-fido-13.0.0.tar.bz2
+$ tar -x -f ~/yp/dl/poky-fido-13.0.0.tar.bz2
 $ cd poky-fido-13.0.0
 $ ls
 ------
@@ -49,7 +51,6 @@ $ source oe-init-build-env
 ------
 
 === Setting Up Yocto (2)
-
 
  * The script creates and switches to a directory build, in which the
    further builds would happen
@@ -71,7 +72,7 @@ $ export MACHINE=qemuarm
 === Need for Configuration File
 
  * There are configurations other than MACHINE, which may need to be
-   passed to the poky build environment.
+   passed to the poky build environment. 
 
  * Passing all required configurations through environment variables
    would be inconvenient.
@@ -79,8 +80,16 @@ $ export MACHINE=qemuarm
  * And also the Poky accepts only limited configurations through
    environment variables.
 
- * To manage this the Poky provides a mechanism of passing
-   configurations through file.
+ * The list of whitelisted variables, that can be passed to bitbake
+   recipes, can be obtained from below command.
+
+[source,shell]
+----
+$ echo $BB_ENV_EXTRAWHITE
+----
+
+ * To manage this, Poky provides a mechanism of passing configurations
+   through file.
 
 === Managing Configurations in File 
 
@@ -89,7 +98,7 @@ $ export MACHINE=qemuarm
 
 [source,shell]
 ------
-$ nano build/conf/local.conf
+$ vim build/conf/local.conf
 ------
 
  * Other parameters like number of threads to use, location for
@@ -142,12 +151,17 @@ $ bitbake core-image-minimal
 $ ls tmp/deploy/images/qemuarm/
 --------------
 
- * The list of packages in rootfs can be read from manifest file
+ * The list of packages in rootfs can be read from manifest file.
+
+[source,shell]
+--------------
+$ cat tmp/deploy/images/qemuarm/core-image-minimal-qemuarm.manifest
+--------------
 
 === Booting Image with QEMU
 
  * Copy the zImage to shared folder /media/sf_share and
-   core-image-minimal-qemuarm.ext4 as disk.img in /media/sf_share
+   core-image-minimal-qemuarm.ext4 as disk.img in /media/sf_shared
 
  * Now we can boot our new images using qemu arm as shown
 
@@ -182,13 +196,22 @@ $ bitbake -g core-image-minimal
 
 [source,shell]
 ------
-$ nano pn-buildlist
+$ vim pn-buildlist
 ------
 
 * From this list we can find that, bash is not built by
   core-image-minimal recipe.
 
 === Adding Package to a Build
+
+
+* We can find the package name and version of the bash using
+  --show-version option of bitbake as
+
+[source,shell]
+------
+$ bitbake -s | grep bash
+------
 
 * We can enable building bash by adding below line to local.conf
 
@@ -206,4 +229,3 @@ IMAGE_INSTALL += bash
 
 * Better practise is to maintain all our permanent changes in separate
   layer, which can be maintained in versioning system.
-
