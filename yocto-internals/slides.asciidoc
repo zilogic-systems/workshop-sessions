@@ -1,5 +1,6 @@
 = Internals of Yocto
 Zilogic Systems <training@zilogic.com>
+:data-uri:
 
 == Things To Know
 
@@ -27,7 +28,7 @@ Zilogic Systems <training@zilogic.com>
    extension '.bbappend' and sticking to file name as same as the main
    recipe.
 
- * Even if main and append recipes are placed in different layers,
+ * Even if main and appended recipes are placed in different layers,
    bitbake can resolve them.
 
  * One example we could find is
@@ -35,7 +36,6 @@ Zilogic Systems <training@zilogic.com>
    _meta-yocto-bsp/recipes-core/packagegroups_ just adds two packages
    to RDEPENDS, whose main recipe _packagegroup-core-tools-profile.bb_
    is available in _meta/recipes-core/packagegroups_
-
 
 === Folders Structure for Build
 
@@ -61,7 +61,7 @@ Zilogic Systems <training@zilogic.com>
 
 === Folders for Package Creation
 
- * The packages are compiled in _build_ directory.
+ * The packages are compiled in _build(B)_ directory.
 
  * The compiled artifacts are installed in _package_ folder, then it
    is analyzed and segregated in _packages-split_ as development, doc
@@ -107,13 +107,28 @@ PREFERRED_VERSION_linux-yocto ?= "3.19%"
  * We can find a sample machine configuration file in
    _meta-yocto-bsp/conf/machine/edgerouter.conf_
 
-=== SSTATE CACHE
+=== Advantages of State Cache
 
- * Yocto creates hash map of the build environment of each recipe and
+ * Yocto creates hash map of the build environment of each task and
    archives the build artifact of the recipe in sstate-cache.
 
- * When we try to build again if the hash map generated for the recipe
+ * When we try to build again if the hash map generated for the task
    matched what already in exist state cache, the archived artifact is
    restored in the new build directory by setscene task.
 
  * We can find mostly _*setscene_ tasks in the build log.
+
+ * We can see that for our builds, we don't have source unpacked,
+   rather stages are populated from state-cache
+
+[source,shell]
+-----
+ls build/tmp/work/armv5e-poky-linux-gnueabi/bash/4.3-r1/
+-----
+
+ * The state-cache creates a map for the input parameters and caches
+   the out of the task using hashmap as the signature.
+
+ * For ex if packages are first built as rpm and then we it build as
+   deb, Yocto can pull data from cache until the install stage and
+   just run only packaging commands for deb.
