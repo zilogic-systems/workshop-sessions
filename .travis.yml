@@ -1,0 +1,8 @@
+before_install:
+  - sudo apt-get update -qq
+
+install:
+  - sudo apt-get install asciidoc dia inkscape
+
+script:
+  - make
