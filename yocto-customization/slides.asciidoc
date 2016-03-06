@@ -103,6 +103,30 @@ IMAGE_INSTALL = " bash coreutils less "
 inherit core-image
 ------
 
+=== Handling Layers
+
+ * We can list the layers added and their priority using
+
+[source,shell]
+------
+$ bitbake-layers show-layers
+------
+
+ * We can add a layer to the current build as 
+
+[source,shell]
+------
+$ bitbake-layers add-layer <path to the layer>
+------
+
+
+ * We can list the recipes based on their layers as 
+
+[source,shell]
+------
+$ bitbake-layers show-recipes
+------
+ 
 === Adding Our Layer to Yocto
 
  * The new layer created has distro configuration and the core-image
@@ -119,6 +143,7 @@ $ bitbake-layers add-layer meta-zepto-fs
 
 [source,shell]
 -----
+$ bitbake-layers show-layers
 $ cat conf/bblayers.conf
 -----
 
@@ -191,7 +216,207 @@ $ vim tmp/deploy/images/qemuarm/core-image-tiny-qemuarm.rootfs.manifest
 $ ./runqemu.sh
 ------
 
-=== Minimal local.conf
+=== Building Custom Packages
+
+ * We can build packages which are compliant to autotools or cmake by
+   inheritting the autotools or cmake classes in the recipe as we did
+   for bash in zepto.
+
+ * We can build packages with fewer source files by placing the source
+   inside the layer itself.
+
+ * We can build packages with custom build scripts by writing a recipe
+   to invoke their build scripts in the build stage.
+
+
+=== Recipes for In-layer Sources
+
+ * We can build a package by placing the source of package along the
+   recipe.
+
+ * We can create a helloworld packages by creating a folder in our
+   meta layer.
+
+[source,shell]
+-----
+$ cd meta-zepto-fs/recipes-core
+$ mkdir -p helloworld
+$ mkdir -p heloworld/files 
+-----
+
+ * Fetcher can look for source files in the `files` folder residing in
+   the same heirarchy of `bb` file.
+
+=== Recipes for In-layer Sources Contd.
+
+ * Create a 'C' file helloworld.c inside the `files` folder.
+
+[source,shell]
+-----
+$ cd helloworld/files
+$ vim helloworld.c
+-----
+
+[source,c]
+-----
+#include <stdio.h>
+
+int main()
+{
+        printf("Hello World\n");
+}
+
+-----
+
+=== Recipes for In-layer Sources Contd.
+
+ * Create a helloworld.bb recipe file inside `helloworld` folder.
+
+[source,shell]
+-----
+$ vim helloworld.bb
+-----
+
+[source,shell]
+-----
+PN="helloworld"
+SRC_URI="file://helloworld.c"
+-----
+
+ * Specify the source file name using `file` protocol through `SRC_URI`,
+   where the fetcher can fetch the file, from files folder to the
+   `WORKDIR`.
+
+ * The location of the source file has to be specified to the build
+   stage, by explcitily pointing the `S` variable to the `WORKDIR`
+   where the file was downloaded.
+
+[source,shell]
+-----
+S = "${WORKDIR}"
+-----
+
+=== Recipes for In-layer Sources Contd.
+
+ * We can specify our custom compilation commands and install commands
+   through compile and install tasks.
+
+[source,shell]
+-----
+do_compile() {
+        ${CC} helloworld.c -o helloworld
+}
+
+do_install() {
+        install -d ${D}${bindir}
+        install -m 0755 helloworld ${D}${bindir}
+}
+-----
+
+ * Install task needs to copy the built files into, `${D}` directory, in
+   unix folder hierarchy locations as it should be placed in the
+   target rootfs.
+
+ * Yocto defines variables for `bin`, `etc` paths in variables
+   `${bindir}`, `${systemdir}` etc.
+
+ * Necessary folder can be created inside `${D}` using `install -d`
+   command.
+
+=== Recipes for In-layer Sources Contd.
+
+ * By default yocto expects license for every package for it's QA
+   proccess.
+
+ * We can specify the license through `LICENSE` variable and md5
+   checksum for the license file through `LIC_FILES_CHKSUM` variable.
+
+ * Yocto has license files and its's checksum in its source itself,
+   which can be referred, as in below example.
+
+[source,shell]
+-----
+LICENSE = "MIT"
+LIC_FILES_CHKSUM =
+"file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
+-----
+
+=== Recipes for In-layer Sources Contd.
+
+[source,shell]
+-----
+PN="helloworld"
+
+LICENSE = "MIT"
+LIC_FILES_CHKSUM =
+"file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
+
+SRC_URI="file://helloworld.c"
+
+S = "${WORKDIR}"
+
+do_compile() {
+        ${CC} helloworld.c -o helloworld
+}
+
+do_install() {
+        install -d ${D}${bindir}
+        install -m 0755 helloworld ${D}${bindir}
+}
+-----
+
+=== Recipe for Custom Built Packages
+
+ * If we want to build a package which has its own build procedure,
+   then it can also be handled by Yocto.
+
+ * We can create a Makefile for our helloworld application and we can
+   invoke it using Yocto.
+ 
+[source,shell]
+-----
+$ cd helloworld/files
+$ vim Makefile
+-----
+
+[source,shell]
+-----
+compile:
+        ${CC} helloworld.c -o helloworld
+
+install:
+        install -d ${DESTDIR}/bin
+        install -m 0755 helloworld ${DESTDIR}/bin
+-----
+
+=== Recipe for Custom Built Packages Contd.
+
+[source,shell]
+-----
+PN="helloworld"
+
+LICENSE = "MIT"
+LIC_FILES_CHKSUM =
+"file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
+
+SRC_URI="file://helloworld.c \
+	 file://Makefile"
+
+S = "${WORKDIR}"
+
+do_configure[noexec] = "1"
+do_clean[noexec] = "1"
+
+do_compile() {
+        oe_runmake compile
+}
+
+do_install() {
+        oe_runmake install DESTDIR=${D}
+}
+-----
+
+=== Bare Minimal local.conf
 
  * The yocto expects the version of the current configuration to be
    provided using CONF_VERSION
@@ -283,27 +508,13 @@ DISTRO = "zebian"
 CONF_VERSION = "1"
 ------
 
- * Build the core-image-tiny image and it would get build on `tmp-glibc`
+ * Build the core-image-tiny image and it would get built on
+   `tmp-glibc`
 
- * test the new distro on the target.
+ * Test the new distro on the target.
  
+=== Handling Recipes in Multiple Layers
 
-=== Handling Multiple Layers
-
- * We can list the layers added and their priority using
-
-[source,shell]
-------
-$ bitbake-layers show-layers
-------
-
- * We can list the recipes based on their layers as 
-
-[source,shell]
-------
-$ bitbake-layers show-recipes
-------
- 
  * The recipes which are defined in both added layers are called
    overlayed layers. 
 
