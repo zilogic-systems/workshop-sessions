@@ -11,4 +11,4 @@ all:
 	make -C yocto-getting-started
 	make -C yocto-internals
 	make -C yocto-intro
-
+	make -C home-automation
