@@ -416,6 +416,21 @@ do_install() {
 }
 -----
 
+=== Supporting Package Source in External Directory
+
+ * If the source exists in a home folder or in anyother folder in a
+   local system, they can be built with externalsrc class definitions.
+
+ * recipes need to inherit the externalsrc class and need to provide
+   the path of the source as shown below, instead of SRC_URI
+ 
+[source,shell]
+-----
+inherit externalsrc
+EXTERNALSRC = " path "
+EXTERNALSRC_BUILD = " path "
+-----
+
 === Bare Minimal local.conf
 
  * The yocto expects the version of the current configuration to be
