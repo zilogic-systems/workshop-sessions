@@ -1,7 +1,7 @@
 TOPDIR = ../
 EXPORT_WIDTH = 1600
 blocks = battery-block.png ftdi-block.png usb-block.png lpc1114-block.png ftdi-simple-block.png regulator-block.png
-diagrams = v1.png v2.png v3.png v4.png v5.png internal-resistance.png ac-adapter-circuit.png ftdi-simple-block.png
+diagrams = v1.png v2.png v3.png v4.png v5.png ftdi-simple-block.png spectrum.png
 
 all: slides.html
 
@@ -16,6 +16,9 @@ v3.png: usb-block.png lpc1114-block.png regulator-block.png
 v4.png: ftdi-block.png lpc1114-block.png
 
 v5.png: ftdi-block.png lpc1114-block.png
+
+spectrum.png: spectrum.svg
+	inkscape -d 200 -z -e spectrum.png spectrum.svg
 
 ftdi-simple-block.png: blocks.svg
 	inkscape -d 1200 -z --export-id=ftdi-simple-block -e ftdi-simple-block.png blocks.svg

@@ -125,9 +125,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.70000001"
-     inkscape:cx="470.90076"
-     inkscape:cy="620.54292"
+     inkscape:zoom="0.98994951"
+     inkscape:cx="513.82071"
+     inkscape:cy="506.66891"
      inkscape:document-units="in"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -149,6 +149,10 @@
        units="in"
        spacingx="0.05in"
        spacingy="0.05in" />
+    <sodipodi:guide
+       orientation="0,1"
+       position="432,828"
+       id="guide3859" />
   </sodipodi:namedview>
   <metadata
      id="metadata7">
@@ -158,7 +162,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -248,104 +252,108 @@
        id="rect9251"
        width="135"
        height="225"
-       x="517.5"
-       y="226.11511" />
+       x="558"
+       y="224.36218" />
     <rect
        style="fill:#ccf5d0;fill-opacity:1;stroke:#000000;stroke-width:1.79999995;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
        id="rect9251-7"
        width="135"
        height="45"
-       x="517.5"
-       y="226.11511" />
+       x="558"
+       y="224.36218" />
     <rect
        style="fill:#ccf5d0;fill-opacity:1;stroke:#000000;stroke-width:1.79999995;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
        id="rect9251-7-8"
        width="135"
        height="45"
-       x="517.5"
-       y="406.11511" />
-    <rect
-       style="fill:none;stroke:#000000;stroke-width:1.79999995;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
-       id="rect9251-6"
-       width="135"
-       height="225"
-       x="247.5"
-       y="226.11511" />
-    <rect
-       style="fill:#ccf5d0;fill-opacity:1;stroke:#000000;stroke-width:1.79999995;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
-       id="rect9251-7-5"
-       width="135"
-       height="90"
-       x="247.5"
-       y="226.11511" />
-    <rect
-       style="fill:#ccf5d0;fill-opacity:1;stroke:#000000;stroke-width:1.79999995;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
-       id="rect9251-7-8-8"
-       width="135"
-       height="90"
-       x="247.5"
-       y="361.11511" />
+       x="558"
+       y="404.36218" />
+    <g
+       id="g3836"
+       transform="translate(54,-1.7529297)">
+      <rect
+         y="226.11511"
+         x="247.5"
+         height="225"
+         width="135"
+         id="rect9251-6"
+         style="fill:none;stroke:#000000;stroke-width:1.79999995;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
+      <rect
+         y="226.11511"
+         x="247.5"
+         height="90"
+         width="135"
+         id="rect9251-7-5"
+         style="fill:#ccf5d0;fill-opacity:1;stroke:#000000;stroke-width:1.79999995;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
+      <rect
+         y="361.11511"
+         x="247.5"
+         height="90"
+         width="135"
+         id="rect9251-7-8-8"
+         style="fill:#ccf5d0;fill-opacity:1;stroke:#000000;stroke-width:1.79999995;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
+      <flowRoot
+         transform="translate(67.5,34.098123)"
+         style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:end;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:end;fill:#000000;fill-opacity:1;stroke:none;font-family:Droid Sans;-inkscape-font-specification:Droid Sans"
+         id="flowRoot9092-2"
+         xml:space="preserve"><flowRegion
+           id="flowRegion9094-4"><rect
+             style="text-align:end;text-anchor:end"
+             y="178.07648"
+             x="90"
+             height="58.94051"
+             width="81"
+             id="rect9096-4" /></flowRegion><flowPara
+           style="font-size:14px;text-align:end;text-anchor:end"
+           id="flowPara9098-39">VDD</flowPara></flowRoot>      <flowRoot
+         transform="translate(67.5,124.09812)"
+         style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:end;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:end;fill:#000000;fill-opacity:1;stroke:none;font-family:Droid Sans;-inkscape-font-specification:Droid Sans"
+         id="flowRoot9092-2-2"
+         xml:space="preserve"><flowRegion
+           id="flowRegion9094-4-2"><rect
+             style="text-align:end;text-anchor:end"
+             y="178.07648"
+             x="90"
+             height="58.940517"
+             width="81"
+             id="rect9096-4-7" /></flowRegion><flowPara
+           style="font-size:14px;text-align:end;text-anchor:end"
+           id="flowPara9098-39-6">VIH </flowPara><flowPara
+           id="flowPara9539"
+           style="font-size:14px;text-align:end;text-anchor:end">  = 0.7 x VDD</flowPara></flowRoot>      <flowRoot
+         transform="translate(67.5,169.09812)"
+         style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:end;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:end;fill:#000000;fill-opacity:1;stroke:none;font-family:Droid Sans;-inkscape-font-specification:Droid Sans"
+         id="flowRoot9092-2-2-7"
+         xml:space="preserve"><flowRegion
+           id="flowRegion9094-4-2-8"><rect
+             style="text-align:end;text-anchor:end"
+             y="178.07648"
+             x="90"
+             height="81.440514"
+             width="81"
+             id="rect9096-4-7-7" /></flowRegion><flowPara
+           style="font-size:14px;text-align:end;text-anchor:end"
+           id="flowPara9098-39-6-9">VIL</flowPara><flowPara
+           id="flowPara9541"
+           style="font-size:14px;text-align:end;text-anchor:end">  = 0.3 x VDD</flowPara></flowRoot>      <flowRoot
+         transform="translate(67.5,259.09812)"
+         style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:end;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:end;fill:#000000;fill-opacity:1;stroke:none;font-family:Droid Sans;-inkscape-font-specification:Droid Sans"
+         id="flowRoot9092-2-2-7-9"
+         xml:space="preserve"><flowRegion
+           id="flowRegion9094-4-2-8-7"><rect
+             style="text-align:end;text-anchor:end"
+             y="178.07648"
+             x="90"
+             height="36.440517"
+             width="81"
+             id="rect9096-4-7-7-6" /></flowRegion><flowPara
+           style="font-size:14px;text-align:end;text-anchor:end"
+           id="flowPara9098-39-6-9-4">GND</flowPara></flowRoot>    </g>
     <flowRoot
-       xml:space="preserve"
-       id="flowRoot9092-2"
-       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:end;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:end;fill:#000000;fill-opacity:1;stroke:none;font-family:Droid Sans;-inkscape-font-specification:Droid Sans"
-       transform="translate(67.5,34.098123)"><flowRegion
-         id="flowRegion9094-4"><rect
-           id="rect9096-4"
-           width="81"
-           height="58.94051"
-           x="90"
-           y="178.07648"
-           style="text-align:end;text-anchor:end" /></flowRegion><flowPara
-         id="flowPara9098-39"
-         style="font-size:14px;text-align:end;text-anchor:end">VDD</flowPara></flowRoot>    <flowRoot
-       xml:space="preserve"
-       id="flowRoot9092-2-2"
-       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:end;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:end;fill:#000000;fill-opacity:1;stroke:none;font-family:Droid Sans;-inkscape-font-specification:Droid Sans"
-       transform="translate(67.5,124.09812)"><flowRegion
-         id="flowRegion9094-4-2"><rect
-           id="rect9096-4-7"
-           width="81"
-           height="58.940517"
-           x="90"
-           y="178.07648"
-           style="text-align:end;text-anchor:end" /></flowRegion><flowPara
-         id="flowPara9098-39-6"
-         style="font-size:14px;text-align:end;text-anchor:end">VIH </flowPara><flowPara
-         style="font-size:14px;text-align:end;text-anchor:end"
-         id="flowPara9539">  = 0.7 x VDD</flowPara></flowRoot>    <flowRoot
-       xml:space="preserve"
-       id="flowRoot9092-2-2-7"
-       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:end;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:end;fill:#000000;fill-opacity:1;stroke:none;font-family:Droid Sans;-inkscape-font-specification:Droid Sans"
-       transform="translate(67.5,169.09812)"><flowRegion
-         id="flowRegion9094-4-2-8"><rect
-           id="rect9096-4-7-7"
-           width="81"
-           height="81.440514"
-           x="90"
-           y="178.07648"
-           style="text-align:end;text-anchor:end" /></flowRegion><flowPara
-         id="flowPara9098-39-6-9"
-         style="font-size:14px;text-align:end;text-anchor:end">VIL</flowPara><flowPara
-         style="font-size:14px;text-align:end;text-anchor:end"
-         id="flowPara9541">  = 0.3 x VDD</flowPara></flowRoot>    <flowRoot
-       xml:space="preserve"
-       id="flowRoot9092-2-2-7-9"
-       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:end;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:end;fill:#000000;fill-opacity:1;stroke:none;font-family:Droid Sans;-inkscape-font-specification:Droid Sans"
-       transform="translate(67.5,259.09812)"><flowRegion
-         id="flowRegion9094-4-2-8-7"><rect
-           id="rect9096-4-7-7-6"
-           width="81"
-           height="36.440517"
-           x="90"
-           y="178.07648"
-           style="text-align:end;text-anchor:end" /></flowRegion><flowPara
-         id="flowPara9098-39-6-9-4"
-         style="font-size:14px;text-align:end;text-anchor:end">GND</flowPara></flowRoot>    <flowRoot
        xml:space="preserve"
        id="flowRoot9092-2-8"
        style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:end;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:end;fill:#000000;fill-opacity:1;stroke:none;font-family:Droid Sans;-inkscape-font-specification:Droid Sans"
-       transform="translate(337.5,34.098123)"><flowRegion
+       transform="translate(378,32.345193)"><flowRegion
          id="flowRegion9094-4-8"><rect
            id="rect9096-4-3"
            width="81"
@@ -358,7 +366,7 @@
        xml:space="preserve"
        id="flowRoot9092-2-2-4"
        style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:end;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:end;fill:#000000;fill-opacity:1;stroke:none;font-family:Droid Sans;-inkscape-font-specification:Droid Sans"
-       transform="translate(337.5,79.098119)"><flowRegion
+       transform="translate(378,77.345189)"><flowRegion
          id="flowRegion9094-4-2-2"><rect
            id="rect9096-4-7-5"
            width="81"
@@ -373,7 +381,7 @@
        xml:space="preserve"
        id="flowRoot9092-2-2-4-6"
        style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:end;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:end;fill:#000000;fill-opacity:1;stroke:none;font-family:Droid Sans;-inkscape-font-specification:Droid Sans"
-       transform="translate(337.5,214.09812)"><flowRegion
+       transform="translate(378,212.34519)"><flowRegion
          id="flowRegion9094-4-2-2-4"><rect
            id="rect9096-4-7-5-5"
            width="81"
@@ -388,7 +396,7 @@
        xml:space="preserve"
        id="flowRoot9092-2-2-4-6-1"
        style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:end;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:end;fill:#000000;fill-opacity:1;stroke:none;font-family:Droid Sans;-inkscape-font-specification:Droid Sans"
-       transform="translate(337.5,259.09812)"><flowRegion
+       transform="translate(378,257.34519)"><flowRegion
          id="flowRegion9094-4-2-2-4-3"><rect
            id="rect9096-4-7-5-5-5"
            width="81"
@@ -846,5 +854,27 @@
            y="143.79077"
            style="font-size:14px" /></flowRegion><flowPara
          id="flowPara4005-6-5-5"
-         style="font-size:38.79999924px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Droid Sans;-inkscape-font-specification:Droid Sans">Credits:</flowPara></flowRoot>  </g>
+         style="font-size:38.79999924px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Droid Sans;-inkscape-font-specification:Droid Sans">Credits:</flowPara></flowRoot>    <flowRoot
+       xml:space="preserve"
+       id="flowRoot9092-9"
+       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Droid Sans;-inkscape-font-specification:Droid Sans"
+       transform="translate(-45,140.34519)"><flowRegion
+         id="flowRegion9094-28"><rect
+           id="rect9096-9"
+           width="130"
+           height="92.85714"
+           x="90"
+           y="178.07648" /></flowRegion><flowPara
+         id="flowPara9098-6"
+         style="font-size:14px">Normal Pin </flowPara><flowPara
+         style="font-size:14px"
+         id="flowPara3903">IOH = 4 mA</flowPara><flowPara
+         style="font-size:14px"
+         id="flowPara3905" /><flowPara
+         style="font-size:14px"
+         id="flowPara3907">High Current Drive</flowPara><flowPara
+         style="font-size:14px"
+         id="flowPara3909">IOH = 20mA</flowPara><flowPara
+         style="font-size:14px"
+         id="flowPara3901" /></flowRoot>  </g>
 </svg>

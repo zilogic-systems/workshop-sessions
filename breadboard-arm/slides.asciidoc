@@ -4,11 +4,111 @@
 
 === The Spectrum
 
+image:spectrum.png[]
+
+[cols="20%,20%,30%,30%"]
+|======
+|		| Bare Metal	| RTOS					| GPOS
+| Example	| AC, Fridge	| Weather Station, Satellite, Robots, Drones	| Mobile Phone, Gaming Consoles
+| Tasks	 	| ~1		| Few, RTOS does scheduling		| Many, GPOS does scheduling
+| Tasks Trusted | Yes		| Yes		 			| No, GPOS restricts Tasks / Apps
+|======
+
 === ARM
+
+  * ARM
+    - ARM7TDMI, Cortex-M: Bare Metal and RTOS
+    - ARM9, Cortex-A: GPOS
+
+  * ARM vs 8051
+    - 32-bit Processor
+    - Deisgned for high level programming
+    - Designed for Multi-tasking
+    - Wide OS, compiler, tools support
 
 === Learning Embedded Systems
 
+  * Embedded developers need good understanding of both hardware and
+    software to be effective
+
+  * Easy to learn software, at home, due to widespread availablity of
+    desktop computers
+
+  * How do you learn hardware? Obstacles:
+    - Expensive
+    - Need to shop
+    - Lack of learning resources
+    - Not hobbyist friendly
+
+=== Learning Hardware Today
+
+  * You still need to spend money, but widely used components are
+    cheaper
+
+  * Hardware components can be ordered online
+    - element14.com, mouser.com
+
+  * Lots of resources are now available on internet
+    - sparkfun.com, adafruit.com
+
+  * Hobbyist friendly
+    - Breakout boards, for use with breadboards
+    - DIP package ICs
+    - Simpler programming mechanisms
+
+[role="two-column"]
+=== Lego Blocks
+
+[role="left"]
+image::lego.jpg[width="70%",align="center"]
+
+[role="right"]
+  * Hardware might sometimes sound complex
+
+  * Hobbyist friendly components are now more like Lego blocks
+
+  * Construction of a house doesn't sound hard when you think Lego
+    blocks
+
+[role="two-column"]
 === LPC1114
+
+[role="left"]
+image::lpc1114.jpg[align="center",width="50%"]
+
+[role="right"]
+  * LPC1114 - ARM chip available in DIP package
+  
+  * Full power of an ARM processor and peripherals available on a
+    breadboard
+
+  * 50 MIPS
+
+  * Peripherals
+    - 32KB Flash, 8KB RAM
+    - GPIO
+    - I2C, SPI, Serial
+    - PWM, Timers
+
+[role="two-column"]
+=== LPC1114 Block
+
+[role="left"]
+image::lpc1114-block.png[align="center",width="40%"]
+
+[role="right"]
+  * LPC1114 - ARM chip available in DIP package
+  
+  * Full power of an ARM processor and peripherals available on a
+    breadboard
+
+  * 50 MIPS
+
+  * Peripherals
+    - 32KB Flash, 8KB RAM
+    - GPIO
+    - I2C, SPI, Serial
+    - PWM, Timers
 
 === Goals
 
@@ -278,6 +378,90 @@ image::v4.png[align="center",width="50%"]
 
 image::v5.png[align="center",width="50%"]
 
+=== ISP Command
+
+  * `lpc21isp` program can download code to the microcontroller.
+  
+  * Invoke as shown below
++
+--------
+$ lpc21isp -bin -control test.bin /dev/ttyUSB0 115200 12000
+--------
++
+  * `-bin` indicates the format of the executable
+
+  * `-control` indicates that `lpc21isp` is to use `DTR` and `RTS` to
+    enter into ISP mode.
+
+  * `test.bin` is the image to be flashed
+
+  * `/dev/ttyUSB0` is the serial device file name
+
+  * `115200` is the baudrate for the serial download
+
+  * `12000` specifies the clock in kHz
+
+[role="tip"]
+=== //
+
+Goal 2: LED + Serial is Complete!
+
+== Goal 3: Custom App
+
+=== mbed
+
+image::mbed.png[align="center"]
+
+  * Components
+    - IDE for embedded software development
+    - RTOS / Library for Firmware Development
+
+  * Distributed under an open source license
+
+=== mbed IDE
+
+  * Goto https://developer.mbed.org/account/login/
+  * Create an account and login
+  * Goto Compiler, and click New
+  * Select Platform "mbed LPC1114FN28"
+  * Select Template "Blinky LED Hello World"
+
+[role="two-column"]
+=== mbed Library
+
+[role="left"]
+[source,cpp]
+------
+#include "mbed.h"
+
+DigitalOut myled(P0_7);
+
+int main() {
+    while(1) {
+        myled.write(1);
+        wait(1);
+        myled.write(0);
+        wait(1);
+    }
+}
+------
+
+[role="right"]
+  * Written in C++
+  * `DigitalOut` class is used for controlling an output pin
+  * myled instance is created for pin `P0_7`.
+  * `myled.write(1)` sets the pin to `1`.
+  * `myled.write(0)` sets the pin to `0`.
+  * `wait` API causes the microcontroller to pause for the specified
+    no. of seconds
+
+=== mbed
+
+  * Modify it so that the LED blinks every 5 seconds.
+  * Click Compile
+  * Download the generated bin file
+  * Flash the bin file using LPC21ISP
+
 == Acknowledgements
 
 === Photo Credits
@@ -296,3 +480,9 @@ image::v5.png[align="center",width="50%"]
 
   * 8051 Programmer Photo:
     http://findparts.in/view/8051+programmer/o5/i14176
+
+  * LPC1114 Photo:
+    https://developer.mbed.org/users/okano/notebook/pinout-picture/
+
+  * Lego Bricks Photo:
+    https://commons.wikimedia.org/wiki/File:Lego_Color_Bricks.jpg
