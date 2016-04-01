@@ -8,3 +8,8 @@
 %.html: %.asciidoc
 	asciidoc -f $(TOPDIR)/stylesheets/zslide.conf $<
 
+install-extra:
+
+install:
+	mkdir $(TOPDIR)/build/$(notdir $(shell pwd))
+	cp slides.html $(TOPDIR)/build/$(notdir $(shell pwd))

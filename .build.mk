@@ -9,3 +9,8 @@ install:
 
 script:
 	make
+	make install
+
+after_success:
+	zdrive-push workshop-sessions $(BUILD_TYPE) $(BUILD_VERSION) misc build/*
+

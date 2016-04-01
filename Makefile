@@ -1,14 +1,21 @@
-all:
-	make -C autotools
-	make -C bitbake-data-model
-	make -C bitbake-intro
-	make -C bitbake-layers
-	make -C bitbake-packages
-	make -C bitbake-rootfs
-	make -C debian-packaging
-	make -C manual-rootfs
-	make -C yocto-customization
-	make -C yocto-getting-started
-	make -C yocto-internals
-	make -C yocto-intro
+sessions = 			\
+	autotools		\
+	bitbake-data-model	\
+	bitbake-intro		\
+	bitbake-layers		\
+	bitbake-packages	\
+	bitbake-rootfs		\
+	debian-packaging	\
+	manual-rootfs		\
+	yocto-customization	\
+	yocto-getting-started	\
+	yocto-internals		\
+	yocto-intro
 
+all:
+	for dir in $(sessions); do make -C $$dir; done
+
+install:
+	rm -fr build
+	mkdir build
+	for dir in $(sessions); do make -C $$dir $@ install-extra; done
