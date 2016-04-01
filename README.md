@@ -5,8 +5,8 @@ by Zilogic.
 
 ## Workshops
 
-  * Git Basics Workshop
-  * Dive Into Yocto, Workshop
+  * Git Basics Workshop. For details see http://www.zilogic.com/git-training.html
+  * Dive Into Yocto, Workshop. For details see http://www.zilogic.com/yocto-poky-training.html
 
 ## Git Basics Workshop: Sessions
 
