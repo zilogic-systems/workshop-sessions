@@ -1,6 +1,6 @@
 = BitBake Data Model
 Zilogic Systems <training@zilogic.com>
-:datauri:
+:data-uri:
 
 == Data Store
 
