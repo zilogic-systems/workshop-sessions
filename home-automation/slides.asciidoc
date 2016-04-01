@@ -1,0 +1,715 @@
+= Home Automation System
+Zilogic Systems <training@zilogic.com>
+:data-uri:
+
+== Project
+
+=== Prerequisites
+
+  * Install Java JRE 1.8 in the host machine.
+
+  * Install Qemu in the host machine.
+
+
+===  General Development Model
+
+image::figures/typical-setup.png[alt="Typical Setup", width="60%", align="center"]
+
+
+=== Home Automation Development Model
+
+image::figures/project-setup.png[alt="Home Automation Project Setup",width="60%", align="center"]
+
+
+=== Building Blocks of Home Automation
+
+  * The build appliance is a Debian based operating system running as
+    a guest in Virtualbox.
+
+  * It is connected to host operating system for files sharing using a
+    shared folder, which is mounted inside guest.
+
+  * The images built are copied to this folder. The target machine is
+    emulated with the built images using Qemu.
+
+  * Home automation is done by the sensors connected to the target
+    machine through serial port. These sensors are simulated by a Java
+    application.
+
+  * The data collected by these sensors will be pushed to a cloud
+    server and a dashboard will be representing the data in a panel.
+
+
+== Recieve Sensor Data
+
+=== //
+
+[role="tip"]
+Manually connect with the sensor simulator & read data via serial
+port.
+
+=== Test Drive Sensor Simulator
+
+  * Build poky core-image-minimal.
+
+------
+$ mkdir ~/yp/project
+$ cd ~/yp/project
+$ tar -xf ~/yp/dl/poky-fido-13.0.0.tar.bz2
+$ cd poky-fido-13.0.0
+$ source oe-init-build-env
+------
+
+  * Edit local.conf and change
+    ** `SSTATE_DIR` pointing `/opt/sstate-cache`,
+    ** `MACHINE` pointing `qemuarm`,
+    ** `BB_NUMBER_THREADS` to `8` and
+    ** `PARALLEL_MAKE` to `-j8`.
+
+------
+$ bitbake core-image-minimal
+------
+
+=== Test Drive Sensor Simulator (1)
+
+  * Using the Poky core-image-minimal outputs, boot the Qemu ARM
+    machine by running these commands in host machine,
+
+------
+$ cd ~/Desktop/shared
+$ bash runqemu.sh
+------
+
+  * From the apps folder, run the java application using,
+
+------
+$ java -jar sensor-simulator-1.1.jar
+------
+
+=== Test Drive Sensor Simulator (2)
+
+  * Login the target machine and run the following command inside Qemu.
+
+------
+# tail -f /dev/ttyAMA1
+------
+
+  * Watch for the data recieved in the target machine's terminal
+    (Qemu) by clicking the door (or) window (or) by sliding the
+    temperature scale.
+
+
+== Home Automation Layer
+
+=== //
+
+[role="tip"]
+A separate layer to handle home automation project by modifying
+core-image-minimal.
+
+=== //
+
+[role="tip"]
+meta-home-automation-v1
+
+=== Creating meta-home-automation layer
+
+  * To create a new layer,
+
+------
+cd /opt/yp
+yocto-layer create home-automation
+------
+
+  * This will prompt for options to create the layer. Select default
+    values. Alternatively, we can create the layer by hand.
+
+  * The layer should look like the following.
+
+------
+meta-home-automation/
+├── conf
+│   └── layer.conf
+├── COPYING.MIT
+└── README
+------
+
+=== Creating meta-home-automation layer (1)
+
+  * Add this layer to bblayer.conf using,
+
+------
+$ bitbake-layers add-layer meta-home-automation
+------
+
+  * Now create the recipes-core directory with a bbappend file.
+
+------
+$ cd meta-home-automation
+$ mkdir -p recipes-core/images
+$ touch recipes-core/images/core-image-minimal.bbappend
+------
+
+=== Creating meta-home-automation layer (2)
+
+  * Install the additional packages needed in the core-image-minimal
+    as below using bbappend in the recipes-core of
+    meta-home-automation layer.
+
+------
+SUMMARY = "A home automation system using poky minimal configuration."
+
+IMAGE_INSTALL_append = " python-core python-pyserial python-requests python-modules ca-certificates"
+------
+
+  * Copy "meta-openembedded" directory from /media/sf_shared/ to
+    ~/yp/project/poky-fido-13.0.0. In this layer, `meta-oe` and
+    `meta-python` are needed. So add them to bblayers.conf
+
+------
+$ cp -rf /media/sf_shared/meta-openembedded ~/yp/project/poky-fido-13.0.0
+$ bitbake-layers add-layer meta-openembedded/meta-oe
+$ bitbake-layers add-layer meta-openembedded/meta-python
+------
+
+=== Creating meta-home-automation layer (3)
+
+  * Now the directory structure changes to this.
+
+------
+meta-home-automation/
+├── conf
+│   └── layer.conf
+├── COPYING.MIT
+├── README
+└── recipes-core
+    └── images
+        └── core-image-minimal.bbappend
+------
+
+  * Now build core-image-minimal, after adding these layers to
+    bblayers.conf (meta-open-embedded, meta-home-automation)
+
+------
+$ bitbake core-image-minimal
+------
+
+
+== Pushing Sensor Data to Cloud
+
+=== //
+
+[role="tip"]
+Lets push the serial data to cloud manually.
+
+
+=== Serial Recieve Data and Post Cloud
+
+  * Copy the built images to /media/sf_shared and boot the target
+    machine using the commands in host machine.
+
+------
+$ cp tmp/deploy/images/qemuarm/core-image-minimal.ext4 /media/sf_shared/disk.img
+$ cp tmp/deploy/images/qemuarm/zImage /media/sf_shared/zImage
+$ ./runqemu.sh
+------
+
+=== Serial Recieve Data and Post Cloud (1)
+
+  * After the Qemu target boots up, login and run python and execute
+    following lines within Qemu,
+
+------
+# python
+>>> import serial
+>>> import requests
+>>> ser = serial.Serial('/dev/ttyAMA1', 115200)
+>>> payload = eval(str(ser.readline().rstrip('\r\n')))
+>>>
+>>># Waits for the serial data, click the door/window/temperature
+>>># slider from the sensor simulator.
+>>>
+>>> r = requests.post('https://dweet.io/dweet/for/userN', data=payload)
+------
+
+Note: Replace `N` in `userN` of the above command ranging from 1 to 30
+and don't change it throughout the course of this session.
+
+=== Serial Recieve Data and Post Cloud (2)
+
+image::figures/cloudpush.png[alt="Cloudpush", align="center"]
+
+  * To view data being pushed to cloud, visit the url,
+    `https://freeboard.io/board/LL55Y_`.
+
+  * There will be a number of panels in the dashboard for each
+    user. The payload corresponds to the user selected above will be
+    represented as lights and gauge in the dashboard.
+
+
+== Cloudpush Application
+
+=== //
+
+[role="tip"]
+Python application to push sensor data to cloud
+
+=== //
+
+[role="tip"]
+meta-home-automation-v2
+
+=== Python Based Cloudpush
+
+[source, py]
+------
+#!/usr/bin/python
+import serial
+import requests
+import sys
+import ConfigParser
+import logging
+import logging.handlers
+
+
+CFGFILE = "/etc/cloudpush.cfg"
+LOGFILE = "/tmp/cloudpush.log"
+LOGLEVEL = logging.INFO
+
+
+class CPLogger(object):
+    def __init__(self, logger, level):
+        self.logger = logger
+        self.level = level
+
+    def write(self, msg):
+        if msg.rstrip() != "":
+            self.logger.log(self.level, msg.rstrip())
+
+
+def err(msg):
+    logger.error("{0}".format(msg))
+    sys.exit(-1)
+
+
+def get_config():
+    try:
+        cfg = ConfigParser.ConfigParser()
+        cfg.read(CFGFILE)
+        if not cfg:
+            sys.exit(-1)
+        else:
+            if cfg.has_section('settings'):
+                return cfg
+            else:
+                err("Section 'settings' not found in config file")
+    except ConfigParser.Error as e:
+        err("Reading config file\n{0}".format(e))
+
+
+def serial_setup(serport):
+    try:
+        ser = serial.Serial(serport, timeout=1)
+        return ser
+    except serial.SerialException as e:
+        err("Serial setup\n{0}".format(e))
+
+
+def get_serial_data(ser):
+    try:
+        data = ser.readline()
+        return data
+    except serial.SerialException as e:
+        err("Serial data\n{0}".format(e))
+
+
+def send_data_to_cloud(dweet, user, data):
+    try:
+        url = dweet + user
+        usrdata = eval(str(data.rstrip('\r\n')))
+        logger.info("{0}".format(usrdata))
+        r = requests.post(url, params=usrdata)
+    except requests.exceptions.RequestException as e:
+        err("Unable to handle request\n{0}".format(e))
+
+
+def start():
+    global logger
+    logger = logging.getLogger(__name__)
+    logger.setLevel(LOGLEVEL)
+    handler = logging.handlers.RotatingFileHandler(LOGFILE, 'w')
+    formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s')
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+
+    sys.stdout = CPLogger(logger, LOGLEVEL)
+    sys.stdout = CPLogger(logger, logging.ERROR)
+
+    try:
+        config = get_config()
+        serport = config.get('settings', 'serialport')
+        url = config.get('settings', 'dweeturl')
+        user = config.get('settings', 'user')
+        port = serial_setup(serport)
+        while True:
+            serial_data = get_serial_data(port)
+            if serial_data:
+                logger.info("{0}".format(serial_data))
+                send_data_to_cloud(url, user, serial_data)
+    except ConfigParser.NoOptionError as e:
+        err("Option not available in config file.\n{0}".format(e))
+        sys.exit(-1)
+    except KeyboardInterrupt as kill:
+        err("User Terminated the Program")
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    start()
+------
+
+=== Cloudpush Configurations
+
+  * Cloudpush application uses a configuration file named
+    "cloudpush.cfg".
+
+------
+[settings]
+serialport = /dev/ttyAMA1
+dweeturl = https://dweet.io:443/dweet/for/
+user = user1
+------
+
+=== Install Cloudpush
+
+  * Create a recipe for cloudpush application to be installed in
+    core-image-minimal and the python packages in RDEPENDS.
+
+------
+$ cd meta-home-automation
+$ mkdir -p recipes-home-automation/cloudpush/cloudpush-0.10
+------
+
+  * Add the cloudpush.py and cloudpush.cfg to cloudpush-0.10
+    directory.
+
+  * Remove the python packages from IMAGE_INSTALL_append in
+    core-image-minimal.bbappend.
+
+  * Add cloudpush to IMAGE_INSTALL_append.
+
+------
+SUMMARY = "A home automation system using poky minimal configuration."
+
+IMAGE_INSTALL_append = " cloudpush"
+------
+
+
+=== Install Cloudpush (1)
+
+  * Create cloudpush.bb like below.
+
+------
+$ cd recipes-home-automation/cloudpush
+$ touch cloudpush_0.10.bb
+------
+
+  * Place the python application and configuration file in
+    cloudpush-0.10. Now the directory structure changes to this.
+
+------
+meta-home-automation/
+├── conf
+│   └── layer.conf
+├── COPYING.MIT
+├── README
+├── recipes-core
+│   └── images
+│       └── core-image-minimal.bbappend
+└── recipes-home-automation
+    └── cloudpush
+        ├── cloudpush-0.10
+        │   ├── cloudpush.cfg
+        │   └── cloudpush.py
+        └── cloudpush_0.10.bb
+------
+
+=== Install Cloudpush (2)
+
+  * Build the core-image-minimal with the following content in
+    cloudpush_0.10.bb.
+
+------
+DESCRIPTION = "A packet forwarding app for home automation"
+LICENSE = "BSD"
+LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/BSD;md5=3775480a712fc46a69647678acb234cb"
+RDEPENDS_${PN} = "python-core python-pyserial python-requests python-modules ca-certificates"
+
+SRC_URI = "file://cloudpush.py \
+           file://cloudpush.cfg \
+"
+
+S = "${WORKDIR}"
+
+do_install_append() {
+     install -d ${D}/${sysconfdir}
+     install -d ${D}/${bindir}
+     install -m 0755 ${S}/cloudpush.py ${D}/${bindir}/cloudpush
+     install -m 0644 ${S}/cloudpush.cfg ${D}/${sysconfdir}/
+}
+
+FILES_${PN} += "${bindir}/cloudpush \
+	        ${sysconfdir}/cloudpush.cfg"
+------
+
+=== Install Cloudpush (3)
+
+  * Boot the Qemu target system with the built images.
+
+  * Login the target system and run the following.
+
+------
+# echo "nameserver 10.0.2.3" > /etc/resolv.conf
+# cloudpush
+------
+
+  * The events in sensor simulator will be reflected in the user panel
+    in the freeboard.io dashboard.
+
+== Setuptools
+
+=== //
+
+[role="tip"]
+Installing cloudpush using python setuptools.
+
+=== //
+
+[role="tip"]
+meta-home-automation-v3
+
+
+=== Install Cloudpush using Setuptools
+
+  * Python applications can be packaged and managed using its own
+    package manager.
+
+  * setuptools provide tools to manage python packages. It uses
+    setup.py file to build, install and manage packages.
+
+  * Yocto provides a separate class to handle such situations.
+
+------
+from setuptools import setup
+
+setup(
+    name = "cloud-push",
+    version = "0.1.0",
+    author = "BabuSubashChandar",
+    author_email = "code@zilogic.com",
+    description = "Publish home automation data to Cloud.",
+    license = "BSD",
+    py_modules = ['cloudpush'],
+    entry_points = {
+        "console_scripts": ["cloudpush = cloudpush:start"]
+    }
+)
+------
+
+=== Install Cloudpush using Setuptools (1)
+
+------
+DESCRIPTION = "A packet forwarding app for home automation"
+LICENSE = "BSD"
+LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/BSD;md5=3775480a712fc46a69647678acb234cb"
+RDEPENDS_${PN} = "python-core python-pyserial python-requests python-modules python-setuptools ca-certificates"
+
+SRC_URI = "file://setup.py \
+	   file://cloudpush.py \
+           file://cloudpush.cfg \
+"
+
+S = "${WORKDIR}"
+
+inherit setuptools
+
+do_install_append() {
+     install -d ${D}/${sysconfdir}
+     install -m 0644 ${S}/cloudpush.cfg ${D}/${sysconfdir}/
+}
+
+FILES_${PN} += "${sysconfdir}/cloudpush.cfg"
+------
+
+=== Install Cloudpush using Setuptools (2)
+
+  * Directory structure with setup.py added.
+
+------
+meta-home-automation/
+├── conf
+│   └── layer.conf
+├── COPYING.MIT
+├── README
+├── recipes-core
+│   └── images
+│       └── core-image-minimal.bbappend
+└── recipes-home-automation
+    └── cloudpush
+        ├── cloudpush-0.10
+        │   ├── cloudpush.cfg
+        │   ├── cloudpush.py
+        │   └── setup.py
+        └── cloudpush_0.10.bb
+------
+
+  * Now build and boot the Qemu target system with the images and run
+    the following commands in the target,
+
+------
+# echo "nameserver 10.0.2.3" > /etc/resolv.conf
+# cloudpush
+------
+
+== Initscripts
+
+=== //
+
+[role="tip"]
+Run the cloudpush application automatically on bootup.
+
+=== //
+
+[role="tip"]
+meta-home-automation-v4
+
+=== Start Cloudpush on Bootup
+
+  * In Linux based system boot sequence, the services are executed
+    based on the priorities and dependencies by a package called
+    sysvinit.
+
+  * It utilizes shell scripts to understand the priorities and
+    dependencies of a service and invoke them accordingly. This is
+    generally called start-stop scripts.
+
+[source, sh]
+------
+#!/bin/sh
+
+### BEGIN INIT INFO
+# Provides:          cloudpush
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: A data pushing application to view sensor values.
+# Description:       Daemonizing the cloudpush application to read
+# 		     sensor values and pushing it to cloud.
+### END INIT INFO
+
+DAEMON=cloudpush
+DAEMON_NAME=cloudpush
+DAEMON_OPTS=""
+DAEMON_USER=root
+
+PIDFILE=/var/run/$DAEMON_NAME.pid
+
+. /etc/init.d/functions
+
+do_start () {
+    start-stop-daemon --start --background --pidfile $PIDFILE --make-pidfile --user $DAEMON_USER --chuid $DAEMON_USER --startas $DAEMON -- $DAEMON_OPTS
+}
+do_stop () {
+    start-stop-daemon --stop --pidfile $PIDFILE --retry 10
+}
+
+case "$1" in
+
+    start|stop)
+	echo "nameserver 10.0.2.3" > /etc/resolv.conf
+        do_${1}
+        ;;
+
+    restart|reload|force-reload)
+        do_stop
+        do_start
+        ;;
+
+    status)
+        status_of_proc "$DAEMON_NAME" "$DAEMON" && exit 0 || exit $?
+        ;;
+
+    *)
+        echo "Usage: /etc/init.d/$DAEMON_NAME {start|stop|restart|status}"
+        exit 1
+        ;;
+
+esac
+exit 0
+------
+
+=== Start Cloudpush on Bootup (1)
+
+  * Yocto provides the mechanism to handle start-stop scripts via
+    update-rc.d class.
+
+------
+DESCRIPTION = "A packet forwarding app for home automation"
+LICENSE = "BSD"
+LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/BSD;md5=3775480a712fc46a69647678acb234cb"
+RDEPENDS_${PN} = "python-core python-pyserial python-requests python-modules python-setuptools ca-certificates"
+
+SRC_URI = "file://setup.py \
+           file://cloudpush.py \
+           file://cloudpush.cfg \
+           file://cloudpush \
+"
+
+S = "${WORKDIR}"
+
+inherit setuptools update-rc.d
+
+INITSCRIPT_NAME = "cloudpush"
+INITSCRIPT_PARAMS = "defaults 99"
+
+do_install_append() {
+     install -d ${D}/${sysconfdir}/init.d
+     install -m 0644 ${S}/cloudpush.cfg ${D}/${sysconfdir}/
+     install -m 0755 ${S}/cloudpush ${D}${sysconfdir}/init.d/cloudpush
+}
+
+FILES_${PN} += "${sysconfdir}/cloudpush.cfg \
+                ${sysconfdir}/init.d/cloudpush \
+"
+------
+
+=== Start Cloudpush on Bootup (2)
+
+  * Directory structure with initscript added.
+
+------
+meta-home-automation/
+├── conf
+│   └── layer.conf
+├── COPYING.MIT
+├── README
+├── recipes-core
+│   └── images
+│       └── core-image-minimal.bbappend
+└── recipes-home-automation
+    └── cloudpush
+        ├── cloudpush-0.10
+        │   ├── cloudpush
+        │   ├── cloudpush.cfg
+        │   ├── cloudpush.py
+        │   └── setup.py
+        └── cloudpush_0.10.bb
+------
+
+  * Now build the core-image-minimal, copy the images to shared
+    folder and start Qemu target.
+
+  * This time the cloudpush application will be started on bootup. By
+    changing sensor values in simulator, the dashboard will be
+    updated.
