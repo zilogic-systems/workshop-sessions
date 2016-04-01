@@ -10,7 +10,8 @@ sessions = 			\
 	yocto-customization	\
 	yocto-getting-started	\
 	yocto-internals		\
-	yocto-intro
+	yocto-intro		\
+	home-automation
 
 all:
 	for dir in $(sessions); do make -C $$dir; done
