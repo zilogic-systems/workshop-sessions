@@ -1,0 +1,368 @@
+= ARM Architecture
+Zilogic Systems
+
+== ARM, Overview
+
+=== Introduction
+
+  * 32-bit RISC processor developed by ARM corporation.
+  * ARM stands for Advanced RISC Machines.
+  * Widely used in embedded systems
+    - mobile phones
+    - MP3 players
+    - handhelds
+
+=== RISC Features
+
+  - Large array of general purpose registers.
+  - Load/store model of data processing.
+  - Small no. of addressing modes.
+  - Uniform fixed length instructions.
+
+=== ARM Features
+
+  - Variable length execution for certain instructions.
+  - Conditional execution of most instructions.
+  - Barrel shifter to preprocess one operand before entering ALU.
+  - Powerful indexed addressing modes with auto-increment and decrement.
+  - Link register for fast leaf function calls.
+
+== Data Flow Model
+
+=== CPU
+
+image::figures/system-bus.png[align="center"]
+
+  * CPU interface - data bus, address bus and control signals
+  * Reads data from memory, processes it, stores back data to memory,
+    based on instructions stored in memory
+
+[role="two-column"]
+=== Data Flow Model
+
+[role="left"]
+image::figures/data-flow.png[align="center"]
+
+[role="right"]
+Register File:: Temporarily stores data read from memory, and data to
+be written to memory
+
+ALU, MAC:: Processes data stored in registers
+
+Instruction Decoder:: Decodes instruction and instructs other blocks
+the operation to perform
+
+[role="two-column"]
+=== Load Store Operations
+
+[role="left"]
+image::figures/load-store-data-flow.png[align="center"]
+
+[role="right"]
+  * During read operation, data from the data bus is stored to the
+    Register File
+  
+  * If signed byte or half-word is read, sign extension is done by the
+    Sign Extend unit, before storing in the register
+
+  * During write operation, data from the register is driven to the
+    data bus
+
+  * During instruction fetch, data from the data bus is stored in the
+    Inst. Decoder
+
+[role="two-column"]
+=== Data Processing
+
+[role="left"]
+image::figures/data-proc-data-flow.png[align="center"]
+
+[role="right"]
+  * During data processing, two operands from register file goes to
+    the ALU, and the result is stored back in the register file
+
+  * One of the operands can be shifted, any number of bits by the
+    Barrel Shifter before being processed
+
+  * Generally a shift register requires 1 clock per shift
+
+  * The Barrel Shifter can shift any no. of bits in 1 clock
+
+[role="two-column"]
+=== MAC
+
+[role="left"]
+image::figures/mac-data-flow.png[align="center"]
+
+[role="right"]
+  * During multiplication, two operands from register file goes to the
+    MAC, and the result is stored back in the register file
+
+  * Multiplication with accumulate, is a common DSP operation, where
+    Result = (A * B) + Acc
+
+  * During multiplication with accumulate, three operands from the
+    register goes to the MAC, and result is stored back in the
+    register file
+
+[role="two-column"]
+=== Address Generation
+
+[role="left"]
+image::figures/addr-gen-data-flow.png[align="center"]
+
+[role="right"]
+   * During read and write operations, the address to read / write
+     from needs to driven on the address bus
+
+   * For simple, pointer dereference, the value from a register is
+     is directly fed to the address bus
+
+[role="two-column"]
+=== Address Generation (Contd.)
+
+[role="left"]
+image::figures/addr-gen-data-flow.png[align="center"]
+
+[role="right"]
+   * For array access, the address is generated as follows
+     - the base address from the Register File is the A operand
+     - the index from the Register File is the B operand
+     - depending on the array type the appropriate shift is applied by
+       the Barrel Shifter
+
+[role="two-column"]
+=== Address Generation (Contd.)
+
+[role="left"]
+image::figures/addr-gen-data-flow.png[align="center"]
+
+[role="right"]
+   * Multi-register operations
+     - Pushing multiple registers
+     - Popping multiple registers
+     
+   * Stack pointer from the Register File with offset if any is stored
+     in the Address Register
+   * After each register load / store, Address Register is incremented
+     by the Incrementer
+
+== Registers
+
+[role="two-column"]
+=== Register File
+
+[role="left"]
+image::figures/register-file.png[width="12%",align="center"]
+
+[role="right"]
+  * 16 general purpose registers
+
+  * Each register is 32 bit wide
+
+  * Referred to as `rn`, where n represents the register index.
+
+  * All instructions treat registers `r0` to `r13` equally.
+
+  * But `r14` and `r15` are assigned special functions by the
+    processor
+
+=== Special Registers
+
+  * `r15` is the program counter
+
+  * Contains the address of the next instruction to be fetched
+
+  * `r14` is the link register
+
+  * Stores the return address, when a subroutine is invoked
+
+  * `r13` is assigned a special function by the operating system
+
+  * `r13` is usually the stack pointer, and points to the top of the
+    stack
+
+=== Status Register
+
+image::figures/cpsr.png[align="center"]
+
+`cpsr` is a dedicated 32-bit register, that contains the following
+fields.
+
+  * Condition Flags
+  * Interrupt Masks
+  * Processor Mode
+  * Processor State
+
+=== Condition Flags
+
+[options="header",width="60%",align="center"]
+|======
+| Flag         | Meaning
+| Carry `C`    | Operation caused a carry.
+| Overflow `O` | Operation caused an overflow.
+| Zero `Z`     | Operation resulted in 0.
+| Negative `N` | Operation resulted in a negative value.
+|======
+
+=== Interrupt Flags
+
+  * ARM cores have two interrupt request inputs `IRQ` and `FIQ`
+
+  * Each interrupt request input can be disabled/enabled by
+    setting/clearing the mask bits `I` and `F`, in the `CPSR`
+
+=== Processor States
+
+  * State determines which instruction set is being executed.
+
+    - ARM
+    - Thumb
+
+  * Instructions cannot be intermingled.
+  * T bit in the CPSR determines the processor state
+  * To change state special branch instructions are available.
+
+=== Thumb Instructions
+
+  * Thumb instruction set is a sub-set of ARM instruction
+    set
+
+  * Instructions are 16 bit wide, and provide higher code
+    density
+
+  * Reduces memory (hence cost), and improves execution speed (fewer
+    bytes to fetch per instruction).
+
+  * Limited functionality, compared to ARM instructions
+
+== Exceptions
+
+=== Overview
+
+  * Program is normally executed sequentially by the processor
+
+  * Certain events might require special handling by Operating System software
+
+  * When the event occurs:
+    - processor transfers control to a preset location
+    - executes code
+    - returns back, to the interrupt code
+
+  * These special events are called *exceptions*
+
+=== Exception Types
+
+Data Abort:: failed attempt to access memory occurs
+
+Prefecth Abort:: failed attempt to fetch instruction
+
+FIQ:: external hardware made an interrupt request on FIQ
+
+IRQ:: external hardware made an interrupt request on IRQ
+
+=== Exceptions Types (Contd.)
+
+Software Interrupt:: SWI instruction is executed
+
+Undefined Instruction:: processor tries to execute an invalid
+instruction
+
+Reset:: processor was reset
+
+=== Exception Vector Table
+
+[options="header",width="50%",cols="70%,30%",align="center"]
+|======
+| Exception               | Address
+| Reset                   | 0x00
+| Undefined Instruction	  | 0x04
+| Software Interrupt (SWI) | 0x08
+| Prefetch Abort	  | 0x0C
+| Data Abort		  | 0x10
+| --			  | 0x14
+| IRQ			  | 0x18
+| FIQ			  | 0x1C
+|======
+
+== ARM Variants
+
+=== Terminology
+
+image::figures/terms.png[align="center"]
+
+Architecture:: document specifying the instruction-set and the
+behaviour of the processor
+
+Core:: a processor design implementing specific features of the processor
+
+Chip:: a processor with the 'Core' implemented in silicon
+
+=== Architecture / Description
+
+  * A potato chip is a thin slice of potato that has been deep fried,
+    baked, kettle-cooked, or popped until crunchy.
+
+  * Potato chips are commonly served as a snack, side dish, or
+    appetizer.
+
+  * The basic chips are cooked and salted; additional varieties are
+    manufactured using various flavorings and ingredients including
+    herbs, spices, cheeses, and artificial additives.
+
+=== Core / Recipe
+
+  * Place potato slices into a large bowl of cold water as you
+    slice.
+
+  * Drain, and rinse, then refill the bowl with water, and add the
+    salt.
+
+  * Let the potatoes soak in the salty water for at least 30
+    minutes.
+
+  * Drain, then rinse and drain again.
+    
+  * Heat oil in a deep-fryer to 365 degrees F (185 degrees C).
+
+  * ...
+
+=== Chips Served
+
+image::https://upload.wikimedia.org/wikipedia/commons/1/15/Pizza_potato.JPG[align="center"]
+
+
+[role="tip"]
+=== //
+
+ARM sells the descriptions and recipes, it does not sell chips!
+
+=== Architecture Revisions
+
+[cols="20%,20%,60%",options="header",width="90%",align="center"]
+|======
+| Revision   | Year   | Features
+| ARMv1      | 1985   | First ARM processor 26-bit addressing
+| ARMv2      | 1987   | Coprocessor support
+| ARMv3      | 1992   | 32-bit addressing, MMU, 64-bit MAC
+| ARMv4      | 1996   | Thumb instruction set
+| ARMv5      | 1999   | Jazelle instruction set, DSP extensions
+| ARMv6      | 2001   | Improved multiprocessors instructions, multimedia instructions
+| ARMv7      | 2005   | Thumb-2 instruction set
+|======
+
+=== ARM Cores
+
+[options="header",cols="20%,30%,30%,20%",width="80%",align="center"]
+|======
+| Arch.	       | Cores by ARM		| Cores by 3rd Party		| SoC
+| ARMv4        | ARM7TDMI, ARM9TDMI	| DEC StrongARM			| LPC2100
+| ARMv5	       | ARM9	   		| Intel XScale			| PXA255
+| ARMv6	       | ARM11			| 				| i.MX31
+| ARMv6-M      | Cortex-M0		|				| LPC1114
+| ARMv7-A      | Cortex-A5, Cortex-A15	| Qualcomm Krait, Apple A6	| SAMA5D3
+| ARMv7-M      | Cortex-M3		| 	   	  		| LPC1769
+| ARMv8-A      | Cortex-A35, Cortex-A72	| Qualcomm Kryo, Apple A7	| Snapdragon 810
+|======
+
+== Questions
