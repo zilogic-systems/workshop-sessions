@@ -1,0 +1,403 @@
+= ARM Instruction Set
+Zilogic Systems
+
+== Overview
+
+=== Instruction Classification
+
+image::figures/arm-iset.png[width="80%",align="center"]
+
+== Alignment
+
+[role="two-column"]
+=== Processors's View of Memory
+
+[role="left"]
+image::figures/mem-view.png[align="center"]
+
+[role="right"]
+  * Programmers think of memory as an array of bytes.
+
+  * Processors do not access memory in byte sized chunks. It accesses
+    memory in 2-byte, 4-byte, 8-byte chunks.
+
+  * The size with which processor access memory is called its memory
+    access granularity.
+
+=== 1-byte Granularity
+
+image::figures/1-byte-granularity.png[align="center"]
+
+  * Reading 32-bit data from address 0
+  * Reading 32-bit data from address 1
+  * Both require 4 memory accesses
+
+=== 2-byte Granularity
+
+image::figures/2-byte-granularity.png[align="center"]
+
+  * Address 0, requires 2 memory accesses
+
+  * Address 1, requires 3 memory accesses
+
+  * Since the address does not fall on the memory access boundary of
+    the processor, extra access is required
+
+  * Such an address is called an unaligned address
+
+=== 4-byte Granularity
+
+image::figures/4-byte-granularity.png[align="center"]
+
+  * Address 0, requires 1 memory access
+  * Address 1, requires 2 memory accesses
+  * Avoiding unaligned accesses, reduces the no. of memory accesses
+
+=== Alignment Requirements
+
+Unaligned access can be avoided by following the below rule
+
+Byte:: Can be located in any address
+
+Half-word:: Should be located in an address that is a multiple of 2
+
+Word:: Should be located in an address that is a multiple of 4
+
+=== Unaligned Accesses
+
+  * Each processor handles unaligned accesses differently
+
+  * x86 processors, perform the unaligned accesses and munge the
+    values to produce the result
+    
+  * This results in lower performance
+
+  * ARM processors, refuse to perform the access and result in a data
+    abort exception
+
+  * Since ARMv6, hardware support is available for unaligned access
+
+== Data Processing Instructions
+
+=== Overview
+
+  * Sub-Types
+    - Data Movement
+    - Arithmetic
+    - Comparison (Does not store results)
+    - Logical
+
+  * Load-store architecture, operands are only registers, or
+    immediates.
+
+=== Condition Flags
+
+  * By default data processing instructions do not update the condition flags
+
+  * Instructions will update condition flags if it is suffixed with an
+    `S`
+
+  * Example: The following instruction adds two registers and updates
+    the condition flags
+
+------
+ADDS r0, r1, r2
+------
+
+=== Data Movement
+
+   * Simplest of all instructions
+
+   * Moves values from one register to another, or an immediate value
+     to a register
++
+------
+MOV Rd, N    ; MOV: Rd = N
+MVN Rd, N    ; MVN: Rd = ~N
+------
++
+   * `Rd` is the destination register
+   * `N` is a immediate value or a register
+   * Immediate is prefixed by a `#`
+
+=== Data Movement Example
+
+   * Example: Move contents of `r5` to `r7`
++
+------
+MOV r7, r5      ; r7 = r5
+------
++
+   * Example: Move `10` to `r2`
++
+------
+MOV r2, #2	; r2 = 2
+------
+
+=== Arithmetic Instructions
+
+  * Addition and subtraction of 32 bit values
+
+  * Syntax:
++
+------
+ADD Rd, Rn, N   ; Rd = Rn + N
+ADC Rd, Rn, N   ; Rd = Rn + N + C
+SUB Rd, Rn, N   ; Rd = Rn - N
+SBC Rd, Rn, N   ; Rd = Rn - N - !C
+------
+
+=== Arithmetic Instructions Example
+
+------
+; r1 = 1, r2 = 2
+
+SUB r0, r2, r1
+
+; r0 = 1
+------
+
+=== Logical Instructions
+
+  * Bitwise operation on two 32 bit values
+
+  * Syntax
++
+------
+AND Rd, Rn, N      ; Rd = Rn & N
+ORR Rd, Rn, N      ; Rd = Rn | N
+EOR Rd, Rn, N      ; Rd = Rn ^ N
+BIC Rd, Rn, N      ; Rd = Rn & ~N
+------
+
+=== Logical Instructions Example
+
+------
+; r0 = 0b0111, r1 = 0b0010
+
+BIC r0, r0, r1
+
+; r0 = 0b0101
+------
+
+=== Comparison Instructions
+
+  * Performs an arithmetic/logical operation and sets the flags
+
+  * The result is not stored
+
+  * Syntax
++
+------
+CMP Rn, N       ; Rn - N and flags set
+CMN Rn, N       ; Rn + N and flags set
+TEQ Rn, N       ; Rn ^ N and flags set
+TST Rn, N       ; Rn & N and flags set
+------
+
+=== Conditional Execution
+
+  * Most other instruction sets only allow conditional execution of
+    branch instructions.
+
+  * In ARM, almost all instructions have a condition field and can be
+    conditionally executed.
+
+  * If corresponding condition is true, the instruction is executed.
+
+  * If the condition is false, the instruction is turned into a NOP.
+
+  * The condition is specified by suffixing the instruction with a
+    condition code mneumonic.
+
+=== Conditional Execution Mneumonic
+
+[options="header",width="60%"]
+|======
+| Mneumonic       | Condition
+| EQ		  | Equal
+| NE		  | Not Equal
+| CS		  | Carry Set
+| CC		  | Carry Clear
+| VC		  | Overflow Clear
+| VS		  | Overflow Set
+| PL		  | Positive
+| MI		  | Minus
+|======
+
+=== Conditional Execution Mneumonic (Contd.)
+
+[options="header",width="60%"]
+|======
+| Mneumonic       | Condition
+| HI		  | Unsigned Higher Than
+| HS		  | Unsigned Higher or Same
+| LO		  | Unsigned Lower Than
+| LS		  | Unsigned Lower or Same
+| GT		  | Signed Greater Than
+| GE		  | Signed Greater Than or Equal
+| LT		  | Signed Less Than
+| LE		  | Signed Less Than or Equal
+|======
+
+=== Conditional Execution Example
+
+Example: The following instruction moves `r1` to `r0` only if carry is
+set.
+
+------
+MOVCS r0, r1
+------
+
+== Branch Instructions
+
+=== Branch
+
+  * Causes the processor to execute instructions from a different
+    address.
++
+------
+B label        ; pc = label
+------
++
+  * Since an instruction is only 32-bit in size, the entire address
+    cannot be stored in the instruction.
+
+  * The assembler calculates the offset, by taking the difference
+    between the branch instruction's address and the labeled address.
+
+  * 24 bits in the instruction are used to specify a signed offset,
+    giving a range of +/- 32MB.
+
+  * When the instruction is executed, the 24 bit offset is shifted 2
+    bits left, sign extended to 32 bit and is added to `pc`.
+
+=== Branch and Link
+
+  * The `BL` instruction in addition to branching to the specified
+    location, also stores the next instruction's address in `lr`.
++
+------
+BL label       ; pc = label, lr = addr of next instruction
+------
++
+  * To return from the subroutine, the `MOV` instruction can be used
+    as shown below.
++
+------
+MOV pc, lr
+------
+
+== Load Store Instructions
+
+=== Single Register Transfer
+
+  * Moves single data item between register and memory
+  * 8-bit, 16-bit and 32-bit transfers are supported
+  * Syntax
++
+------
+LDR   Rd, Addressing    ; Rd = mem32[addr]
+STR   Rd, Addressing    ; mem32[addr] = Rd
+LDRB  Rd, Addressing    ; Rd = mem8[addr]
+STRB  Rd, Addressing    ; mem8[addr] = Rd
+LDRH  Rd, Addressing    ; Rd = mem16[addr]
+STRH  Rd, Addressing    ; mem16[addr] = Rd
+------
+
+=== Sign Extend
+
+Instructions to load signed values from memory
+
+------
+LDRSB Rd, Addressing    ; Rd = SignExtend( mem8[addr] )
+LDRSH Rd, Addressing    ; Rd = SignExtend( mem16[addr] )
+------
+
+=== Addressing
+
+  * `Addressing` is formed from two parts
+
+    - base register
+    - offset
+
+  * Base register can be any general purpose register.
+  * Offset and base register can interact in 3 different ways.
+
+=== Base Offset Interaction
+
+Offset::
+The offset is added or subtracted from the base register to form the
+address
++
+------
+LDR Rd, [Rm, offset]
+------
++
+Pre-indexed::
+The offset is added or subtracted from the base register to form the
+address, and the address is written back to the base register
++
+------
+LDR Rd, [Rm, offset]!
+------
+
+=== Base Offset Interaction (Contd.)
+
+Post-indexed::
+The base register contains the address to be accessed, and the offset
+is added or subtracted from the address and stored in the base
+register
++
+------
+LDR Rd, [Rm], offset
+------
+
+=== Offset Format
+
+Immediate:: 
+Offset is an unsigned number, that can be added or subtracted from the
+base register. Useful for accessing structure members, local variables
+in the stack. Immediate values start with a `#`.
+
+Register::
+Offset is an unsigned value in a general purpose register, that can be a
+added or subtracted from the base register. Useful for accessing array
+elements.
+
+=== Examples
+
+------
+LDR  r1, [r0]              ; Same as LDR r1, [r0, #0], r1 = mem32[r0]
+LDR  r8, [r3, #4]          ; r8 = mem32[r3 + 4]
+LDR  r12, [r13, #-4]       ; r12 = mem32[r13 - 4]
+STRB r10, [r7, -r4]        ; mem8[r7 - r4] = r10
+STRB r7, [r6, #-1]!        ; mem8[r6 - 1] = r7, r6 = r6 - 1
+STR  r2, [r5], #8          ; mem32[r5] = r2, r5 = r5 + 8
+------
+
+== Status Register Transfer
+
+=== Status Register Transfer
+
+  * Move data to and from `cpsr`
+  * Usually used to set and clear interrupt mask bits
+  * Syntax
++
+------
+MRS Rd, cpsr		; Rd = cpsr
+MSR cpsr, Rm		; cpsr = Rm
+MSR cpsr, #imm		; cpsr = imm
+------
+
+=== Example
+
+Example: Clear interrupt mask flag and enable IRQ.
+
+------
+MRS r1, cpsr
+BIC r1, r1, #0x40 ; 0b01000000
+MSR cpsr, r1
+------
+
+== Questions
