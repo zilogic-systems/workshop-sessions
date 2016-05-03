@@ -1,0 +1,278 @@
+= ARM Assembler
+Zilogic Systems
+
+== Hello ARM
+
+=== Assembly Program
+
+ * Syntax of assembly source lines
+ * Each of the components is optional
++
+------
+label:    instruction         @ comment
+------
++
+ * Comment starts with an `@`, and the characters that appear after an
+  `@` are ignored
+
+=== Label
+
+  * The label is a convenient way to refer to the location of the instruction in memory
+
+  * The label can be used where ever an address can appear
+
+  * For example as an operand of the branch instruction
+  
+  * The label name should consist of alphabets, digits, `_` and `$`
+
+=== Instruction
+
+  * The `instruction` could be an ARM instruction or an assembler
+    directive
+
+  * Assembler directives are commands to the assembler
+
+  * Assembler directives always start with a `.` (period)
+
+=== Adding Two Numbers
+
+[source,armasm]
+------
+	.text                
+start:                       @ Label, not really required
+	mov   r0, #5	     @ Load register r0 with the value 5
+	mov   r1, #4	     @ Load register r1 with the value 4
+	add   r2, r1, r0     @ Add r0 and r1 and store in r2
+	
+stop:	b stop               @ Infinite loop to stop execution
+------
+
+  * `.text` is an assembler directive.
+  * Indicates that the instructions should go into the code section
+  * Sections will be discussed later
+
+=== Invoking Assembler
+
+  * Assembly program is stored in `add.s`
++
+------
+$ arm-none-eabi-as -o add.o add.s
+------
++
+  * `-o` option specifies the output filename
+
+=== Invoking Linker
+
+  * Linker is invoked to generate the executable
++
+------
+$ arm-none-eabi-ld -Ttext=0x0 -o add.elf add.o
+------
++
+  * `-o` option specifies the output filename
+
+  * `-Ttext=0x0`, indicates that the instructions are starting from address `0x0`
+
+  * The linker will assign addresses to labels accordingly
+
+=== Label Addresses
+
+  * `nm` is invoked to display the address assigned to labels
++
+------
+$ arm-none-eabi-nm add.elf
+... clip ...
+00000000 t start
+0000000c t stop
+------
++
+  * `start` is the label of the first instruction, gets the address `0x0`
+
+  * `stop` is after 3 instructions
+  
+  * Each instruction is 4 byte wide
+
+  * `stop` gets the address `3 x 4 = 12 = 0xC`
+
+=== Try Out
+
+  * Create the file `add.s`
+
+  * Invoke the assembler to generate the object file
+  
+  * Invoke the linker to generate the executable
+
+  * Use `nm` to determine the labels assigned to symbols
+
+=== Label Addresses (Contd.)
+
+   * Linker can be invoked with a different base address
+
+   * A different set of addresses will be assigned to the labels
++
+------
+$ arm-none-eabi-ld -Ttext=0x20000000 -o add.elf add.o
+$ arm-none-eabi-nm add.elf
+... clip ...
+20000000 t start
+2000000c t stop
+------
++
+
+  * The instructions will be stored in Flash, located at base address `0x0`
+  * The base address `0x0` is used for the instructions
+
+=== Binary Format
+
+  * The output file created by `ld` is in a format called `ELF`
+
+  * `ELF` contains meta information used by the OS to load the
+    instructions into memory
+
+  * Binary is a simpler alternate format
+
+  * A file in `binary` format contains consecutive bytes from a
+    specific memory address
+
+  * Convenient for use with Flash programming tools
+
+=== Converting from ELF to Binary
+
+  * `objcopy` - convert between various object file formats
++
+------
+objcopy -O <output-format> <in-file> <out-file>
+------
++
+
+  * Converting from ELF to Binary format
++
+------
+$ arm-none-eabi-objcopy -O binary add.elf add.bin
+------
++
+  * The Binary file will contain exactly 16 bytes, corresponding to 4 instructions
+  * File size is checked using `ls`
++
+------
+$ ls -al add.bin
+------
+
+=== Try Out
+
+  * Convert the ELF file to Binary format
+
+  * Check the size of the file
+
+== Executing in Qemu
+
+=== Flash Memory
+
+  * On reset the ARM processor starts executing from `0x0`
+
+  * On the `connex` board a 16MB is located at `0x0`
+
+  * Instructions at the begining of the flash will be executed
+
+  * Qemu has to provided a file that will represent the Flash contents
+
+=== Flash File Format
+
+  * Flash file format is same as binary format
+
+  * When the processor reads address X of the Flash, Qemu reads from
+    file offset X of the Flash file
+
+  * An empty 16MB Flash file can be created using
++
+------
+$ dd if=/dev/zero of=flash.bin bs=4092 count=4092
+------
+
+=== Flashing the Program
+
+  * The program has to be copied to the top of the Flash
+
+  * This can be done using `dd` again
++
+------
+$ dd if=add.bin of=flash.bin bs=4096 conv=notrunc
+------
++
+
+  * If `conv=notrunc` is not specified, `flash.bin` will equal the
+    size of `add.bin`
+
+  * `conv=notrunc` ensures that `flash.bin` still remains 16MB
+
+=== Invoking Qemu
+
+  * Qemu is invoked as shown below
++
+------
+$ qemu-system-arm -M connex -pflash flash.bin -nographic -serial /dev/null
+------
++
+  * `-M connex` specifies the machine type
+  * `-pflash flash.bin` specifies the file that represents the Flash memory
+  * `-nographic` specifies simulation of graphical display is not required
+  * `-serial /dev/null` specifies the serial data is to be ignored
+
+=== Viewing Registers
+
+  * The instructions in the Flash is executed
+
+  * The processor spins in the last branch to self instruction
+
+  * The state of the processor can be viewed Qemu's monitor interface
+
+  * Monitor interface is a Command line interface for the emulation
+    - View the state of the emulation
+    - Control the emulation
+
+  * Monitor interface is now available through Qemu's stdio
+
+=== Viewing Registers (Contd.)
+
+  * `info registers` can be used to view the current state of the registers
++
+------
+(monitor) info registers
+R00=00000005 R01=00000004 R02=00000009 R03=00000000
+R04=00000000 R05=00000000 R06=00000000 R07=00000000
+R08=00000000 R09=00000000 R10=00000000 R11=00000000
+R12=00000000 R13=00000000 R14=00000000 R15=0000000c
+PSR=400001d3 -Z-- A svc32
+------
+
+=== Try Out
+
+  * Create the Flash file
+
+  * Copy `add.bin` into the Flash file
+
+  * Invoke Qemu to run the program in the Flash
+
+  * View the register state using the `info registers` Monitor command
+
+=== Monitor Commands
+
+== Assembler Directives
+
+=== Sum an Array
+
+=== `.byte` Directive
+
+=== `.align` Directive
+
+=== String Length
+
+=== `.asciz` Directive
+
+=== `.equ` Directive
+
+== Using RAM
+
+=== Storing in RAM
+
+
