@@ -1,0 +1,214 @@
+= Role of Linker
+Zilogic Systems
+
+== Overview
+
+
+=== Role of Linker
+
+image::figures/linker.png[align="center"]
+
+  * Assembers / compilers work on only one file at a time
+
+  * Linker combines the object file to create the executable
+
+    - Symbol Resolution
+    - Relocation
+
+== Symbol Resolution
+
+=== Unresolved Symbols
+
+  * Single File Program
+  
+    - Label references are replaced by addresses by the assembler
+
+  * Multi-File Program
+
+    - Labels defined in another file are marked as unresolved symbols
+
+    - Linker determines the value of references from other object files
+
+    - Patches the code with correct address / value
+
+=== Sum of Array, Subroutine
+
+[source,armasm]
+-------
+include::code/sum-sub.s[]
+-------
+
+=== Sum of Array, Main
+
+[source,armasm]
+------
+include::code/sum-main.s[]
+------
+
+=== Global Directive
+
+  * C, all global variables have external visibility
+  * `static` keyword limits visibility to the file
+  * In ASM, all global variable have file visibility
+  * `.global` directive provides external visibility
+
+[role="two-column"]
+=== Symbol Tables
+
+[role="left"]
+------
+$ arm-none-eabi-nm main.o
+00000004 t arr
+00000007 t eoa
+00000008 t start
+00000018 t stop
+         U sum 
+$ arm-none-eabi-nm sum-sub.o
+00000004 t loop
+00000000 T sum
+------
+
+[role="right"]
+  * `t` - indicates text section
+  * `u` - indicates undefined
+  * uppercase - indicates external visibility
+  * lowercase - indicates file visibility
+
+== Relocation
+
+=== Meaning
+
+  * Changing address already assigned to labels
+  * Involves patching up all references as well
+  * Reasons for relocation
+    - Section Merging
+    - Section Placement
+  * What is a section?
+
+=== Code and Data
+
+  * Code and data have different run time requirements
+  * Code can be placed in read-only memory
+  * Data might require read-write memory
+
+  * Interleaving code and data, two conflicting requirements
+    - If not interleaved, they can be located in different memories
+    - If interleaved, convenient while reading / writing programs
+
+=== Sections
+
+  * Programs are divided into sections
+    - `.text` for code
+    - `.data` for data
+
+  * Assembler directives `.text` and `.data` switch between the two
+
+  * Sections are like buckets
+
+  * Code / data following a section directive is put in the
+    corresponding bucket
+
+  * Code / data in a section appear in contiguous locations
+
+=== Sections (Contd.)
+
+image::figures/sections.png[align="center"]
+
+=== Section Merging
+
+  * Multi-file programs, sections of the same name appear in each file
+
+  * Sections of same name from input files, is placed contiguously
+    into section of same name in the ouput file
+
+image::figures/section-merge.png[align="center"]
+
+[role="two-column"]
+=== Effects of Section Merging
+
+[role="left"]
+------
+$ arm-none-eabi-nm main.o
+00000004 t arr
+00000007 t eoa
+00000008 t start
+00000018 t stop
+         U sum
+
+
+$ arm-none-eabi-nm sum-sub.o
+00000004 t loop
+00000000 T sum
+------
+
+[role="right"]
+------
+$ arm-none-eabi-ld \
+  -Ttext=0x0       \
+  -o sum.elf main.o sum-sub.o
+$ arm-none-eabi-nm sum.elf
+...
+00000004 t arr
+00000007 t eoa
+00000008 t start
+00000018 t stop
+00000028 t loop
+00000024 T sum
+------
+
+=== Section Placement
+
+  * Each section is assumed to start from address 0
+  * All labels are assigned address relative to start of section
+  * Sections are placed at a specific address X in the final executable
+  * Address of all labels is incremented by X
+  * All label references are patched to reflect the new address
+
+[role="two-column"]
+=== Example
+
+[role="left"]
+------
+$ arm-none-eabi-as     \
+  -o sum.o sum.s
+
+$ arm-none-eabi-nm -n sum.o
+00000000 t entry
+00000004 t arr
+00000007 t eoa
+00000008 t start
+00000014 t loop
+00000024 t stop
+------
+
+[role="right"]
+------
+$ arm-none-eabi-ld     \
+  -Ttext=0x100         \
+  -o sum.elf sum.o
+$ arm-none-eabi-nm -n sum.elf
+00000100 t entry
+00000104 t arr
+00000107 t eoa
+00000108 t start
+00000114 t loop
+00000124 t stop
+...
+------
+
+== Relocation Demo
+
+=== Step 1
+
+image::figures/relocation-1.png[align="center"]
+
+=== Step 2
+
+image::figures/relocation-2.png[align="center"]
+
+=== Step 3
+
+image::figures/relocation-3.png[align="center",width="40%"]
+
+== Questions
+
