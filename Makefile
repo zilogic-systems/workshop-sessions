@@ -20,3 +20,6 @@ install:
 	rm -fr build
 	mkdir build
 	for dir in $(sessions); do make -C $$dir $@ install-extra; done
+
+clean:
+	for dir in $(sessions); do make -C $$dir clean; done
