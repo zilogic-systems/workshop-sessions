@@ -257,22 +257,187 @@ PSR=400001d3 -Z-- A svc32
 
 === Monitor Commands
 
+[options="header",width="80%",align="center"]
+|======
+| Command         | Purpose
+| `help`	  | List available commands
+| `quit`	  | Quits the emulator
+| `xp /fmt addr`  | Physical memory dump from `addr`
+| `system_reset`  | Reset the system.
+|======
+
+=== Memory Dump
+
+The `xp` command deserves more explanation. The `fmt` argument
+specifies how the memory contents is to be displayed. The syntax of
+`fmt` is `<count><format><size>`.
+
+`count`::
+specifies no. of data items to be dumped.
+
+`size`::
+specifies the size of each data item. `b` for 8 bits, `h` for 16 bits,
+`w` for 32 bits and `g` for 64 bits.
+
+`format`::
+specifies the display format. `x` for hex, `d` for signed decimal, `u`
+for unsigned decimal, `o` for octal, `c` for char and `i` for
+asm instructions.
+
+=== Disassembly
+
+  * `xp` command with the `i` format, can be used to disassemble
+    instructions
++
+------
+(qemu) xp /4iw 0x0
+0x00000000:  mov        r0, #5  ; 0x5
+0x00000004:  mov        r1, #4  ; 0x4
+0x00000008:  add        r2, r1, r0
+0x0000000c:  b  0xc
+------
++
+
+  * `0x0` specifies the address to display / disassemble
+  * `4` specifies 4 items are to be displayed
+  * `i` specifies that the items are to be printed as instructions
+  * `w` specifies that the items are 32 bits in size
+
 == Assembler Directives
 
-=== Sum an Array
+=== Representing Arrays
 
-=== `.byte` Directive
+[source,"armasm"]
+------
+include::code/arr.s[]
+------
+
+  * Assemble byte sized arguments of `.byte` into consecutive bytes in memory
++
+------
+.byte   exp1, exp2, ...
+.2byte  exp1, exp2, ...
+.4byte  exp1, exp2, ...
+------
++
+  * Hexdump of generated BIN file
++
+------
+include::code/arr.hexdump[]
+------
+
+=== `.byte` Arguments
+
+  * Simple integer literals
+    - binary, prefixed by `0b` or `0B`
+    - octal, prefixed by `0`
+    - decimal
+    - hexadecimal, prefixed by `0x` or `0X`
+  * Character constants, character in single quotes, ASCII value is used
+  * C expressions constructed out of literals and symbols
+
+=== `.byte` Examples
+
+------
+pattern:  .byte 0b01010101, 0b00110011, 0b00001111
+npattern: .byte npattern - pattern
+halpha:   .byte 'A', 'B', 'C', 'D', 'E', 'F'
+dummy:    .4byte 0xDEADBEEF
+nalpha:   .byte 'Z' - 'A' + 1
+------
 
 === `.align` Directive
 
+[source,"armasm"]
+------
+include::code/arr-align.s[]
+------
+
+  * `.align` directive inserts padding bytes till the next byte address
+    is a multiple of 4
++
+------
+include::code/arr-align.hexdump[]
+------
++
+  * ARM requires instructions be present in 32-bit aligned memory locations
+
+  * Required when data bytes or half words are inserted within code
+
+  * Hexdump of generated BIN file
+
+=== Sum an Array
+
+[source,"armasm"]
+------
+include::code/sum.s[]
+------
+
+=== Try Out
+
+  * Create `sum.s` containing the assembly program
+  
+  * Assemble, link and generate the Flash file
+  
+  * Invoke Qemu to run the program
+
+=== Representing Strings
+
+[source,"armasm"]
+------
+include::code/str.s[]
+------
+
+  * Accepts C string literals as arguments
+
+  * String literals are assembled into consecutive memory locations
+
+  * A `\0` character is automatically inserted after each string
+
+  * `.ascii` directive is same as `.asciz`, but the assembler does not
+    insert `\0`
+
+=== Inserting Symbols / Constants
+
+  * Symbols are names assigned to numbers
+  * Symbols types
+    - labels, value assigned by assembler automatically
+    - constants, value assigned manually
+  * `.equ` Directive
++
+[source,"armasm"]
+------
+include::code/equ.s[]
+------
++
+  * Do not take up space in generated binary
+  * But creates an entry in the symbol table
+
 === String Length
 
-=== `.asciz` Directive
-
-=== `.equ` Directive
+[source,"armasm"]
+------
+include::code/strlen.s[]
+------
 
 == Using RAM
 
+[role="two-column"]
 === Storing in RAM
 
+[role="left"]
+image::figures/flash-ram-mm.png[width="75%",align="center"]
 
+[role="right"]
+  * Variables so far stored in Flash
+
+  * If variables are to be modified they need to be stored in RAM
+
+  * Code is to be located in Flash
+
+  * Data is to be located in RAM
+
+  * Understanding of linker scripts is required
+
+
+== Questions

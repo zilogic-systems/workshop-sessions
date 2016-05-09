@@ -1,0 +1,1 @@
+str:	.asciz "Hello World"

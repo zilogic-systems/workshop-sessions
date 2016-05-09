@@ -1,0 +1,1 @@
+	.equ myval, 5
