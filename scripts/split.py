@@ -25,12 +25,13 @@ import os
 import os.path
 
 
+start_regex = re.compile("### START: ([-.a-z0-9]*)")
+end_regex = re.compile("### END: ([-.a-z0-9]*)")
+
+
 def get_starts_ends(script):
     starts = {}
     ends = {}
-
-    start_regex = re.compile("### START: ([-.a-z0-9]*)")
-    end_regex = re.compile("### END: ([-.a-z0-9]*)")
 
     for lineno, line in enumerate(script):
         match = start_regex.search(line)
@@ -49,7 +50,9 @@ def get_starts_ends(script):
 def write_part(part_filename, script, start_lineno, end_lineno):
     with open(part_filename, "w") as fp:
         for line in range(start_lineno + 1, end_lineno):
-            fp.write(script[line])
+            text = script[line]
+            if not (start_regex.search(text) or end_regex.search(text)):
+                fp.write(script[line])
                 
 
 def split(script_filename, script):
