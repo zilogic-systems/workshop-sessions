@@ -1,0 +1,430 @@
+= Linker Scripts
+Zilogic Systems
+
+== Overview
+
+=== Linker Scripts
+
+  * Role of Linker 
+
+    - Symbol Resolution
+    - Relocation: Section Merging and Placement
+
+  * Programmer can control section merging and placement using linker
+    scripts
+
+== Data in Flash
+
+[role="two-column"]
+=== Example
+
+[[example]]
+[role="left"]
+------
+SECTIONS {
+	. = 0x00000000;
+	.text : {
+		abc.o (.text); 
+		def.o (.text);
+	}
+}
+------
+
+
+[role="right"]
+
+  * `SECTIONS` command, specifies
+    - How sections are to be merged
+    - Location at which they are to be placed
+
+[role="two-column"]
+=== Example
+
+[role="left"]
+------
+SECTIONS {
+	. = 0x00000000;
+	.text : {
+		abc.o (.text); 
+		def.o (.text);
+	}
+}
+------
+
+
+[role="right"]
+
+   * `.` represents the location counter
+   * Can be modified by assigning a new value to it
+   * Location counter is by default set to `0x0`
+   * Assignment here is superfluous
+
+[role="two-column"]
+=== Example
+
+[role="left"]
+------
+SECTIONS {
+	. = 0x00000000;
+	.text : {
+		abc.o (.text); 
+		def.o (.text);
+	}
+}
+------
+
+
+[role="right"]
+image::figures/section-merge.png[width="50%",align="center"]
+
+=== Generalize with Wildcards
+
+------
+SECTIONS {
+	. = 0x00000000;
+	.text : { * (.text); }
+}
+------
+
+  * Wildcard character `*` can be used to specified to refer to all input
+    files
+
+  * Unix shell style wild cards can be used
+
+=== Try Out
+
+  * Try assembling and linking the sum array program using linker
+    scripts
+
+  * Try assembling and linking the two-file sum array program using
+    linker scripts
+
+  * What should be the order of files in the command line?
+
+[role="two-column"]
+=== Multiple Sections
+
+[role="left"]
+------
+SECTIONS {
+         . = 0x00000000;
+         .text : { * (.text); }
+
+         . = 0x00000400;
+         .data : { * (.data); }
+}
+------
+
+[role="right"]
+image::figures/section-placement.png[width="75%",align="center"]
+
+[role="two-column"]
+=== Multiple Sections (Contd.)
+ 
+[role="left"]
+------
+SECTIONS {
+         . = 0x00000000;
+         .text : { * (.text); }
+         .data : { * (.data); }
+}
+------
+
+[role="right"]
+image::figures/section-placement-2.png[width="75%",align="center"]
+
+== Data in RAM
+
+=== Add Value in Memory
+
+[source,armasm]
+------
+include::code/add-mem.s[]
+------
+
+[role="two-column"]
+=== Linker Script
+
+[role="left"]
+------
+include::code/flash-ram.lds[]
+------
+
+[role="right"]
+------
+$ arm-none-eabi-nm     \
+  -n add-mem.elf
+00000000 t start
+0000001c t stop
+a0000000 d val1
+a0000001 d val2
+a0000002 d result
+------
+
+=== Try Out
+
+  * Store the ASM code and linker script in files
+
+  * Assemble, link and dump the symbol table using `nm`
+
+  * Symbols can be created within linker scripts using an assignment
+    within `SECTION`.
++
+------
+abc = 10
+------
++
+  * Add a symbol and check the symbol table
+
+[role="two-column"]
+=== Loaders
+
+[role="left"]
+image::figures/data-ram-0.png[align="center",width="75%"]
+
+[role="right"]
+  * A external program like a bootloader, loads `.text` and `.data` to
+    Flash and RAM
+
+  * Transfers control to code, and program executes
+
+  * What if we do not have a bootloader?
+
+  * How do we get the `.data` in RAM at startup?
+
+[role="two-column"]
+=== RAM is Volatile
+
+[role="left"]
+image::figures/data-ram-1.png[align="center",width="75%"]
+
+[role="two-column"]
+=== RAM is Volatile (1)
+
+[role="left"]
+image::figures/data-ram-2.png[align="center",width="75%"]
+
+[role="right"]
+
+  * On reset, before the main prorgram starts executing a small
+    routine copies `.data` from Flash to RAM
+
+  * Control is then transfered to the main program
+
+  * Main program can now find its global variables in RAM
+
+[role="two-column"]
+=== RAM is Volatile (2)
+
+[role="left"]
+image::figures/data-ram-3.png[align="center",width="75%"]
+
+=== LMA and VMA
+
+  * `.data` section has two addresses
+    - load address in Flash
+    - run-time address in RAM
+
+  * Changes required for this to work
+
+    - Linker script should specify both the load address and run-time
+      address, for `.data`
+
+    - Startup code should copy `.data` from load address to run-time
+      address
+
+[role="two-column"]
+=== Specifying Load Address
+
+[role="left"]
+------
+SECTIONS {
+	. = 0x00000000;
+	.text : {
+	   * (.text);
+	}
+	etext = .;
+
+	. = 0xA0000000;
+	.data : AT (etext) {
+	    * (.data);
+	}
+}
+------
+
+[role="right"]
+  * Run-time address is used for determining address of labels
+
+  * Address specified so far in linker scripts is run-time address
+
+  * Load address defaults to run-time address
+
+  * Alternate load address can be specified using `AT` keyword
+
+
+
+[role="two-column"]
+=== Specifying Load Address
+
+[role="left"]
+------
+SECTIONS {
+	. = 0x00000000;
+	.text : {
+	   * (.text);
+	}
+	etext = .;
+
+	. = 0xA0000000;
+	.data : AT (etext) {
+	    * (.data);
+	}
+}
+------
+
+[role="right"]
+   * Load address for `.data` should be at the end of `.text`
+
+   * Symbol `etext` is created to correspond to the end of `.text`
+     section
+   
+   * Load address for `.data` is specified as `etext` using AT keyword
+
+=== Startup Code
+
+  * Startup code needs to copy data from Flash to RAM
+
+  * To perform a copy three bits of information is required
+    - source address
+    - destination address
+    - length
+
+  * Source address is the start of `.data` in Flash, `flash_sdata`
+  * Destination address is the start of `.data` in RAM, `ram_sdata`
+  * Length is the size of `.data` section, `data_size`
+
+=== Startup Code (2)
+
+Code to copy data from Flash to RAM.
+
+[source,armasm]
+------
+	ldr   r0, =flash_sdata
+	ldr   r1, =ram_sdata
+	ldr   r2, =data_size
+
+copy:	
+	ldrb  r4, [r0], #1
+	strb  r4, [r1], #1
+	subs  r2, r2, #1
+	bne   copy
+------
+
+=== Startup Code (3)
+
+Linker script is modified to provide the symbols required by startup code.
+
+------
+SECTIONS {
+	. = 0x00000000;
+	.text : { 
+	      * (.text);
+	}
+	flash_sdata = .;
+
+	. = 0xA0000000;
+	ram_sdata = .;
+	.data : AT (flash_sdata) { 
+              * (.data); 
+        };
+	ram_edata = .;
+	data_size = ram_edata - ram_sdata;
+}
+------
+
+=== Try Out
+
+  * Start-up code is combined with the main program in
+    link:{include:code/add-ram.s.datauri}["add-ram.s",filename="add-ram.s"]
+
+  * Download and save the program
+  
+  * Download the linker script file link:{include:code/add-ram.lds.datauri}["add-ram.lds",filename="add-ram.lds"]
+
+  * Execute the program in Qemu, and dump the RAM contents
++
+------
+$ qemu-system-arm -M connex     \
+  -pflash flash.bin             \
+  -nographic                    \
+  -serial /dev/null
+(qemu) xp /4dw 0xA0000000
+a0000000:         10         30         40          0
+------
+
+== Exception Handling
+
+=== Exception Vector Address
+
+[cols="70%,30%",options="header",width="50%",align="center"]
+|======
+| Exception               | Address
+| Reset                   | 0x00
+| Undefined Instruction	  | 0x04
+| Software Interrupt (SWI)| 0x08
+| Prefetch Abort	  | 0x0C
+| Data Abort		  | 0x10
+| Reserved, not used	  | 0x14
+| IRQ			  | 0x18
+| FIQ			  | 0x1C
+|======
+
+[role="two-column"]
+=== Exception Handlers
+
+[role="left"]
+------
+	.section "vectors"
+reset:	b     start
+undef:  b     undef
+swi:	b     swi
+pabt:	b     pabt
+dabt:	b     dabt
+	nop
+irq:	b     irq
+fiq:	b     fiq
+------
+
+[role="right"]
+  * The locations should contain a branch instruction to transfer
+    control to the exception handler
+
+  * In our simple case, branch to self
+
+  * Only reset exception transfer control to the startup code
+
+[role="two-column"]
+=== Locating with Linker Script
+
+[role="left"]
+------
+SECTIONS {
+	. = 0x00000000;
+	.text : {
+		* (vectors);
+		* (.text); 
+		...
+	}
+	...
+}
+------
+
+[role="right"]
+  * Exception handlers should be located at `0x0`
+  * Exception handler are located in a custom section `vectors`, using
+    `.section` directive
+  * `vector` section is located at the beginning of `.text`
+  * `.text` is itself placed at `0x0`
+  * Ensures exception handlers are located at `0x0`
+
+== Questions
