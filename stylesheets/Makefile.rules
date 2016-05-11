@@ -6,10 +6,10 @@
 	@trap "rm -f $(png_log_tmp)" EXIT; if grep Error $(png_log_tmp); then exit 1; else exit 0; fi
 
 %.html: %.asciidoc
-# 	test -h ~/.asciidoc/filters/source || test ! -e ~/.asciidoc/filters/source
-# 	mkdir -p ~/.asciidoc/filters
-#	ln -f -s $(TOPDIR)/stylesheets/filters/source ~/.asciidoc/filters/source
 	asciidoc -f $(TOPDIR)/stylesheets/zslide.conf $<
+
+%.datauri: %
+	python $(TOPDIR)/scripts/data-uri.py $(MIMETYPE) $< > $@
 
 install-extra:
 
