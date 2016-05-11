@@ -1,0 +1,285 @@
+= C Startup Code
+Zilogic Systems
+:data-uri:
+
+== Overview
+
+=== C Startup Code
+
+  * Assembly programs requires a minimal startup code to copy data to
+    RAM
+
+  * C programs requires a more elaborate startup code before `main()`
+    can be invoked
+    
+    1. Setup stack
+    2. Initialize global variables
+    3. Initialize read-only data
+
+  * Sum of array in C, will be taken as example
+
+=== Example
+
+[source,c]
+------
+include::code/csum.c[]
+------
+
+== C Stack
+
+=== Stack Usage
+
+  * Storing local variables
+  * Passing function arguments
+  * Storing return addresses
+
+[role="two-column"]
+=== Stack Types (1)
+
+[role="left"]
+image::figures/ad-stack.png[]
+
+[role="right"]
+Ascending stack:: In a push the stack pointer is incremented, i.e the
+stack grows towards higher address.
+
+Descending stack:: In a push the stack pointer is decremented, i.e the
+stack grows towards lower address.
+
+[role="two-column"]
+=== Stack Types (2)
+
+[role="left"]
+image::figures/fe-stack.png[]
+
+[role="right"]
+Full stack:: Stack pointer points to the location in which the last
+item was stored. A push will increment the stack pointer and store the
+value.
+
+Empty stack:: Stack pointer points to the location in which the next
+item will be stored. A push will store the value, and increment the
+stack pointer. 
+
+=== AAPCS
+
+  * ARM Architecture Procedure Call Standard, ensures interop between
+    different compilers
+
+  * Register to use as stack pointer: `r13`
+
+  * Stack type: Full Descending
+
+[role="two-column"]
+=== Stack Setup
+
+[role="left"]
+image::figures/stack.png[align="center"]
+
+[role="right"]
+   * Placement of global variables and stack
+   * C startup code: setup stack pointer to highest RAM address
++
+------
+ldr sp, =0xA4000000
+------
++
+   * `sp` is an alias for `r13`, in the assembler
+
+== Global Data
+
+=== Types of Globals
+
+  * Initialized global variables
++
+------
+int a = 10;
+------
++
+  * Un-initialized global variables
++
+------
+int b;
+------
+
+=== Initialized Globals
+
+  * Handling similar to assembly programs
+  
+  * Global variables are located in `.data` section
+
+  * Load address corresponds to Flash
+
+  * Run-time address corresponds to RAM
+
+  * At startup data is copied from Flash to RAM
+
+=== Un-initialized Globals
+
+  * Un-initialized globals are guaranteed to be initialized to zero
+
+  * A separate section `.bss` is used for un-initialized globals
+
+  * Since the values are all zeroes, does not have to be stored in
+    Flash
+
+  * At startup memory corresponding `.bss` is filled with zeroes
+
+=== Read-only Data
+
+  * Global variables marked as `const`
+
+  * Strings literals
+
+  * Separate section `.rodata`
+
+  * Since value is not modified, can be placed in Flash
+
+== Startup Code
+
+=== Linker Script (1)
+
+`.text` and `.rodata` are placed contiguously in Flash.
+
+------
+include::code/csum/flash.part[]
+------
+
+=== Linker Script (2)
+
+`.data` has run-time address in RAM, but load-address in Flash.
+
+------
+include::code/csum/data.part[]
+------
+
+=== Linker Script (3)
+
+`.data` and `.bss` is placed contiguously in RAM.
+
+------
+include::code/csum/bss.part[]
+------
+
+[role="tip"]
+=== \\
+
+Complete linker script:
+link:{include:code/csum/csum.full.datauri}["csum.lds",filename="csum.lds"]
+
+=== Startup Code (1)
+
+------
+include::code/startup/vectors.part[]
+------
+
+=== Startup Code (2)
+
+------
+include::code/startup/copy-data.part[]
+------
+
+=== Startup Code (3)
+
+------
+include::code/startup/init-bss.part[]
+------
+
+=== Startup Code (4)
+
+------
+include::code/startup/setup-stack.part[]
+------
+
+[role="tip"]
+=== \\
+
+Complete linker script:
+link:{include:code/startup/startup.full.datauri}["startup.s",filename="startup.s"]
+
+=== Compilation
+
+  * Invoking `gcc`, automatically invokes the assembler and linker as
+    required
++
+------
+$ arm-none-eabi-gcc -nostdlib -o csum.elf -T csum.lds csum.c startup.s
+------
++
+  * `-nostdlib` option, specifies the standard C library is not required
+
+  * C library requires some additional initialization, discussed later
+
+[role="two-column"]
+=== Symbol Table (1)
+
+------
+$ arm-none-eabi-nm -n csum.elf
+------
+
+[role="left"]
+[source,txt,src_numbered=numbered]
+------
+00000000 t reset
+00000004 A bss_size
+00000004 t undef
+00000008 t swi
+0000000c t pabt
+00000010 t dabt
+00000018 A data_size
+00000018 t irq
+0000001c t fiq
+00000020 T main
+-------
+
+[role="right"]
+  * Line 1: `reset` and rest of exception vectors are placed starting from `0x0`
+
+  * Line 10: Code is placed right after the 8 exception vectors
+
+  * `8 * 4 = 32 = 0x20`
+
+[role="two-column"]
+=== Symbol Table (2)
+
+[role="left"]
+[source,txt,src_numbered=numbered]
+-------
+00000090 t start
+000000a0 t copy
+000000b0 t init_bss
+000000c4 t zero
+000000d0 t init_stack
+000000d8 t stop
+000000f4 r n
+000000f8 A flash_sdata
+a0000000 d arr
+a0000000 A ram_sdata
+a0000018 A ram_edata
+a0000018 A sbss
+a0000018 b sum
+a000001c A ebss
+------
+
+[role="right"]
+  * Line 7: Read-only data `n` is placed in Flash after the code
+
+  * Line 9: Initialized global data `arr`, is placed at start of RAM
+
+  * Line 13: Unitialized global data `sum`, is placed after the array
+    of 6 integers
+
+  * `6 * 4 = 24 = 0x18`
+
+=== Executing In Qemu
+
+Output can be verified in Qemu using the following monitor
+commands
+
+------
+(qemu) xp /6dw 0xa0000000
+a0000000:          1         10          4          5
+a0000010:          6          7
+(qemu) xp /1dw 0xa0000018
+a0000018:         33
+------
