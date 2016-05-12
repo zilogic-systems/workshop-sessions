@@ -7,6 +7,8 @@ by Zilogic.
 
   * Git Basics Workshop. For details see http://www.zilogic.com/git-training.html
   * Dive Into Yocto, Workshop. For details see http://www.zilogic.com/yocto-poky-training.html
+  * ARM Bare Metal Programming, Workshop. For details see
+    http://www.zilogic.com/arm-linker-script-training.html
 
 ## Git Basics Workshop: Sessions
 
@@ -29,3 +31,13 @@ by Zilogic.
   * Yocto Getting Started
   * Yocto Customization
   * Yocto Internals
+
+## ARM Bare Metal Programming, Workshop: Sessions
+
+  * ARM Introduction
+  * ARM Instruction Set
+  * ARM Assembly
+  * Role of Linkers
+  * Linker Scripts
+  * C Startup Code
+  * Standard C Library
