@@ -94,6 +94,24 @@ image::figures/seq-time.png[align="center"]
     - Take advantage of pipelining, to speed up execution
     - Move complexity to the compiler
 
+=== RISC vs CISC Instruction
+
+   * Add integer at address 100 and integer at address 200
+     and store result in address 100
++
+------
+ADD 100, 200
+------
++
+   * RISC equivalent
++
+------
+LOAD R0, 100
+LOAD R1, 200
+ADD R1, R0
+STORE R1, 100
+------
+
 === RISC Features
 
   - Large array of general purpose registers.
@@ -101,7 +119,7 @@ image::figures/seq-time.png[align="center"]
   - Small no. of addressing modes.
   - Uniform fixed length instructions.
 
-=== Introduction
+=== ARM Introduction
 
   * 32-bit RISC processor developed by ARM corporation.
   * ARM stands for Advanced RISC Machines.
