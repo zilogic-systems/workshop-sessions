@@ -186,7 +186,7 @@ $ ls -al add.bin
   * An empty 16MB Flash file can be created using
 +
 ------
-$ dd if=/dev/zero of=flash.bin bs=4092 count=4092
+$ dd if=/dev/zero of=flash.bin bs=4096 count=4096
 ------
 
 === Flashing the Program
