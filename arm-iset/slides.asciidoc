@@ -134,6 +134,12 @@ MOV r7, r5      ; r7 = r5
 MOV r2, #2	; r2 = 2
 ------
 
+=== Try Out
+
+  * Use the `MOV` instruction to set the zero (Z) flag
+
+  * Use the `MOV` instruction to set the negative (N) flag
+
 === Arithmetic Instructions
 
   * Addition and subtraction of 32 bit values
@@ -157,6 +163,17 @@ SUB r0, r2, r1
 ; r0 = 1
 ------
 
+=== Try Out
+
+  * Use the `ADD` instruction to set the carry (C) flag
+
+  * Use the `SUB` instruction to set the carry (C) flag
+
+  * What flags are set when you try to add `0x7FFF_FFFF` and `0x1`
+
+  * Try adding `0xDCBA_9876_5432` with `0xEDCB_A987_6543`, using `ADD`
+    and `ADC` check if the result is `0x0001_CA86_41FD_B975`
+
 === Logical Instructions
 
   * Bitwise operation on two 32 bit values
@@ -179,6 +196,13 @@ BIC r0, r0, r1
 
 ; r0 = 0b0101
 ------
+
+=== Try Out
+
+  * Check if the value two registers are equal, using `EOR`, and zero
+    flag
+
+  * Clear a register using each instruction: `AND`, `EOR` and `BIC`
 
 === Comparison Instructions
 
@@ -248,6 +272,11 @@ set.
 ------
 MOVCS r0, r1
 ------
+
+=== Try Out
+
+  * Clear the zero flag, try a `MOV` if equal
+  * Repeat with `MOV` if not equal
 
 == Branch Instructions
 
@@ -375,6 +404,16 @@ STRB r10, [r7, -r4]        ; mem8[r7 - r4] = r10
 STRB r7, [r6, #-1]!        ; mem8[r6 - 1] = r7, r6 = r6 - 1
 STR  r2, [r5], #8          ; mem32[r5] = r2, r5 = r5 + 8
 ------
+
+=== Try Out
+
+  * Move 4 32-bit values from memory to a register, in each execution
+  
+  * Fill 4 memory locations with the value `0xDEADBEEF`
+
+  * Implement a stack
+    - Push values `0xAA`, `0xBB`, `0xCC`, `0xDD`, `0xEE`
+    - Pop the values from the stack
 
 == Status Register Transfer
 
