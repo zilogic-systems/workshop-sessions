@@ -3,6 +3,104 @@ Zilogic Systems
 
 == ARM, Overview
 
+=== Sequential Execution
+
+image::figures/seq0.png[width="30%",align="center"]
+
+=== Sequential Execution (Contd.)
+
+image::figures/seq1.png[width="30%",align="center"]
+
+=== Sequential Execution (Contd.)
+
+image::figures/seq2.png[width="30%",align="center"]
+
+=== Sequential Execution (Contd.)
+
+image::figures/seq3.png[width="30%",align="center"]
+
+=== Sequential Execution (Contd.)
+
+image::figures/seq1.png[width="30%",align="center"]
+
+[role="two-column"]
+=== Sequential Execution Time
+
+[role="left"]
+image::figures/seq-time.png[align="center"]
+
+[role="right"]
+* What is the time required to execute 1 instruction?
+
+[role="two-column"]
+=== Sequential Execution Time
+
+[role="left"]
+image::figures/seq-time.png[align="center"]
+
+[role="right"]
+* What is the time required to execute 1 instruction?
+
+* Total 3ms = Fetch 1ms + Decode 1ms + Execute 1ms
+
+=== Pipelined Execution
+
+image::figures/pipe0.png[width="30%",align="center"]
+
+=== Pipelined Execution (Contd.)
+
+image::figures/pipe1.png[width="30%",align="center"]
+
+=== Pipelined Execution (Contd.)
+
+image::figures/pipe2.png[width="30%",align="center"]
+
+=== Pipelined Execution (Contd.)
+
+image::figures/pipe3.png[width="30%",align="center"]
+
+=== Pipelined Execution (Contd.)
+
+image::figures/pipe4.png[width="30%",align="center"]
+
+=== Pipelined Execution (Contd.)
+
+image::figures/pipe5.png[width="30%",align="center"]
+
+=== Pipelined Execution (Contd.)
+
+image::figures/pipe6.png[width="30%",align="center"]
+
+[role="two-column"]
+=== Pipelined Execution (Contd.)
+
+[role="left"]
+image::figures/seq-time.png[align="center"]
+
+[role="right"]
+* First instruction required 3ms to complete
+
+* After first instruction, subsequent instruction completed in 1 ms
+
+=== RISC vs CISC
+
+  * How to build better microprocessors
+  * CISC Camp
+    - Add more functionality into single instruction
+    - Assembly language gets closer to high level language
+    - Compiler development becomes easier
+  * RISC Camp
+    - Make instruction simpler and uniform
+    - Take advantage of pipelining, to speed up execution
+    - Move complexity to the compiler
+
+=== RISC Features
+
+  - Large array of general purpose registers.
+  - Load/store model of data processing.
+  - Small no. of addressing modes.
+  - Uniform fixed length instructions.
+
 === Introduction
 
   * 32-bit RISC processor developed by ARM corporation.
@@ -11,13 +109,6 @@ Zilogic Systems
     - mobile phones
     - MP3 players
     - handhelds
-
-=== RISC Features
-
-  - Large array of general purpose registers.
-  - Load/store model of data processing.
-  - Small no. of addressing modes.
-  - Uniform fixed length instructions.
 
 === ARM Features
 
