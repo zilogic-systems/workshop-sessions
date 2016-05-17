@@ -164,7 +164,7 @@
         <dia:boolean val="true"/>
       </dia:attribute>
       <dia:attribute name="file">
-        <dia:string>#/tmp/chip-design.jpg#</dia:string>
+        <dia:string>#core.jpg#</dia:string>
       </dia:attribute>
     </dia:object>
     <dia:object type="Standard - Text" version="1" id="O3">
@@ -223,7 +223,7 @@
         <dia:boolean val="true"/>
       </dia:attribute>
       <dia:attribute name="file">
-        <dia:string>#/tmp/640px-KL_Motorola_68HC11.jpg#</dia:string>
+        <dia:string>#chip.jpg#</dia:string>
       </dia:attribute>
     </dia:object>
     <dia:object type="Standard - Text" version="1" id="O5">
