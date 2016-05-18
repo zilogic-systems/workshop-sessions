@@ -1,4 +1,4 @@
-@ ### START: startup.full>
+@ ### START: startup.full
 @ ### START: vectors.part
 	.section "vectors"
 reset:	b     start
