@@ -10,33 +10,33 @@ by Zilogic.
 
 ## Git Basics Workshop: Sessions
 
-  * Git Basics
-  * Git Object Model
-  * Git Remotes
+  * [git-basics](Git Basics)
+  * [git-internals](Git Object Model)
+  * [git-remotes](Git Remotes)
   * Advanced Git Features
 
 ## Dive Into Yocto, Workshop: Sessions
 
-  * Autotools
-  * Manual Rootfs
-  * BitBake Intro
-  * BitBake Rootfs
-  * BitBake Layers
-  * Debian Packaging
-  * BitBake Data Model
-  * BitBake Packaging
-  * Yocto Introduction
-  * Yocto Getting Started
-  * Yocto Customization
-  * Yocto Internals
+  * [autotools](Autotools)
+  * [manual-rootfs](Manual Rootfs)
+  * [bitbake-intro](BitBake Intro)
+  * [bitbake-rootfs](BitBake Rootfs)
+  * [bitbake-layers](BitBake Layers)
+  * [debian-packaging](Debian Packaging)
+  * [bitbake-data-model](BitBake Data Model)
+  * [bitbake-packages](BitBake Packaging)
+  * [yocto-intro](Yocto Introduction)
+  * [yocto-getting-started](Yocto Getting Started)
+  * [yocto-customization](Yocto Customization)
+  * [yocto-internals](Yocto Internals)
 
 ## ARM Bare Metal Programming, Workshop: Sessions
 
-  * ARM Architecture
-  * ARM Instruction Set
-  * ARM Assembler
-  * Role of Linker
-  * Linker Scripts
-  * C Startup Code
+  * [arm-intro](ARM Architecture)
+  * [arm-iset](ARM Instruction Set)
+  * [arm-asm](ARM Assembler)
+  * [arm-linker](Role of Linker)
+  * [arm-lds](Linker Scripts)
+  * [arm-cstartup](C Startup Code)
   * Device Interfacing
   * Using C Library
