@@ -29,3 +29,14 @@ by Zilogic.
   * Yocto Getting Started
   * Yocto Customization
   * Yocto Internals
+
+## ARM Bare Metal Programming, Workshop: Sessions
+
+  * ARM Architecture
+  * ARM Instruction Set
+  * ARM Assembler
+  * Role of Linker
+  * Linker Scripts
+  * C Startup Code
+  * Device Interfacing
+  * Using C Library
