@@ -23,7 +23,7 @@ label:    instruction         @ comment
 
   * For example as an operand of the branch instruction
   
-  * The label name should consist of alphabets, digits, `_` and `$`
+  * The label name may consist of alphabets, digits, `_` and `$`
 
 === Instruction
 
