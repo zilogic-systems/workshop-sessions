@@ -1,5 +1,6 @@
 = Device Interfacing
 Zilogic Systems
+:data-uri:
 
 == Microprocessors
 
@@ -84,3 +85,65 @@ a = 5;
 === Controller Based IO
 
 image::figures/io-controller.png[width="75%",align="center"]
+
+== ARM Lab
+
+=== Tools
+
+  * Qemu to emulate the target system
+
+    - Gumstix Connex Board
+    - Intel XScale PXA255 Processor
+    - 64 MB RAM
+    - 16 MB Flash
+
+  * Pre-built GNU ARM Toolchain from Code Sourcery
+
+  * Cross tool chain prefix: `arm-none-eabi-`
+
+=== Try Out
+
+  * Create a Flash file 
++
+------
+$ dd if=/dev/zero of=flash.bin bs=4096 count=4096
+------
++
+  * Download
+    link:{include:u-boot.bin.datauri}["u-boot.bin",filename="u-boot.bin"]
+    and store it in the top of the Flash
++
+------
+$ dd if=u-boot.bin of=flash.bin bs=4096 conv=notrunc
+------
+
+=== Try Out
+
+  * Start Qemu with the Flash contents
++
+------
+$ qemu-system-arm -M connex -pflash flash.bin -nographic
+------
++
+  * Should display the U-boot prompt
+
+=== RTC Registers
+
+[options="header",width="75%",align="center"]
+|======
+| Address	| Name	| Description
+| 0x40900000	| RCNR	| RTC Count Register
+| 0x40900004	| RTAR	| RTC Alarm Register
+| 0x40900008 	| RTSR	| RTC Status Register
+| 0x4090000C	| RTTR	| RTC Trim Register
+|======
+
+=== Try Out
+
+  * Viewing the RTC count register
++
+------
+GUM> md 0x40900000 1
+------
++
+  * Increments every 1 second
