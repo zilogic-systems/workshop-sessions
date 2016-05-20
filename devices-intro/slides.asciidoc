@@ -1,0 +1,86 @@
+= Device Interfacing
+Zilogic Systems
+
+== Microprocessors
+
+=== Model 1
+
+image::figures/model.png[width="60%",align="center"]
+
+=== Model 2
+
+image::figures/model2.png[width="60%",align="center"]
+
+=== Model 3
+
+image::figures/model3.png[width="60%",align="center"]
+
+=== RAM
+
+image::figures/ram.png[width="30%",align="center"]
+
+=== Instruction
+
+image::figures/instruction.png[width="90%",align="center"]
+
+== Memory Interfacing
+
+=== RAM Interfacing
+
+image::figures/single-ram.png[width="70%",align="center"]
+
+=== Two RAM Chips
+
+image::figures/two-ram-nodecode.png[width="40%",align="center"]
+
+=== With Decoding Logic
+
+image::figures/two-ram.png[width="50%",align="center"]
+
+== Device Interfacing
+
+=== Seven Segment Display
+
+image::figures/7-segment.png[width="70%",align="center"]
+
+=== Seven Segment Display
+
+image::figures/7-segment-data.png[width="70%",align="center"]
+
+=== Memory Mapped IO
+
+image::figures/ram-display.png[width="60%",align="center"]
+
+=== Memory Access Optmization
+
+  * CPU is much faster than RAM
+
+  * An operation like ADD, performed within the CPU takes about 0.5 ns
+
+  * A memory access operation, takes about 100 ns
+
+  * Optimization
+
+    - Compiler Level
+    - System Level
+    - CPU Level
+
+=== Compiler Level Optimization
+
+  * Compiler level
++
+------
+int a;
+
+a = 2;
+...
+a = 5;
+------
++
+  * Can be disastrous while accessing devices
+
+  * Can be disabled using the `volatile` keyword
+
+=== Controller Based IO
+
+image::figures/io-controller.png[width="75%",align="center"]
