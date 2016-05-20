@@ -375,14 +375,16 @@ include::code/sum.s[]
 
 === Try Out
 
-  * Download the link:{include:code/Makefile.datauri}["Makefile",filename="Makefile"]
-
   * Create `sum.s` containing the assembly program
   
   * Assemble, link and generate the Flash file using
 +
 ------
-make sum-flash.bin
+arm-none-eabi-as -o sum.o sum.s
+arm-none-eabi-ld -Ttext=0x0 -o sum.elf sum.o
+arm-none-eabi-objcopy -O binary sum.elf sum.bin
+dd if=/dev/zero of=sum-flash.bin bs=4096 count=4096
+dd if=sum.bin of=sum-flash.bin bs=4096 conv=notrunc
 ------
 +
   * Invoke Qemu to run the program
@@ -437,7 +439,11 @@ include::code/strlen.s[]
   * Assemble, link and generate the Flash file using
 +
 ------
-make strlen-flash.bin
+arm-none-eabi-as -o strlen.o strlen.s
+arm-none-eabi-ld -Ttext=0x0 -o strlen.elf strlen.o
+arm-none-eabi-objcopy -O binary strlen.elf strlen.bin
+dd if=/dev/zero of=strlen-flash.bin bs=4096 count=4096
+dd if=strlen.bin of=strlen-flash.bin bs=4096 conv=notrunc
 ------
 +
   * Invoke Qemu to run the program
