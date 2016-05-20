@@ -172,5 +172,5 @@ GUM> md 0x40900000 1
 
   * Explored the ARM lab setup
 
-  * Re-infornced the idea of memory mapped IO with RTC example
+  * Re-inforced the idea of memory mapped IO with RTC example
 
