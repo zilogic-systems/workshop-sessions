@@ -169,24 +169,28 @@ link:{include:code/csum/csum.full.datauri}["csum.lds",filename="csum.lds"]
 
 === Startup Code (1)
 
+[source,armasm]
 ------
 include::code/startup/vectors.part[]
 ------
 
 === Startup Code (2)
 
+[source,armasm]
 ------
 include::code/startup/copy-data.part[]
 ------
 
 === Startup Code (3)
 
+[source,armasm]
 ------
 include::code/startup/init-bss.part[]
 ------
 
 === Startup Code (4)
 
+[source,armasm]
 ------
 include::code/startup/setup-stack.part[]
 ------
@@ -266,8 +270,8 @@ a000001c A ebss
 
   * Line 9: Initialized global data `arr`, is placed at start of RAM
 
-  * Line 13: Unitialized global data `sum`, is placed after the array
-    of 6 integers
+  * Line 13: Un-initialized global data `sum`, is placed after the
+    array of 6 integers
 
   * `6 * 4 = 24 = 0x18`
 

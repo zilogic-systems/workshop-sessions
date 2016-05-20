@@ -1,31 +1,6 @@
 = ARM Architecture
 Zilogic Systems
-
-== ARM, Overview
-
-=== Introduction
-
-  * 32-bit RISC processor developed by ARM corporation.
-  * ARM stands for Advanced RISC Machines.
-  * Widely used in embedded systems
-    - mobile phones
-    - MP3 players
-    - handhelds
-
-=== RISC Features
-
-  - Large array of general purpose registers.
-  - Load/store model of data processing.
-  - Small no. of addressing modes.
-  - Uniform fixed length instructions.
-
-=== ARM Features
-
-  - Variable length execution for certain instructions.
-  - Conditional execution of most instructions.
-  - Barrel shifter to preprocess one operand before entering ALU.
-  - Powerful indexed addressing modes with auto-increment and decrement.
-  - Link register for fast leaf function calls.
+:data-uri:
 
 == Data Flow Model
 
@@ -329,7 +304,7 @@ Chip:: a processor with the 'Core' implemented in silicon
 
 === Chips Served
 
-image::https://upload.wikimedia.org/wikipedia/commons/1/15/Pizza_potato.JPG[align="center"]
+image::figures/potato-chips.jpg[align="center"]
 
 
 [role="tip"]
@@ -366,3 +341,139 @@ ARM sells the descriptions and recipes, it does not sell chips!
 |======
 
 == Questions
+
+== ARM, Overview
+
+=== Sequential Execution
+
+image::figures/seq0.png[width="30%",align="center"]
+
+=== Sequential Execution (Contd.)
+
+image::figures/seq1.png[width="30%",align="center"]
+
+=== Sequential Execution (Contd.)
+
+image::figures/seq2.png[width="30%",align="center"]
+
+=== Sequential Execution (Contd.)
+
+image::figures/seq3.png[width="30%",align="center"]
+
+=== Sequential Execution (Contd.)
+
+image::figures/seq1.png[width="30%",align="center"]
+
+[role="two-column"]
+=== Sequential Execution Time
+
+[role="left"]
+image::figures/seq-time.png[align="center"]
+
+[role="right"]
+* What is the time required to execute 1 instruction?
+
+[role="two-column"]
+=== Sequential Execution Time
+
+[role="left"]
+image::figures/seq-time.png[align="center"]
+
+[role="right"]
+* What is the time required to execute 1 instruction?
+
+* Total 3ms = Fetch 1ms + Decode 1ms + Execute 1ms
+
+=== Pipelined Execution
+
+image::figures/pipe0.png[width="30%",align="center"]
+
+=== Pipelined Execution (Contd.)
+
+image::figures/pipe1.png[width="30%",align="center"]
+
+=== Pipelined Execution (Contd.)
+
+image::figures/pipe2.png[width="30%",align="center"]
+
+=== Pipelined Execution (Contd.)
+
+image::figures/pipe3.png[width="30%",align="center"]
+
+=== Pipelined Execution (Contd.)
+
+image::figures/pipe4.png[width="30%",align="center"]
+
+=== Pipelined Execution (Contd.)
+
+image::figures/pipe5.png[width="30%",align="center"]
+
+=== Pipelined Execution (Contd.)
+
+image::figures/pipe6.png[width="30%",align="center"]
+
+[role="two-column"]
+=== Pipelined Execution (Contd.)
+
+[role="left"]
+image::figures/seq-time.png[align="center"]
+
+[role="right"]
+* First instruction required 3ms to complete
+
+* After first instruction, subsequent instruction completed in 1 ms
+
+=== RISC vs CISC
+
+  * How to build better microprocessors
+  * CISC Camp
+    - Add more functionality into single instruction
+    - Assembly language gets closer to high level language
+    - Compiler development becomes easier
+  * RISC Camp
+    - Make instruction simpler and uniform
+    - Take advantage of pipelining, to speed up execution
+    - Move complexity to the compiler
+
+=== RISC vs CISC Instruction
+
+   * Add integer at address 100 and integer at address 200
+     and store result in address 100
++
+------
+ADD 100, 200
+------
++
+   * RISC equivalent
++
+------
+LOAD R0, 100
+LOAD R1, 200
+ADD R1, R0
+STORE R1, 100
+------
+
+=== RISC Features
+
+  - Large array of general purpose registers.
+  - Load/store model of data processing.
+  - Small no. of addressing modes.
+  - Uniform fixed length instructions.
+
+=== ARM Introduction
+
+  * 32-bit RISC processor developed by ARM corporation.
+  * ARM stands for Advanced RISC Machines.
+  * Widely used in embedded systems
+    - mobile phones
+    - MP3 players
+    - handhelds
+
+=== ARM Features
+
+  - Variable length execution for certain instructions.
+  - Conditional execution of most instructions.
+  - Barrel shifter to preprocess one operand before entering ALU.
+  - Powerful indexed addressing modes with auto-increment and decrement.
+  - Link register for fast leaf function calls.
+
