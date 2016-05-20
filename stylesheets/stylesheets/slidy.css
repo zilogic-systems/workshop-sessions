@@ -31,8 +31,8 @@ thead, p.table.header,
 #toctitle,
 #author, #revnumber, #revdate, #revremark,
 #footer {
-  font-family: "hagane", sans-serif;
-  font-weight: normal;
+  font-family: "hammersmith one", sans-serif;
+  font-weight: bold;
 }
 
 tt {
