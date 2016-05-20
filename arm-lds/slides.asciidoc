@@ -168,7 +168,7 @@ a0000002 d result
   * Assemble, link and dump the symbol table using `nm`
 
   * Symbols can be created within linker scripts using an assignment
-    within `SECTION`.
+    within `SECTIONS`.
 +
 ------
 abc = 10
@@ -421,7 +421,7 @@ SECTIONS {
 
 [role="right"]
   * Exception handlers should be located at `0x0`
-  * Exception handler are located in a custom section `vectors`, using
+  * Exception handlers are located in a custom section `vectors`, using
     `.section` directive
   * `vector` section is located at the beginning of `.text`
   * `.text` is itself placed at `0x0`
