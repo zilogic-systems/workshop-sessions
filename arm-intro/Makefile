@@ -10,13 +10,13 @@ all: slides.html
 figures/terms.png: figures/chip.jpg figures/core.jpg figures/potato-chips.jpg
 
 figures/chip.jpg:
-	wget -O $@ -c "https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/KL_Motorola_68HC11.jpg/640px-KL_Motorola_68HC11.jpg"
+	wget --no-check-certificate -O $@ -c "https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/KL_Motorola_68HC11.jpg/640px-KL_Motorola_68HC11.jpg"
 
 figures/core.jpg:
-	wget -O $@ -c "https://upload.wikimedia.org/wikipedia/commons/4/4e/Diopsis.jpg"
+	wget --no-check-certificate -O $@ -c "https://upload.wikimedia.org/wikipedia/commons/4/4e/Diopsis.jpg"
 
 figures/potato-chips.jpg:
-	wget -O $@ -c "https://upload.wikimedia.org/wikipedia/commons/1/15/Pizza_potato.JPG"
+	wget --no-check-certificate -O $@ -c "https://upload.wikimedia.org/wikipedia/commons/1/15/Pizza_potato.JPG"
 
 slides.html: $(images_png) 
 
