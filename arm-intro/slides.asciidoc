@@ -175,8 +175,8 @@ fields.
 |======
 | Flag         | Meaning
 | Carry `C`    | Operation caused a carry.
-| Overflow `O` | Operation caused an overflow.
-| Zero `Z`     | Operation resulted in 0.
+| Overflow `V` | Operation caused an overflow.
+| Zero `Z`     | Operation resulted in `0`.
 | Negative `N` | Operation resulted in a negative value.
 |======
 
@@ -230,7 +230,7 @@ fields.
 
 Data Abort:: failed attempt to access memory occurs
 
-Prefecth Abort:: failed attempt to fetch instruction
+Prefetch Abort:: failed attempt to fetch instruction
 
 FIQ:: external hardware made an interrupt request on FIQ
 
