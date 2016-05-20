@@ -40,7 +40,10 @@ var w3c_slidy = {
   selected_text_len: 0, // length of drag selection on document
   view_all: 0,  // 1 to view all slides + handouts
   want_toolbar: true,  // user preference to show/hide toolbar
-  mouse_click_enabled: true, // enables left click for next slide
+  // NOTE: We would like users to copy paste code from slides
+  // Allowing click to advance to next slide can be troublesome.
+  // -- Zilogic Systems
+  mouse_click_enabled: false, // enables left click for next slide
   scroll_hack: 0, // IE work around for position: fixed
   disable_slide_click: false,  // used by clicked anchors
 
