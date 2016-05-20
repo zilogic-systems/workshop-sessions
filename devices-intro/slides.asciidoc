@@ -88,8 +88,13 @@ image::figures/io-controller.png[width="75%",align="center"]
 
 == ARM Lab
 
-=== Tools
+[role="two-column"]
+=== Target Board
 
+[role="left"]
+image::figures/connex-mmap.png[width="80%",align="center"]
+
+[role="right"]
   * Qemu to emulate the target system
 
     - Gumstix Connex Board
@@ -97,13 +102,20 @@ image::figures/io-controller.png[width="75%",align="center"]
     - 64 MB RAM
     - 16 MB Flash
 
+=== Toolchain
+
   * Pre-built GNU ARM Toolchain from Code Sourcery
+
+  * Separate toolchain for bare metal programming
 
   * Cross tool chain prefix: `arm-none-eabi-`
 
+    - `gcc`: `arm-none-eabi-gcc`
+    - `ld`: `arm-none-eabi-ld`
+
 === Try Out
 
-  * Create a Flash file 
+  * Create a 16MB file to represent the Flash
 +
 ------
 $ dd if=/dev/zero of=flash.bin bs=4096 count=4096
@@ -125,7 +137,12 @@ $ dd if=u-boot.bin of=flash.bin bs=4096 conv=notrunc
 $ qemu-system-arm -M connex -pflash flash.bin -nographic
 ------
 +
-  * Should display the U-boot prompt
+  * When Qemu is started, the ARM processor starts executing code from
+    the reset address
+
+  * U-boot has been programmed at the address, U-boot starts executing
+
+  * Serial port of the target is mapped to stdio of Qemu
 
 === RTC Registers
 
@@ -147,3 +164,13 @@ GUM> md 0x40900000 1
 ------
 +
   * Increments every 1 second
+
+=== Conclusion
+
+  * Served to refresh microprocessor and device interfacing
+    fundamentals
+
+  * Explored the ARM lab setup
+
+  * Re-infornced the idea of memory mapped IO with RTC example
+
