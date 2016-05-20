@@ -93,12 +93,33 @@ SECTIONS {
 
 === Try Out
 
+  * Linker script is specified in the to `ld` using `-T` option.
+  
+  * Store the linker script in a file called `sum.lds`.
+
   * Try assembling and linking the sum array program using linker
     scripts
++
+------
+arm-none-eabi-as -o sum.o sum.s
+arm-none-eabi-ld -T sum.lds -o sum.elf sum.o
+arm-none-eabi-nm sum.elf
+------
+
+=== Try Out
 
   * Try assembling and linking the two-file sum array program using
     linker scripts
-
++
+------
+arm-none-eabi-as -o sum-main.o sum-main.s
+arm-none-eabi-as -o sum-sub.o sum-sub.s
+arm-none-eabi-ld -T sum.lds -o sum.elf sum-main.o sum-sub.o
+arm-none-eabi-nm sum-main.o
+arm-none-eabi-nm sum-sub.o
+arm-none-eabi-nm sum.elf
+------
++
   * What should be the order of files in the command line?
 
 [role="two-column"]
@@ -166,7 +187,13 @@ a0000002 d result
   * Store the ASM code and linker script in files
 
   * Assemble, link and dump the symbol table using `nm`
-
++
+------
+arm-none-eabi-as -o add-mem.o add-mem.s
+arm-none-eabi-ld -T add-mem.lds -o add-mem.elf add-mem.o
+arm-none-eabi-nm add-mem.elf
+------
++
   * Symbols can be created within linker scripts using an assignment
     within `SECTIONS`.
 +
@@ -349,13 +376,22 @@ SECTIONS {
 
   * Download and save the program
   
-  * Download the linker script file link:{include:code/add-ram.lds.datauri}["add-ram.lds",filename="add-ram.lds"]
-
+  * Download the linker script file
+    link:{include:code/add-ram.lds.datauri}["add-ram.lds",filename="add-ram.lds"]
++
+------
+arm-none-eabi-as -o add-ram.o add-ram.s
+arm-none-eabi-ld -T add-ram.lds -o add-ram.elf add-ram.o
+arm-none-eabi-objcopy -O binary add-ram.elf add-ram.bin
+dd if=/dev/zero of=add-ram-flash.bin bs=4096 count=4096
+dd if=add-ram.bin of=add-ram-flash.bin bs=4096 conv=notrunc
+------
++
   * Execute the program in Qemu, and dump the RAM contents
 +
 ------
 $ qemu-system-arm -M connex     \
-  -pflash flash.bin             \
+  -pflash add-ram-flash.bin     \
   -nographic                    \
   -serial /dev/null
 (qemu) xp /4dw 0xA0000000
