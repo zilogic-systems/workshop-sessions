@@ -375,11 +375,21 @@ include::code/sum.s[]
 
 === Try Out
 
+  * Download the link:{include:code/Makefile.datauri}["Makefile",filename="Makefile"]
+
   * Create `sum.s` containing the assembly program
   
-  * Assemble, link and generate the Flash file
-  
+  * Assemble, link and generate the Flash file using
++
+------
+make sum-flash.bin
+------
++
   * Invoke Qemu to run the program
++
+------
+qemu-system-arm -M connex -pflash sum-flash.bin -nographic -serial /dev/null
+------
 
 === Representing Strings
 
@@ -418,6 +428,22 @@ include::code/equ.s[]
 [source,"armasm"]
 ------
 include::code/strlen.s[]
+------
+
+=== Try Out
+
+  * Create `strlen.s` containing the assembly program
+  
+  * Assemble, link and generate the Flash file using
++
+------
+make strlen-flash.bin
+------
++
+  * Invoke Qemu to run the program
++
+------
+qemu-system-arm -M connex -pflash strlen-flash.bin -nographic -serial /dev/null
 ------
 
 == Using RAM
