@@ -275,8 +275,11 @@ MOVCS r0, r1
 
 === Try Out
 
-  * Clear the zero flag, try a `MOV` if equal
-  * Repeat with `MOV` if not equal
+  * Clear the zero flag.
+  * Execute a `MOV` instruction with if equal, `EQ` condition
+  * Does the instruction get executed?
+  * Repeat the `MOV` instruction with if not equal, `NE` condition
+  * Does the instruction get executed now?
 
 == Branch Instructions
 
