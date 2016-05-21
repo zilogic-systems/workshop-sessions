@@ -4,15 +4,27 @@ EXPORT_WIDTH  = 1024
 
 images_dia = $(wildcard figures/*.dia)
 images_png = $(images_dia:.dia=.png)
-datauris = code/csum/csum.full.datauri        \
-	   code/startup/startup.full.datauri  \
-	   code/syscalls/syscalls.full.datauri
+datauris = code/csum/csum.full.datauri         \
+	   code/startup/startup.full.datauri   \
+	   code/syscalls/syscalls.full.datauri \
+	   code/logbuf.c.datauri                 \
+	   code/hello-v0.c.datauri               \
+	   code/hello-v1.c.datauri	       \
+	   code/hello-v2.c.datauri	       \
+	   code/dynamic-mem.c.datauri	
 
 code/csum/csum.full.datauri: MIMETYPE="text/plain;charset=us-ascii"
 
 code/startup/startup.full.datauri: MIMETYPE="text/plain;charset=us-ascii"
 
 code/syscalls/syscalls.full.datauri: MIMETYPE="text/plain;charset=us-ascii"
+
+code/logbuf.c.datauri: MIMETYPE="text/plain;charset=us-ascii"
+code/hello-v0.c.datauri: MIMETYPE="text/plain;charset=us-ascii"
+code/hello-v1.c.datauri: MIMETYPE="text/plain;charset=us-ascii"
+code/hello-v2.c.datauri: MIMETYPE="text/plain;charset=us-ascii"
+code/dynamic-mem.c.datauri: MIMETYPE="text/plain;charset=us-ascii"
+
 
 all: csum-lds-split startup-split syscalls-split slides.html
 

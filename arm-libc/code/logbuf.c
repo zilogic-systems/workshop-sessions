@@ -19,6 +19,5 @@ int printf(char *str)
 int main()
 {
 	printf("Hello World");
-
 	printf("Good Bye");
 }

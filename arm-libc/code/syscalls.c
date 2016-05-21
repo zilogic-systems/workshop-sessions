@@ -28,6 +28,7 @@ int _read(int fd, char *ptr, int len)
 	return -1;
 }
 
+int _sbrk(int inc) __attribute__((weak));
 int _sbrk(int inc)
 {
 	return -1;

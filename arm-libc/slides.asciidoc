@@ -39,17 +39,18 @@ include::code/logbuf.c[]
 
 === Tryout
 
+* Download link:{include:code/logbuf.c.datauri}["logbuf.c",filename="logbuf.c"]
+
 [source,sh]
 ------
-$ arm-none-eabi-gcc -o out.elf -T csum.lds startup.s -nostdlib \ 
+arm-none-eabi-gcc -o out.elf -T csum.lds startup.s -nostdlib \ 
   		    logbuf.c 
-$ arm-none-eabi-nm -n out.elf
-$ arm-none-eabi-objcopy -O binary out.elf out.bin
-$ dd if=/dev/zero of=flash.bin bs=4096 count=4096
-$ dd if=out.bin of=flash.bin bs=4096 conv=notrunc
-$ qemu-system-arm -M connex     \
-  -pflash flash.bin             \
-  -nographic                    \
+arm-none-eabi-objcopy -O binary out.elf out.bin
+dd if=/dev/zero of=flash.bin bs=4096 count=4096
+dd if=out.bin of=flash.bin bs=4096 conv=notrunc
+qemu-system-arm -M connex     \
+  -pflash flash.bin           \
+  -nographic                  \
   -serial /dev/null
 ------
 
@@ -93,14 +94,16 @@ include::code/hello-v0.c[]
 
 === Tryout
 
+* Download
+  link:{include:code/hello-v0.c.datauri}["hello-v0.c",filename="hello-v0.c"]
+
 [source,sh]
 ------
-$ arm-none-eabi-gcc -o out.elf -T csum.lds startup.s -nostdlib \
+arm-none-eabi-gcc -o out.elf -T csum.lds startup.s -nostdlib \
   		    hello-v0.c 
-$ arm-none-eabi-nm -n out.elf
-$ arm-none-eabi-objcopy -O binary out.elf out.bin
-$ dd if=/dev/zero of=flash.bin bs=4096 count=4096
-$ dd if=out.bin of=flash.bin bs=4096 conv=notrunc
+arm-none-eabi-objcopy -O binary out.elf out.bin
+dd if=/dev/zero of=flash.bin bs=4096 count=4096
+dd if=out.bin of=flash.bin bs=4096 conv=notrunc
 ------
 
 === Qemu Options
@@ -215,17 +218,18 @@ include::code/hello-v1.c[]
 
 === Tryout
 
+* Download
+  link:{include:code/hello-v1.c.datauri}["hello-v1.c",filename="hello-v1.c"]
+
 [source,sh]
 ------
-$ arm-none-eabi-gcc -o out.elf -T csum.lds startup.s \
+arm-none-eabi-gcc -o out.elf -T csum.lds startup.s \
   		    hello-v1.c 
-$ arm-none-eabi-nm -n out.elf
-$ arm-none-eabi-objcopy -O binary out.elf out.bin
-$ dd if=/dev/zero of=flash.bin bs=4096 count=4096
-$ dd if=out.bin of=flash.bin bs=4096 conv=notrunc
-$ qemu-system-arm -M connex     \
-  -pflash flash.bin             \
-  -nographic                    \
+arm-none-eabi-objcopy -O binary out.elf out.bin
+dd if=/dev/zero of=flash.bin bs=4096 count=4096
+dd if=out.bin of=flash.bin bs=4096 conv=notrunc
+qemu-system-arm -M connex -pflash flash.bin        \
+  -nographic
 ------
 
 === Newlibc's Undefined Syscalls
@@ -299,10 +303,7 @@ include::code/syscalls/syscalls.dummy1[]
 * exception sections used for handling exceptions in C++, for
   debugging stack-trace in C applications.
 
-[style="two-column"]
 === Special Sections (2)
-
-[style="right"]
 
 * The linker script has to be modified to avoid collision of section
   because of these compiler's behaviour.
@@ -314,6 +315,8 @@ include::code/syscalls/syscalls.dummy1[]
 
 * data section can be placed at last, after above sections.
 
+
+=== Special Sections (3)
 
 [source,c]
 ------
@@ -330,23 +333,25 @@ include::code/syscalls/syscalls.dummy1[]
 
 === Tryout for Standard Printf
 
-* The hello world program has to be compiled along with
-  link:{include:code/csum/csum.full.datauri}["syscalls.c",filename="syscalls.c"].
-  and new link:{include:code/csum/csum.full.datauri}["linker
-  script",filename="csum.lds"].
+* Download
+  link:{include:code/syscalls/syscalls.full.datauri}["syscalls.c",filename="syscalls.c"]
+  and link:{include:code/csum/csum.full.datauri}["linker
+  script",filename="csum.lds"], which is required for printf to work.
 
 [source,sh]
 ------
-$ arm-none-eabi-gcc -o out.elf -T csum.lds startup.s syscalls.c \
+arm-none-eabi-gcc -o out.elf -T csum.lds startup.s syscalls.c \
   		       hello-v1.c 
-$ arm-none-eabi-nm -n out.elf
-$ arm-none-eabi-objcopy -O binary out.elf out.bin
-$ dd if=/dev/zero of=flash.bin bs=4096 count=4096
-$ dd if=out.bin of=flash.bin bs=4096 conv=notrunc
-$ qemu-system-arm -M connex     \
-  -pflash flash.bin             \
-  -nographic                    \
+arm-none-eabi-objcopy -O binary out.elf out.bin
+dd if=/dev/zero of=flash.bin bs=4096 count=4096
+dd if=out.bin of=flash.bin bs=4096 conv=notrunc
+qemu-system-arm -M connex -pflash flash.bin           \
+  -nographic                  
 ------
+
+* Download
+  link:{include:code/hello-v2.c.datauri}["hello-v2.c",filename="hello-v2.c"]
+  and try for checking formatted printing.
 
 === Dynamic Memory Allocation
 
@@ -389,17 +394,18 @@ include::code/dynamic-mem.c[]
 
 === Tryout
 
+* Download
+  link:{include:code/dynamic-mem.c.datauri}["dynamic-mem.c",filename="dynamic-mem.c"]
+
 [source,sh]
 ------
-$ arm-none-eabi-gcc -o out.elf -T csum.lds startup.s syscalls.c \
+arm-none-eabi-gcc -o out.elf -T csum.lds startup.s syscalls.c \
   		    heap.c dynamic-mem.c 
-$ arm-none-eabi-nm -n out.elf
-$ arm-none-eabi-objcopy -O binary out.elf out.bin
-$ dd if=/dev/zero of=flash.bin bs=4096 count=4096
-$ dd if=out.bin of=flash.bin bs=4096 conv=notrunc
-$ qemu-system-arm -M connex     \
-  -pflash flash.bin             \
-  -nographic                    \
+arm-none-eabi-objcopy -O binary out.elf out.bin
+dd if=/dev/zero of=flash.bin bs=4096 count=4096
+dd if=out.bin of=flash.bin bs=4096 conv=notrunc
+qemu-system-arm -M connex -pflash flash.bin   \
+  -nographic                   
 ------
 
 == Questions
