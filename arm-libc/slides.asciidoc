@@ -395,6 +395,7 @@ include::code/dynamic-mem.c[]
 === Tryout
 
 * Download
+  link:{include:code/heap.c.datauri}["heap.c",filename="heap.c"] and
   link:{include:code/dynamic-mem.c.datauri}["dynamic-mem.c",filename="dynamic-mem.c"]
 
 [source,sh]
