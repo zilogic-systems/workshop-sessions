@@ -1,0 +1,405 @@
+= Integrating with C Library
+Zilogic Systems 
+:data-uri:
+
+== Standard C Library
+
+=== Debugging
+
+* Debugging a C program in an embedded systems is not easy without a
+  costlier debugger.
+
+* If we want to debug the embedded software as we do in a PC, by
+  printing
+
+* then all the prints can be sent to UART and can be viewed through
+  terminal softwares like hyperterminal.
+
+* But an uart driver is required for this.
+
+=== Complex Hello World
+
+* In firmware development, simple hello world program is complex, but
+  LED blinking could be simple.
+
+* But on top of OSes printing hello world would be a simple program,
+  but LED program could be complex.
+
+=== In Memory Prints
+
+* Until the UART driver is up, it is possible that prints can be
+  done to memory,
+
+* With qemu, the prints in memory can be viewed through `xp` command.
+
+[source,c]
+------
+include::code/logbuf.c[]
+------
+
+=== Tryout
+
+[source,sh]
+------
+$ arm-none-eabi-gcc -o out.elf -T csum.lds startup.s -nostdlib \ 
+  		    logbuf.c 
+$ arm-none-eabi-nm -n out.elf
+$ arm-none-eabi-objcopy -O binary out.elf out.bin
+$ dd if=/dev/zero of=flash.bin bs=4096 count=4096
+$ dd if=out.bin of=flash.bin bs=4096 conv=notrunc
+$ qemu-system-arm -M connex     \
+  -pflash flash.bin             \
+  -nographic                    \
+  -serial /dev/null
+------
+
+=== UART Controller
+
+* The Connex Board emulated through QEMU, Marvell PXA255 based ARM
+  processor.
+
+* PXA255 has UART0 at base address `0x40100000`, which is based on
+  standard 16550 UART standard and registers shown below.
+
+=== UART Registers
+
+|=====================================================================================
+|*Offset* | *Registers*               | *Description*
+|0x0| Divisor Latch Registers (DLH/L) | internal baud rate generator to support varied baud rates.
+|0x0| Receive Buffer Registers (RBR)  | Holds the data received from the UART Bus.
+|0x0| Transmit Holding Registers (THR)| Holds the data to be transmitted next.
+|0xC| Line Control Register (LCR)     | Configurations for Parity, Number of Data bits and Stop Bits.
+|0x14|Line Status Register (LSR)      | Has Data Ready & Transmit Data Request flags
+|=========================================================================================
+
+=== UART Programming
+
+* In QEMU emulation there is no need for setting the configuration and
+  baud-rate registers.
+
+* It's enough that we write data directly to the THR register.
+
+[source, C] 
+------
+*(volatile unsigned int *) 0x40100000 = <CHAR>
+------
+
+=== Printing through UART
+
+[source, c] 
+------
+include::code/hello-v0.c[]
+------
+
+=== Tryout
+
+[source,sh]
+------
+$ arm-none-eabi-gcc -o out.elf -T csum.lds startup.s -nostdlib \
+  		    hello-v0.c 
+$ arm-none-eabi-nm -n out.elf
+$ arm-none-eabi-objcopy -O binary out.elf out.bin
+$ dd if=/dev/zero of=flash.bin bs=4096 count=4096
+$ dd if=out.bin of=flash.bin bs=4096 conv=notrunc
+------
+
+=== Qemu Options
+
+* Qemu supports printing the UART data in the standard-io of QEMU.
+
+* The output `Hello World` should be printed in the Qemu standard
+  output.
+
+------
+qemu-system-arm -M connex -pflash flash.bin \
+  		-nographic                  
+------
+
+* Press `Ctrl-a x` to quit qemu. 
+
+=== Need for C Library
+
+* printing in ANSI C formatted strings like `printf` requires a more
+  complex codes, involving string APIs, variable arguments support and
+  etc.
+
+* This rises the need for OS like C library for the firmware
+  development, even for a simple integer printing.
+
+=== C Library
+
+* The standard functions like printf, strlen, malloc which are
+  frequently used C programs are provided by C library.
+
+* In a bare metal embedded systems, these features are not available
+  directly and it has to be integrated by the developers.
+
+* C Standard library provides functions for mathematical operation,
+  string manipulation, type conversions.
+
+* Supports OS specific memory management, time, file and console-based
+  I/O functions.
+
+=== Open Source C Libraries
+
+.MMU based OSes
+
+* glibc - Used UNIX OSes
+
+* BSD libc - developed part of BSD
+
+* Bionic - Used in Android
+
+* Microsoft C run-time library - Used by MS VC++
+
+.MMU Less Systems
+
+* dietlibc - small in footprint, but currently stalled.
+
+* uclibc - developed part of uClinux distribution
+
+* newlibc - small footprint and commonly used in firmware development.
+
+=== Newlib 
+
+* A collection of several open source libraries, to build software for
+  embedded systems.
+
+* Created by Cygnus Support and now maintained by Red Had Developers.
+
+* Newlib with semi-hosting support where library calls can be routed
+  to host system.
+
+* In OS less systems where the system calls would be calling the
+  direct peripheral drivers.
+
+* Permissive Licensing - can be used for proprietary applications.
+
+* Newlib is supported by several tool-chains for bare metal
+  programming including code sourcery toolchain used in this workshop.
+
+=== Newlib Features
+
+* Supports complete Standard IO functions like printf, sprintf,
+  fprintf etc.,
+
+* Unix like APIs open, read, write, close.
+
+* Supports math library
+
+=== System Calls
+
+* In POSIX compatible OSes the applications has to request a service
+  from OS through special functions called system calls.
+
+* Open, read, write, close, lseek are the primitive system calls,
+  using which applications can request access to the devices.
+
+* printf, scanf, fprintf like APIs intern calls the above system
+  calls.
+
+* Since the Newlibc tries to comply POSIX, it uses system calls to
+  access IO.
+
+* For firmware based embedded systems, newlibc allows the developers
+  to define their own definitions for the syscalls.
+
+=== Using Printf 
+
+* Let us try a 'C' program using printf from the standard library.
+
+[source,c]
+------
+include::code/hello-v1.c[]
+------
+
+=== Tryout
+
+[source,sh]
+------
+$ arm-none-eabi-gcc -o out.elf -T csum.lds startup.s \
+  		    hello-v1.c 
+$ arm-none-eabi-nm -n out.elf
+$ arm-none-eabi-objcopy -O binary out.elf out.bin
+$ dd if=/dev/zero of=flash.bin bs=4096 count=4096
+$ dd if=out.bin of=flash.bin bs=4096 conv=notrunc
+$ qemu-system-arm -M connex     \
+  -pflash flash.bin             \
+  -nographic                    \
+------
+
+=== Newlibc's Undefined Syscalls
+
+* when we build the `C` file with standard library support, ie without
+  `nostdlib` option, should be getting below error.
+
+[source,sh]
+------ 
+$ arm-none-eabi-gcc hello-v1.c
+
+/home/deepak/arm-2011.03/bin/../lib/gcc/arm-none-eabi/4.5.2/../../../../arm-none-eabi/lib/libc.a(lib_a-sbrkr.o):
+In function `_sbrk_r':
+sbrkr.c:(.text+0x18): undefined reference to `_sbrk'
+/home/deepak/arm-2011.03/bin/../lib/gcc/arm-none-eabi/4.5.2/../../../../arm-none-eabi/lib/libc.a(lib_a-writer.o):
+In function `_write_r':
+writer.c:(.text+0x20): undefined reference to `_write'
+/home/deepak/arm-2011.03/bin/../lib/gcc/arm-none-eabi/4.5.2/../../../../arm-none-eabi/lib/libc.a(lib_a-closer.o):
+In function `_close_r':
+closer.c:(.text+0x18): undefined reference to `_close'
+/home/deepak/arm-2011.03/bin/../lib/gcc/arm-none-eabi/4.5.2/../../../../arm-none-eabi/lib/libc.a(lib_a-fstatr.o):
+In function `_fstat_r':
+fstatr.c:(.text+0x1c): undefined reference to `_fstat'
+/home/deepak/arm-2011.03/bin/../lib/gcc/arm-none-eabi/4.5.2/../../../../arm-none-eabi/lib/libc.a(lib_a-isattyr.o):
+In function `_isatty_r':
+isattyr.c:(.text+0x18): undefined reference to `_isatty'
+/home/deepak/arm-2011.03/bin/../lib/gcc/arm-none-eabi/4.5.2/../../../../arm-none-eabi/lib/libc.a(lib_a-lseekr.o):
+In function `_lseek_r':
+lseekr.c:(.text+0x20): undefined reference to `_lseek'
+/home/deepak/arm-2011.03/bin/../lib/gcc/arm-none-eabi/4.5.2/../../../../arm-none-eabi/lib/libc.a(lib_a-readr.o):
+In function `_read_r':
+readr.c:(.text+0x20): undefined reference to `_read'
+collect2: ld returned 1 exit status
+------
+
+=== Defining Syscalls
+
+* We may need to define the syscalls for our system, to avoid linking
+  issues.
+
+* The printf requires _write api to be defined for printing.
+
+* For all other syscalls, until we don't have clear use case, we can
+  make a dummy definitions, which returns -1.
+
+=== Defining Syscalls (2)
+
+[source,c]
+------
+include::code/syscalls/syscalls.defined[]
+------
+
+=== Defining Syscalls (3)
+
+[source,c]
+------
+include::code/syscalls/syscalls.dummy1[]
+------
+
+=== Special Sections
+
+* GCC compiler generates other sections by default based on the code,
+  and are inserted automatically into the executable.
+
+* .rodata.str.4 is a section which holds intermediate read-only
+  strings.
+
+* .ARM.exidx & .ARM.extab are the sections which are created by
+  compiler when it finds multiple or recursive function calls.
+
+* exception sections used for handling exceptions in C++, for
+  debugging stack-trace in C applications.
+
+[style="two-column"]
+=== Special Sections (2)
+
+[style="right"]
+
+* The linker script has to be modified to avoid collision of section
+  because of these compiler's behaviour.
+
+* using `.rodata*` merges all the sections which starts with .rodata,
+  where acts as shell like wildcard.
+
+* exidx can be placed after the rodata section.
+
+* data section can be placed at last, after above sections.
+
+
+[source,c]
+------
+	.rodata : {
+              * (.rodata*);
+        }
+
+	.ARM.exidx : {
+    	      * (.ARM.exidx*);
+    	      * (.gnu.linkonce.armexidx.*);
+	} 
+	flash_sdata = .;
+------
+
+=== Tryout for Standard Printf
+
+* The hello world program has to be compiled along with
+  link:{include:code/csum/csum.full.datauri}["syscalls.c",filename="syscalls.c"].
+  and new link:{include:code/csum/csum.full.datauri}["linker
+  script",filename="csum.lds"].
+
+[source,sh]
+------
+$ arm-none-eabi-gcc -o out.elf -T csum.lds startup.s syscalls.c \
+  		       hello-v1.c 
+$ arm-none-eabi-nm -n out.elf
+$ arm-none-eabi-objcopy -O binary out.elf out.bin
+$ dd if=/dev/zero of=flash.bin bs=4096 count=4096
+$ dd if=out.bin of=flash.bin bs=4096 conv=notrunc
+$ qemu-system-arm -M connex     \
+  -pflash flash.bin             \
+  -nographic                    \
+------
+
+=== Dynamic Memory Allocation
+
+* In C, the dynamic memory allocation is done by a standard library
+function `malloc`.
+
+* `malloc` inturn calls a system call `sbrk`.
+
+* `sbrk()` increments the location of the program break, which defines
+  the end of the process's data segment.
+
+* generally program break is the location after .bss.
+
+* dynamic memories are allocated in heap, a separate memory section,
+  which is created after the data section.
+
+=== Heap Section
+
+[source,c]
+------
+include::code/csum/heap.part[]
+------
+
+=== sbrk
+
+* In newlibc the sbrk function call expects `_sbrk`, which is to be
+  defined by the developers.
+
+[source,c]
+------
+include::code/heap.c[]
+------
+
+=== Malloc Example
+
+[source,c]
+------
+include::code/dynamic-mem.c[]
+------
+
+=== Tryout
+
+[source,sh]
+------
+$ arm-none-eabi-gcc -o out.elf -T csum.lds startup.s syscalls.c \
+  		    heap.c dynamic-mem.c 
+$ arm-none-eabi-nm -n out.elf
+$ arm-none-eabi-objcopy -O binary out.elf out.bin
+$ dd if=/dev/zero of=flash.bin bs=4096 count=4096
+$ dd if=out.bin of=flash.bin bs=4096 conv=notrunc
+$ qemu-system-arm -M connex     \
+  -pflash flash.bin             \
+  -nographic                    \
+------
+
+== Questions
