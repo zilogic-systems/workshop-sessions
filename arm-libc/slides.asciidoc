@@ -335,8 +335,9 @@ include::code/syscalls/syscalls.dummy1[]
 
 * Download
   link:{include:code/syscalls/syscalls.full.datauri}["syscalls.c",filename="syscalls.c"]
-  and link:{include:code/csum/csum.full.datauri}["linker
-  script",filename="csum.lds"], which is required for printf to work.
+  and
+  link:{include:code/csum/csum.full.datauri}["csum.lds",filename="csum.lds"],
+  which is required for printf to work.
 
 [source,sh]
 ------
