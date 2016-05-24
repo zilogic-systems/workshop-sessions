@@ -12,7 +12,7 @@ int printf(char *str)
 		*(log_buffer + log_off++) = *(str + len++);
 
 		if (log_off == (LOG_BUF_BASE + LOG_BUF_SIZE))
-			log_off = (unsigned char *) LOG_BUF_BASE;
+			log_off = 0;
 	}
 }
 
