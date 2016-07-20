@@ -206,7 +206,7 @@ class GameView:
 
         self.gl.draw_status(self._screen,
                             "MOVES  PUSHES",
-                            " {0:04}    {1:04}".format(len(moves), world.pushes))
+                            " {0:04}     {1:04}".format(len(moves), world.pushes))
         self.gl.update(self._screen)
                 
     def show_msgbox(self, text):
@@ -247,8 +247,7 @@ class PyGameGL:
             pygame.K_SPACE: Key.OK,
             pygame.K_r: Key.RESET,
         }
-        self._font = pygame.font.Font("Monaco.ttf", 18)
-        self._font.set_bold(True)
+        self._font = pygame.font.Font("atari.ttf", 12)
         self._width = None
         self._height = None
         
@@ -336,7 +335,7 @@ def play_level(view, level):
 
     if engine.is_game_over(world):
         time.sleep(1)
-        view.show_msgbox("Level Complete!")
+        view.show_msgbox("LEVEL COMPLETE!")
 
 
 def main(view):
