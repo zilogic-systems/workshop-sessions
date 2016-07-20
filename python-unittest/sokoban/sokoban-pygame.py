@@ -299,9 +299,9 @@ class PyGameGL:
     def draw_msgbox(self, screen, text):
         text_surface = self._font.render(text, 1, (255, 255, 255), (0, 0, 0))
         textpos = text_surface.get_rect()
-	textpos.centerx = screen.get_rect().centerx
+        textpos.centerx = screen.get_rect().centerx
         textpos.centery = screen.get_rect().centery
-	screen.blit(text_surface, textpos)
+        screen.blit(text_surface, textpos)
 
 
 def play_level(view, level):
