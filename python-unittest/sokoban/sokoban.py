@@ -9,7 +9,6 @@ import pygame
 
 Position = namedtuple("Position", "x y")
 
-
 class Tile:
     WALL = 0
     FLOOR = 1
@@ -37,74 +36,12 @@ class Key:
     QUIT = 6
     OK = 7
     RESET = 8
-    
-    
-class GameEngine:
-    def _is_floor(self, tile):
-        return tile in (Tile.FLOOR, Tile.DOCK)
 
-    def _is_box(self, tile):
-        return tile in (Tile.BOX, Tile.BOX_DOCKED)
 
-    def move(self, direction, world, moves):
-        saved_world = copy.deepcopy(world)
-        moved = self._move(direction, world)
-        if moved:
-            moves.append(saved_world)
-        return world
-
-    def _move(self, direction, world):
-        pos = world.worker_pos
-
-        if direction == Dir.UP:
-            next_pos = Position(pos.x, pos.y - 1)
-            push_pos = Position(pos.x, pos.y - 2)
-        elif direction == Dir.DN:
-            next_pos = Position(pos.x, pos.y + 1)
-            push_pos = Position(pos.x, pos.y + 2)
-        elif direction == Dir.RT:
-            next_pos = Position(pos.x + 1, pos.y)
-            push_pos = Position(pos.x + 2, pos.y)
-        elif direction == Dir.LT:
-            next_pos = Position(pos.x - 1, pos.y)
-            push_pos = Position(pos.x - 2, pos.y)
-
-        next_tile = world.get(next_pos)
-        push_tile = world.get(push_pos)
-
-        if next_tile is None:
-            return None
-        elif next_tile == Tile.WALL:
-            return False
-        elif self._is_box(next_tile):
-            if self._is_floor(push_tile):
-                world.push_box(next_pos, push_pos)
-                world.worker_pos = next_pos
-                return True
-            else:
-                return False
-        elif self._is_floor(next_tile):
-            world.worker_pos = next_pos
-            return True
-
-    def undo(self, world, moves):
-        try:
-            return moves.pop()
-        except IndexError:
-            return world
-
-    def reset(self, world, moves):
-        try:
-            while True:
-                world = moves.pop()
-        except IndexError:
-            return world
-
-    def is_game_over(self, world):
-        for dock in world.docks:
-            if world.get(dock) != Tile.BOX_DOCKED:
-                return False
-        return True
+class GameState:
+    def __init__(self, world, moves):
+        self.world = world
+        self.moves = moves
 
 
 class World:
@@ -215,8 +152,10 @@ class GameView:
         img, _ = self.gl.render_string(" {0:04}     {1:04}".format(len(moves), world.pushes))
         self.gl.draw_image(self._screen, x, y, img)
 
-    def show(self, world, moves):
+    def show(self, state):
         self.gl.clear(self._screen)
+        world = state.world
+        moves = state.moves
 
         for y in range(world.nrows):
             for x in range(world.ncols):
@@ -285,7 +224,7 @@ class PyGameGL:
 
     def load_tile(self, tile):
         tile_name = self._tile_map[tile]
-        return pygame.image.load("yoshi-32-{0}.bmp".format(tile_name))
+        return pygame.image.load("tiles/{0}.bmp".format(tile_name))
 
     def draw_image(self, screen, x, y, image):
         screen.blit(image, (x, y))
@@ -311,41 +250,117 @@ class PyGameGL:
                 return None
 
 
-def play_level(view, level):
-    world = World(level)
-    engine = GameEngine()
-    moves = []
+class GameEngine:
+    def _is_floor(self, tile):
+        return tile in (Tile.FLOOR, Tile.DOCK)
 
-    view.set_size(world.ncols, world.nrows)
-    view.show(world, moves)
+    def _is_box(self, tile):
+        return tile in (Tile.BOX, Tile.BOX_DOCKED)
 
-    while not engine.is_game_over(world):
-        inp = view.wait_key()
-        if inp == Key.UP:
-            world = engine.move(Dir.UP, world, moves)
-        elif inp == Key.DOWN:
-            world = engine.move(Dir.DN, world, moves)
-        elif inp == Key.LEFT:
-            world = engine.move(Dir.LT, world, moves)
-        elif inp == Key.RIGHT:
-            world = engine.move(Dir.RT, world, moves)
-        elif inp == Key.UNDO:
-            world = engine.undo(world, moves)
-        elif inp == Key.RESET:
-            world = engine.reset(world, moves)
-        elif inp == Key.SKIP:
-            break
-        elif inp == Key.QUIT:
-            sys.exit(0)
+    def move(self, direction, state):
+        saved_world = copy.deepcopy(state.world)
+        moved = self._move(direction, state.world)
+        if moved:
+            state.moves.append(saved_world)
 
-        view.show(world, moves)
+    def _move(self, direction, world):
+        pos = world.worker_pos
 
-    if engine.is_game_over(world):
-        time.sleep(1)
-        view.show_msgbox("LEVEL COMPLETE!")
+        if direction == Dir.UP:
+            next_pos = Position(pos.x, pos.y - 1)
+            push_pos = Position(pos.x, pos.y - 2)
+        elif direction == Dir.DN:
+            next_pos = Position(pos.x, pos.y + 1)
+            push_pos = Position(pos.x, pos.y + 2)
+        elif direction == Dir.RT:
+            next_pos = Position(pos.x + 1, pos.y)
+            push_pos = Position(pos.x + 2, pos.y)
+        elif direction == Dir.LT:
+            next_pos = Position(pos.x - 1, pos.y)
+            push_pos = Position(pos.x - 2, pos.y)
+
+        next_tile = world.get(next_pos)
+        push_tile = world.get(push_pos)
+
+        if next_tile is None:
+            return None
+        elif next_tile == Tile.WALL:
+            return False
+        elif self._is_box(next_tile):
+            if self._is_floor(push_tile):
+                world.push_box(next_pos, push_pos)
+                world.worker_pos = next_pos
+                return True
+            else:
+                return False
+        elif self._is_floor(next_tile):
+            world.worker_pos = next_pos
+            return True
+
+    def undo(self, state):
+        try:
+            state.world = moves.pop()
+        except IndexError:
+            pass
+
+    def reset(self, state):
+        try:
+            while True:
+                state.world = state.moves.pop()
+        except IndexError:
+            pass
+
+    def is_game_over(self, state):
+        for dock in state.world.docks:
+            if state.world.get(dock) != Tile.BOX_DOCKED:
+                return False
+        return True
 
 
-def main(view):
+class GameController:
+    def _react(self, view, engine, state):
+        while not engine.is_game_over(state):
+            inp = view.wait_key()
+            if inp == Key.UP:
+                engine.move(Dir.UP, state)
+            elif inp == Key.DOWN:
+                engine.move(Dir.DN, state)
+            elif inp == Key.LEFT:
+                engine.move(Dir.LT, state)
+            elif inp == Key.RIGHT:
+                engine.move(Dir.RT, state)
+            elif inp == Key.UNDO:
+                engine.undo(state)
+            elif inp == Key.RESET:
+                engine.reset(state)
+            elif inp == Key.SKIP:
+                break
+            elif inp == Key.QUIT:
+                sys.exit(0)
+
+            view.show(state)
+    
+    def _play_level(self, view, level):
+        world = World(level)
+        engine = GameEngine()
+        state = GameState(world, moves=[])
+
+        view.set_size(world.ncols, world.nrows)
+        view.show(state)
+
+        self._react(view, engine, state)
+
+        if engine.is_game_over(state):
+            time.sleep(1)
+            view.show_msgbox("LEVEL COMPLETE!")
+
+
+    def play(self, view, levels):
+        for level in levels:
+            self._play_level(view, level)
+
+
+def _read_levels():
     levels = []
     curr_level = []
     for line in open("levels.txt"):
@@ -358,11 +373,16 @@ def main(view):
         except IndexError:
             pass
 
-    for level in levels:
-        play_level(view, level)
+    return levels
+
+
+def main():
+    gl = PyGameGL()
+    view = GameView(gl)
+    levels = _read_levels()
+    ctl = GameController()
+    ctl.play(view, levels)
 
 
 if __name__ == "__main__":
-    gl = PyGameGL()
-    view = GameView(gl)
-    main(view)
+    main()
