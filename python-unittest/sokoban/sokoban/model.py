@@ -13,7 +13,7 @@ class World:
         self._map = []
         self.worker_pos = None
         self.box_pos = set()
-        self.docks = set()
+        self.dock_pos = set()
         self.nrows = 0
         self.ncols = 0
         self.pushes = 0
@@ -35,16 +35,16 @@ class World:
                     tile = Tile.FLOOR
 
                 elif tile == '.':
-                    self.docks.add(pos)
+                    self.dock_pos.add(pos)
                     tile = Tile.DOCK
 
                 elif tile == '*':
                     self.box_pos.add(pos)
-                    self.docks.add(pos)
+                    self.dock_pos.add(pos)
                     tile = Tile.DOCK
 
                 elif tile == "+":
-                    self.docks.add(pos)
+                    self.dock_pos.add(pos)
                     self.worker_pos = pos
                     tile = Tile.DOCK
 
@@ -67,7 +67,7 @@ class World:
     def get(self, pos):
         if pos == self.worker_pos:
             return Tile.WORKER
-        elif pos in self.box_pos and pos in self.docks:
+        elif pos in self.box_pos and pos in self.dock_pos:
             return Tile.BOX_DOCKED
         elif pos in self.box_pos:
             return Tile.BOX

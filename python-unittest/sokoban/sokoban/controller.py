@@ -71,7 +71,7 @@ class GameEngine:
             pass
 
     def is_game_over(self, state):
-        for dock in state.world.docks:
+        for dock in state.world.dock_pos:
             if state.world.get(dock) != Tile.BOX_DOCKED:
                 return False
         return True
