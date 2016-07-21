@@ -1,0 +1,186 @@
+= Unit Testing with Python
+Zilogic Systems
+
+== Introduction
+
+=== Why write Test Cases?
+
+  * Python's expressiveness and dynamic nature makes it very
+    powerful
+
+  * Some times it just too powerful, and wielding it needs care
+
+  * Can you spot the issue in the following code?
+
+[source,python]
+------
+class ProtocolX:
+    def __init__(self, server, username, password):
+        self.server = server
+	self.username = username
+        self.passwd = password
+
+    def reconnect(self, server):
+        self._disconnect()
+        self.sevrer = server
+        self._connect()
+------
+
+=== More Examples
+
+  * Such issues are hard to debug, hours are wasted chasing such bugs
+
+  * Typos can lurk within code paths that are seldom taken
+
+  * Causing programs to crash, when they shouldn't
+
+[source,python]
+------
+def read_file(filename):
+    try:
+        fp = open(filename)
+	data = fp.read()
+    except IOError as exc:
+        log.err("error reading '%s': %s" % (filenme, exc))
+    finally:
+        fp.close()
+------
+
+=== Too Powerful!
+
+  * Python lacks the safety net of a compiler and static type checking
+
+  * Remember what Uncle Ben said to Peter Parker?
++
+[quote,Uncle Ben]
+______
+With great *powers*, comes great *responsibility*.
+______
++
+
+  * Responsible Python programmers, write automated test cases for their
+    code
+
+  * Driving the code through all possible code paths, weeding out
+    silly typos and regressions
+
+=== E2E vs Unit Testing
+
+  * People generally tend to test their software as a whole
+    - Run the program
+    - Input data through the UI
+    - Check program's response
+
+  * Tests done this way automated or manual is called E2E Testing
+
+  * E2E Testing is required but not sufficient
+
+=== Drawbacks of E2E Testing
+
+  * It is terribly *slow*
+  
+    - Accessing database, networks, files, etc. is slow
+    - Implication: Will not be run often
+    
+  * Running test cases has *dependencies*
+
+    - Depends on the availability of test server, input emulators, etc.
+    - Implication: Only people with access to resources can execute it
+
+  * Hard to determine *root cause* of failing test
+
+    - Implication: For a large code base, takes time and effort to zero in on the faulty code
+
+=== Drawback of E2E Testing (Contd.)
+
+  * Cannot drive program through all possible code path, *low code coverage*
+
+    - Some error scenarios is almost impossible to create
+    - Implication: Low code coverage, and typos lurking in untested code paths
+
+  * E2E tests can be *flaky*
+
+    - Intermittent network failures, power outages, device failures,
+      can cause tests to fail
+    
+    - Implication: Reduces trust on the tests
+
+=== Unit Testing
+
+  * Unit Tests, verify the public interface of a module / class, in
+    isolation
+
+  * Dependencies are *mocked* or *faked*
+
+  * Written and executed by developers
+
+=== Advantages of Unit Testing
+
+  * Unit tests are extremely *fast*
+    - They do not use databases, network, file system, other applications, console, etc.
+
+  * Unit tests provide *early feedback*
+    - No test setup or resources are required to run the tests
+    - Developers can run them every time they make a change and before committing the code
+
+=== Advantages of Unit Testing (Contd.)
+
+  * Unit tests makes it easier to *refactor*
+    - Any regression due to refactoring, will be caught by unit tests
+    - Code can be refactored / improved without the fear of regression
+
+
+[role="two-column"]
+=== Testing Pyramid
+
+[role="left"]
+image::figures/test-pyramid.png[align="center"]
+
+[role="right"]
+
+  * Unit tests verify the *functionality of each unit*
+
+  * Integration tests verify that the *units work together* at the
+    sub-system level
+
+  * E2E tests verify that the *product works as a whole*
+
+  * A good test strategy will have, a mix of each approach, with most
+    of the testing done at the unit level
+
+[role="tip"]
+=== //
+
+Article on Google Testing Blog:
+http://googletesting.blogspot.in/2015/04/just-say-no-to-more-end-to-end-tests.html[Just
+Say No to More End-to-End Tests]
+
+== Writing Unit Tests
+
+=== Unit Testing Frameworks
+
+  * Unit testing frameworks provide then necessary infrastructure to
+
+    - Write test cases
+    - Run the test cases
+    - Generate test reports
+
+  * Available unit testing frameworks
+
+    - `unittest`, part of standard library
+    - `py.test`, popular third party framework
+    - `nose2`, extends `unittest`, making nicer and easier
+
+=== Testing a Simple Function
+
+== Mocking
+
+== Patching
+
+== Faking
+
+== Managing Test Cases
+
+== Resources
+
+== Questions
