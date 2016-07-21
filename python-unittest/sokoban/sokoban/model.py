@@ -17,9 +17,9 @@ class World:
         self.nrows = 0
         self.ncols = 0
         self.pushes = 0
-        self._read_from_file(level)
+        self._parse(level)
 
-    def _read_from_file(self, level):
+    def _parse(self, level):
         self._map = []
         for i, line in enumerate(level):
             row = []
