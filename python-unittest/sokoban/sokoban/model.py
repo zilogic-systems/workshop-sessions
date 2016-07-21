@@ -1,4 +1,3 @@
-from .utils import Position
 from .utils import Tile
 
 
@@ -24,7 +23,7 @@ class World:
         for i, line in enumerate(level):
             row = []
             for j, tile in enumerate(line):
-                pos = Position(j, i)
+                pos = (j, i)
 
                 if tile == '@':
                     self.worker_pos = pos
@@ -73,11 +72,7 @@ class World:
             return Tile.BOX
         else:
             try:
-                return self._map[pos.y][pos.x]
+                x, y = pos
+                return self._map[y][x]
             except IndexError:
                 return None
-
-    def push_box(self, from_pos, to_pos):
-        self.box_pos.remove(from_pos)
-        self.box_pos.add(to_pos)
-        self.pushes += 1

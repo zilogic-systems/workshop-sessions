@@ -7,7 +7,6 @@ from .model import GameState
 from .utils import Tile
 from .utils import Key
 from .utils import Dir
-from .utils import Position
 
 
 class GameEngine:
@@ -17,6 +16,11 @@ class GameEngine:
     def _is_box(self, tile):
         return tile in (Tile.BOX, Tile.BOX_DOCKED)
 
+    def _push_box(self, world, from_pos, to_pos):
+        world.box_pos.remove(from_pos)
+        world.box_pos.add(to_pos)
+        world.pushes += 1    
+
     def move(self, direction, state):
         saved_world = copy.deepcopy(state.world)
         moved = self._move(direction, state.world)
@@ -24,20 +28,20 @@ class GameEngine:
             state.moves.append(saved_world)
 
     def _move(self, direction, world):
-        pos = world.worker_pos
+        x, y = world.worker_pos
 
         if direction == Dir.UP:
-            next_pos = Position(pos.x, pos.y - 1)
-            push_pos = Position(pos.x, pos.y - 2)
+            next_pos = (x, y - 1)
+            push_pos = (x, y - 2)
         elif direction == Dir.DN:
-            next_pos = Position(pos.x, pos.y + 1)
-            push_pos = Position(pos.x, pos.y + 2)
+            next_pos = (x, y + 1)
+            push_pos = (x, y + 2)
         elif direction == Dir.RT:
-            next_pos = Position(pos.x + 1, pos.y)
-            push_pos = Position(pos.x + 2, pos.y)
+            next_pos = (x + 1, y)
+            push_pos = (x + 2, y)
         elif direction == Dir.LT:
-            next_pos = Position(pos.x - 1, pos.y)
-            push_pos = Position(pos.x - 2, pos.y)
+            next_pos = (x - 1, y)
+            push_pos = (x - 2, y)
 
         next_tile = world.get(next_pos)
         push_tile = world.get(push_pos)
@@ -48,7 +52,7 @@ class GameEngine:
             return False
         elif self._is_box(next_tile):
             if self._is_floor(push_tile):
-                world.push_box(next_pos, push_pos)
+                self._push_box(world, next_pos, push_pos)
                 world.worker_pos = next_pos
                 return True
             else:

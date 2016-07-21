@@ -3,7 +3,6 @@ import time
 
 from .utils import Tile
 from .utils import Key
-from .utils import Position
 
 
 class GameView:
@@ -46,7 +45,7 @@ class GameView:
 
         for y in range(world.nrows):
             for x in range(world.ncols):
-                tile = world.get(Position(x, y))
+                tile = world.get((x, y))
                 if tile == None:
                     tile = Tile.WALL
 

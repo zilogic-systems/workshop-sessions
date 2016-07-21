@@ -27,5 +27,3 @@ class Key:
     QUIT = 6
     OK = 7
     RESET = 8
-
-Position = namedtuple("Position", "x y")
