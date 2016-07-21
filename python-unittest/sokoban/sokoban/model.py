@@ -10,7 +10,7 @@ class GameState:
 
 class World:
     def __init__(self, level):
-        self._maze = []
+        self._map = []
         self.worker_pos = None
         self.box_pos = set()
         self.docks = set()
@@ -20,7 +20,7 @@ class World:
         self._read_from_file(level)
 
     def _read_from_file(self, level):
-        self._maze = []
+        self._map = []
         for i, line in enumerate(level):
             row = []
             for j, tile in enumerate(line):
@@ -59,10 +59,10 @@ class World:
 
                 row.append(tile)
 
-            self._maze.append(row)
+            self._map.append(row)
 
-        self.nrows = len(self._maze)
-        self.ncols = max(map(len, self._maze))
+        self.nrows = len(self._map)
+        self.ncols = max(map(len, self._map))
 
     def get(self, pos):
         if pos == self.worker_pos:
@@ -73,7 +73,7 @@ class World:
             return Tile.BOX
         else:
             try:
-                return self._maze[pos.y][pos.x]
+                return self._map[pos.y][pos.x]
             except IndexError:
                 return None
 
