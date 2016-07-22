@@ -351,53 +351,347 @@ include::code/test_model_v5/test3.py[]
   * Try adding a test case to verify that an exception is raised, when
     there is mismatch in the no. of boxes and docks
 
-=== Quering Tile at Position
+== Short Detour: Game Objects
 
-  * The `World` object has a `get()` method, to query the current tile
-    at a give (x, y) position
+=== Overview
 
-  * `get()` method returns one of
-    - `Tile.WALL`
-    - `Tile.FLOOR`
-    - `Tile.DOCK`
-    - `Tile.BOX`
-    - `Tile.WORKER`
-    - `Tile.BOX_DOCKED`
+  * Model
+    - GameState
+    - World
+
+  * Controller
+    - GameEngine
+    - GameController
+
+  * View
+    - GameView
+    - PyGameGL
+
+=== World Object
+
+  * `get(pos)`
+    - Query tile at the specified `(x, y)` position
+    - Returns one of `Tile.WALL`, `Tile.FLOOR`, `Tile.DOCK`,
+      `Tile.BOX`, `Tile.WORKER`, `Tile.BOX_DOCKED`
+    
+  * `move_worker(to_pos)`
+    - Move worker to the specified position
+    
+  * `push_box(from_pos, to_pos)`
+    - Move a box from one position to another
 
 [role="two-column"]
-=== Tracking Game State
+=== GameState Object
 
 [role="left"]
 image::figures/game-state.png[align="center"]
 
 [role="right"]
-  * The current state of the game is represented by `sokoban.model.GameState`
+  * The current state in a level is represented by `GameState`
 
   * `GameState` has two attributes
     - `world`
-    - `moves`
+    - `history`
 
   * `world` is a `World` object that represents the position of the
     tiles
 
-  * `moves` is a stack that stores previous `world` states
+  * `history` is a stack that stores previous `world` states
 
 [role="two-column"]
-=== Tracking Game State
+=== GameState Object
 
 [role="left"]
 image::figures/game-state.png[align="center"]
 
 [role="right"]
   * When user moves the worker, a 'copy' of `world` is stored in
-    `moves` and `world` is modified
+    `history` and `world` is modified
 
-  * The `moves` stack is used for getting previous `World` objects,
+  * The `history` stack is used for getting previous `World` objects,
     for implementing undos and reset
+
+=== GameEngine Object
+
+  * Implements user actions within a level like, move, undo and reset
+
+  * `move(dir, state)`
+
+    - Validates and moves the worker in the specified direction, by
+      updating the `World` object
+
+    - Validates and pushes the box, if present
+
+  * `undo(state)`
+
+    - Pops previous `World` state from history and sets as current
+      state
+
+  * `reset(state)`
+
+    - Pops all previous `World` states from history and goes to the
+      initial state
+
 
 == Mocking
 
+=== What is Mocking?
 
+  * Unit testing requirements:
+
+    - A unit needs to be tested, in isolation from the rest of the
+      units
+  
+    - Units being tested should not access external resources like
+      network, filesystem, databases.
+      
+  * Mocking provides one way of satisfying these requirements
+
+  * A Mock objects can be used to *simulate real objects*
+
+  * In a unit test, Mock objects are deliberately used in place of
+    real objects
+
+=== Simulating Objects
+
+  * Simulating an object with attributes
++
+[source,python]
+------
+>>> from mock import Mock
+>>> m = Mock(a=1, b=2)
+>>> m.a
+1
+>>> m.b
+2
+>>> m.b = 3
+>>> m.b
+3
+------
+
+=== Simulating Functions
+
+  * Simulating a function like object, returing a fixed value
++
+[source,python]
+-------
+>>> mfunc = Mock(return_value=10)
+>>> mfunc()
+10
+>>> mfunc()
+10
+-------
+
+=== Simulating Functions (Contd.)
+
+  * Simulating a function like object, returning a series of values
++
+[source,python]
+-------
+>>> mfunc = Mock(side_effect=["a", "b", "c"])
+>>> mfunc()
+'a'
+>>> mfunc()
+'b'
+>>> mfunc()
+'c'
+>>> mfunc()
+...
+StopIteration
+-------
+
+=== Simulating Functions (Contd.)
+
+  * Simulating a function like object, raising an exception
++
+[source,python]
+------
+>>> mfunc = Mock(side_effect=ValueError("test error"))
+>>> mfunc()
+...
+ValueError: test error
+------
+
+=== On the Fly, Attributes
+
+  * Object attribute assignment, creates attributes on the fly
++
+[source,python]
+------
+>>> m = Mock()
+>>> m.a = 10
+>>> print(m.a)
+10
+------
+
+=== On the Fly, Object Hierarchy
+
+  * Object attribute access, auto-creates Mock objects
++
+[source,python]
+------
+>>> m = Mock()
+>>> m.b
+<Mock ...>
+>>> m = Mock()
+>>> m.b.c = 30
+>>> m.b
+<Mock ...>
+>>> m.b.c
+30
+------
++
+  * Hierarchy of objects and attributes can be easily created
+
+=== On the Fly, Functions
+
+  * Turn any Mock object into a function like object by setting
+    `return_value` attribute
++
+[source,python]
+------
+>>> m = Mock()
+>>> m.func.return_value = 20
+>>> m.func()
+20
+------
+
+=== Call Tracking
+
+  * All calls made on Mock objects are captured and stored
++
+[source,python]
+------
+>>> mfunc = Mock(return_value=None)
+>>> mfunc(1, 2)
+>>> mfunc(2, 3)
+>>> mfunc.call_args_list
+[calls(1, 2), calls(2, 3)]
+------
+
+=== Asserting on Calls
+
+  * Helper methods to assert calls were made on the Mock object
+
+  * `assert_called_once_with()`, checks if *only one call* was made
+    with given arguments
++
+[source,python]
+------
+>>> mfunc = Mock(return_value=None)
+>>> mfunc(1, 2)
+>>> mfunc.assert_called_once_with(1, 2)
+>>> mfunc(2, 3)
+>>> mfunc.assert_called_once_with(1, 2)
+...
+AssertionError
+-------
+
+=== Asserting on Calls (Contd.)
+
+  * `assert_called_with()`, checks if the *last call* was made with
+    given arguments
++
+[source,python]
+-------
+>>> mfunc = Mock(return_value=None)
+>>> mfunc(1, 2)
+>>> mfunc(2, 3)
+>>> mfunc.assert_called_with(2, 3)
+>>> mfunc.assert_called_with(1, 2)
+...
+AssertionError
+-------
+
+=== Asserting on Calls (Contd.)
+
+  * `assert_any_call()`, checks if one of the calls was made with
+    given arguments
++
+[source,python]
+------
+>>> mfunc = Mock(return_value=None)
+>>> mfunc(1, 2)
+>>> mfunc(2, 3)
+>>> mfunc.assert_any_call(1, 2)
+>>> mfunc.assert_any_call(2, 3)
+------
+
+=== Asserting on Calls (Contd.)
+
+  * `assert_has_calls()`, checks if a list of calls were made
+  * A call is specified using a `call()` object
+
+[source,python]
+------
+>>> from mock import call
+>>> mfunc = Mock(return_value=None)
+>>> mfunc(1, 2)
+>>> mfunc(2, 3)
+>>> mfunc(4, 5)
+>>> mfunc.assert_has_calls([call(1, 2), call(2, 3)])
+>>> mfunc.assert_has_calls([call(2, 3), call(1, 2)])
+...
+AssertionError
+>>> mfunc.assert_has_calls([call(2, 3), call(1, 2)], any_order=True)
+------
+
+[role="two-column"]
+=== Testing GameEngine
+
+[role="left"]
+image::figures/game-engine.png[align="center"]
+
+[role="right"]
+  * `GameEngine` manipulates the `GameState` object
+
+  * Testing the `GameEngine` requires that we isolate it from
+    `GameState`
+
+  * `GameState` is simulated using a Mock object
+
+  * Assertions on the Mock object will be used to verify the
+    functionality of the `GameEngine`
+
+[role="two-column"]
+=== First Test Case
+
+[role="left"]
+image::figures/game-engine-test-1.png[width="50%",align="center"]
+
+[role="right"]
+  * *Arrange*
+    - Worker is in position `(1, 1)`
+    - Two tiles to the right are floors
+
+  * *Act*, User moves worker to the right
+
+  * *Assert*, Worker should be moved to `(2, 1)`
+
+=== Test Case Implementation
+
+[source,python]
+------
+include::code/test_controller_v1/test.py[]
+------
+
+[role="two-column"]
+=== Try Out
+
+[role="left"]
+image::figures/game-engine-test-2.png[width="50%",align="center"]
+
+[role="right"]
+  * Write a test case to verify that the worker cannot move into
+    a wall
+
+  * *Arrange*
+    - Worker is in position `(1, 1)`
+    - Two tiles to the right are walls
+
+  * *Act*, User moves worker to the right
+
+  * *Assert*, Worker should not be moved
 
 == Patching
 
