@@ -157,6 +157,46 @@ Say No to More End-to-End Tests]
 
 == Writing Unit Tests
 
+[role="two-column"]
+=== Sokoban
+
+[role="left"]
+image::figures/sokoban.png[align="center"]
+
+[role="right"]
+  * A puzzle game, where the player pushes boxes to docks
+  * Restrictions
+    - Boxes cannot be pulled
+    - Boxes cannot be pushed into walls or other boxes
+
+  * Under 400 lines of code, written using Pygame
+
+  * Will serve as base for practicing writing unit test cases
+
+[role="two-column"]
+=== Sokoban
+
+[role="left"]
+image::figures/sokoban.png[align="center"]
+
+[role="right"]
+  * First, let's try playing around with it
+
+  * You need to have `pygame` installed
+
+  * Download link:{include:sokoban.zip.datauri}["sokoban.zip",filename="sokoban.zip"]
+
+  * Extract and run the program
++
+------
+$ unzip sokoban.zip
+$ cd sokoban
+$ python -m sokoban.main
+------
++
+  * Arrow keys to move, `S` to skip to next level, `BACKSPACE` to
+    undo, `R` to reset
+
 === Unit Testing Frameworks
 
   * Unit testing frameworks provide then necessary infrastructure to
@@ -171,7 +211,162 @@ Say No to More End-to-End Tests]
     - `py.test`, popular third party framework
     - `nose2`, extends `unittest`, making nicer and easier
 
-=== Testing a Simple Function
+[role="two-column"]
+=== Sokoban Levels
+
+[role="left"]
+[source,python]
+------
+include::code/test_sokoban_v1.py[]
+------
+
+[role="right"]
+  * A level is represented as a list of strings.
+  * Corresponding graphical representation
++
+image::figures/sokoban-level-example.png[]
++
+  * The `World` class parses the given level, and sets
+    up its attributes
+
+=== Try Out
+
+  * Go to the top level folder (the one that contains the `README` file)
+
+  * Create `test_sokoban.py`, with the code from previous slide
+
+  * Execute and verify the output
+
+=== Writing a Test Case
+
+[source,python]
+------
+include::code/test_sokoban_v2.py[]
+------
+
+=== Try Out
+
+  * Update `test_sokoban.py` with the code from the previous slide
+
+  * Invoke `python -m unittest discover`
+    - Discovers all files starting with `test_`
+    - Looks for classes derived from `unittest.TestCase`
+    - Executes the tests in the class
+    - Records and prints the results
+
+  * Change the assertion of `ncols` to `self.assertEqual(world.ncols,
+    8)` causing it to fail, and observe the output of `python -m
+    unittest discover`
+
+=== Unit Tests Improved
+
+  * Tests to verify the other attributes are added in
+    link:{include:code/test_sokoban_v3.py.datauri}["version 3 of
+    test_sokoban.py",filename="test_sokoban.py"]
+
+  * Each test only verifies on behaviour
+
+  * Test functions are named verbosely to indicate what is being tested
+
+=== Unit Tests Improved (Contd.)
+
+  * link:{include:code/test_sokoban_v4.py.datauri}["Version 4 of
+    test_sokoban.py",filename="test_sokoban.py"] adds the following
+    tests
+
+    - Tests to verify dimensions is correctly reported in a
+      non-rectangular world
+
+    - Tests to verify positions are correctly reported when there are
+      multiple docks and boxes
+
+=== Assert Raises Exception
+
+  * A `LevelInvalidError` is thrown
+    - When an invalid character is present
+    - Or when the worker is missing
+    - Or when the number of boxes and docks do not match
+    - Or when the no. of boxes is zero
+
+=== Assert Raises Exception (Contd.)
+
+  * `assertRaises` can be used to verify that an exception was raised
++
+------
+assertRaises(exception, func, *args)
+------
++
+ 
+  * `assertRaises` calls `func` is called with `args`, and verifies
+    that `exception` was raised
+
+  * Example:
++
+------
+self.assertRaises(LevelInvalidError, World, level)
+------
+
+=== Assert Raises Exception (Contd.)
+
+  * `assertRaisesRegexp` in addition can verify that string
+    representation of raised exception matches a regex
++
+------
+assertRaisesRegexp(exception, regex, func, *args)
+------
+
+  * link:{include:code/test_sokoban_v5.py.datauri}["Version 5 of
+    test_sokoban.py",filename="test_sokoban.py"] adds test cases to
+    verify the exceptions
+
+=== Try Out
+
+  * Try adding a test case to verify that an exception is raised, when
+    there is mismatch in the no. of boxes and docks
+
+=== Quering Tile at Position
+
+  * The `World` object has a `get()` method, to query the current tile
+    at a give (x, y) position
+
+  * `get()` method returns one of
+    - `Tile.WALL`
+    - `Tile.FLOOR`
+    - `Tile.DOCK`
+    - `Tile.BOX`
+    - `Tile.WORKER`
+    - `Tile.BOX_DOCKED`
+
+[role="two-column"]
+=== Tracking Game State
+
+[role="left"]
+image::figures/game-state.png[align="center"]
+
+[role="right"]
+  * The current state of the game is represented by `sokoban.model.GameState`
+
+  * `GameState` has two attributes
+    - `world`
+    - `moves`
+
+  * `world` is a `World` object that represents the position of the
+    tiles
+
+  * `moves` is a stack that stores previous `world` states
+
+[role="two-column"]
+=== Tracking Game State
+
+[role="left"]
+image::figures/game-state.png[align="center"]
+
+[role="right"]
+  * When user moves the worker, a 'copy' of `world` is stored in
+    `moves` and `world` is modified
+
+  * The `moves` stack is used for getting previous `World` objects,
+    for implementing undos and reset
 
 == Mocking
 
