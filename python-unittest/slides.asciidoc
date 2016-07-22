@@ -185,13 +185,13 @@ image::figures/sokoban.png[align="center"]
 
   * You need to have `pygame` installed
 
-  * Download link:{include:sokoban.zip.datauri}["sokoban.zip",filename="sokoban.zip"]
+  * Download link:{include:game.zip.datauri}["game.zip",filename="game.zip"]
 
   * Extract and run the program
 +
 ------
-$ unzip sokoban.zip
-$ cd sokoban
+$ unzip game.zip
+$ cd game
 $ python -m sokoban.main
 ------
 +
