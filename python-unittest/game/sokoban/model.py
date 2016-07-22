@@ -10,7 +10,7 @@ class LevelInvalidError(Exception):
 class GameState:
     def __init__(self, level):
         self.world = World(level)
-        self.moves = []
+        self.history = []
 
 
 class World:

@@ -18,7 +18,7 @@ class GameEngine:
         saved_world = state.world.copy()
         moved = self._move(direction, state.world)
         if moved:
-            state.moves.append(saved_world)
+            state.history.append(saved_world)
 
     def _move(self, direction, world):
         x, y = world.worker_pos
@@ -56,14 +56,14 @@ class GameEngine:
 
     def undo(self, state):
         try:
-            state.world = state.moves.pop()
+            state.world = state.history.pop()
         except IndexError:
             pass
 
     def reset(self, state):
         try:
             while True:
-                state.world = state.moves.pop()
+                state.world = state.history.pop()
         except IndexError:
             pass
 

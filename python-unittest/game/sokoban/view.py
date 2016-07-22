@@ -28,20 +28,20 @@ class GameView:
 
         self._screen = self.gl.resize(self._width, self._height)
 
-    def _draw_status_line(self, world, moves):
+    def _draw_status_line(self, world, history):
         x = 0
         y = (world.nrows * self._tile_size)
         img, _ = self.gl.render_string("MOVES  PUSHES")
         self.gl.draw_image(self._screen, x, y, img)
 
         y += self._get_line_height()
-        img, _ = self.gl.render_string(" {0:04}     {1:04}".format(len(moves), world.pushes))
+        img, _ = self.gl.render_string(" {0:04}     {1:04}".format(len(history), world.pushes))
         self.gl.draw_image(self._screen, x, y, img)
 
     def show(self, state):
         self.gl.clear(self._screen)
         world = state.world
-        moves = state.moves
+        history = state.history
 
         for y in range(world.nrows):
             for x in range(world.ncols):
@@ -54,7 +54,7 @@ class GameView:
                 img = self._images[tile]
                 self.gl.draw_image(self._screen, sx, sy, img)
 
-        self._draw_status_line(world, moves)
+        self._draw_status_line(world, history)
         self.gl.update(self._screen)
                 
     def show_msgbox(self, text):

@@ -1368,7 +1368,7 @@
         <dia:point val="13,5"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="13,4.265;15.175,5.1875"/>
+        <dia:rectangle val="13,4.2675;15.175,5.1875"/>
       </dia:attribute>
       <dia:attribute name="text">
         <dia:composite type="text">
@@ -1481,12 +1481,12 @@
         <dia:point val="25,5"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="25,4.265;27.6175,5.1875"/>
+        <dia:rectangle val="25,4.2445;27.7405,5.2335"/>
       </dia:attribute>
       <dia:attribute name="text">
         <dia:composite type="text">
           <dia:attribute name="string">
-            <dia:string>#moves#</dia:string>
+            <dia:string>#history#</dia:string>
           </dia:attribute>
           <dia:attribute name="font">
             <dia:font family="sans" style="0" name="Helvetica"/>
@@ -2594,7 +2594,7 @@
         <dia:point val="11,2"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="11,1.24194;15.4681,2.23362"/>
+        <dia:rectangle val="11,1.2675;15.445,2.1875"/>
       </dia:attribute>
       <dia:attribute name="text">
         <dia:composite type="text">
