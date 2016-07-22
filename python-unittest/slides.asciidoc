@@ -218,7 +218,7 @@ $ python -m sokoban.main
 [role="left"]
 [source,python]
 ------
-include::code/test_sokoban_v1.py[]
+include::code/test_model_v1.py[]
 ------
 
 [role="right"]
@@ -234,7 +234,7 @@ image::figures/sokoban-level-example.png[]
 
   * Go to the top level folder (the one that contains the `README` file)
 
-  * Create `test_sokoban.py`, with the code from previous slide
+  * Create `test_model.py`, with the code from previous slide
 
   * Execute and verify the output
 
@@ -242,12 +242,12 @@ image::figures/sokoban-level-example.png[]
 
 [source,python]
 ------
-include::code/test_sokoban_v2.py[]
+include::code/test_model_v2.py[]
 ------
 
 === Try Out
 
-  * Update `test_sokoban.py` with the code from the previous slide
+  * Update `test_model.py` with the code from the previous slide
 
   * Invoke `python -m unittest discover`
     - Discovers all files starting with `test_`
@@ -261,25 +261,41 @@ include::code/test_sokoban_v2.py[]
 
 === Unit Tests Improved
 
-  * Tests to verify the other attributes are added in
-    link:{include:code/test_sokoban_v3.py.datauri}["version 3 of
-    test_sokoban.py",filename="test_sokoban.py"]
-
+  * Add tests to verify the other attributes.
++
+[source,python]
+------
+include::code/test_model_v3/tests.py[]
+------
++
   * Each test only verifies on behaviour
 
   * Test functions are named verbosely to indicate what is being tested
 
 === Unit Tests Improved (Contd.)
 
-  * link:{include:code/test_sokoban_v4.py.datauri}["Version 4 of
-    test_sokoban.py",filename="test_sokoban.py"] adds the following
-    tests
+  * Tests to verify dimensions is correctly reported in a
+    non-rectangular world
 
-    - Tests to verify dimensions is correctly reported in a
-      non-rectangular world
+  * Tests to verify positions are correctly reported when there are
+    multiple docks and boxes
 
-    - Tests to verify positions are correctly reported when there are
-      multiple docks and boxes
+  * Add a level variant, with non-rectangular border and multiple
+    docks and boxes
++
+[source,python]
+------
+include::code/test_model_v4/level.py[]
+------
+
+=== Unit Tests Improved (Contd.)
+
+  * Add tests to verify the behaviour using the level variant
++
+[source,python]
+------
+include::code/test_model_v4/tests.py[]
+------
 
 === Assert Raises Exception
 
@@ -316,8 +332,8 @@ self.assertRaises(LevelInvalidError, World, level)
 assertRaisesRegexp(exception, regex, func, *args)
 ------
 
-  * link:{include:code/test_sokoban_v5.py.datauri}["Version 5 of
-    test_sokoban.py",filename="test_sokoban.py"] adds test cases to
+  * link:{include:code/test_model_v5.py.datauri}["Version 5 of
+    test_model.py",filename="test_model.py"] adds test cases to
     verify the exceptions
 
 === Try Out
