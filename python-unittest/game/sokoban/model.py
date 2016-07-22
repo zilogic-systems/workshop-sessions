@@ -1,4 +1,6 @@
 from .utils import Tile
+from copy import deepcopy
+from copy import copy
 
 
 class LevelInvalidError(Exception):
@@ -12,7 +14,7 @@ class GameState:
 
 
 class World:
-    def __init__(self, level):
+    def __init__(self, level=None):
         self._map = []
         self.worker_pos = None
         self.box_pos = set()
@@ -20,7 +22,9 @@ class World:
         self.nrows = 0
         self.ncols = 0
         self.pushes = 0
-        self._parse(level)
+
+        if level is not None:
+            self._parse(level)
 
     def _parse(self, level):
         self._map = []
@@ -92,3 +96,22 @@ class World:
                 return self._map[y][x]
             except IndexError:
                 return None
+
+    def push_box(self, from_pos, to_pos):
+        self.box_pos.remove(from_pos)
+        self.box_pos.add(to_pos)
+        self.pushes += 1
+
+    def move_worker(self, to_pos):
+        self.worker_pos = to_pos
+
+    def copy(self):
+        new_world = World()
+        new_world._map = deepcopy(self._map)
+        new_world.worker_pos = self.worker_pos
+        new_world.box_pos = copy(self.box_pos)
+        new_world.dock_pos = copy(self.dock_pos)
+        new_world.nrows = self.nrows
+        new_world.ncols = self.ncols
+        new_world.pushes = self.pushes
+        return new_world

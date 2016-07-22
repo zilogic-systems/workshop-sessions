@@ -1,7 +1,5 @@
-import copy
 import sys
 import time
-
 
 from .model import GameState
 from .utils import Tile
@@ -16,13 +14,8 @@ class GameEngine:
     def _is_box(self, tile):
         return tile in (Tile.BOX, Tile.BOX_DOCKED)
 
-    def _push_box(self, world, from_pos, to_pos):
-        world.box_pos.remove(from_pos)
-        world.box_pos.add(to_pos)
-        world.pushes += 1    
-
     def move(self, direction, state):
-        saved_world = copy.deepcopy(state.world)
+        saved_world = state.world.copy()
         moved = self._move(direction, state.world)
         if moved:
             state.moves.append(saved_world)
@@ -52,13 +45,13 @@ class GameEngine:
             return False
         elif self._is_box(next_tile):
             if self._is_floor(push_tile):
-                self._push_box(world, next_pos, push_pos)
-                world.worker_pos = next_pos
+                world.push_box(next_pos, push_pos)
+                world.move_worker(next_pos)
                 return True
             else:
                 return False
         elif self._is_floor(next_tile):
-            world.worker_pos = next_pos
+            world.move_worker(next_pos)
             return True
 
     def undo(self, state):
