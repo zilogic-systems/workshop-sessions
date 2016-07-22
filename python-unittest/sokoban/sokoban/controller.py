@@ -63,7 +63,7 @@ class GameEngine:
 
     def undo(self, state):
         try:
-            state.world = moves.pop()
+            state.world = state.moves.pop()
         except IndexError:
             pass
 
