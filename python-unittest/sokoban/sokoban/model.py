@@ -1,6 +1,10 @@
 from .utils import Tile
 
 
+class LevelInvalidError(Exception):
+    pass
+
+
 class GameState:
     def __init__(self, level):
         self.world = World(level)
@@ -53,13 +57,25 @@ class World:
                 elif tile == ' ':
                     tile = Tile.FLOOR
 
-                else:
+                elif tile == '\n':
                     continue
+
+                else:
+                    msg = "character not recognized {0}".format(tile)
+                    raise LevelInvalidError(msg)
 
                 row.append(tile)
 
             self._map.append(row)
 
+        if self.worker_pos is None:
+            raise LevelInvalidError("worker not found")
+
+        if len(self.dock_pos) != len(self.box_pos):
+            raise LevelInvalidError("boxes and docks count mismatch")
+
+        if len(self.box_pos) is 0:
+            raise LevelInvalidError("boxes not found")
         self.nrows = len(self._map)
         self.ncols = max(map(len, self._map))
 
