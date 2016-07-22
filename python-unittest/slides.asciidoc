@@ -654,6 +654,36 @@ image::figures/game-engine.png[align="center"]
     functionality of the `GameEngine`
 
 [role="two-column"]
+=== Review of Object Methods
+
+[role="left"]
+------
+class GameEngine:
+    def move():
+        ...
+	
+    def undo():
+        ...
+	
+    def reset():
+        ...
+------
+
+[role="right"]
+------
+.
+
+class World:
+    def move_worker():
+        ...
+
+    def push_box():
+        ...
+
+
+------
+
+[role="two-column"]
 === First Test Case
 
 [role="left"]
