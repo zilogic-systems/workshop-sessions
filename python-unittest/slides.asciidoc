@@ -71,7 +71,8 @@ ______
     - Input data through the UI
     - Check program's response
 
-  * Tests done this way automated or manual is called E2E Testing
+  * Tests done this way automated or manual is called End-to-End
+    Testing
 
   * E2E Testing is required but not sufficient
 
@@ -369,6 +370,8 @@ image::figures/game-state.png[align="center"]
     for implementing undos and reset
 
 == Mocking
+
+
 
 == Patching
 
