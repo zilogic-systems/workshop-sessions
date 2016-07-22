@@ -259,20 +259,20 @@ include::code/test_model_v2.py[]
     8)` causing it to fail, and observe the output of `python -m
     unittest discover`
 
-=== Unit Tests Improved
+=== One Logical Concept Per Test
 
-  * Add tests to verify the other attributes.
+  * Tests to verify the other attributes.
 +
 [source,python]
 ------
 include::code/test_model_v3/tests.py[]
 ------
 +
-  * Each test only verifies on behaviour
+  * Each test only verifies one logical concept
 
   * Test functions are named verbosely to indicate what is being tested
 
-=== Unit Tests Improved (Contd.)
+=== Increasing Coverage
 
   * Tests to verify dimensions is correctly reported in a
     non-rectangular world
@@ -288,10 +288,8 @@ include::code/test_model_v3/tests.py[]
 include::code/test_model_v4/level.py[]
 ------
 
-=== Unit Tests Improved (Contd.)
+=== Increasing Coverage (Contd.)
 
-  * Add tests to verify the behaviour using the level variant
-+
 [source,python]
 ------
 include::code/test_model_v4/tests.py[]
@@ -313,17 +311,15 @@ include::code/test_model_v4/tests.py[]
 assertRaises(exception, func, *args)
 ------
 +
- 
-  * `assertRaises` calls `func` is called with `args`, and verifies
-    that `exception` was raised
-
-  * Example:
+  * Verify that `LevelInvalidError` is raised when an invalid
+    character is present
 +
+[source,python]
 ------
-self.assertRaises(LevelInvalidError, World, level)
+include::code/test_model_v5/test1.py[]
 ------
 
-=== Assert Raises Exception (Contd.)
+=== Assert Raises with Regex Match
 
   * `assertRaisesRegexp` in addition can verify that string
     representation of raised exception matches a regex
@@ -331,10 +327,24 @@ self.assertRaises(LevelInvalidError, World, level)
 ------
 assertRaisesRegexp(exception, regex, func, *args)
 ------
++
+  * Test case modified to use `assertRaisesRegexp()`
++
+[source,python]
+------
+include::code/test_model_v5/test2.py[]
+------
 
-  * link:{include:code/test_model_v5.py.datauri}["Version 5 of
-    test_model.py",filename="test_model.py"] adds test cases to
-    verify the exceptions
+=== Assert Raises with Regex Match (Contd.)
+
+  * Verify that `LevelInvalidError` is raised when no worker is
+    present
++
+[source,python]
+------
+include::code/test_model_v5/test3.py[]
+------
+
 
 === Try Out
 

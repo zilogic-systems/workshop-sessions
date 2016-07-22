@@ -9,7 +9,7 @@ datauris = game.zip.datauri             \
 	   code/test_model_v4.py.datauri \
            code/test_model_v5.py.datauri
 
-all: test_model_v3-split test_model_v4-split slides.html
+all: test_model_v3-split test_model_v4-split test_model_v5-split slides.html
 
 game.zip:
 	zip -r $@ game
@@ -25,6 +25,9 @@ test_model_v3-split:
 
 test_model_v4-split:
 	python $(TOPDIR)/scripts/split.py code/test_model_v4.py
+
+test_model_v5-split:
+	python $(TOPDIR)/scripts/split.py code/test_model_v5.py
 
 slides.html: $(images_png) $(datauris)
 

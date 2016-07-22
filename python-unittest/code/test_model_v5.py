@@ -42,24 +42,34 @@ class WorldTestCase(TestCase):
         self.assertEqual(world.box_pos, {(2, 1), (2, 2)})
         self.assertEqual(world.dock_pos, {(1, 1), (1, 2)})
 
+### START: test1.py
     def test_invalid_character_error(self):
         level = [
             "########!",
             "#.$     #",
             "#########",
         ]
+        self.assertRaises(LevelInvalidError, World, level)
+### END: test1.py
 
-        self.assertRaisesRegex(LevelInvalidError, "character", World, level)
+### START: test2.py
+    def test_invalid_character_error(self):
+        level = [
+            "########!",
+            "#.$     #",
+            "#########",
+        ]
+        self.assertRaisesRegex(LevelInvalidError, "character",
+                               World, level)
+### END: test2.py
 
+### START: test3.py
     def test_no_worker_error(self):
         level = [
             "#########",
             "#.$     #",
             "#########",
         ]
-
-        self.assertRaises(LevelInvalidError, "worker", World, level)
-
-
-
-                         
+        self.assertRaisesRegex(LevelInvalidError, "worker",
+                               World, level)
+### END: test3.py
