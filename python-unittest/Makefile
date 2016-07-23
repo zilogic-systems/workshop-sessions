@@ -51,5 +51,6 @@ clean:
 distclean: clean
 	find . -name "*.pyc" -delete
 	find . -name "*~" -delete
+	find . -name "*.ttf" -delete
 
 include $(TOPDIR)/stylesheets/Makefile.rules
