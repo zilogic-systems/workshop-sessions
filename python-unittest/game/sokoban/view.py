@@ -105,8 +105,10 @@ class PyGameGL:
         }
         self._font = pygame.font.Font("atari.ttf", 12)
 
+    ### START: resize.py
     def resize(self, width, height):
         return pygame.display.set_mode((width, height))
+    ### END: resize.py
 
     def load_tile(self, tile):
         tile_name = self._tile_map[tile]
@@ -125,6 +127,7 @@ class PyGameGL:
     def update(self, screen):
         pygame.display.flip()
 
+    ### START: read-key.py
     def read_key(self):
         event = pygame.event.wait()
         if event.type == pygame.QUIT:
@@ -134,3 +137,4 @@ class PyGameGL:
                 return self._key_map[event.key]
             except KeyError:
                 return None
+    ### END: read-key.py

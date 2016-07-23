@@ -1,5 +1,6 @@
 = Unit Testing with Python
 Zilogic Systems
+:data-uri:
 
 == Introduction
 
@@ -636,6 +637,10 @@ AssertionError
 >>> mfunc.assert_has_calls([call(2, 3), call(1, 2)], any_order=True)
 ------
 
+=== Spec-ing
+
+FIXME
+
 [role="two-column"]
 === Testing GameEngine
 
@@ -724,6 +729,129 @@ image::figures/game-engine-test-2.png[width="50%",align="center"]
   * *Assert*, Worker should not be moved
 
 == Patching
+
+=== Testing the View 
+
+  * View layer of Sokoban is written in Pygame
+
+  * `PyGameGL` object is where all access to Pygame is done
+
+  * `PyGameGL` has a method `resize()` to set the display size
++
+[source,python]
+------
+include::code/view/resize.py[]
+------
+
+=== Testing the View (Contd.)
+
+  * Unit testing best practices suggest that the `pygame` should be
+    isolated, while testing `resize()`
+
+  * `pygame` is not passed into the function as argument
+
+  * If it were passed in as argument, we could pass in a Mock object
+    for purpose of testing
+
+  * How do we replace `pygame` with a Mock Object?
+
+=== Enter Monkey Patching
+
+  * Monkey patch is a piece of code, which extends or modifies other
+    code at runtime
++
+[source,python]
+------
+>>> import sokoban.view
+>>> sokoban.view.pygame
+<module ...>
+>>> mpygame = Mock()
+>>> sokoban.view.pygame = mpygame
+------
++
+  * With this patch in place, all the accesses to `pygame`, within the
+    `view` module will receive our Mock object
+
+=== Verifying the Patch
+
+  * Let's verify that our Mock object is indeed, being used, within `view`
++
+[source,python]
+------
+>>> gl = sokoban.view.PyGameGL()
+>>> gl.resize(20, 30)
+>>> mpygame.display.set_mode.call_args_list
+[call((20, 30))]
+------
++
+  * This proves that the `set_mode()` was infact called on the Mock
+    object we patched into `pygame`
+
+=== Managing the Patch
+
+  * A patch should be reverted when longer required
+
+  * Forgetting to revert the patch will affect the functionality of
+    the patched code
+
+  * Patching for unit testing, should be restricted to the duration of
+    execution of the test
+
+    - Install the patch
+    - Run the test
+    - Revert the patch
+
+  * `mock` module provides convient helpers for this purpose
+
+=== Using `patch()`
+
+  * `patch()` should be provided the target to be patched
+  * Target is specified as a string, of the form `package.module.name` 
+  * `.start()` patches the target with a mock object, and returns it
+  * `.stop()` restores the original object
+
+[source,python]
+------
+>>> patcher = patch("sokoban.view.pygame")
+>>> mpygame = patcher.start()
+>>> import sokoban.view
+>>> sokoban.view.pygame
+<MagicMock ...>
+>>> patcher.stop()
+>>> sokoban.view.pygame
+<module ...>
+------
+
+=== Patching Custom Object
+
+  * A custom object to be patched, can be provided as argument.
++
+[source,python]
+------
+>>> mpygame = Mock()
+>>> patcher = patch("sokoban.view.pygame", mpygame)
+------
+
+=== Patch as Decorator
+
+  * `patch()` can be used as a decorator on a function
+  * The patched Mock object is passed as argument to the function
+  * Patch is applied when the test function is called
+  * Patch is reverted when the test function returns
++
+[source,python]
+------
+@patch("sokoban.view.pygame")
+def test_func(self, mpygame):
+    ...
+------
+
+=== Test Case Implementation
+
+[source,python]
+-------
+include::code/test_view_v1.py[]
+-------
 
 == Faking
 
