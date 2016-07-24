@@ -92,6 +92,7 @@ class PyGameGL:
             Tile.DOCK: "dock",
             Tile.FLOOR: "floor",
         }
+        ### START: key-map.py
         self._key_map = {
             pygame.K_UP: Key.UP,
             pygame.K_LEFT: Key.LEFT,
@@ -103,6 +104,7 @@ class PyGameGL:
             pygame.K_SPACE: Key.OK,
             pygame.K_r: Key.RESET,
         }
+        ### END: key-map.py
         self._font = pygame.font.Font("atari.ttf", 12)
 
     ### START: resize.py
