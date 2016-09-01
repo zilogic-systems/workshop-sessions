@@ -1,0 +1,354 @@
+= Debugging the Device Tree Issues
+
+== Linux Kernel Debugging
+
+=== Debug Infrastructures
+
+* Linux provides varied infrastructure within itself to debug and
+  analyze the kernel issues.
+
+* Without any external hw debugger it is possible that Linux kernel
+  could debugged to an extent.
+
+== Debugging no bootlog issue using Logbuf
+
+=== Kernel Log Buffer
+
+* The kernel printks are stored in a circular ring buffer called log
+  buffer.
+
+* The kernel log buffer can be accessed through `/proc/kmsg`, and
+  `dmesg` command does prints the messages from this.
+
+* Kernel bootlogs are also printed to the console, which has been set
+  through the kernel boot argument `"console=<tty>"`
+
+=== Kernel Log Buffer (2)
+
+* If the kernel has a early boot issue or problem in serial driver, we
+  may not see the bootlog in the console.
+
+* Even if the kernel bootlog is not printed in console, they may be
+  available in the kernel log buffer.
+
+* By accessing the kernel log buffer it is possible to debug the early
+  boot issues.
+
+=== Kernel Log Buffer Size
+
+* If the size of the log buffer is less, it may get overrun soon by
+  the kernel messages, The size of the log buffer can be obtained from
+  CONFIG_LOG_BUF_SHIFT configuration.
+
+-----
+PC$ cd ~/linux
+PC$ grep CONFIG_LOGBUF_SHIFT .config
+CONFIG_LOG_BUF_SHIFT=14
+-----
+
+* The log buf size is 2 ^ 14 which is 16K, which can be modified by
+  menuconfig.
+
+=== Kernel Log Buffer Size (2)
+
+* The logbuffer size can also be modified through kernel boot argument
+  `log_buf_len=<size>`
+
+-----
+u-boot> setenv bootargs $bootargs log_buf_len=1M
+u-boot> boot
+-----
+
+=== Retreiving Log Buffer Address
+
+* Since the logbuffer is available in external SDRAM, it can be
+  retreived after a warm reset of the CPU from the bootloader.
+
+* To access the log buffer we may need to know the address of it,
+  which can be obtained from the Linker Map file.
+
+* Linker Map file `System.map` is available in the Linux build folder
+  and which has the virtual address of the log buffer.
+
+------
+PC$ grep __log_buf System.map
+c0652b18 b __log_buf
+------
+
+=== Retreiving Log Buffer Address (2)
+    
+* __log_buf is a character array of size (1 < CONFIG_LOG_BUS_SHIFT),
+  which holds the log messages and log_buf is the pointer which
+  points to the __log_buf array.
+
+----
+#define __LOG_BUF_LEN (1 << CONFIG_LOG_BUF_SHIFT)
+char __log_buf[__LOG_BUF_LEN];
+char *log_buf = __log_buf;
+----
+
+* if the log_buf_len is modified then it is allocated dynamically and
+  the newly allocated log buffer can be accessed using address
+  available in the __log_buf.
+
+------
+PC$ grep log_buf System.map
+c0613a94 d log_buf
+------
+
+=== Accessing the Log Bufer from U-Boot
+
+* After a warm reset of the CPU, using below command in the qemu
+  monitor, we can access the log buf content through u-boot.
+
+-----
+(qemu) system_reset
+-----
+
+* To access log buffer we may need to find the physical address,
+  kernel System.map providdes virtual address and U-Boot works
+  directly through physical address.
+
+* Linux maps the physical address of a portion of memory which kernel
+  text and data segment, to a virtual memory using a static mapping.
+
+* Ex: Physical ram base `0xA0000000` would be mapped to virtual address
+  `0xC0000000 (CONFIG_PAGE_OFFSET)`
+
+=== Accessing the Log Bufer from U-Boot (2)
+
+* The __log_buf can be accessed as
+  
+----
+u-boot> md 0xa0652b18
+----
+
+* if the log_buf_len is passed with higher memory size than
+  CONFIG_LOG_BUF_SHIFT, then we need to access the __log_bug and
+  obtain the address of the dynamically allocated log_buffer
+
+=== Accessing the Log Bufer from U-Boot (3)
+
+----
+u-boot> md 0xa0613a94
+a0613a94: c3ceb000 c28eff60 c28eff60 00000001    ....`...`.......
+a0613aa4: c0613aa4 c0613aa4 00000001 c0613ab0    .:a..:a......:a.
+----
+
+----
+u-boot> md 0xa3ceb000
+$ md 0xa3ceb000
+a3ceb000: 00000000 00000000 00210038 c6000000    ........8.!.....
+a3ceb010: 746f6f42 20676e69 756e694c 6e6f2078    Booting Linux on
+a3ceb020: 79687020 61636973 5043206c 78302055     physical CPU 0x
+a3ceb030: 00000030 00000000 00000000 00000000    0...............
+a3ceb040: 00a800b8 a6000000 756e694c 65762078    ........Linux ve
+a3ceb050: 6f697372 2e34206e 2d302e37 30303030    rsion 4.7.0-0000
+----
+
+=== Debugging the Initcall Sequence
+
+* To check whether initcall of module has happened and when it had
+  happened, in kernel we can enable the initcall logging.
+
+* In kernel boot argument if we add "initcall_debug", then kernel
+  would print all the init modules in their invocation order.
+
+* Boot the board and try 
+
+-----
+u-boot> setenv bootargs $bootargs initcall_debug log_buf_len=1M
+u-boot> boot
+-----
+
+* In the Linux kernel you can check the initcall sequence by 
+
+-----
+Target$ dmesg | grep initcall
+-----
+
+=== Timed Printks 
+
+* If we want to know the time of invocation of initcalls, we can
+  enable timed printks which prints time along with the text.
+
+* This feature has to be enabled in kernel configuration, by enabling
+  CONFIG_PRINTK_TIME
+
+* Which can be enabled or disabled using kernel boot argument as shown
+  below
+
+----
+u-boot> setenv bootargs $bootargs printk.time=y
+----
+
+=== Enabling Debug Prints 
+
+* In Linux kernel several debug prints from modules are disabled using
+  conditional compilations, which can be enabled when kernel is
+  compiled with DEBUG option in the required subsystem.
+
+* Even through certain prints are enabled through compile time, it is
+  possible to get it bypassed from printing, by changing boot-time
+  flags when dynamic debugging is enabled.
+
+* Most of the drivers use kernel's common debug api to print debug
+  messages.
+  - pr_xxx() which are used for printing in generic drivers
+  - dev_xxx() which are used in drivers associated with devices
+
+=== Dynamic Prints
+
+* When debug is enabled at top level we would get lot if debug
+  messages printed and it would be tough search the required messages.
+
+* Dynamic debugging allows to enable debug prints for certain files
+  and specific function in a file dynamically.
+
+=== Dyn Debugging Queries
+
+* The syntax for enabling or disabling dynamic prints is
+
+----
+<keyword> <argument> <operator><flags>
+----
+
+* Below example would enables debug printing in file x.c
+
+----
+file x.c +p
+----
+
+=== Dyn Debugging Queries
+
+* Supported keywords are
+
+  - `file`
+  - `func`
+  - `module`
+  - `format`
+  - `line`
+
+* Arguments are string representing filename or function name or line
+  number based on keyword.
+
+=== Dyn Debugging Queries
+
+* Operator allows to operate on the flags
+
+  - `-` remove the given flags
+  - `+` add the given flags
+  - `=` set the flags to the given flags
+
+=== Dyn Debugging Queries
+
+* Supported flags are 
+
+  - `p` enables the pr_debug() callsite.
+  - `f` include the function name in the printed message
+  - `l` include line number in the printed message
+  - `m` include module name in the printed message
+  - `t` include thread ID in messages not generated from interrupt context
+  - `_` no flags are set. (Or'd with others on input)
+
+=== Enabling Dyn Debugging in Boot 
+
+* To enable dynamic debugging in bootup the debugging queries can be
+  passed through kernel boot arguments
+
+----
+u-boot> setenv bootargs $bootargs dyndbg="file x.c +p"
+----
+
+=== Debugging through Sysfs
+
+* The device and driver binding can be debugged using sysfs
+
+* In `/sys/bus/platform/devices`, we can find whether the platform
+  devices got populated.
+
+----
+$ ls /sys/bus/platform/devices/4000300.ethernet/
+driver
+----
+
+=== Debugging through Sysfs (2)
+
+* In `/sys/bus/platform/drivers`, we can find whether the platform
+  drivers got loaded into kernel
+
+----
+$ ls /sys/bus/platform/drivers/smc91x/
+4000300.ethernet/
+----
+
+* In devices folder, if find link to the driver or vice versa, we can
+  conclude that the device and drivers are bound.
+
+=== Debugging through Debugfs
+
+* Kernel provides debug filesystem using which it is possible that
+  user can query frameworks and drivers
+
+----
+$ mount -t debugfs none /sys/kernel/debug
+----
+
+* To query any specific information from the drivers we can cat the
+  files under driver folder.
+
+=== Debugging through Debugfs (2)
+
+* Below example shows querying the IO information from mmc subsystem
+
+----
+$ cat /sys/kernel/debug/mmc0/ios
+clock:		0 Hz
+vdd:		  0 (invalid)
+bus mode:	  2 (push-pull)
+chip select:	  0 (don't care)
+power mode:	  0 (off)
+bus width:	  0 (1 bits)
+timing spec:	  0 (legacy)
+signal voltage:	  0 (3.30 V)
+driver type:	  0 (driver type B)
+----
+
+=== Debugging through Debugfs (3)
+
+* Below example shows querying the pinmux map for the i2c controller.
+
+----
+$ cat /sys/kernel/debug/pinctrl pinctrl-maps | grep -n i2c
+58:device 40301680.i2c
+65:device 40301680.i2c
+----
+
+----
+cat /sys/kernel/debug/pinctrl pinctrl-maps  
+
+device 40301680.i2c
+state default
+type MUX_GROUP (2)
+controlling device 40e00054.pinctrl
+group P117
+function SCL
+
+device 40301680.i2c
+state default
+type MUX_GROUP (2)
+controlling device 40e00054.pinctrl
+group P118
+function SDA
+----
+
+=== References
+
+* More details on initcall debugging can be obtained from
+  http://elinux.org/Initcall_Debug
+
+* Details on using debug apis can be found in
+  http://nairobi-embedded.org/printing_kernel_messages.html
+
+* Details on using dynamic debugging is available in
+  https://www.kernel.org/doc/Documentation/dynamic-debug-howto.txt
