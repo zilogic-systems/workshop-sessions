@@ -1,0 +1,139 @@
+= Qemu Introduction
+Zilogic Systems
+
+== Using the Emulator
+
+[role="two-column"]
+=== Qemu, Introduction
+
+[role="left"]
+image::figures/qemu.png[align="center"]
+
+[role="right"]
+  * Emulates a full system -- processor and peripherals
+
+  * Can emulate various architectures including x86, ARM, SPARC,
+    PowerPC
+
+  * Operating Systems like Linux and Windows can be run within the
+    emulated system
+
+  * Useful for testing and developing Embedded Systems
+
+  * Android emulator is a modified version of Qemu
+
+[role="two-column"]
+=== ARM Emulation
+
+[role="left"]
+image::figures/gumstix.jpg[align="center"]
+
+[role="right"]
+  * Supported ARM SoCs include Exynos4210, PXA255, PXA270, OMAP2420,
+    LM3S811
+
+  * PXA270 based Verdex board plus add-ons from Gumstix, will be used
+    for development
+
+=== Board Components
+
+  - SDRAM (128 MB)
+  - NOR Flash (32 MB)
+  - Serial Interface
+  - Ethernet Interface
+  - LCD Interface
+
+=== SDRAM Emulation
+
+image::figures/setup.png[align="center",width="50%"]
+
+Emulator allocates a portion of the host memory for emulating the
+target's RAM
+
+=== Flash Emulation
+
+image::figures/setup.png[align="center",width="50%"]
+    
+  * Since Flash is persistent, the emulator uses a file to store the
+    Flash contents
+
+  * When target reads from offset X in the Flash, the file content at
+    offset X is returned by the emulator
+
+  * When target writes to offset X in the Flash, the data is written
+    to offset X in the file by the emulator
+
+=== Serial Emulation
+
+image::figures/setup.png[align="center",width="50%"]
+
+  * Serial port is mapped to stdio of the emulator
+
+  * When target send a character through the UART, the character is
+    printed on the standard output by the emulator
+
+  * Any input given in the standard input of the emulator, is received
+    by the target on the UART
+
+=== Ethernet Emulation
+
+image::figures/setup.png[align="center",width="50%"]
+
+  * Qemu emulates an Ethernet network
+
+  * Emulator moves ethernet packets between the target and the host,
+    connecting them over an emulated ethernet network
+
+  * Qemu also runs a TFTP server and DHCP server on the host
+
+=== Ethernet Emulation (2)
+
+image::figures/setup.png[align="center",width="50%"]
+
+  * When the target requests for an IP address through DHCP, the DHCP
+    server responds with an IP address
+
+  * The TFTP server serves files from a specific directory: FIXME
+
+  * Files can be transfered into the target from the host using the
+    TFTP server
+
+=== LCD Emulation
+
+image::figures/setup.png[align="center",width="50%"]
+
+  * The target's display is emulated using a GUI window
+
+  * When the target updates the contents of the display, the
+    corresponding pixels on the GUI window, is updated by the emulator
+
+=== Memory Map
+
+image::figures/memory-map.png[align="center",width="40%"]
+
+=== Board Boot Sequence
+
+  * The PXA270 processor, on reset starts executing instructions from
+    `0x0`
+
+  * The NOR Flash is located at base address `0x0`
+
+  * U-Boot is located at offset `0x0` in the NOR Flash
+
+  * So on reset, the processor starts executing U-Boot
+
+  * U-Boot downloads the Kernel, Ramdisk and Device Tree Blob to RAM,
+    from the host, using TFTP
+
+  * U-Boot transfers control to the Kernel, and provides the location
+    of the Ramdisk and Device Tree Blob to the kernel
+
+== Credits
+
+=== Photo Credits
+
+  * Gumstix board photo is from
+    https://commons.wikimedia.org/wiki/File:Gumstix.agr.jpg
+
+  * Android Emulator screenshot is from
+    https://commons.wikimedia.org/wiki/File:Android_screenshot.png

@@ -1,0 +1,175 @@
+= The Linux Kernel
+Zilogic Systems
+
+== Development Process
+
+=== Kernel Sources
+
+  * The kernel sources can be obtained from http://kernel.org
+
+  * The mainline git repository of the Linux can be obtained using
++
+-------
+git clone git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git 
+-------
++
+  * Each subsystem maintainer has a separate tree
+
+  * Subsystem specific tree can be obtained from `MAINTAINERS`
+
+=== Kernel Development Process
+
+  * A new development cycle starts after a release of a stable kernel
+
+  * Version number is chosen for the next stable kernel, say 4.23
+
+  * Merge window is open for 2 weeks
+
+  * Maintainers submit feature additions for inclusion into the kernel
+
+  * At the close of the merge window, Linus releases `4.23-rc1`
+
+=== Kernel Development Process (Contd.)
+
+  * Over period of 6 - 10 weeks, only bugfixes can be submitted
+
+  * Linus releases an RC kernel every week
+
+  * Kernels are named `4.23-rc2`, `4.23-rc3`, and so on
+
+  * When the kernel is deemed sufficiently stable, Linux releases `4.23`
+
+=== Kernel Development Process (Contd.)
+
+  * A new development cycle starts for `4.24`
+
+  * Development of the stable kernel is passed on to the "stable
+    team", consisting of Greg KH
+
+  * Only bug fixes are accepted into the stable kernel
+
+  * Stable kernels are released 2 - 3 times a month
+
+  * Stable kernels are numbered `4.23.1`, `4.23.2`, etc.
+
+=== Kernel Versioning Scheme
+
+image::figures/kernel-releases.png[width="35%",align="center"]
+
+=== Try Out
+
+  * Pre-downloaded kernel for the workshop is available from
++
+------
+/usr/share/workshop/kp/linux-4.7.tar.xz
+------
++
+  * Copy the kernel to the home directory and extract the kernel
++
+------
+cp /usr/share/workshop/kp/linux-4.7.tar.xz .
+tar -x -f linux-4.7.tar.xz
+------
+
+=== Try Out
+
+  * The kernel needs to be patched with Gumstix Verdex support
++
+------
+cd linux-4.7
+patch -p1 < /usr/share/workshop/kp/verdex.patch
+------
+
+== Kernel Build
+
+=== Pre-build Check
+
+  * Tools required to build the kernel is specified in
+    `Documentation/Changes`
+
+  * Need to ensure that tools of required version is installed
+
+=== Toolchain
+
+  * Codesourcery's ARM cross toolchain is installed within the Vagrant
+    box
+
+  * Cross-compiler prefix: `arm-none-linux-gnueabi-`
+
+  * Will be used for cross-compiling the Linux kernel
+
+=== Kernel Configuration
+
+  * Configuring the kernel specifies
+
+    - what features are required
+    - what are not required
+    - what features are required as modules
+
+  * Pre-canned configurations are available and can be invoked using
+    `make` targets with `_defconfig` suffix
++
+------
+export ARCH=arm
+make verdex_dt_defconfig
+------
++
+  * Creates `.config` containing the selected configuration
+
+=== Kernel Build
+
+  * Command to build the kernel and the DTBs
++
+-----
+export CROSS_COMPILE=arm-none-linux-gnueabi-
+make -j4
+-----
++
+   * Command to build the uImage
++
+-----
+make uImage
+-----
+
+=== Try Out
+
+  * Build the kernel, DTBs and generate the uImage
+  * Verify that the kernel image is available from
+    `arch/arm/boot/uImage`
+  * Copy the kernel to `/tftpboot`
+  * Boot Qemu to verify that the kernel boots
+
+=== Kernel Configuration Changes
+
+  * The kernel displays a logo at bootup
+
+  * This can be changed to black and white by making following
+    configuration changes
++
+------
+Device Drivers > Graphics Support > Bootup Logo
+    [*]   Standard black and white Linux logo
+    [ ]   Standard 16-color Linux logo
+    [ ]   Standard 224-color Linux logo
+------
+
+=== Try Out
+
+  * Make the mentioned configuration changes
+
+  * Build, boot and verify that the configuration changes have taken
+    effect
+
+=== Clean Targets
+
+  * Sometimes it is required to do a clean build of the kernel
+
+  * There are various `make` targets to remove the generated files
+    from the source tree
+
+    - `clean`: Removes files generated as part of the build process
+    - `mrproper`: `clean` + remove `.config`
+    - `distclean`: `mrproper` + patch files + backup files
+
+  * Order of greater cleanliness 
+    - `distclean > mrproper > clean`

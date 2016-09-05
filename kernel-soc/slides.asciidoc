@@ -1,0 +1,30 @@
+= SoC Architecture
+Zilogic Systems
+
+== PXA Architecture
+
+=== Block Diagram v1
+
+image::figures/soc-v1.png[align="center"]
+
+=== Block Diagram v2
+
+image::figures/soc-v2.png[align="center"]
+
+=== Block Diagram v3
+
+image::figures/soc-v3.png[align="center"]
+
+=== Block Diagram v4
+
+image::figures/soc-v4.png[align="center"]
+
+=== Interrupt Tree
+
+image::figures/interrupt-tree.png[align="center",width="50%"]
+
+== Board Architecture
+
+=== Block Diagram
+
+image::figures/verdex.png[align="center"]
