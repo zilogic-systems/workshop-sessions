@@ -1,0 +1,53 @@
+/* ### START: full */
+/dts-v1/;
+
+/ {
+	aliases {
+		myplanet = &earth;
+		mymoon = &luna;
+	};
+
+	planet-0 {
+		title = "mercury";
+		radius_km = <2439>;
+	};
+
+	planet-1 {
+		title = "venus";
+		radius_km = <6051>;
+	};
+
+	/* ### START: label */
+	earth: planet-2 {
+		title = "earth";
+		radius_km = <6371>;
+		inhabitable;
+
+		luna: moon-0 {
+			title = "luna";
+			radius_km = <1737>;
+		};
+	};
+	/* ### END: label */
+
+	planet-3 {
+		title = "mars";
+		radius_km = <33895>;
+
+		moon-0 {
+			title = "deimos";
+			radius_km = <5>;
+		};
+
+		moon-1 {
+			title = "phobos";
+			radius_km = <11>;
+		};
+	};
+
+	planet-4 {
+		title = "jupiter";
+		radius_km = <69911>;
+	};
+};
+/* ### END: full */

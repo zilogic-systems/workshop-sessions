@@ -1,0 +1,22 @@
+/dts-v1/;
+
+/include/ "inner.dtsi"
+
+/ {
+	planet-3 {
+		moon-0 {
+			title = "deimos";
+			radius_km = <5>;
+		};
+
+		moon-1 {
+			title = "phobos";
+			radius_km = <11>;
+		};
+	};
+
+	planet-4 {
+		title = "jupiter";
+		radius_km = <69911>;
+	};
+};

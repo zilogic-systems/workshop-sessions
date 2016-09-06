@@ -1,0 +1,504 @@
+= Device Tree Syntax
+Zilogic Systems
+
+== Device Tree History
+
+=== Open Firmware
+
+  * Open Firmware: a standard specifying the interface provided by a
+    firmware
+
+  * Developed by Sun, and widely used in Sun, Apple and IBM systems
+
+  * Just like the BIOS, it is stored in a ROM, and is the first
+    program to execute on power-up
+
+=== Device Tree
+
+  * Among the other things, Open Firmware specifies a way of providing
+    device information through device trees
+
+  * The device tree is constructed by the Open Firmware by probing the
+    hardware
+
+  * The program loaded by Open Firmware like a bootloader or an
+    operating system can access the device tree, through the Client
+    Interface
+
+=== Device Tree in Linux
+
+  * PowerPC and SPARC platforms commonly use Open Firmware
+
+  * The Linux kernel on these platforms generally used Open Firmware
+    to obtain the device tree
+
+  * In 2005, it was made mandatory for all PowerPC ports to use the
+    device tree
+
+  * For those platforms that did not use Open Firmware for booting, a
+    Flattened Device Tree representation has created
+
+=== Device Tree in Linux (Contd)
+
+  * "Flattened": passed to the kernel as blob, rather than being
+    queried from the firmware at run-time.
+
+  * Source representation called the Device Tree Source and files had
+    the extension `.dts`.
+
+  * Binary representation called the Device Tree Binary and files had
+    the extension `.dtb`
+
+== ARM & Device Trees
+
+=== Kernel Support for ARM
+
+  * In 2011, the ARM support for the Linux kernel was overflowing with
+    patches and lots of copied and duplicated code with minor
+    variations
+
+  * The problem was covered in the LWN article at
+    http://lwn.net/Articles/439314/
+
+  * Problems solved by device tree
+    - Board File Proliferation
+    - Kernel Forks / Patches
+    - Duplicated SoC Code
+    - Multi-platform Kernels
+
+=== Board File Proliferation
+
+  * SoC busses: not possible to detect what devices are connected to
+    the bus at run-time
+
+  * Device information specified using platform devices
+    - base address
+    - interrupts
+    - DMA channels
+    - clocks
+
+=== Board File Proliferation (Contd)
+
+  * Hard coded board specific configuration
+    - IO pin configuration
+    - GPIOs
+    - External Interrupts
+
+  * For every new board, slightly different configuration, kernel had
+    to be modified to support it
+
+  * With device trees, kernel code need not be modified to add support
+    for a new board
+
+=== Kernel Forks / Patches
+
+  * Kernels where un-necessarily forked by board vendors to add
+    support to their board
+
+  * Or there where un-merged patches floating around to support a
+    specific board
+
+  * Device trees simplified the process of porting the kernel,
+    reducing the bar for submitting patches to the kernel
+
+=== Duplicated SoC Code
+
+  * For each SoC GPIO handling, power management, clock management
+    were similar but still there was no code reuse
+
+  * For SoC variants, duplicated copies of SoC code with minor
+    modification, were added for each SoC
+
+  * Forcing all machine specific information to be data-driven through
+    device trees, forced people to reuse existing drivers, with
+    drivers using information from device trees to handle variants of
+    the device.
+
+=== Multi-platform Kernels
+
+  * In the x86 world, it possible for a single kernel to work across
+    multiple different machines
+
+  * The kernel queries the devices and starts accessing them
+
+  * But such generic ARM kernels were not possible. The kernel had to
+    be compiled for one SoC
+
+  * With device trees, and the necessary to code to implement
+    multi-plaform kernels, generic kernels are now able to run on a
+    wide variety of SoCs
+
+== Syntax
+
+[role="two-column"]
+=== Simple Device Tree
+
+[role="left"]
+image::figures/simple-dt.png[align="center"]
+
+[role="right"]
+[source,"dts"]
+------
+include::code/simple.dts[]
+------
+
+=== Compiling the DTS
+
+  * Device Tree Source (.dts) can be converted to Device Tree Blob
+    (.dtb) using the `dtc`
++
+------
+dtc -O dtb -o simple.dtb simple.dts
+------
+
+=== Querying the Device Tree
+
+  * Device tree can be queried using `fdtget` command
+
+  * Each node is identified by a path, similar to filesystem paths
+
+  * Starting from the top level node specify all the nodes separated by `/`
++
+------
+fdtget simple.dtb /a x
+------
+
+=== Try Out
+
+  * Create `simple.dts` file as indicated in the previous slide
+
+  * Comile the `.dts` file using `dtc`
+
+  * Print the `x` and `y` values of node `/a` using `fdtget`
+
+=== Property Values
+
+Array of bytes, formed from array of 32-bit cells, AKA cell array
+
+  * `<0x1>` stored as `00 00 00 01`
+  * `<0x1 0x2>` stored as `00 00 00 01 00 00 00 02`
+
+[source,"dts"]
+------
+include::code/simple-v2.dts[]
+------
+
+=== Try Out
+
+  * Modify `simple.dts` file as indicated in the previous slide
+
+  * Print the `x` and `y` values of node `/b` using `fdtget`
+
+  * The option `-t ib` prints the values as bytes
++  
+------
+fdtget -t ib simple.dtb /b x
+------
+
+=== Property Values (Contd.)
+
+Array of bytes, formed from strings
+
+  * `"ABC"` stored as `65 66 67 00`
+  * `"ABC", "DEF"` stored as `64 66 67 00 68 69 70 00`
+
+[source,"dts"]
+------
+include::code/simple-v3.dts[]
+------
+
+=== Try Out
+
+  * Modify `simple.dts` file as indicated in the previous slide
+
+  * Print the `x` and `y` values of node `/b` using `fdtget`
+
+=== Property Values (Contd.)
+
+Array of bytes, formed from byte array notation
+
+  * `[65 66 67 00]` stored as `65 66 67 00`
+  * `[65 66 67 00 68 69 70 00]` stored as `65 66 67 00 68 69 70 00`
+
+[source,"dts"]
+------
+include::code/simple-v4.dts[]
+------
+
+=== Try Out
+
+  * Modify `simple.dts` file as indicated in the previous slide
+
+  * Print the `x` and `y` values of node `/b` using `fdtget`
+
+== DTS Features
+
+=== Planets Example
+
+  * Example DTS file representing the planets in the solar system
+    link:{include:code/planets-v1.dts.datauri}["planets-v1.dts",filename="planets-v1.dts"]
+
+  * `title` property specifies the name of the planet
+
+  * `radius_km` property specifies the radius of the planet in KM.
+
+[role="two-column"]
+=== Nested Nodes and Bools
+
+[role="left"]
+[source,dts]
+------
+include::code/planets-v2/earth[]
+------
+
+[role="right"]
+  * Adding boolean property `inhabitable`
+
+  * Adding moons for planet earth
+
+  * Path for moon node
++
+------
+/planet-2/moon-0
+------
++
+  * Full DTS file:
+    link:{include:code/planets-v2/full.datauri}["planets-v2.dts",filename="planets-v2.dts"]
+
+[role="two-column"]
+=== Auto Merging
+
+[role="left"]
+[source,dts]
+------
+/dts-v1/;
+/ {
+    a {
+        x = <10>;
+	y = <20>;
+    };
+};
+
+/ {
+    b {
+        x = <30>;
+	y = <40>;
+    };
+};
+------
+
+[role="right"]
+   * Multiple trees can be specified within a DTS file
+
+   * Compiler will merge the trees into a single tree
+
+   * Useful in combination with `/include/` directive for sharing
+     common information
+
+[role="two-column"]
+=== Auto Merging
+
+[role="left"]
+[source,dts]
+------
+/dts-v1/;
+/ {
+    a {
+        x = <10>;
+	y = <20>;
+    };
+
+    b {
+        x = <30>;
+	y = <40>;
+    };
+};
+------
+[role="right"]
+   * Multiple trees can be specified with a DTS file
+
+   * Compiler will merge the trees into a single tree
+
+   * Useful in combination with `/include/` directive for sharing
+     common information
+
+=== Sharing Common Information
+
+  * `/include/` directive can be used to include files
++
+------
+/include/ "filename"
+------
++
+  * Device trees for two boards using the same SoC
+
+  * SoC specific information is the same, but board specific
+    information might differ
+
+  * One SoC `.dtsi` file, contains the common device tree informartion
+
+  * Separate `.dts` file for each board includes the SoC `.dtsi`
+
+=== Try Out
+
+  * Get
+    link:{include:code/planets-v3.dts.datauri}["planets-v3.dts",filename="planets-v3.dts"],
+    link:{include:code/inner.dtsi.datauri}["inner.dtsi",filename="inner.dtsi"]
+
+  * Compile the `planets-v3.dts`
+
+  * Compile and dump the DTB contents using `fdtdump`
++
+------
+fdtdump planets-v3.dtb
+------
++
+  * Observe that the two trees have been merged into a single tree
+
+=== Adding Child Nodes
+
+[source,dts]
+------
+include::code/planets-v4.dts[]
+------
+
+=== Try Out
+
+  * Get link:{include:code/planets-v4.dts.datauri}["planets-v4.dts",filename="planets-v4.dts"]
+
+  * Compile and dump the DTB contents using `fdtdump`
+
+=== Modifying Property Values
+
+[source,dts]
+------
+include::code/planets-v5.dts[]
+------
+
+=== Deleting Property
+
+[source,dts]
+------
+include::code/planets-v6.dts[]
+------
+
+=== Deleting Node
+
+[source,dts]
+------
+include::code/planets-v7.dts[]
+------
+
+== Referencing Nodes
+
+[role="two-column"]
+=== Need for References
+
+[role="left"]
+image::figures/simple-dt-ref.png[align="center"]
+
+[role="right"]
+
+  * Sometimes it is necessary to refer to another node, in a nodes property
+
+  * Useful to specify a relation between two nodes
+
+  * For example, to represent the fact that the serial controller
+    raises interrupt to a particular interrupt controller
+
+
+
+[role="two-column"]
+=== Labels
+
+[role="left"]
+[source,dts]
+------
+include::code/simple-v5.dts[]
+------
+
+[role="right"]
+  * Each node can have a label in addition to a node name.
+
+  * Labels should be unique throughout the DTS file
+
+  * Labels can be used in other places to refer to the node
+
+  * Labels can be referred using
+    - Reference using strings
+    - Reference using phandle
+
+[role="two-column"]
+=== Reference Using Strings
+
+[role="left"]
+[source,dts]
+------
+include::code/simple-v6.dts[]
+------
+
+[role="right"]
+  * A node with a label can be referred using `&label` notation
+
+  * Expanded to a string representing the node's path
+
+[role="two-column"]
+=== Reference Using Strings
+
+[role="left"]
+[source,dts]
+------
+include::code/simple-v6-expanded.dts[]
+------
+
+[role="right"]
+  * A node with a label can be referred using `&label` notation
+
+  * Expanded to a string representing the node's path
+  
+[role="two-column"]
+=== Reference Using Phandles
+
+[role="left"]
+[source,dts]
+------
+include::code/simple-v7.dts[]
+------
+
+[role="right"]
+  * A reference to a label within a cell array causes the following
+
+    - A property `phandle` is added to the labelled node, with a
+      unique numeric ID
+
+    - Label reference in the cell array is replaced by the numeric ID
+
+[role="two-column"]
+=== Reference Using Phandles
+
+[role="left"]
+[source,dts]
+------
+include::code/simple-v7-expanded.dts[]
+------
+
+[role="right"]
+  * A reference to a label within a cell array causes the following
+
+    - A property `phandle` is added to the labelled node, with a
+      unique numeric ID
+
+    - Label reference is replaced by the numeric ID
+
+=== Try Out
+
+  * Get link:{include:code/simple-v7.dts.datauri}["simple-v7.dts",filename="simple-v7.dts"]
+
+  * Add a label for node `a`
+
+  * Add another property `path2` to node `c`, that references `a`
+    using a phandle
+
+  * Compile and dump the generated DTB
+
+  * Observe the phandle property added to node `a` as well
