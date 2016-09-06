@@ -1,0 +1,56 @@
+= Device Tree by Example
+Zilogic Systems
+
+== DTS for Machine
+
+=== Machine v1
+
+image::figures/v1.png[align="center"]
+
+=== DTS for Machine v1
+
+[source,dts]
+------
+include::code/v1.dts[]
+------
+
+=== Machine v2
+
+image::figures/v2.png[align="center"]
+
+=== DTS for Machine v2
+
+[source,dts]
+------
+include::code/v2.dts[]
+------
+
+=== Machine v3
+
+image::figures/v3.png[align="center"]
+
+=== Interrupt Tree
+
+image::figures/interrupt-tree.png[align="center"]
+
+=== DTS for Machine v3
+
+[source,dts]
+------
+include::code/v3.dts[]
+------
+
+=== Machine v4
+
+image::figures/v4.png[align="center"]
+
+=== Clock Tree
+
+image::figures/clock-tree.png[aling="center"]
+
+=== DTS for Machine v4
+
+[source,dts]
+------
+include::code/v4.dts[]
+------

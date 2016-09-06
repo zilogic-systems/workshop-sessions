@@ -1,0 +1,21 @@
+/dts-v1/;
+
+/ {
+	compatible = "marvell,pxa270";
+	#address-cells = <1>;
+	#size-cells = <1>;
+
+	memory {
+		device_type = "memory";
+		reg = <0xA0000000 0x10000000>;
+	};
+
+	cpus {
+		#address-cells = <0>;
+		#size-cells = <0>;
+		cpu {
+			compatible = "marvell,xscale";
+			device_type = "cpu";
+		};
+	};
+};

@@ -1,0 +1,58 @@
+/* ### START: full */
+/dts-v1/;
+
+/ {
+	compatible = "marvell,pxa270";
+	#address-cells = <1>;
+	#size-cells = <1>;
+
+	memory {
+		device_type = "memory";
+		reg = <0xA0000000 0x10000000>;
+	};
+
+	cpus {
+		#address-cells = <0>;
+		#size-cells = <0>;
+		cpu {
+			compatible = "marvell,xscale";
+			device_type = "cpu";
+		};
+	};
+
+	pxabus {
+		compatible = "simple-bus";
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+
+		/* ### START: interrupt-controller */
+		pxairq: interrupt-controller@40d00000 {
+			#interrupt-cells = <1>;
+			compatible = "marvell,pxa-intc";
+			interrupt-controller;
+			interrupt-parent;
+			marvell,intc-priority;
+			marvell,intc-nr-irqs = <34>;
+			reg = <0x40d00000 0xd0>;
+		};
+		/* ### END: interrupt-controller */		
+
+		/* ### START: interrupt-property */
+		uart@40100000 {
+			compatible = "mrvl,pxa-uart";
+			reg = <0x40100000 0x30>;
+			interrupt-parent = <&pxairq>;
+			interrupts = <22>;
+		};
+
+		timer@40a00000 {
+			compatible = "marvell,pxa-timer";
+			reg = <0x40a00000 0x20>;
+			interrupt-parent = <&pxairq>;
+			interrupts = <26>;
+		};
+		/* ### END: interrupt-property */		
+	};	
+};
+/* ### END: full */
