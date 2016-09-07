@@ -1,9 +1,12 @@
 /* ### START: full */
 /dts-v1/;
 
+/* ### START: compatible */
 / {
+    compatible = "gumstix,verdex", "marvell,pxa270";
     #address-cells = <1>;
     #size-cells = <1>;
+/* ### END: compatible */
     interrupt-parent = <&pxairq>;
 
     memory {
@@ -27,7 +30,6 @@
             reg = <0x40d00000 0xd0>;
         };
 
-        /* ### START: clocks-property */
         uart@40100000 {
             compatible = "mrvl,pxa-uart";
             reg = <0x40100000 0x30>;
@@ -41,14 +43,11 @@
             interrupts = <26>;
             clocks = <&clks 36>;
         };
-        /* ### END: clocks-property */
 
-        /* ### START: clks */
         clks: pxa2xx_clks@41300000 {
             compatible = "marvell,pxa270-clocks";
             #clock-cells = <1>;
         };
-        /* ### END: clks */        
     };
 };
 /* ### END: full */

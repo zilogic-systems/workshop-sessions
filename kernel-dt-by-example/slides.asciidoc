@@ -1,7 +1,7 @@
 = Device Tree by Example
 Zilogic Systems
 
-== DTS for Machine
+== DTS Nodes & Bindings
 
 === Machine v1
 
@@ -14,43 +14,472 @@ image::figures/v1.png[align="center"]
 include::code/v1.dts[]
 ------
 
+  * `/memory` node specifies the memory range
+
+  * `reg` property specifies the base address and size
+
+=== DTS for Machine v1
+
+[source,dts]
+------
+include::code/v1.dts[]
+------
+
+  * No. of cells for base address is specified by `#address-cells`
+    property
+
+  * No. of cells for size is specified by `#size-cells`
+
+=== `reg` Property 
+
+  * `reg` property is used by memory mapped peripherals to specify
+    memory ranges used by the device
+
+  * The parent of the node using `reg` property should indicate the
+    no. of cells for base address and no. of cells for size
+
+  * Multiple base address and size pairs can be specified in a single
+    `reg` property
+
+=== `device_type` Property
+
+  * `device_type` is used to indicate that this node describes the memory
+
+  * It is provided for compatibility with older device tree standards,
+    used by some architectures
+
+  * Current device tree standard, only requires that the node be named
+    as `/memory`
+
 === Machine v2
 
 image::figures/v2.png[align="center"]
 
+[role="two-column"]
+=== Bus and Devices in DTS
+
+[role="left"]
+------
+bus {
+   device1 {
+      ...
+   }
+
+   device2 {
+      ...
+   }
+}
+------
+
+[role="right"]
+  * Nodes with children represent busses
+
+  * Children of a bus node, represent devices on the bus
+
+[role="two-column"]
 === DTS for Machine v2
 
+[role="left"]
 [source,dts]
 ------
-include::code/v2.dts[]
+include::code/v2/peripherals[]
 ------
+
+[role="right"]
+  * Memory mapped bus is represented by `/pxabus`
+
+  * Memory mapped peripherals are represented as children of
+    `/pxabus`
+
+  * `compatible` property is used for matching the device with a
+    driver
+
+=== `compatible` Property
+
+  * Can specify one or more names, more specific names should be
+    specified first
+
+  * Example with Micron M25P32
++
+-----
+compatible = "m25p32", "jedec,spi-nor";
+-----
++
+  * Flash supports JEDEC commands and additional M25P32 commands
+
+  * OS will check for driver that supports M25P32 commands, by matching with name `m25p32`
+
+  * If not, will check for a generic driver that supports JEDEC
+    commands, by matching with name `jedec,spi-nor`
+
+=== `simple-bus` Device & Driver
+
+  * The bus is also a device that will be handled by a driver
+
+  * The sole purpose of the driver for `simple-bus`, is to create and
+    add platform devices, for the child nodes
 
 === Machine v3
 
 image::figures/v3.png[align="center"]
 
-=== Interrupt Tree
+=== DTS for Machine v3
 
-image::figures/interrupt-tree.png[align="center"]
+[source,dts]
+------
+include::code/v3/interrupt-controller[]
+------
+
+  * Interrupt controller is just like any other memory mapped device
+
+  * `interrupt-controller` property indicates that this node is an
+    interrupt controller
 
 === DTS for Machine v3
 
 [source,dts]
 ------
-include::code/v3.dts[]
+include::code/v3/interrupt-controller[]
 ------
+
+  * Device nodes can refer to an interrupt controller
+
+  * Can indicate that interrupt output signal is connected to an IRQ
+    line of the interrupt controller
+
+=== Interrupt Tree
+
+image::figures/interrupt-tree.png[align="center"]
+
+  * Interrupt tree should be represented in the device tree
+
+  * Drivers require the IRQ no. to register interrupt handler
+
+[role="two-column"]
+=== DTS for Machine v3
+
+[role="left"]
+[source,dts]
+------
+include::code/v3/interrupt-property[]
+------
+
+[role="right"]
+  * `interrupt-parent` indicates the interrupt controller to which
+    interrupt output is connected
+  
+  * `interrupts` property indicates the IRQ numbers on the interrupt
+    controller
+
+  * No. of cells used to represent an interrupt is indicated by the
+    `#interrupt-cells` property of the interrupt controller
+
+[role="two-column"]
+=== Interrupt Parent Inheritance
+
+[role="left"]
+[source,dts]
+------
+/dts-v1/;
+
+/ {
+    interrupt-parent = <&pxairq>;
+    ...
+    pxabus {
+        ...
+        uart@40100000 {
+            ...
+            interrupts = <22>;
+        };
+        timer@40a00000 {
+            ...
+            interrupts = <26>;
+        };
+    };
+};
+------
+
+[role="right"]
+  * If `interrupt-parent` is not specified in a node, it is
+    recursively searched for in parent nodes
+
+  * Useful to reduce repetition, specify once in the top-level node
+
+=== Node Names
+
+  * Node name convention
++
+------
+node-name@unit-address
+------
++
+  * `node-name`: 1 - 31 characters
+    - `0-9 A-Z a-z [comma] [period] [underscore]
+      [plus-sign] [dash]`
+
+  * `unit-address`, the first address specified in the `reg` property
+
+  * Nodes without `reg` property, `@unit-address` should be omitted
+
+=== Node Names
+
+  * Name of node should represent the function of the device
+
+  * A list of recommend names is available from the device tree
+    specification
+
+  * An excerpt is provided below
+
+    - `gpio`, `interrupt-controller`
+    - `rtc`, `timer`, `watchdog`
+    - `flash`, `disk`, `compact-flash`
+    - `ethernet`, `serial`, `i2c`, `spi`
+
+[role="two-column"]
+=== Clock Controller
+
+[role="left"]
+image::figures/clock-tree.png[align="center"]
+
+[role="right"]
+  * All SoCs have a mechanism to enable / disable clocks to
+    peripherals on the SoC
+
+  * Clock gating is a basic mechanism of saving power in a CMOS
+    circuit
+
+  * Before a peripheral is accessed clocks to the peripheral needs to
+    be enabled
 
 === Machine v4
 
 image::figures/v4.png[align="center"]
 
-=== Clock Tree
-
-image::figures/clock-tree.png[aling="center"]
-
 === DTS for Machine v4
 
 [source,dts]
 ------
-include::code/v4.dts[]
+include::code/v4/clks[]
 ------
+
+  * The clock controller is represented as device node
+
+  * Will be referred to by device nodes that it provides clocks for
+
+[role="two-column"]
+=== DTS for Machine v4
+
+[role="left"]
+[source,dts]
+------
+include::code/v4/clocks-property[]
+------
+
+[role="right"]
+  * `clocks` property specifies the clocks used by the peripheral
+
+  * Specifies one ore more clock specifier
+
+  * A clock specifier consists of clock controller node phandle and
+    cells to identify the clock within the clock controller
+
+  * No. of cells to identify the clock is specified by `#clocks-cells`
+    property of the clock controller
+
+=== Machine `compatible`
+
+[source,dts]
+------
+include::code/v5/compatible[]
+------
+
+  * `compatible` property on the root node specifies the board / machine type
+
+  * Used by the OS to do machine specific setup / initialization
+
+  * Machine names should be specified with more specific machine first
+
+  * OS will first look for setup code for machine type
+    `gumstix,verdex` and if not found, will search for machine type
+    `marvell,pxa270`.
+
+=== Device Numbering
+
+  * Serial port device names
+    - `/dev/ttyS0`
+    - `/dev/ttyS1`
+
+  * `probe` function of driver is called when platform devices are
+    instantiated and added to the platform bus
+
+  * The devices can get different device names based on the `probe`
+    order, which is unspecified by the kernel
+
+  * Between bootup the names of serial ports can change!
+
+[role="two-column"]
+=== Device Naming with `aliases`
+
+[role="left"]
+[source,dts]
+------
+include::code/v6/aliases[]
+    ...
+------
+
+[role="right"]
+  * Device numbering can be controlled using `aliases`
+  * `aliases` are used to specify the device numerbing
+  * Each property specifies an alias
+
+[role="two-column"]
+=== Device Naming with `aliases`
+
+[role="left"]
+[source,dts]
+------
+include::code/v6/aliases[]
+    ...
+------
+
+[role="right"]
+  * Alias names have the following naming convention
++
+------
+<alias-name><id>
+------
++
+  * Example: `serial0`
+    - `alias-name` is `serial`
+    - `id` is `0`
+
+[role="two-column"]
+=== Device Naming with `aliases`
+
+[role="left"]
+[source,dts]
+------
+include::code/v6/aliases[]
+    ...
+------
+
+[role="right"]
+  * The value of the property is a string, representing the path to
+    the device node
+
+  * Can be specified as a string
+    - `"/pxabus/uart@40100000"`
+  
+  * Or using phandles
+
+=== Try Out
+
+  * Replace the DTS file in the kernel source tree, build and boot
+
+  * Check if the RTC device file `/dev/rtc0` is available. `hwclock`
+    will fail
+
+  * Add the RTC device node to the DTS file, build and boot
+    - Register Region Base: `0x40900000`
+    - Register Region Size: `0x3c`
+    - IRQ Nos.: `30`, `31`
+
+  * Check if the RTC device file `/dev/rtc0` is available. `hwclock`
+    should work
+
+[role="two-column"]
+=== `cpus` node
+
+[role="left"]
+[source,dts]
+------
+include::code/v7/cpus[]
+------
+
+[role="right"]
+  * Since the no. of cpus is only 1, `#address-cells` and
+    `#size-cells` is set to `0`
+
+  * `device_type` is used to indicate that the node is a CPU node, for
+    backwards compatibility
+
+=== Multi-core SoC: Broadcom BCM11351 
+
+[source,dts]
+------
+cpus {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	enable-method = "brcm,bcm11351-cpu-method";
+
+	cpu0: cpu@0 {
+		device_type = "cpu";
+		compatible = "arm,cortex-a9";
+		reg = <0>;
+	};
+
+	cpu1: cpu@1 {
+		device_type = "cpu";
+		compatible = "arm,cortex-a9";
+		secondary-boot-reg = <0x3500417c>;
+		reg = <1>;
+	};
+};
+------
+
+== DTS Layering
+
+=== Layering
+
+  * DTS is not written as a single file
+
+  * Rather broken down into multiple includable files, to share common
+    DTS nodes
+
+  * Simple Layering
+    - DTS for SoC Family
+    - DTS for SoC
+    - DTS for Board
+
+=== Layering for PXA27x
+
+image::figures/dts-inheritance.png[align="center",width="75%"]
+
+=== Device Status
+
+  * Not all devices in a SoC is used on a machine / board
+
+  * SoC DTS files add devices with `status` property set to `disabled`
+
+  * Board DTS file enables the device by overriding the `status`
+    property, setting it to `okay`
+
+  * Device nodes with `status` property `disabled` will not be added
+    as a platform device
+
+=== Layered DTS
+
+[source,dts]
+------
+include::code/layered.dts[]
+------
+
+=== C Preprocessor and Include
+
+  * DTS files use a lot of numbers for IRQs, clocks, flags, etc.
+
+  * To make the DTS more readable and maintainable, the kernel now
+    uses macros instead of numbers
+
+  * DTS has to be run through the C preprocessor to perform macro
+    expansion
+
+  * Also the macros are defined in header files
+
+  * Hence DTS files now use, `#include` instead of the DTS include
+    mechanism
+
+=== Try Out
+
+  * Replace the DTS file in the kernel source tree, build and boot
+

@@ -2,41 +2,31 @@
 /dts-v1/;
 
 / {
-	compatible = "marvell,pxa270";
-	#address-cells = <1>;
-	#size-cells = <1>;
+    #address-cells = <1>;
+    #size-cells = <1>;
 
-	memory {
-		device_type = "memory";
-		reg = <0xA0000000 0x10000000>;
-	};
+    memory {
+        device_type = "memory";
+        reg = <0xA0000000 0x10000000>;
+    };
 
-	cpus {
-		#address-cells = <0>;
-		#size-cells = <0>;
-		cpu {
-			compatible = "marvell,xscale";
-			device_type = "cpu";
-		};
-	};
+    /* ### START: peripherals */
+    pxabus {
+        compatible = "simple-bus";
+        #address-cells = <1>;
+        #size-cells = <1>;
+        ranges;
 
-	/* ### START: peripherals */
-	pxabus {
-		compatible = "simple-bus";
-		#address-cells = <1>;
-		#size-cells = <1>;
-		ranges;
+        uart@40100000 {
+            compatible = "mrvl,pxa-uart";
+            reg = <0x40100000 0x30>;
+        };
 
-		uart@40100000 {
-			compatible = "mrvl,pxa-uart";
-			reg = <0x40100000 0x30>;
-		};
-
-		timer@40a00000 {
-			compatible = "marvell,pxa-timer";
-			reg = <0x40a00000 0x20>;
-		};
-	};
-	/* ### END: peripherals */	
+        timer@40a00000 {
+            compatible = "marvell,pxa-timer";
+            reg = <0x40a00000 0x20>;
+        };
+    };
+    /* ### END: peripherals */
 };
 /* ### END: full */
