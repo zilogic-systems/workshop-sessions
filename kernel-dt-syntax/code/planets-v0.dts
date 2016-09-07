@@ -1,0 +1,13 @@
+/dts-v1/;
+
+/ {
+	planet@0 {
+		title = "mercury";
+		radius_km = <2439>;
+	};
+
+	planet@1 {
+		title = "venus";
+		radius_km = <6051>;
+	};
+};

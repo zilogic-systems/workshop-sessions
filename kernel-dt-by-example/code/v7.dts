@@ -1,0 +1,66 @@
+/* ### START: full */
+/dts-v1/;
+
+/ {
+    compatible = "gumstix,verdex", "marvell,pxa270";
+    #address-cells = <1>;
+    #size-cells = <1>;
+    interrupt-parent = <&pxairq>;
+
+    aliases {
+        serial0 = &ffuart;
+    };
+
+    memory {
+        device_type = "memory";
+        reg = <0xA0000000 0x10000000>;
+    };
+
+    /* ### START: cpus */
+    cpus {
+        #address-cells = <0>;
+        #size-cells = <0>;
+        cpu {
+            compatible = "marvell,xscale";
+            device_type = "cpu";
+        };
+    };
+    /* ### END: cpus */
+
+    pxabus {
+        compatible = "simple-bus";
+        #address-cells = <1>;
+        #size-cells = <1>;
+        ranges;
+
+        pxairq: interrupt-controller@40d00000 {
+            #interrupt-cells = <1>;
+            compatible = "marvell,pxa-intc";
+            interrupt-controller;
+            interrupt-parent;
+            marvell,intc-priority;
+            marvell,intc-nr-irqs = <34>;
+            reg = <0x40d00000 0xd0>;
+        };
+
+        ffuart: uart@40100000 {
+            compatible = "mrvl,pxa-uart";
+            reg = <0x40100000 0x30>;
+            interrupts = <22>;
+            clocks = <&clks 11>;
+        };
+
+        timer@40a00000 {
+            compatible = "marvell,pxa-timer";
+            reg = <0x40a00000 0x20>;
+            interrupts = <26>;
+            clocks = <&clks 36>;
+        };
+
+        clks: pxa2xx_clks@41300000 {
+            compatible = "marvell,pxa270-clocks";
+            #clock-cells = <1>;
+        };
+    };
+};
+/* ### END: full */

@@ -1,0 +1,201 @@
+= GPIOs & LEDs
+Zilogic Systems
+
+== GPIOs
+
+=== GPIO Controller
+
+  * GPIO: software controlled digital signal
+
+  * Controller Functions:
+    - Change direction - input, output
+    - Read state of pins
+    - Set the state of pins, in case of output
+
+=== `gpiolib` Framework
+
+image::figures/gpio-framework.png[align="center",width="65%"]
+
+=== Example Usage
+
+image::figures/mmc-gpio.png[align="center",width="65%"]
+
+=== GPIOs in Device Trees
+
+  * In device trees, GPIOs are identified using a GPIO specifier
+
+  * Represented as a cell array
+
+    - First cell: GPIO controller phandle
+    - Additional cells: specify GPIO no. and flags
+
+  * Number and meaning of additional cells are specific to GPIO
+    controller
+
+  * Defined in GPIO controller bindings
+
+  * Example GPIO specifier
++
+------
+<&gpio 12 0>
+------
+
+
+[role="two-column"]
+=== GPIO Provider: Device Tree Representation
+
+[role="left"]
+[source,dts]
+-----
+gpio: gpio@40e00000 {
+    compatible = "mrvl,pxa-gpio";
+    reg = <0x40e00000 0x10000>;
+    gpio-controller;
+    #gpio-cells = <0x2>;
+    ...
+};
+-----
+
+[role="right"]
+  * `gpio-controller` boolean property, specifies that the node is a
+    GPIO controller
+
+  * `#gpio-cells` specifies the no. of additional cells, 2 for
+    `mrvl,pxa-gpio`
+
+  * First cell specifies the GPIO number
+
+  * Second cell bitwise-or of
+    - `GPIO_ACTIVE_LOW` or `GPIO_ACTIVE_HIGH`
+    - `GPIO_SINGLE_ENDED` or `GPIO_PUSH_PULL`
+
+[role="two-column"]
+=== GPIO Consumer: Device Tree Representation
+
+[role="left"]
+[source,dts]
+------
+mmc0: mmc@41100000 {
+  compatible = "marvell,pxa-mmc";
+  reg = <0x41100000 0x1000>;
+  interrupts = <23>;
+  ...
+  cd-gpios = <&gpio 12 0>;
+  wp-gpios = <&gpio 13 0>;
+};
+------
+
+[role="right"]
+  * Custom properties to specifiy list of GPIOs
+
+  * Properties are name `<function>-gpios`
+
+  * Older bindings use the name `gpios` and `<function>-gpio`
+
+  * A property, depending on binding, can be used specify one or more
+    GPIOs
+
+== LEDs
+
+[role="two-column"]
+=== LED Framework
+
+[role="left"]
+image::figures/led-framework.png[align="center"]
+
+[role="right"]
+  * Provides a mechanism to mechanism to expose LEDs
+
+  * Provides a mechanism to manually control the LEDs using sysfs
+
+  * Provides a mechanism to automatically trigger LEDs based on events
+
+=== LED Drivers
+
+  * Dedicated LED controllers provide
+    - mechanism to control LEDs
+    - hardware accelerated blink
+
+  * LED drivers expose LEDs, allowing them to be controlled
+
+  * LED driver implements
+    - method to control the brightness of an LED
+    - method to set blink on / off delays
+
+  * Manual control
++
+[source,sh]
+------
+echo 0 > /sys/class/leds/<led-device>/brightness
+------
+
+=== LED Trigger Drivers
+
+  * Triggers allow LEDs to be controlled based on events
+
+    - Disk Access
+    - Flash Access
+    - Network Activity
+    
+  * List of available triggers can be found using
++
+------
+cat /sys/class/leds/<led-device>/trigger
+------
++
+  * Can be set using
++
+[source,sh]
+------
+echo trigger-name > "/sys/class/leds/<led-trigger>/trigger"
+------
+
+== GPIO LEDs
+
+=== Overview
+
+  * On many boards LEDs are connected to GPIOs
+
+  * A generic GPIO LED driver is available to control such LEDs
+
+  * Utilizes the GPIO framework, to provide a SoC agnostic LED driver
+
+  * GPIO LEDs can be specified from within the device tree
+
+=== GPIO LEDs in Device Tree (1)
+
+[source,dts]
+------
+leds {
+    compatible = "gpio-leds";
+
+    hdd {
+        label = "IDE Activity";
+        gpios = <&gpio 0 GPIO_ACTIVE_LOW>;
+        linux,default-trigger = "ide-disk";
+    };
+
+    fault {
+        gpios = <&gpio 1 GPIO_ACTIVE_HIGH>;
+        default-state = "keep";
+    };
+};
+------
+
+=== GPIO LEDs in Device Tree (2)
+
+  * Multiple leds are specified as child nodes
+
+  * `gpios` property specifies the GPIO, the LED is connected to
+
+  * `label` optional property specifies a name for the LED, should be
+    unique among all LED class devices, default is the node name
+
+  * `linux,default-trigger` optional property specifies the trigger name
+  
+  * `default-state` optional property specifies initial state of the
+    LED
+    - `"on"`
+    - `"off"`
+    - `"keep"`
+

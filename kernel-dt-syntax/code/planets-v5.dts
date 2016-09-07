@@ -1,0 +1,9 @@
+/dts-v1/;
+
+/include/ "inner.dtsi"
+
+/ {
+	planet-3 {
+		radius_km = <33900>;
+	};
+};

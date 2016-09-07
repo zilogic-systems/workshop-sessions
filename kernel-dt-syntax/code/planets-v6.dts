@@ -1,0 +1,9 @@
+/dts-v1/;
+
+/include/ "inner.dtsi"
+
+/ {
+	planet-2 {
+		/delete-property/inhabitable;
+	};
+};

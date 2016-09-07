@@ -1,0 +1,10 @@
+/dts-v1/;
+
+/include/ "inner.dtsi"
+
+/ {
+	planet-4 {
+		title = "jupiter";
+		radius_km = <69911>;
+	};
+};

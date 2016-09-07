@@ -1,0 +1,34 @@
+/* ### START: full */
+/dts-v1/;
+
+/ {
+	planet-0 {
+		title = "mercury";
+		radius_km = <2439>;
+	};
+
+	planet-1 {
+		title = "venus";
+		radius_km = <6051>;
+	};
+
+	/* ### START: earth */
+	planet-2 {
+		title = "earth";
+		radius_km = <6371>;
+		inhabitable;
+
+		moon-0 {
+			title = "luna";
+			radius_km = <1737>;
+		};
+
+	};
+	/* ### END: earth */
+
+	planet-3 {
+		title = "mars";
+		radius_km = <33895>;
+	};
+};
+/* ### END: full */

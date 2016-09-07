@@ -1,0 +1,205 @@
+= Pin Control
+Zilogic Systems
+
+== Overview
+
+=== Role of Pin Control Subsystem
+
+  * Enumeration and naming controllable pins
+
+  * Multiplexing of pins
+
+  * Configuration off pins - drive strength,pull-ups, etc.
+
+=== Muxing of Pins
+
+  * SoCs have limited number of available pins
+
+  * Not sufficient to accomodate signals from all available
+    controllers on the SoC
+
+  * But not all controllers are used in an application
+
+  * Pin muxing allows multiple functions to be mapped to the same pin
+  
+  * Pin mux has to be configured for the selected funtionality
+
+=== Pin Mux Example
+
+image::figures/pin-mux.png[align="center",width="60%"]
+
+[role="two-column"]
+=== Redundant Mapping
+
+[role="left"]
+image::figures/redundant-mapping.png[align="center",width="60%"]
+
+[role="right"]
+  * Commonly used functionality is mapped to multiple pins
+
+  * Prevents signals of important controllers from geting blocked by
+    usage of a functionality on the SoC
+
+=== Pin Controllers
+
+  * Some SoCs, have dedicated controller for pin-muxing and
+    configuration
+
+  * Many SoCs, GPIO controller allows does pin-muxing and
+    configuration
+
+  * PXA270, pin control is part of the GPIO controller
+
+  * Every GPIO pin, can have upto 6 alternate functions
+
+== Driver Interaction
+
+=== Requirements
+
+  * Each driver will require pins to muxed and configured for
+    accessing the device
+
+  * Pin muxing and configuration must be performed before the driver
+    can access the device
+
+  * Pin used, their muxing and configuration will vary between SoCs
+    and boards
+
+  * Pin muxing and configuration, should be specified on a per-board
+    basis
+
+[role="two-column"]
+=== Provider: Device Tree Representation
+
+[role="left"]
+[source,dts]
+------
+pinctrl: pinctrl@40e00000 {
+  ...
+  ffuart_pins: ff {
+    mux_p19 {
+      pins = "P19";
+      function = "FFRXD";
+    };
+
+    mux_p37 {
+      pins = "P37";
+      function = "FFTXD";
+    };
+  };
+};
+------
+
+[role="right"]
+  * Pin settings of one or more pins is specified as part of the
+    pin controller node
+
+  * GPIO 19 is configured for FF-UART RXD functionality
+
+  * GPIO 37 is configured for FF-UART TXD functionality
+
+  * Name of pins and the possible functions is specified in the
+    binding documentation
+
+[role="two-column"]
+=== Consumer: Device Tree Representation
+
+[role="left"]
+[source,dts]
+------
+ffuart: uart@40100000 {
+  ...
+  pinctrl-names = "default";
+  pinctrl-0 = <&ffuart_pins>;
+};
+------
+
+[role="right"]
+  * Pin configuration is specified using `pinctrl-<n>` property
+
+  * Specifies one or more phandles, representing the nodes that
+    specify pin configuration settings
+
+  * Pin configuration can be specified for different state of the
+    device: `"default"`, `"sleep"`
+
+  * For each state a separate property is used `pinctrl-0`,
+    `pinctrl-1`, etc
+
+  * Mapping to state names is specified in `pinctrl-names` property
+
+=== Driver Life Cycle and Pin Control
+
+  * Driver first accesses the device within the `probe()` callback
+
+  * Driver bus framework, will make the required pin muxing and
+    configuration before the `probe()` callback is invoked
+
+== Verdex Info
+
+=== FF UART
+
+[options="header",width="50%"]
+|======
+| GPIO		| Function
+| P34		| FFRXD
+| P39		| FFTXD
+|======
+
+=== FF UART Pin Configuration Node
+
+[source,dts]
+------
+ffuart_pins: ff {
+    mux_p34 {
+        pins = "P34";
+        function = "FFRXD";
+    };
+    mux_p39 {
+        pins = "P39";
+        function = "FFTXD";
+    };
+};
+------
+
+=== I2C
+
+[options="header",width="50%"]
+|======
+| GPIO		| Function
+| P117		| SCL
+| P118		| SDA
+|======
+
+=== I2C Pin Configuration Node
+
+[source,dts]
+------
+i2c_pins: i2c {
+    mux_p117 {
+        pins = "P117";
+        function = "SCL";
+    };
+
+    mux_p118 {
+        pins = "P118";
+        function = "SDA";
+    };
+};
+------
+
+== Extra Slides
+
+=== MMC
+
+[options="header"]
+|======
+| GPIO		| Function
+| P32		| MMCLK
+| P112		| MMCMD
+| P92		| MMDAT<0>
+| P109		| MMDAT<1>
+| P110		| MMDAT<2>
+| P111		| MMDAT<3>
+|======
+

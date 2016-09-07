@@ -1,0 +1,7 @@
+/dts-v1/;
+
+/include/ "inner.dtsi"
+
+/ {
+	/delete-node/planet-3;
+};

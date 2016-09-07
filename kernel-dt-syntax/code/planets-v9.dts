@@ -1,0 +1,57 @@
+/dts-v1/;
+
+/ {
+	planet-0 {
+		title = "mercury";
+		radius_km = <2439>;
+		missions = <&messenger 2008>;
+	};
+
+	planet-1 {
+		title = "venus";
+		radius_km = <6051>;
+		missions = <&messenger 0 &galileo 0>;
+	};
+
+	planet-2 {
+		title = "earth";
+		radius_km = <6371>;
+		inhabitable;
+
+		moon-0 {
+			title = "luna";
+			radius_km = <1737>;
+		};
+	};
+
+	planet-3 {
+		title = "mars";
+		radius_km = <33895>;
+
+		moon-0 {
+			title = "deimos";
+			radius_km = <5>;
+		};
+
+		moon-1 {
+			title = "phobos";
+			radius_km = <11>;
+		};
+	};
+
+	planet-4 {
+		title = "jupiter";
+		radius_km = <69911>;
+		missions = <&galileo 1995>;
+	};
+
+	messenger: mission-0 {
+		title = "messenger";
+		launch_year = <2004>;
+	};
+
+	galileo: mission-1 {
+		title = "galileo";
+		launch_year = <1989>;
+	};
+};

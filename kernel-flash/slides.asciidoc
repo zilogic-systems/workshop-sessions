@@ -1,0 +1,156 @@
+= Adding Flash Support 
+
+== Flash 
+
+=== Flash and Linux Kernel
+
+ * Flashes devices are handled in Linux kernel by the Memory
+   Technology Devices(MTD) subsystem.
+
+ * The raw Flash devices like Parallel NOR, NAND & SPI NOR are
+   supported by this subsystem.
+
+ * Parallel NOR resides directly in to the processor bus as a memory
+   mapped device, which the processor can access directly as a memory.
+
+ * The NAND or SPI NOR flashes are connected to NAND controller or a
+   SPI controller which are generally not memory mapped and requires
+   special drivers for them.
+
+[style="two-column"]
+=== MTD Framework
+
+[style="right"]
+  * Since we would like to use Flash for file storage, block devices
+    seem to be a natural choice. This will allow us to create a
+    filesystem in the Flash.
+
+  * The MTD subsystem tries to emulate the block device layer over the
+    Flash, and tries to provide operations other than block operations
+    through a character device layer.
+
+image::figures/mtd-emu.png[align="center", width=400]
+
+=== Using MTD
+
+  * From an application point of view the Flash device can be accessed
+    in 3 different ways.
+
+  * `FS on MTD` - An MTD aware filesystem can be used to store files
+    in Flash. Example: JFFS2
+
+  * `FS on Block Device` - An MTD un-aware filesystem can be used on
+    top of the emulated block device. This can cause Flash to wear
+    out. But is useful if the filesystem is read-only. Example: ext2
+    on Flash, squashfs on Flash.
+
+  * `Raw Access` - The bytes in the Flash device can be accessed as if
+    it were contents of a file, through the MTD char device
+    interface. Special ioctls are provided for Flash specific
+    operations like erase.
+
+=== MTD Device Nodes
+
+  * To access MTD as char/block devices, the following device nodes
+    can be used.
+
+[options="header"]
+|======
+| Device Name     | Major  | Minor | Description
+| `/dev/mtdN`	  | 90	   | 2*N   | Character device
+| `/dev/mtdrN`    | 90	   | 2*N+1 | Read-only Char. device
+| `/dev/mtdblockN`| 31	   | N     | Block device
+|======
+
+=== MTD Partitions
+
+  * Just as with a hard-disk, MTDs can also be partitioned.
+
+  * But unlike a hard-disk, the partition table is specified as a
+    kernel boot argument or through the device tree.
+
+  * The MTD paritions has list of partitions their base address and
+    the size.
+
+=== NOR Flash Connectivity
+
+
+  * Since NOR flash is in memory bus, it gets connected to the address
+    and the data bus.
+
+
+----
+       _____                       _____ 
+      |	    | --- Address Bus --> |     |
+      | CPU | --- Data Bus    --> | NOR |
+      |_____| --- R/W Strobes --> |_____|
+
+----
+
+  * The width of the data us can be of 16 bit or 32 bit based on the
+    flash.
+
+  * The address lines connected would be based on the size of the
+    Flash.
+
+=== Device Tree Representation for NOR Flash
+
+  * Since the NOR flash is mapped to address 0x0 of the system bus it
+    can be represented as node with reg pointing the physical address
+    of it..
+
+  * The kernel has `cfi-flash` driver which can query the flash device
+    and find Flash's size and sector size, so the node can be marked
+    compatible to `cfi-flash` driver.
+
+----
+		nor_flash@00000000 {
+			compatible = "cfi-flash";
+			reg = <0x00000000 0x01000000>;
+			linux,mtd-name = "physmap-flash.0";
+			bank-width = <2>;
+		};
+----
+
+
+=== Device Tree Representation MTD Partitions
+
+  * The partitions can be represented in the dts as 
+  
+----
+			bootloader@0 {
+				label = "bootloader";
+				reg = <0x00000 0x40000>;
+				read-only;
+			};
+----
+
+=== References for MTD Bindings
+
+  * The bindings for the mtd paritions are available in
+    Documentation/devicetree/bindings/mtd/mtd-physmap.txt
+
+  * The bindings for the mtd paritions are available in
+    Documentation/devicetree/bindings/mtd/partition.txt
+
+=== Flash Driver Configuration
+
+  * The driver for the memory mapped flash device can be enabled as
+
+----
+Device drivers --->
+	<*> Memory Technology Device (MTD) support  --->
+	      RAM/ROM/Flash chip drivers  --->
+      		    <*> Memory device in physical memory map 
+		    	       	      based on OF description 
+----
+
+  * The driver for parsing the partition table from the DTS can be enabled as
+
+----
+Device drivers --->
+	<*> Memory Technology Device (MTD) support  --->
+	      <*>   OpenFirmware partitioning information support 
+
+----
+
