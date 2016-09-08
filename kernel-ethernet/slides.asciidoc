@@ -1,0 +1,167 @@
+= Adding Ethernet Support in DTS
+
+==  Ethernet
+
+[style="two-column"]
+=== Ethernet Support in kernel
+
+[style="left"]
+ * The kernel has driver for the ethernet controller, which can hook
+   into the TCP/IP stack.
+
+ * There exists PHY driver which would be used by the ethernet driver
+   to get or set the modes and speeds of the connection.
+
+[role="right"]
+image::figures/ethernet-in-linux.png[width=316]
+
+=== Ethernet HW Connectivity
+
+image::figures/ethernet-connectivity.png[align="center", width=1024]
+
+ * The Ethernet's MAC layer needs to get connected to the Phy layer
+   through Media Independent Interface (MII) for data and Management
+   Data Input/Output (MDIO) for configuration.
+
+ * The phy provides the differential lines to Magnetics isolator,
+   whose output is connected to the RJ-45 Connector.
+
+=== MII Modes
+
+ * The MII is has more set of lines, which was reduced to half by RMII.
+
+ * MII operates at 2.5 MHZ for 10 Mbps & 25 MHz for 100 Mbps.
+
+ * RMII operates at 50 MHz for 100 Mbps & 10 Mbps, where for 10 Mbps
+   the signals are held for 10 clock cycles.
+
+ * GMII operates as 125 MHz which uses 8 lines for transmission.
+
+=== Ethernet Controller
+
+ * The target board has SMSC lan91c94 ethernet chipset
+
+ * This ethernet controller has both MAC & PHY integrated within a
+   single chip.
+
+ * The SMSC controller sits on the external bus as memory mapped
+   controller.
+
+ * The memory controller is configured for proper timing and chip
+   select configuration in the boot-loader.
+
+ * The kernel driver would need only the base address and the irq for
+   the controller, which needs to provided by the DTS.
+
+=== Device Tree Representation for SMSC Ethernet controller
+
+ * Since the ethernet controller is mapped in the memory controller
+   for the address 0x4000300
+
+ * As per the bindings of the smsc controller requires the interrupt
+   number to be specified.
+
+[role="two-column"]
+=== Interrupts from External Device
+
+[role="right"]
+ * The interrupts can be specified with `interrupts-extended`
+   property, which takes the interrupt trigger type as one more
+   argument.
+
+ * The interrupt used in Verdex board is a gpio irq, where gpio
+   controller acts as the interrupt parent. Where the #interrupt-cells
+   denotes how many arguments represent a interrupt.
+
+[role="left"]
+[source,dts]
+----
+gpio@40{
+         .....
+
+         interrupt-controller;
+         #interrupt-cells = <0x2>;
+		
+         .....
+};
+----
+
+=== DTS for SMSC
+
+ * The dts node can be written as 
+
+[source,dts]
+----
+mac: ethernet@04000300 {
+	compatible = "smsc,lan91c94";
+	reg = <0x04000300 0xffd00>;
+	interrupts-extended = <&gpio 99 IRQ_TYPE_EDGE_RISING>;
+};
+----
+
+===  References for Ethernet Bindings
+
+ * Bindings for smsc is available in
+   Documentation/devicetree/bindings/net/smsc-lan91c111.txt
+ 
+ * Bindings for generic ethernet controllers is available in
+   Documentation/devicetree/bindings/net/ethernet.txt
+
+=== Tryout
+
+ * As the board has SMSC based controller connected to the system bus,
+   add node for it to the pxabus node of dts.
+
+ * build the dts 
+
+=== Testing 
+
+ * If the SMSC lan controller is added properly to the device tree and
+   the driver is enabled, it should get reflected in the boot log.
+
+ * the ethernet interface can be listed as
+
+----
+$ ifconfig -a 
+----
+
+ * the IP address for the interface can be assigned by the kernel
+   using dhcp at the boot, when specified through the kernel boot
+   argument.
+
+ * We can check the kernel command line as
+
+----
+$ cat /proc/cmdline
+----
+
+=== Testing 
+
+ * We can verify the interrupt mapping in 
+
+----
+$ cat /proc/interrupts
+----
+
+ * We can check whether interrupts are getting triggered, when packets
+   are sent as
+
+----
+$ ping -c 10.0.2.2
+$ cat /proc/interrupts
+----
+
+=== Enabling SMSC Driver
+
+ * The driver for the SMSC ethernet controller can be enabled in Linux
+   kernel as shown below.
+ 
+----
+
+   Device Drivers --->
+   	  Network device support --->
+	  	  Ethernet driver support --->
+		  	    <*>     SMC 91C9x/91C1xxx support
+----
+
+
