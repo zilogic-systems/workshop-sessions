@@ -1,0 +1,126 @@
+= Kernel Modules
+Zilogic Systems
+
+== Introduction
+
+=== Kernel Modules
+
+  * The Linux kernel consists of
+    - large base kernel image
+    - many small kernel modules located in `/lib/modules/x.y.z/`.
++
+------
+[~]$ find -name "*.ko" /lib/modules/2.6.18/ | head -n 5
+/lib/modules/2.6.18/kernel/lib/crc-itu-t.ko
+/lib/modules/2.6.18/kernel/lib/crc7.ko
+/lib/modules/2.6.18/kernel/lib/crc16.ko
+...
+------
+
+=== Plugins vs Kernel Modules
+
+  * Lot similar to plug-ins commonly found in web browsers
+  * Modules can be dynamically loaded and unloaded
+  * By loading modules features can be added to the kernel
+  * By unloading modules modules features can be removed from the kernel
+
+=== Advantages of Kernel Modules
+
+  * Smaller Base Kernel Image for Generic Kernels
+
+    - Linux distributions will have to provide generic kernels that
+      support all available hardware
+
+    - Without module support, all the drivers would have to be part of
+      the base kernel image
+
+    - With module support, all the drivers are available as modules in
+      the filesystem
+
+    - Hardware will be detected at boot time and only the required
+      modules will be loaded into the kernel
+
+  * Shorter Development Cycle
+    - Edit - Compile - Reboot cycle
+    - Edit - Compile - Unload - Load cycle
+
+
+=== What Can be Implemented as Modules?
+
+  * Device Drivers
+  * Filesystems - `ext3`, `fat`, `ntfs`
+  * Network Protocols - `ipv6`, `ppp`
+  * Cryptographic Algorithms - `aes`, `des`, `blowfish`, `sha1`
+
+== Using Modules
+
+=== Listing Modules
+
+  * The list of currently loaded kernel modules can be obtained using
+    the `lsmod` command.
++
+------
+[~]$ lsmod
+Module                  Size  Used by
+psmouse                35016  0 
+radeon                 99744  2 
+...
+usbcore               112644  2 uhci_hcd
+processor              28840  0 
+------
+
+=== Unloading a Module
+
+  * An unwanted module can be removed using the `rmmod` command
++
+------
+[~]$ lsmod | grep rtc
+rtc                    12372  0
+[~]$ sudo rmmod rtc
+[~]$ lsmod | grep rtc
+------
++
+  * A module can be removed only when it's usage count is at zero
+
+=== Loading a Module
+
+  * Module can be loaded into the kernel using the `insmod`
+
+  * `insmod` command takes the complete path to the module as argument
+
+------
+[~]$ sudo insmod /lib/modules/2.6.18/kernel/drivers/char/rtc.ko 
+[~]$ lsmod | grep rtc
+rtc                    12372  0
+------
+
+=== Module Information
+
+  * Command `modinfo` provides details about a module
++
+------
+[~]$ /sbin/modinfo /lib/modules/2.6.18/kernel/drivers/block/loop.ko 
+filename:       /lib/modules/2.6.18/kernel/drivers/block/loop.ko
+license:        GPL
+alias:          block-major-7-*
+vermagic:       2.6.18 SMP mod_unload 686 REGPARM gcc-4.1
+depends:        
+parm:           max_loop:Maximum number of loop devices (1-256) (int)
+------
+
+[role="two-column"]
+=== Modules and Dependencies
+
+[role="left"]
+image::figures/dependencies.png[]
+
+[role="right"]
+  * A module can depend on other modules
+
+  * Module load order: `D E B C A`
+
+  * Figuring out the dependencies and loading them in the right order
+    can be complex
+
+  * `modprobe` automates the process, loads the dependencies first and
+    then loads the requested module

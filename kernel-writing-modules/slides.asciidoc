@@ -1,0 +1,45 @@
+= Writing Modules
+Zilogic Systems
+
+== Hello World
+
+=== Simple Version
+
+[source,c]
+------
+include::code/simple/simple.c[]
+------
+
+=== Makefile
+
+------
+include::code/simple/Makefile[]
+------
+
+=== Building the Kernel Module
+
+[source,shell]
+------
+export CROSS_COMPILE=arm-none-linux-gnueabi-
+export ARCH=arm
+make modules M=/path/to/module 
+------
+
+=== Improved Version
+
+[source,c]
+------
+include::code/hello/hello.c[]
+------
+
+=== Makefile
+
+------
+include::code/hello/Makefile[]
+------
+
+=== Try Out
+
+  * Change the return value of init function to a negative value
+
+  * Observe what happens when the module is loaded
