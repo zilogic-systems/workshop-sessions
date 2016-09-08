@@ -86,6 +86,8 @@ a = 5;
 
 image::figures/io-controller.png[width="75%",align="center"]
 
+ifdef::arm[]
+
 == ARM Lab
 
 [role="two-column"]
@@ -144,6 +146,8 @@ $ qemu-system-arm -M connex -pflash flash.bin -nographic
 
   * Serial port of the target is mapped to stdio of Qemu
 
+endif::arm[]
+
 === RTC Registers
 
 [options="header",width="75%",align="center"]
@@ -157,7 +161,7 @@ $ qemu-system-arm -M connex -pflash flash.bin -nographic
 
 === Try Out
 
-  * Viewing the RTC count register
+  * Viewing the RTC count register, from U-Boot prompt
 +
 ------
 GUM> md 0x40900000 1
@@ -170,7 +174,6 @@ GUM> md 0x40900000 1
   * Served to refresh microprocessor and device interfacing
     fundamentals
 
-  * Explored the ARM lab setup
+  * Explored the lab setup
 
   * Re-inforced the idea of memory mapped IO with RTC example
-
