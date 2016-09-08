@@ -107,6 +107,12 @@ image::figures/setup.png[align="center",width="50%"]
   * When the target updates the contents of the display, the
     corresponding pixels on the GUI window, is updated by the emulator
 
+=== Invoking Qemu
+
+------
+qemu-system-arm -M verdex -pflash ./flash -m 256M -tftp tftpboot -serial mon:stdio
+------
+
 === Memory Map
 
 image::figures/memory-map.png[align="center",width="40%"]
