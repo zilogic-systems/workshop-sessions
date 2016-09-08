@@ -1,5 +1,6 @@
 = Unit Testing with Python
 Zilogic Systems
+:data-uri:
 
 == Introduction
 
@@ -636,6 +637,10 @@ AssertionError
 >>> mfunc.assert_has_calls([call(2, 3), call(1, 2)], any_order=True)
 ------
 
+=== Spec-ing
+
+FIXME
+
 [role="two-column"]
 === Testing GameEngine
 
@@ -725,7 +730,300 @@ image::figures/game-engine-test-2.png[width="50%",align="center"]
 
 == Patching
 
-== Faking
+=== Testing the View 
+
+  * View layer of Sokoban is written in Pygame
+
+  * `PyGameGL` object is where all access to Pygame is done
+
+  * `PyGameGL` has a method `resize()` to set the display size
++
+[source,python]
+------
+include::code/view/resize.py[]
+------
+
+=== Testing the View (Contd.)
+
+  * Unit testing best practices suggest that the `pygame` should be
+    isolated, while testing `resize()`
+
+  * `pygame` is not passed into the function as argument
+
+  * If it were passed in as argument, we could pass in a Mock object
+    for purpose of testing
+
+  * How do we replace `pygame` with a Mock Object?
+
+=== Enter Monkey Patching
+
+  * Monkey patch is a piece of code, which extends or modifies other
+    code at runtime
++
+[source,python]
+------
+>>> import sokoban.view
+>>> sokoban.view.pygame
+<module ...>
+>>> mpygame = Mock()
+>>> sokoban.view.pygame = mpygame
+------
++
+  * With this patch in place, all the accesses to `pygame`, within the
+    `view` module will receive our Mock object
+
+=== Verifying the Patch
+
+  * Let's verify that our Mock object is indeed, being used, within `view`
++
+[source,python]
+------
+>>> gl = sokoban.view.PyGameGL()
+>>> gl.resize(20, 30)
+>>> mpygame.display.set_mode.call_args_list
+[call((20, 30))]
+------
++
+  * This proves that the `set_mode()` was infact called on the Mock
+    object we patched into `pygame`
+
+=== Managing the Patch
+
+  * A patch should be reverted when longer required
+
+  * Forgetting to revert the patch will affect the functionality of
+    the patched code
+
+  * Patching for unit testing, should be restricted to the duration of
+    execution of the test
+
+    - Install the patch
+    - Run the test
+    - Revert the patch
+
+  * `mock` module provides convient helpers for this purpose
+
+=== Using `patch()`
+
+  * `patch()` should be provided the target to be patched
+  * Target is specified as a string, of the form `package.module.name` 
+  * `.start()` patches the target with a mock object, and returns it
+  * `.stop()` restores the original object
+
+[source,python]
+------
+>>> patcher = patch("sokoban.view.pygame")
+>>> mpygame = patcher.start()
+>>> import sokoban.view
+>>> sokoban.view.pygame
+<MagicMock ...>
+>>> patcher.stop()
+>>> sokoban.view.pygame
+<module ...>
+------
+
+=== Patching Custom Object
+
+  * A custom object to be patched, can be provided as argument.
++
+[source,python]
+------
+>>> mpygame = Mock()
+>>> patcher = patch("sokoban.view.pygame", mpygame)
+------
+
+=== Patch as Decorator
+
+  * `patch()` can be used as a decorator on a function
+  * The patched Mock object is passed as argument to the function
+  * Patch is applied when the test function is called
+  * Patch is reverted when the test function returns
++
+[source,python]
+------
+@patch("sokoban.view.pygame")
+def test_func(self, mpygame):
+    ...
+------
+
+=== Test Case Implementation
+
+[source,python]
+-------
+include::code/test_view_v1.py[]
+-------
+
+[role="two-column"]
+=== Testing Read Key
+
+[role="left"]
+[source,python]
+------
+include::code/view/key-map.py[]
+------
+
+[role="right"]
+  * `PyGameGL` uses a keymap to convert from `pygame`'s enumeration to
+    an internal key representation
+
+  * Rest of the code base remains, independent of `pygame`, and can be
+    easily ported to a different graphics layer
+
+=== Testing Read Key (Contd.)
+
+`read_key()` reads the key and converts to the internal key
+representation.
+
+[source,python]
+------
+include::code/view/read-key.py[]
+------
+
+=== Test Case Implementation
+
+Verify that `read_key()`, returns `Key.UNDO`, when the user presses
+the Backspace key.
+
+[source,python]
+------
+include::code/test_view_v2/read-key-undo.py[]
+------
+
+=== Try Out
+
+Write a test case to check that `read_key()` returns `Key.QUIT` when
+the event of type `pygame.QUIT` occurs.
+
+=== Patching with Context Managers
+
+[source,python]
+------
+include::code/test_view_v2/read-key-undo-with.py[]
+------
+
+== Fixtures
+
+=== What is Fixture?
+
+=== Sharing Setup Code
+
+=== Releasing Resources
+
+=== Using `addCleanup()`
+
+=== Factory Approach
+
+=== Handling Multiple Patches
+
+[source,python]
+------
+@patch("module1.func1")
+@patch("module1.class2")
+@patch("module2.func3")
+def test_some_feature(mfunc1, mclass2, mfunc3):
+    .. .
+    ...
+------
+
+=== Handling Multiple Patches (Contd.)
+
+[source,python]
+------
+def test_some_feature():
+    with patch("module1.func1") as mfunc1:
+        with patch("module1.class2") as mclass2:
+            with patch("module2.func3") as mfunc3:
+                ...
+                ...
+------
+
+=== Handling Multiple Patches (Contd.)
+
+[source,python]
+------
+class MyTestCase(TestCase):
+    def setUp(self):
+        self.mfunc1_patcher = patch("module1.func1")
+        self.mfunc1 = self.mfunc1_patcher.start()
+        self.mclass2_patcher = patch("module1.class2")
+	self.mclass2 = self.mclass2_patcher.start()
+        self.mfunc3_patcher = patch("module2.func3")
+        self.mfunc3 = self.mfunc3_patcher.start()
+
+    def test_some_feature(self):
+        ...
+
+    def tearDown(self):
+        self.mfunc1_patcher.stop()
+        self.mclass2_patcher.stop()
+        self.mfunc3_patcher.stop()
+------
+
+=== Handling Multiple Patches (Contd.)
+
+[source,python]
+------
+class MyTestCase(TestCase):
+    def setUp(self):
+        patcher = patch("module1.func1")
+	self.addCleanup(patcher.stop)
+	self.mfunc1 = patcher.start()
+
+        patcher = patch("module1.class2")
+	self.addCleanup(patcher.stop)
+	self.mclass2 = patcher.start()
+
+        patcher = patch("module2.func3")
+        self.addCleanup(patcher.stop)
+	self.mfunc3 = patcher.start()
+
+    def test_some_feature(self):
+        ...
+------
+
+=== Handling Multiple Patches (Contd.)
+
+[source,python]
+------
+class MyTestCase(TestCase):
+    def patch(self, *args, **kwargs):
+        patcher = patch(*args, **kwargs)
+        self.addCleanup(patcher.stop)
+        return patcher.start()
+
+    def test_some_feature(self):
+        mfunc1 = self.patch("module1.func1")
+	mclass2 = self.patch("module1.class2")
+        mfunc3 = self.patch("module2.func3")
+	...
+------
+
+=== Patch Mixin
+
+[source,python]
+------
+include::code/test_view_v3/patch-mixin.py[]
+------
+
+=== Test Case with Patch Mixin
+
+[source,python]
+------
+class MyTestCase(PatchMixin, TestCase):
+    def test_some_feature(self):
+        mfunc1 = self.patch("module1.func1")
+	mclass2 = self.patch("module1.class2")
+        mfunc3 = self.patch("module2.func3")
+	...
+
+------
+
+=== Test Case with Patch Mixin
+
+[source,python]
+------
+include::code/test_view_v3/read-key-undo.py[]
+------
 
 == Managing Test Cases
 

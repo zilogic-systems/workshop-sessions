@@ -1,0 +1,129 @@
+= Introduction to Drivers
+Zilogic Systems
+
+== Drivers, Introduction
+
+=== Device Abstraction
+
+  * Same helloworld program runs in any computer, despite the
+    differences in the hardware
+
+  * OS Objective: Abstract away the differences in the hardware from
+    the applications running in the OS
+
+=== Driver API
+
+image::figures/driver-api.png[align="center"]
+
+=== Consistent API
+
+image::figures/driver-api-consistent.png[align="center"]
+
+== Drivers in Linux
+
+=== File IO and Device IO
+
+image::figures/driver-linux.png[align="center"]
+
+=== Device Files
+
+  * Drivers implement the File IO API
+  * Accessed through device files
++
+------
+/dev/hda, /dev/hdb - IDE Hardisk, CDROM
+/dev/sda, /dev/sdb - SCSI or SATA Hardisk
+/dev/fd0	   - Floppy Drive
+/dev/audio         - Sound Card
+/dev/input/mice    - Mouse
+------
++
+  * Reading and writing to the device files, will result in reading
+    and writing to the devices
+
+=== Mouse Device
+
+  * Read the mouse device using the following command
++
+------
+# cat /dev/input/mice
+------
++
+  * Move the mouse, you should be able to see characters getting
+    printed on the screen
+
+  * Correlation between mouse movement and data from device file
+
+=== Mouse Device (Contd.)
+
+  * For each mouse event 3 bytes are produced
+
+  * First byte contains bits to indicate which of the 3 mouse buttons
+    was pressed
+
+image::figures/mouse.png[width="50%",align="center"]
+
+=== Print Mouse Button Status
+
+[source,c]
+------
+include::code/mouse.c[]
+------
+
+=== Device Files
+
+  * Listing of device files and regular files
+
+  * Device files have the type flag set to `c`
+
+  * Device no. instead of the size
+
+=== Drivers and Device No.
+
+image::figures/device-file-driver-1.png[align="center"]
+
+=== Drivers and Device No.
+
+image::figures/device-file-driver-2.png[align="center"]
+
+=== Drivers and Device No.
+
+image::figures/device-file-driver.png[align="center"]
+
+=== Try Out
+
+  * Try writing to the LCD display. The device file is FIXME.
+
+  * Try reading from the Keypad. The device file is FIXME.
+
+=== Minor No.
+
+image::figures/minor-1.png[width="30%"]
+
+------
+void serial_putc(char c)
+------
+
+=== Minor No. (Contd.)
+
+image::figures/minor-2.png[width="30%"]
+
+------
+void serial_putc(char c)
+------
+
+=== Minor No. (Contd.)
+
+image::figures/minor-2.png[width="30%"]
+
+------
+void serial_putc(int dev, char c)
+------
+
+=== Minor No. (Contd.)
+
+  * The no. in the device table is the major no.
+
+  * Major no. identifies the driver
+
+  * Minor no. is used by the driver to identify the device
