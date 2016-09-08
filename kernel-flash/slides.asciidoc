@@ -10,12 +10,12 @@
  * The raw Flash devices like Parallel NOR, NAND & SPI NOR are
    supported by this subsystem.
 
- * Parallel NOR resides directly in to the processor bus as a memory
-   mapped device, which the processor can access directly as a memory.
+ * Parallel NOR resides directly in the processor bus, as a memory
+   mapped device, which the processor can access as if like a memory.
 
  * The NAND or SPI NOR flashes are connected to NAND controller or a
    SPI controller which are generally not memory mapped and requires
-   special drivers for them.
+   special drivers to use them.
 
 [style="two-column"]
 === MTD Framework
@@ -26,15 +26,14 @@
     filesystem in the Flash.
 
   * The MTD subsystem tries to emulate the block device layer over the
-    Flash, and tries to provide operations other than block operations
-    through a character device layer.
+    Flash to support filesystem.
 
 image::figures/mtd-emu.png[align="center", width=400]
 
 === Using MTD
 
-  * From an application point of view the Flash device can be accessed
-    in 3 different ways.
+  * From an application point of view the Flash devices can be
+    accessed in 3 different ways.
 
   * `FS on MTD` - An MTD aware filesystem can be used to store files
     in Flash. Example: JFFS2
@@ -69,23 +68,16 @@ image::figures/mtd-emu.png[align="center", width=400]
   * But unlike a hard-disk, the partition table is specified as a
     kernel boot argument or through the device tree.
 
-  * The MTD paritions has list of partitions their base address and
+  * The MTD partitions has list of partitions their base address and
     the size.
 
+[style="two-column"]
 === NOR Flash Connectivity
 
+[role="right"]
 
   * Since NOR flash is in memory bus, it gets connected to the address
     and the data bus.
-
-
-----
-       _____                       _____ 
-      |	    | --- Address Bus --> |     |
-      | CPU | --- Data Bus    --> | NOR |
-      |_____| --- R/W Strobes --> |_____|
-
-----
 
   * The width of the data us can be of 16 bit or 32 bit based on the
     flash.
@@ -93,47 +85,116 @@ image::figures/mtd-emu.png[align="center", width=400]
   * The address lines connected would be based on the size of the
     Flash.
 
+
+[role="left"]
+image::figures/nor-connectivity.png[]
+
+
+[role="two-column"]
 === Device Tree Representation for NOR Flash
 
-  * Since the NOR flash is mapped to address 0x0 of the system bus it
-    can be represented as node with reg pointing the physical address
-    of it..
+[role="right"]
 
-  * The kernel has `cfi-flash` driver which can query the flash device
-    and find Flash's size and sector size, so the node can be marked
-    compatible to `cfi-flash` driver.
+  * `reg` is used to denote the base and size of the Flash.
 
+  * `cfi-flash` driver can query the Flash device and find Flash's
+    size and sector size, so node can be marked `compatible` to it.
+
+  * `linux,mtd-name` specifies the name of the Flash device.
+
+  * `bank-width` specifies width of the data bus of the Flash.
+
+[role="left"]
+[source,dts]
 ----
-		nor_flash@00000000 {
-			compatible = "cfi-flash";
-			reg = <0x00000000 0x01000000>;
-			linux,mtd-name = "physmap-flash.0";
-			bank-width = <2>;
-		};
+flash@0 {
+      	 compatible = "cfi-flash";
+	 reg = <0x0 0x0000000>;
+	 linux,mtd-name = "nor.0";
+	 bank-width = <2>;
+};
 ----
 
+[role="two-column"]
+=== Device Tree Representation of MTD Partitions
 
-=== Device Tree Representation MTD Partitions
+[role="right"]
 
-  * The partitions can be represented in the dts as 
+  * The partitions can be represented in the dts shown 
+
+  * `label` provides name to the partition.
   
+  * `reg` denotes the offset address and size of the partition.
+
+  * `read-only` property can be used if a partition has to marked as
+    ro partition by the kernel.
+
+[role="left"]
+[source,dts]
 ----
-			bootloader@0 {
-				label = "bootloader";
-				reg = <0x00000 0x40000>;
-				read-only;
-			};
+boot@0 {
+	label = "bootloader";
+	reg = <0x00000 0x40000>;
+	read-only;
+};
 ----
 
 === References for MTD Bindings
 
-  * The bindings for the mtd paritions are available in
+  * The bindings for the mtd partitions are available in
     Documentation/devicetree/bindings/mtd/mtd-physmap.txt
 
-  * The bindings for the mtd paritions are available in
+  * The bindings for the mtd partitions are available in
     Documentation/devicetree/bindings/mtd/partition.txt
 
-=== Flash Driver Configuration
+=== Tryout
+
+ * As the board has NOR flash of size 32 MB connected to the system
+   bus, add that to the pxabus node of dts.
+
+ * Then add four partitions of below details
+
+   1) bootloader at 0x0 of size 0x40000
+   2) bootenv at 0x80000 of size 0x40000
+   3) kernel at 0xC0000 of size 0x400000
+   4) rootfs at 0x4C0000 of size till flash end
+
+ * Download link:{include:code/nor-support.patch.datauri}["nor-support.patch",filename="nor-support.patch"] and apply to the dts.
+ 
+
+=== Testing Flash Devices
+
+  * From boot log we can find that the flash device gets detected
+
+----
+[    3.260047] physmap-flash.0: Found 1 x16 devices at 0x0 in 16-bit bank. Manufacturer ID 0x000000 Chip ID 0x000000
+[    3.262246] Intel/Sharp Extended Query Table at 0x0031
+[    3.264666] Using buffer write method
+[    3.267677] Searching for RedBoot partition table in physmap-flash.0 at offset 0x1fe0000
+[    3.270410] No RedBoot partition table detected in physmap-flash.0
+[    3.272473] 4 ofpart partitions found on MTD device physmap-flash.0
+[    3.275326] Creating 4 MTD partitions on "physmap-flash.0":
+[    3.276978] 0x000000000000-0x000000040000 : "bootloader"
+[    3.287376] 0x000000080000-0x0000000c0000 : "bootenv"
+[    3.294347] 0x0000000c0000-0x0000004c0000 : "kernel"
+[    3.301306] 0x0000004c0000-0x000001b40000 : "rootfs"
+----
+
+=== Testing the Flash Partitions
+
+  * The partition details can be obtained from the `/proc/mtd` as
+
+----
+$ cat /proc/mtd
+----
+ 
+  * we can print the contents of the bootenv partitions using
+
+----
+$ hexdump -C /dev/mtd1
+---- 
+
+=== Flash Driver Kernel Configuration
 
   * The driver for the memory mapped flash device can be enabled as
 
@@ -153,4 +214,3 @@ Device drivers --->
 	      <*>   OpenFirmware partitioning information support 
 
 ----
-
