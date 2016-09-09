@@ -560,12 +560,12 @@
         <dia:point val="15,25"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="15,24.405;19.235,25.15"/>
+        <dia:rectangle val="15,24.3864;19.2536,25.1873"/>
       </dia:attribute>
       <dia:attribute name="text">
         <dia:composite type="text">
           <dia:attribute name="string">
-            <dia:string>#0xB000_0000#</dia:string>
+            <dia:string>#0xA800_0000#</dia:string>
           </dia:attribute>
           <dia:attribute name="font">
             <dia:font family="monospace" style="0" name="Courier"/>
