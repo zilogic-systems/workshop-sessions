@@ -92,9 +92,9 @@ image::figures/device-file-driver.png[align="center"]
 
 === Try Out
 
-  * Try writing to the LCD display. The device file is FIXME.
+  * Try writing to the LCD display. The device file is `/dev/tty0`.
 
-  * Try reading from the Keypad. The device file is FIXME.
+  * Try reading from the Keypad. The device file is `/dev/i2c-key`.
 
 === Minor No.
 

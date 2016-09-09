@@ -1,7 +1,7 @@
 = Qemu Introduction
 Zilogic Systems
 
-== Using the Emulator
+== Qemu, Overview
 
 [role="two-column"]
 === Qemu, Introduction
@@ -35,82 +35,73 @@ image::figures/gumstix.jpg[align="center"]
   * PXA270 based Verdex board plus add-ons from Gumstix, will be used
     for development
 
-=== Board Components
+=== Qemu Architecture
 
+image::figures/qemu-arch.png[align="center"]
+
+=== User Mode Networking
+
+  * When a packet is written to the Ethernet controller, Qemu looks
+    into the IP and UDP/TCP payload
+
+  * If packet is a TCP connection, Qemu opens a socket on the host
+    system and connects to the specified IP
+
+  * Payload from subsequent TCP packets for the connection, is
+    extracted and written to the socket
+
+  * Same applies for UDP packets as well
+
+[role="two-column"]
+=== DHCP Server
+
+[role="left"]
+image::figures/user-mode-networking-1.png[align="center"]
+
+[role="right"]
+  * If a DHCP packet is received, then Qemu responds with an IP
+    address
+
+  * IP addresses: 10.0.2.15 - 10.0.2.31
+
+[role="two-column"]
+=== TFTP Server
+
+[role="left"]
+image::figures/user-mode-networking-2.png[align="center"]
+
+[role="right"]
+  * TFTP is a simple UDP based protocol for file transfer
+
+  * User mode networking implements a TFTP server
+
+  * If a UDP packet is destined for 10.0.2.2, port 69, then the
+    in-built TFTP server responds
+
+  * Qemu's TFTP server should be provided with a directory to serve
+    files from
+
+== Verdex Emulation
+
+[role="two-column"]
+=== Verdex Board Components
+
+[role="left"]
+image::figures/setup.png[align="center"]
+
+[role="right"]
   - SDRAM (128 MB)
   - NOR Flash (32 MB)
-  - Serial Interface
-  - Ethernet Interface
-  - LCD Interface
+  - Serial: stdio
+  - Ethernet: user mode networking
+  - LCD: Web UI
+  - I2C Keypad: Web UI
+  - LEDs: Web UI
 
-=== SDRAM Emulation
-
-image::figures/setup.png[align="center",width="50%"]
-
-Emulator allocates a portion of the host memory for emulating the
-target's RAM
-
-=== Flash Emulation
-
-image::figures/setup.png[align="center",width="50%"]
-    
-  * Since Flash is persistent, the emulator uses a file to store the
-    Flash contents
-
-  * When target reads from offset X in the Flash, the file content at
-    offset X is returned by the emulator
-
-  * When target writes to offset X in the Flash, the data is written
-    to offset X in the file by the emulator
-
-=== Serial Emulation
-
-image::figures/setup.png[align="center",width="50%"]
-
-  * Serial port is mapped to stdio of the emulator
-
-  * When target send a character through the UART, the character is
-    printed on the standard output by the emulator
-
-  * Any input given in the standard input of the emulator, is received
-    by the target on the UART
-
-=== Ethernet Emulation
-
-image::figures/setup.png[align="center",width="50%"]
-
-  * Qemu emulates an Ethernet network
-
-  * Emulator moves ethernet packets between the target and the host,
-    connecting them over an emulated ethernet network
-
-  * Qemu also runs a TFTP server and DHCP server on the host
-
-=== Ethernet Emulation (2)
-
-image::figures/setup.png[align="center",width="50%"]
-
-  * When the target requests for an IP address through DHCP, the DHCP
-    server responds with an IP address
-
-  * The TFTP server serves files from a specific directory: FIXME
-
-  * Files can be transfered into the target from the host using the
-    TFTP server
-
-=== LCD Emulation
-
-image::figures/setup.png[align="center",width="50%"]
-
-  * The target's display is emulated using a GUI window
-
-  * When the target updates the contents of the display, the
-    corresponding pixels on the GUI window, is updated by the emulator
-
-=== Invoking Qemu
+=== Invoking Qemu, without Web UI
 
 ------
-qemu-system-arm -M verdex -pflash ./flash -m 256M -tftp tftpboot -serial mon:stdio
+qemu-system-arm -M verdex -pflash flash -m 256M -tftp tftpboot -serial mon:stdio
 ------
 
 === Memory Map
