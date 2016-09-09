@@ -1,6 +1,7 @@
 = Device Interfacing
 Zilogic Systems
 :data-uri:
+:kernel-porting:
 
 == Microprocessors
 
@@ -26,13 +27,26 @@ image::figures/instruction.png[width="90%",align="center"]
 
 == Memory Interfacing
 
+=== Hypothetical 8-bit CPU
+
+image::figures/8-bit-cpu.png[width="20%",align="center"]
+
 === RAM Interfacing
 
 image::figures/single-ram.png[width="70%",align="center"]
 
+=== Multiple RAM Chips
+
+  * What if we wanted 32 bytes of RAM?
+  * And we have only 16 byte RAM chips
+
 === Two RAM Chips
 
 image::figures/two-ram-nodecode.png[width="40%",align="center"]
+
+=== Chip Select
+
+image::figures/chip-select.png[width="40%",align="center"]
 
 === With Decoding Logic
 
@@ -47,6 +61,10 @@ image::figures/7-segment.png[width="70%",align="center"]
 === Seven Segment Display
 
 image::figures/7-segment-data.png[width="70%",align="center"]
+
+=== Replace RAM with Display
+
+image::figures/two-ram.png[width="60%",align="center"]
 
 === Memory Mapped IO
 
@@ -82,9 +100,51 @@ a = 5;
 
   * Can be disabled using the `volatile` keyword
 
+[role="two-column"]
+=== Interrupts
+
+[role="left"]
+image::figures/interrupt.png[]
+
+[role="right"]
+  * Devices are slaves on the bus, cannot initiate a transaction
+  
+  * To notify the processor of data availability raises an 'interrupt'
+    to the processor
+
+  * The processor transfers control to the present location, executes
+    the interrupt handler code and returns back
+
+=== Interrupt Controller
+
+image::figures/interrupt-controller.png[align="center"]
+
+  * Interrupt Controller has multiple interrupt request lines
+
+  * Can be used to receive interrupts from multiple devices
+
+  * Interrupt Controller provides registers to idenitfy which device
+    raised the interrupt
+
+[role="tip"]
+=== //
+
+But how does the USB mouse / keyboard talk to the CPU?
+
 === Controller Based IO
 
 image::figures/io-controller.png[width="75%",align="center"]
+
+=== Why?
+
+  * I2C and SPI Bus
+    - Reduces no. of pins on the chip
+    - Saves board space, since only fewer lines are required
+
+  * USB Bus
+    - Serial interface reduces no. of wires
+    - Decreases the thicknes of cable, improves flexibility
+    - Simplified connector
 
 ifdef::arm[]
 
@@ -147,6 +207,34 @@ $ qemu-system-arm -M connex -pflash flash.bin -nographic
   * Serial port of the target is mapped to stdio of Qemu
 
 endif::arm[]
+
+ifdef::kernel-porting[]
+
+== ARM Lab
+
+=== Target Board
+
+  * Qemu to emulate the target system
+
+    - Gumstix Verdex Board
+    - Intel XScale PXA27x Processor
+    - 128 MB RAM
+    - 32 MB Flash
+
+=== Try Out
+
+  * Run `kp-init` to setup the required files and folders
+  
+    - Creates TFTP dir, with image files
+    - Creates Flash image file
+
+  * Start Qemu with the Flash contents
++
+------
+run-qemu
+------
+
+endif::kernel-porting[]
 
 === RTC Registers
 
