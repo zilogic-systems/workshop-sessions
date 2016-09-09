@@ -113,6 +113,8 @@ image::figures/bus-model-7.png[align="center"]
 
 === I2C Driver Skeleton
 
+Download link:{include:code/i2c-my/my.c.datauri}["skel.c",filename="skel.c"]
+
 [source,c]
 ------
 include::code/i2c-my/my.c[]
@@ -123,7 +125,7 @@ include::code/i2c-my/my.c[]
   * `rmmod` the `i2c_key` module
 
   * Modify the skeleton code so that the `probe()` callback is called
-    for the i2c device `zkey`
+    for the I2C device `zkey`
 
   * Build the module, and check if the `probe()` is invoked when the
     module is loaded
