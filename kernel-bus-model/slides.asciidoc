@@ -1,0 +1,247 @@
+= Bus Model
+Zilogic Systems
+
+== Hotplug
+
+=== Hotplug Buses
+
+  * Hotplug is the ability to connect and disconnect a device on a
+    running system.
+
+  * Some busses are hotplug capable, while others are not.
+
+  * Examples of busses that support hotplug - USB, Firewire, cPCI, 
+    etc.
+
+  * Examples of busses that do not support hotplug - system bus, ISA
+    bus, I2C, etc.
+
+=== OS Support
+
+  * With hotplug capable busses the devices can be connected after
+    boot-up and the driver should be able to handle the device at any
+    time
+
+  * The hotplug capable buses, provide the following capabilities for
+    the OS to detect and handle the devices correctly
+
+    1. The bus controller can determine the list of devices connected
+       to the bus
+
+    2. The devices on the bus, provide the model no. they belong to,
+       usually using a vendor ID and product ID
+
+== Bus Model and Driver Binding
+
+=== Bus Model
+
+image::figures/bus-model-1.png[align="center"]
+
+  * The system keeps track of the devices and drivers for every bus in
+    the system
+
+  * This hierarchy of buses and the list of devices and drivers
+    pertaining to each bus, is called the bus model
+
+  * The bus model is exported to the user space through the sysfs
+    filesystem under `/sys/bus`
+
+=== Adding Device
+
+image::figures/bus-model-2.png[align="center"]
+
+=== Adding Drivers
+
+image::figures/bus-model-3.png[align="center"]
+
+=== Matching
+
+image::figures/bus-model-4.png[align="center"]
+
+  * When a device is added to the device list, the Bus Driver checks
+    if there is a driver that can handle the device.
+
+=== Matching (Contd.)
+
+image::figures/bus-model-5.png[align="center"]
+
+  * When a driver is added to the driver list, the Bus Driver checks
+    if there is a device that the driver can handle.
+
+=== Binding
+
+image::figures/bus-model-6.png[align="center"]
+
+  * If a match is found, then the driver's `probe()` function is
+    called with the device information as argument
+
+  * If `probe()` is successful, the device is said to be bound to the
+    driver
+
+  * Indicated in sysfs, in the driver node
+
+== Generalizing the Bus Model
+
+=== Bus Model for Non-Hotplug Devices
+
+  * Uniform handling of both hotplug and hotplug busses / devices
+
+  * Separate-out machine specific code from the driver
+
+=== Limitations of Non-Hotplug Busses
+
+  * The kernel provides mechanisms to overcome the following
+    limitations of buses that are not hotplug capable
+
+    1. The buses cannot detect what devices are present
+
+    2. The devices cannot identify themselves with a vendor ID &
+        product ID
+
+=== Overcoming the Limitations
+
+  * The first limitation is overcome by populating the device list at
+    boot-up by the board specific code of the kernel
+
+  * The second limitation is overcome by providing a unique string, to
+    identify the device. Drivers identify the devices that they
+    support using the unique string
+
+=== I2C Bus
+
+image::figures/bus-model-7.png[align="center"]
+
+=== I2C Driver Skeleton
+
+[source,c]
+------
+include::code/i2c-my/my.c[]
+------
+
+=== Try Out
+
+  * `rmmod` the `i2c_key` module
+
+  * Modify the skeleton code so that the `probe()` callback is called
+    for the i2c device `zkey`
+
+  * Build the module, and check if the `probe()` is invoked when the
+    module is loaded
+
+  * Check `sysfs` to see if the driver is bound to the device
+
+== Module Autoload
+
+=== Autoloading
+
+  * Driver tells us how a driver starts handling a device, if the
+    driver is already loaded
+
+  * If the driver is not already loaded, it should be loaded first
+
+  * Autoloading happens
+    - at boot up
+    - during device hotplug
+
+=== How does it work?
+
+  * Observations
+    - Only userspace is capable of loading modules into the kernel
+    - `modprobe` should be invoked to load the required modules
+
+  * Requirements
+    - Device hotplug should be notified to user space
+    - Userspace should be able to identify the driver for the device
+
+=== Device Hotplug Notification
+
+  * Device hotplug is notified to user space, through netlink socket
+
+  * When a device is plugged into the system, a message is sent on
+    netlink socket
+
+  * Contains information about the device plugged
++
+------
+bus:vendor-id-product-id
+------
++ 
+  * Examples
++
+------
+i2c:zkey
+pci:v00000010d00000020
+------
+
+=== Module Loading by Alias
+
+  * Modules can have an alias
+
+  * Aliases for a module can be obtained using `modinfo`
+
+  * Module can be loaded by its filename or by its alias AKA modalias
++
+------
+modprobe i2c_key
+modprobe i2c:zkey
+------
+
+=== Module's Alias Can Have Wild Cards
+
+  * If modules alias is `pci:v00000010d*`
+
+  * Matches devices with vendord ID 0x10 and any device ID
+
+  * Module can be loaded with any of the following names
+    - `pci:v00000010d00000020`
+    - `pci:v00000010d00000030`
+
+=== Device to Driver Mapping
+
+  * Modules alias AKA modalias provides device to driver mapping
+
+  * The device information sent over netlink is infact the modalias
+    string of the device
+
+  * `modprobe` should be invoked with the modalias string of the
+    inserted device
+
+  * Matching driver will be loaded into the kernel, and the bus model
+    takes over
+
+=== UDev, Completes the Puzzle
+
+image::figures/autoload.png[align="center"]
+
+=== Try Out
+
+  * Try loading `8139cp` PCI driver with the filename first, in the
+    host system (VM)
+
+  * You should use `sudo` to load and unload modules
+
+  * Find out the modalias names for the PCI driver
+
+  * Try loading the driver with the alias names
+  
+=== Module Device Table
+
+  * The list of supported devices is injected in the module info using
+    the following macro
++
+[source,c]
+------
+MODULE_DEVICE_TABLE(i2c, my_id)
+------
++
+  * First argument is the bus type: `i2c`, `pci`, `usb`, ...
+
+  * Second argument is the array of IDs, indicating the supported
+    devices
+
+=== Try Out
+
+  * Add a few more device names to id list of our I2C driver
+  * Build and check if they appear in the `modinfo` output
+  * Remove the `MODULE_DEVICE_TABLE()` macro invocation build and
+    check `modinfo` output
