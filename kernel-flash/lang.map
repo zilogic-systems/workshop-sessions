@@ -1,0 +1,5 @@
+armasm = armasm.lang
+c = cpp.lang
+txt = nohilite.lang
+dts = dts.lang
+sh = sh.lang
