@@ -9,7 +9,7 @@ photos = figures/gumstix.jpg
 all: slides.html
 
 figures/gumstix.jpg:
-	wget -O $@ 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Gumstix.agr.jpg/1280px-Gumstix.agr.jpg'
+	wget --no-check-certificate -O $@ 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Gumstix.agr.jpg/1280px-Gumstix.agr.jpg'
 
 slides.html: $(images_png) $(photos)
 
