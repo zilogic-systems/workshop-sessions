@@ -1,6 +1,72 @@
 = Device Tree Syntax
 Zilogic Systems
 
+== Need for Device Tree
+
+=== Boot-up in PC
+
+  * In a PC, when the kernel boots up, the kernel can figure out
+    address of basic peripherals
+    - Either fixed
+    - Can be queried from the BIOS
+
+=== Boot-up in ARM
+
+  * ARM SoCs are designed by variety of vendors
+    - Differ in RAM base address
+    - Differ in the peripheral controllers
+    - Differ in the startup and initialization sequence
+    - Information cannot be queried from a BIOS
+
+  * In an ARM SoC, when the kernel boots up,
+    - Does know the location of peripherals
+    - Drivers required to handle the peripherals
+
+=== Solution 1
+
+  * For each SoC / machine, the kernel had board specific setup and
+    initialization code
+
+  * The available devices where hard coded into the kernel of each
+    machine
+
+  * Boot code will add them as platform devices, with the following
+    information
+    - Register Address
+    - IRQ Numbers
+
+  * Boot Sequence
+    - Machine specific code does initialization
+    - Required drivers using the platform device information
+
+=== Problem with Solution 1
+
+  * Did a good job of containing the problem to a certain extent
+
+  * Still a lot of code duplication between SoC variants
+
+  * Kernels had to be compiled for each target, and single kernel
+    could not support multiple hardware
+
+  * Lot of common code, that was not generalized into frameworks
+
+=== Solution 2: Pure Data Driven Approach
+
+  * In-memory tree-like data structure called the device tree provides
+    information about the system
+
+    - base address of RAM
+    - available peripherals, and their base addresses
+
+  * Data driven approach, forced lot of code to be converted to
+    frameworks: `irq`, `pinctrl`, `gpio`, `clock`, `led`, etc.
+
+  * And machine specific code were converted to drivers within these
+    frameworks
+
+  * Now, at boot-up a common code, queries the device tree to figure
+    out details of the machine and invokes the appropriate drivers
+
 == Device Tree History
 
 === Open Firmware
@@ -49,9 +115,7 @@ Zilogic Systems
   * Binary representation called the Device Tree Binary and files had
     the extension `.dtb`
 
-== ARM & Device Trees
-
-=== Kernel Support for ARM
+=== Device Trees in ARM
 
   * In 2011, the ARM support for the Linux kernel was overflowing with
     patches and lots of copied and duplicated code with minor
@@ -60,73 +124,7 @@ Zilogic Systems
   * The problem was covered in the LWN article at
     http://lwn.net/Articles/439314/
 
-  * Problems solved by device tree
-    - Board File Proliferation
-    - Kernel Forks / Patches
-    - Duplicated SoC Code
-    - Multi-platform Kernels
-
-=== Board File Proliferation
-
-  * SoC busses: not possible to detect what devices are connected to
-    the bus at run-time
-
-  * Device information specified using platform devices
-    - base address
-    - interrupts
-    - DMA channels
-    - clocks
-
-=== Board File Proliferation (Contd)
-
-  * Hard coded board specific configuration
-    - IO pin configuration
-    - GPIOs
-    - External Interrupts
-
-  * For every new board, slightly different configuration, kernel had
-    to be modified to support it
-
-  * With device trees, kernel code need not be modified to add support
-    for a new board
-
-=== Kernel Forks / Patches
-
-  * Kernels where un-necessarily forked by board vendors to add
-    support to their board
-
-  * Or there where un-merged patches floating around to support a
-    specific board
-
-  * Device trees simplified the process of porting the kernel,
-    reducing the bar for submitting patches to the kernel
-
-=== Duplicated SoC Code
-
-  * For each SoC GPIO handling, power management, clock management
-    were similar but still there was no code reuse
-
-  * For SoC variants, duplicated copies of SoC code with minor
-    modification, were added for each SoC
-
-  * Forcing all machine specific information to be data-driven through
-    device trees, forced people to reuse existing drivers, with
-    drivers using information from device trees to handle variants of
-    the device.
-
-=== Multi-platform Kernels
-
-  * In the x86 world, it possible for a single kernel to work across
-    multiple different machines
-
-  * The kernel queries the devices and starts accessing them
-
-  * But such generic ARM kernels were not possible. The kernel had to
-    be compiled for one SoC
-
-  * With device trees, and the necessary to code to implement
-    multi-plaform kernels, generic kernels are now able to run on a
-    wide variety of SoCs
+  * Gradually, all machines are being moved to use the device tree
 
 == Syntax
 
