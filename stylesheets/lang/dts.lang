@@ -8,7 +8,7 @@ include "c_string.lang"
 
 keyword = '\<(aliases)?\>' nonsensitive
 # node name
-keyword = '[a-zA-Z0-9_,._+-]+(@[0-9a-fA-F]+)?[[:blank:]]*(?={)'
+keyword = '[a-zA-Z0-9_,._+-]+(@[0-9a-fA-F]+)?[[:blank:]]*(?=\{)'
 
 # prop name
 variable = '\<[a-zA-Z0-9,._+?#-]+\>(?=[[:blank:]]*=)' nonsensitive
