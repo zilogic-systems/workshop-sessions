@@ -1,0 +1,169 @@
+= Driver for Device Tree
+
+== Need for Device Model
+
+=== Pre Enumerated Devices
+
+ * The CPU's system bus is a pre-enumerated bus, means the controllers
+   are allocated with their base address during their production
+   itself.
+
+ * Since the bus is non discoverable bus, we cannot probe the
+   addresses of the controller from the processor.
+
+ * The memory map of the SoC would be available in datasheet and this
+   memory map has to be known to the drivers.
+
+ * Drivers developed for these busses, had hardcoded the controller's
+   addresses.
+
+=== SoC Derivatives 
+
+ * In a SoC evolution, there were numerous SoCs designed with slighter
+   variation.
+ 
+ * The same peripherals controllers might be used in different SOCs of
+   same family. Ex:PXA25x, PXA27X
+
+ * Since the peripheral controllers are, built as HW libraries and
+   reused in several processors and usually called as IPs.
+
+ * There also scenarios where same peripheral controllers IP are
+   shared across differerent SOC vendors. Ex: DWC USB 3.0 Controller
+
+  * Where there is change only in the resources like base address, irq
+    no and dma channel, but not in the register sequence.
+
+=== Compile Time Device Mapping
+
+  * In the drivers which are common for different CPUs, different
+    resource information were handled with `ifdef` ladders.
+
+  * And the drivers were mapped to particular resources at compile
+    time.
+
+=== No DT Driver Example
+
+[source,c]
+------ 
+include::code/rtc-raw.c[]
+------
+
+=== Platform Agnostic Drivers 
+
+  * But this platform specific drivers would be less flexible to
+    support multiple SoCs.
+
+  * If the drivers has these platform specific resources embedded into
+    it, then it cannot be a platform agnostic driver.
+
+  * To develop a platform agnostic driver, the portions other than
+    register manipulation, need to be moved out of the driver.
+
+  * So that driver becomes platform agnostic and can be mapped to
+    devices at runtime, rather than at compile time.
+
+=== Device Model 
+
+  * In Linux kernel the platform related information are moved out of
+    driver and it is represented as `device` and provided with a unique
+    string as a name to identify themselves.
+
+  * The `device` would represent the resources like `Memory Regions`
+    of the controller, `IRQ Nos` designated in the particular
+    platform.
+
+  * The core logic which manipulates the registers is represented as
+    `driver`.
+
+  * Drivers are mapped to the devices that they support using by
+    matching the unique string.
+
+
+=== Platform Device
+
+  * Since the bus model is generalized and is extended to buses and
+    devices that are not hotplug capable, such as SOC's system bus.
+
+  * In Linux kernel The SOC's system bus is represented as platform
+    bus.
+  
+  * The peripheral controllers which are available in SOCs are called
+    as platform devices.
+
+  * Platform devices are populated at boot-up by the architecture
+    specific code of the kernel.
+
+  * Platform devices are provided with a unique string, to identify
+    themselves.
+
+=== Platform Device Example
+
+[source,c]
+------ 
+include::code/rtc-device.c[]
+------
+
+=== Platform Driver
+
+  * The drivers which serve platform devices are called as platform
+    drivers.
+
+  * The platform drivers registers to kernel in platform specific
+    code, specifing the device name which it can handle.
+
+  * The platform bus driver matches the platform device and platform
+    driver, on successful matching passes the platform device
+    information to the platform driver through it's probe function.
+
+=== Platform Driver Example 
+
+[source,c]
+------ 
+include::code/rtc-driver.c[]
+------
+
+=== Device Tree for Platform Devices 
+
+  * In kernel startup code the device tree is parsed and the platform
+    devices are registered in the bootup.
+ 
+  * Now it is possible that kernel has only platformm agnostic
+    drivers, which can be bound to the device dynamically at runtime.
+
+=== Platform Driver for Device Tree
+
+* For the platform driver to support device tree, it needs to define
+  the set of device tree compatible names it can handle.
+
+[source,c]
+------ 
+include::code/rtc-of-driver.c[]
+------
+
+=== Tryout
+
+ * Download
+    link:{include:code/rtc-raw.c.datauri}["rtc-raw.c",filename="rtc-raw.c"]
+    and test it.
+
+ * Download
+    link:{include:code/rtc-driver.c.datauri}["rtc-driver.c",filename="rtc-driver.c"]
+    build, and load the module.
+
+ * Download
+    link:{include:code/rtc-device.c.datauri}["rtc-device.c",filename="rtc-device.c"],
+    build and load the module.
+
+ * Download
+    link:{include:code/rtc-of-driver.c.datauri}["rtc-of-driver.c",filename="rtc-of-driver.c"],
+    build and test it.
+
+=== References 
+
+* Information related to platform drivers can be referred in
+  https://lwn.net/Articles/448499/
+
+* Using device tree and platform data is available in
+  http://elinux.org/Device_Tree_Linux
+
