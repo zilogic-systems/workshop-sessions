@@ -1,0 +1,50 @@
+--- pxa27x-verdex.dts	2016-09-09 14:19:11.673653862 +0530
++++ pxa27x-verdex-display.dts	2016-09-09 14:24:32.777668866 +0530
+@@ -44,5 +44,47 @@
+                         };
+                 };
+ 
++		lcd-controller@40500000 {
++			compatible = "marvell,pxa270-lcdc";
++			reg = <0x44000000 0x10000>;
++			interrupts = <17>;
++			clocks = <&clks CLK_LCD>;			
++			status = "okay";
++
++			port {
++				lcdc_out: endpoint {
++					remote-endpoint = <&panel_in>;
++					bus-width = <16>;
++				};
++			};
++		};
++
++	};
++
++	display@0 {
++		display-timings {
++			native-mode = <&timing0>;
++			timing0: 480x640 {
++				clock-frequency = <20000000>;
++				hactive = <480>;
++				vactive = <640>;
++				hfront-porch = <4>;
++				hback-porch = <8>;
++				hsync-len = <4>;
++				vback-porch = <3>;
++				vfront-porch = <3>;
++				vsync-len = <2>;
++				hsync-active = <1>;
++				vsync-active = <1>;
++			};
++		};
++			
++		port {
++			panel_in: endpoint {
++				remote-endpoint = <&lcdc_out>;
++			};
++		};
+ 	};
++
++
+ };
