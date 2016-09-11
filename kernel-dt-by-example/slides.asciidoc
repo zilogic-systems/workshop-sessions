@@ -76,16 +76,15 @@ bus {
 
   * Devices are represented by child nodes of the bus node
 
-[role="two-column"]
 === DTS for Machine v2
 
-[role="left"]
 [source,dts]
 ------
 include::code/v2/peripherals[]
 ------
 
-[role="right"]
+=== DTS for Machine v2 (Contd.)
+
   * Memory mapped bus is represented by `/pxabus`
 
   * Memory mapped peripherals are represented as children of
@@ -155,16 +154,15 @@ image::figures/interrupt-tree.png[align="center"]
 
   * Drivers require the IRQ no. to register interrupt handler
 
-[role="two-column"]
 === DTS for Machine v3
 
-[role="left"]
 [source,dts]
 ------
 include::code/v3/interrupt-property[]
 ------
 
-[role="right"]
+=== DTS for Machine v3 (Contd.)
+
   * `interrupt-parent` indicates the interrupt controller to which
     interrupt output is connected
   
@@ -174,10 +172,8 @@ include::code/v3/interrupt-property[]
   * No. of cells used to represent an interrupt is indicated by the
     `#interrupt-cells` property of the interrupt controller
 
-[role="two-column"]
 === Interrupt Parent Inheritance
 
-[role="left"]
 [source,dts]
 ------
 /dts-v1/;
@@ -199,7 +195,8 @@ include::code/v3/interrupt-property[]
 };
 ------
 
-[role="right"]
+=== Interrupt Parent Inheritance
+
   * If `interrupt-parent` is not specified in a node, it is
     recursively searched for in parent nodes
 
@@ -266,16 +263,15 @@ include::code/v4/clks[]
 
   * Will be referred to by device nodes that it provides clocks for
 
-[role="two-column"]
-=== DTS for Machine v4
+=== DTS for Machine v4 (Contd.)
 
-[role="left"]
 [source,dts]
 ------
 include::code/v4/clocks-property[]
 ------
 
-[role="right"]
+=== DTS for Machine v4 (Contd.)
+
   * `clocks` property specifies the clocks used by the peripheral
 
   * Specifies one ore more clock specifier
@@ -317,53 +313,30 @@ include::code/v5/compatible[]
 
   * Between bootup the names of serial ports can change!
 
-[role="two-column"]
 === Device Naming with `aliases`
 
-[role="left"]
 [source,dts]
 ------
 include::code/v6/aliases[]
     ...
 ------
 
-[role="right"]
+=== Device Naming with `aliases` (Contd.)
+
   * Device numbering can be controlled using `aliases`
   * `aliases` are used to specify the device numerbing
   * Each property specifies an alias
-
-[role="two-column"]
-=== Device Naming with `aliases`
-
-[role="left"]
-[source,dts]
-------
-include::code/v6/aliases[]
-    ...
-------
-
-[role="right"]
   * Alias names have the following naming convention
 +
 ------
 <alias-name><id>
 ------
-+
+
+=== Device Naming with `aliases` (Contd.)
+
   * Example: `serial0`
     - `alias-name` is `serial`
     - `id` is `0`
-
-[role="two-column"]
-=== Device Naming with `aliases`
-
-[role="left"]
-[source,dts]
-------
-include::code/v6/aliases[]
-    ...
-------
-
-[role="right"]
   * The value of the property is a string, representing the path to
     the device node
 
@@ -374,29 +347,34 @@ include::code/v6/aliases[]
 
 === Try Out
 
-  * Replace the DTS file in the kernel source tree, build and boot
+  * Get the minimal bootable DTS file:
+    link:{include:code/v6/full.datauri}["basic.dts",filename="basic.dts"]
 
-  * Check if the RTC device file `/dev/rtc0` is available. `hwclock`
-    will fail
+  * Replace the `arch/arm/boot/dts/pxa27x-verdex.dts` with this DTS
+    file.
 
-  * Add the RTC device node to the DTS file, build and boot
-    - Register Region Base: `0x40900000`
-    - Register Region Size: `0x3c`
-    - IRQ Nos.: `30`, `31`
+  * Build the kernel using
++
+------
+export ARCH=arm
+export CROSS_COMPILE=arm-none-linux-gnueabi-
+make -j4
+------
++
+  * Copy the generated DTB file into TFTP folder, boot
 
-  * Check if the RTC device file `/dev/rtc0` is available. `hwclock`
-    should work
+  * LCD and Keypad will not work, since the device was not added, and
+    hence driver was not initialized
 
-[role="two-column"]
 === `cpus` node
 
-[role="left"]
 [source,dts]
 ------
 include::code/v7/cpus[]
 ------
 
-[role="right"]
+=== `cpus` node (Contd.)
+
   * Since the no. of cpus is only 1, `#address-cells` and
     `#size-cells` is set to `0`
 
@@ -480,6 +458,9 @@ include::code/layered.dts[]
     mechanism
 
 === Try Out
+
+  * Get the minimal layered DTS file: 
+    link:{include:code/layered.dts.datauri}["layered.dts",filename="layered.dts"]
 
   * Replace the DTS file in the kernel source tree, build and boot
 
