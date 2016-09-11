@@ -72,9 +72,9 @@ bus {
 ------
 
 [role="right"]
-  * Nodes with children represent busses
+  * Busses are represented by nodes with child nodes
 
-  * Children of a bus node, represent devices on the bus
+  * Devices are represented by child nodes of the bus node
 
 [role="two-column"]
 === DTS for Machine v2
