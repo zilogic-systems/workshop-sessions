@@ -105,7 +105,7 @@ image::figures/nor-connectivity.png[]
   * `bank-width` specifies width of the data bus of the Flash.
 
 [role="left"]
-[source,dts]
+//[source,dts]
 ----
 flash@0 {
       	 compatible = "cfi-flash";
@@ -130,7 +130,7 @@ flash@0 {
     ro partition by the kernel.
 
 [role="left"]
-[source,dts]
+//[source,dts]
 ----
 boot@0 {
 	label = "bootloader";
