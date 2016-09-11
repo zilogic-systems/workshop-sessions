@@ -1,3 +1,4 @@
+
 yocto-sessions = 		\
 	autotools		\
 	bitbake-data-model	\
@@ -31,7 +32,8 @@ kp-sessions =			\
 	kernel-soc		\
 	kernel-dt-by-example	\
 	kernel-gpio		\
-	kernel-pinctrl
+	kernel-pinctrl		\
+	kernel-i2c
 
 sessions = $(yocto-sessions) $(kp-sessions)
 
