@@ -1,0 +1,58 @@
+= I2C
+Zilogic Systems
+
+== I2C and Device Tree
+
+=== Background
+
+  * I2C is a low speed serial bus
+
+  * It is convenient over memory mapped access, since it is a serial
+    bus with two signals, clock and data
+
+  * Each peripheral connected to the bus is given a unique 7-bit
+    address, hence a maximum of 127 devices can be connected
+
+  * The device which provides clock is the master and all the other
+    devices in the bus acts as a slave. Only the master can initiate a
+    transaction
+
+=== Device Tree
+
+  * I2C controller node represents the I2C bus
+
+  * I2C devices are represented as child nodes in the I2C bus
+  
+  * I2C controller properties
+    - `#address-cells` is set to 1
+    - `#size-cells` is set to 0
+
+  * I2C device properties
+    - `#reg` is set to the 7-bit address
+
+== Verdex Info
+
+[role="two-column"]
+=== I2C Keypad
+
+[role="left"]
+[source,dts]
+------
+zkey@30 {
+    compatible = "zkey";
+    reg = <0x30>;
+    interrupts-extended = <&gpio 19 IRQ_TYPE_EDGE_RISING>;
+};
+------
+
+[role="right"]
+  * I2C address is `0x30`
+
+  * Interrupt is generated to GPIO controller, pin 19
+
+=== Try Out
+
+  * First verify that the I2C Keypad device file is not present
+  * Add the I2C device node to the device tree
+  * Build and boot with the modified device tree
+  * Ensure the keypad is now accessible
