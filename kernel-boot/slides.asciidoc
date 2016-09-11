@@ -1,0 +1,244 @@
+= Device Tree Boot
+
+== Pre Device Tree Boot
+
+=== ATAGS
+
+* Prior to device tree boot, in ARM architecture informations like
+  - Ram Size
+  - Kernel Boot Arguments
+  - Ramdisk Location 
+
+were passed through ATAGS by the bootloader.
+
+[role="two-column"]
+=== ATAGS (2)
+
+[role="left"]
+-----
+	+-----------+----------+
+base ->	| ATAG_CORE |	       |  
+     	+-----------+----------+  
+     	| ATAG_MEM  | Mem Size |  | increasing 
+     	+-----------+----------+  v address
+     	| ATAG_NONE |          |
+     	+-----------+----------+  
+-----
+
+[role="right"]
+* Bootloader sets registers as 
+  - `r0` - is set as 0
+  - 'r1' - is set as unique registered machine ID
+  - 'r2' - as set as the base address of ATAGS.
+
+[role="two-column"]
+=== Boot Strapping Linux
+
+[role="right"]
+* Kernel is loaded at address offset 0x8000 (32K) from the base of the
+  physical memory.
+
+* The information like ATAGS, which are to be passed are placed within
+  this 0x8000 offset.
+
+* Typically bootloaders like U-Boot places ATAGS in offset 0x100.
+
+[role="left"]
+-----
+	+-----------+----------+
+RAM  ->	| 0x0000    | Data to  | 
+Base  	| 	    | Kernel   |  
+     	+-----------+----------+  
+     	| 0x8000    | Kernel   |  | increasing address
+     	+-----------+----------+  v
+     	| ATAG_NONE |          |
+     	+-----------+----------+  
+-----
+
+=== Device Tree From Bootloader
+
+* The device tree has to be passed to the Linux kernel by the
+  bootloader.
+
+* if required the bootloader patches the dtb with the boot arguments
+  provided.
+
+* In U-boot For ARM architecture, the device tree blob is loaded into
+  memory between after Linux kernel, and close to 64MB or 128MB
+  boundary and ramdisk is placed after the DTB.
+
+* the bootloader passes the starting address of the device tree blob
+  through `r2` register.
+
+  - `r0` - is set as 0
+  - 'r1' - is set as ~0, is all ones so it doesn't match any machine.
+  - 'r2' - is set as the base address of dtb.
+
+=== Kernel Boot Sequence
+
+image::figures/boot-flow.png[align="center",width=800]
+
+=== Kernel Boot Sequence (2)
+
+* In Linux kernel, the execution starts at `arch/arm/kernel/head.S`
+  and `head-common.S`
+  - Verifies the dtb/atags
+  - Sets up minimal page table & enables MMU
+  - Copies data segement & Clears BSS
+  
+* After setting up the architecture and boot specific features, it
+  starts into `start_kernel` function available in `init/main.c`
+
+* `start_kernel`, calls `setup_arch` from `arch/arm/kernel/setup.c`,
+  which actually calls `unflatten_device_tree` .
+
+=== Kernel Boot Sequence (3)
+
+* At the end of `start_kernel` it calls `rest_init`.
+
+* From `rest_init` a kernel thread starts `kernel_init` for kernel
+  initialization.
+
+* From where it jumps into 'kernel_init_freeable', in which
+  `do_basic_setup` is invoked.
+
+* Here the `do_initcalls` is called, which invokes the init function
+  of all the kernel modules.
+
+=== Device Tree Boot Sequence
+
+* The kernel checks for the compatible string of the root node with
+  the machine list it has.
+
+* The function `driver_init` in `drivers/init/base.c`, which calls
+  `device_init`, `platform_bus_init`, which both initializes the bus
+  model and platform bus of the Linux kernel.
+
+* In ARM architecture specific code the `customize_machine` is
+  registered as `arch_initcall` method, which calls
+  `of_platform_populate`.
+
+* `of_platform_populate` populates the platform devices to the
+  platform bus.
+
+===  DT Machine Definition
+
+* The name of the supported machine are defined as a string arrays
+ 
+----
+static const char * const pxa27x_dt_board_compat[] __initconst = {
+	"marvell,pxa270",
+	NULL,
+};
+----
+
+* This has to be set to the kernel's support machines.
+
+----
+DT_MACHINE_START(PXA27X_DT, "Marvell PXA2xx (Device Tree Support)")
+	.dt_compat	= pxa27x_dt_board_compat,
+MACHINE_END
+
+----
+
+* The supported machines are verfied at the architecture specific boot
+  code.
+
+=== Init Calls Invocation
+
+* Each module defines it's initcall using `module_init` function,
+  which would be invoked by kernel to initialize the module.
+
+* All the initcall funtion addresses are written sequentially in a
+  array, by defining special linker sections for them.
+
+* These array of functions are invoked in sequence by the kernel.
+
+* Since the order of function invocation is based on the order of
+  linking by the linker, it becomes a problem that we couldn't control
+  the dependencies between modules.
+  Ex: spi flash driver requries spi controller driver prior to it.
+
+* To control the dependency and ordering between modules, kernel
+  modules can be marked to different init levels.
+
+=== Init Call Levels
+
+* Kernel supports 8 initcall levels each holds array of init
+  functions.
+
+  - early
+  - core
+  - post_core
+  - arch
+  - subsystem
+  - fs
+  - device
+  - late
+
+=== Init Call Levels (2)
+
+* They are invoked in the same order as specified earlier
+
+* Initcalls can be placed in the required initcall level to, sequence
+  the dependencies.
+
+* `module_init` call places the module in the `device` initcall level.
+
+* if a module explicitly wants to raise its initcall level it can
+  register it to other initlevel as xxx_initcall(<init_function>) 
+  Ex : arch_initcall(customize_machine);
+
+=== Platform Bus
+
+* In `arch_initcall` level the platform devices are added to the
+  platform bus by `of_platform_populate`.
+
+* child nodes of the root and the nodes which has compatible property
+  has `simple-bus` are populated as the platform devices.
+
+* the drivers which were added prior to device population, would bind
+  immediately to the devices which are added to the bus.
+
+* The drivers which gets added later to the platform bus, would bind
+  to the devices, in the order of driver's init invocations.
+
+=== Deferred Probe
+
+* On the failure of device and driver binding, if the probe returns
+  `EPROBE_DEFER`, device probing is deferred.
+
+* The deferred binding would be triggered at the `late_inicall` stage.
+
+=== Device Tree Journey
+
+image::figures/dtc-lifecycle.png[align="center", width=800]
+
+=== Device Tree Journey (2)
+
+* DTS text representation is compiled to binary flattened device tree
+  blob.
+
+* The DTB is patched by the bootloader.
+
+* The patched DTB is loaded into memory and passed to the kernel.
+
+* The early kernel drivers directly access the fdt to get cpu specific
+  parameters.
+
+* The kernel unflattens the device tree blob as a tree data structure,
+  which can be traversed easily.
+
+=== Device Tree Journey (2)
+
+* This expanded device tree is used by the kernel to build the
+  platform bus.
+
+* The `/sys/firmware/device-tree` is filesystem representation of the
+  expanded device tree.
+
+* The `/sys/bus/platform/` is the device model representation of the cpu
+  bus.
+
+* The `/sys/firmware/fdt` has the fdt blob which is available as a
+  reference for debugging.

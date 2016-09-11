@@ -21,7 +21,13 @@ kp-sessions =			\
 	kernel-build		\
 	kernel-writing-modules	\
 	kernel-bus-model	\
-	kernel-dt-syntax
+	kernel-dt-syntax	\
+	kernel-display		\
+	kernel-boot		\
+	kernel-dt-drivers	\
+	dt-debugging		\
+	kernel-ethernet		\
+	kernel-flash
 
 sessions = $(yocto-sessions) $(kp-sessions)
 

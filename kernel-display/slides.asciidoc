@@ -208,17 +208,17 @@ $ cat /dev/urandom > /dev/fb0
   the display.
 
 ----
-PC$ convert logo: -fill none -stroke black -strokewidth 3 \
-    	     -draw "rectangle 10,10 630,470" logo_rect.png
-
-PC$ cp logo_rect.png ~/tftpboot
+PC$  convert -size 480x640 xc:skyblue -fill white -stroke black \
+     -draw "rectangle 10,10 470,630" rect.rgb
+PC$ cp rect.rgb ~/tftpboot
 ----
 
 * Then the created image can be retrieved rendered on FB as
 
 ----
-$ tftp -g -r logo_rect.png 10.0.2.2
-$ cat rect.raw > /dev/fb0
+$ cd /tmp
+$ tftp -g -r rect.rgb 10.0.2.2
+$ cat rect.rgb > /dev/fb0
 ----
 
 === Testing Frame Buffer Console
