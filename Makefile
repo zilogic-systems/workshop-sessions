@@ -27,7 +27,11 @@ kp-sessions =			\
 	kernel-dt-drivers	\
 	dt-debugging		\
 	kernel-ethernet		\
-	kernel-flash
+	kernel-flash		\
+	kernel-soc		\
+	kernel-dt-by-example	\
+	kernel-gpio		\
+	kernel-pinctrl
 
 sessions = $(yocto-sessions) $(kp-sessions)
 
