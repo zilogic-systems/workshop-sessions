@@ -7,7 +7,7 @@
 * Prior to device tree boot, in ARM architecture informations like
   - Ram Size
   - Kernel Boot Arguments
-  - Ramdisk Location 
+  - Ramdisk Location
 
 were passed through ATAGS by the bootloader.
 
@@ -15,18 +15,10 @@ were passed through ATAGS by the bootloader.
 === ATAGS (2)
 
 [role="left"]
------
-	+-----------+----------+
-base ->	| ATAG_CORE |	       |  
-     	+-----------+----------+  
-     	| ATAG_MEM  | Mem Size |  | increasing 
-     	+-----------+----------+  v address
-     	| ATAG_NONE |          |
-     	+-----------+----------+  
------
+image::figures/atags-info.png[align="center"]
 
 [role="right"]
-* Bootloader sets registers as 
+* Bootloader sets registers as
   - `r0` - is set as 0
   - 'r1' - is set as unique registered machine ID
   - 'r2' - as set as the base address of ATAGS.
@@ -44,16 +36,7 @@ base ->	| ATAG_CORE |	       |
 * Typically bootloaders like U-Boot places ATAGS in offset 0x100.
 
 [role="left"]
------
-	+-----------+----------+
-RAM  ->	| 0x0000    | Data to  | 
-Base  	| 	    | Kernel   |  
-     	+-----------+----------+  
-     	| 0x8000    | Kernel   |  | increasing address
-     	+-----------+----------+  v
-     	| ATAG_NONE |          |
-     	+-----------+----------+  
------
+image::figures/atags-in-memory.png[align="center"]
 
 === Device Tree From Bootloader
 
@@ -85,7 +68,7 @@ image::figures/boot-flow.png[align="center",width=800]
   - Verifies the dtb/atags
   - Sets up minimal page table & enables MMU
   - Copies data segement & Clears BSS
-  
+
 * After setting up the architecture and boot specific features, it
   starts into `start_kernel` function available in `init/main.c`
 
@@ -124,7 +107,7 @@ image::figures/boot-flow.png[align="center",width=800]
 ===  DT Machine Definition
 
 * The name of the supported machine are defined as a string arrays
- 
+
 ----
 static const char * const pxa27x_dt_board_compat[] __initconst = {
 	"marvell,pxa270",
@@ -186,7 +169,7 @@ MACHINE_END
 * `module_init` call places the module in the `device` initcall level.
 
 * if a module explicitly wants to raise its initcall level it can
-  register it to other initlevel as xxx_initcall(<init_function>) 
+  register it to other initlevel as xxx_initcall(<init_function>)
   Ex : arch_initcall(customize_machine);
 
 === Platform Bus
@@ -212,7 +195,7 @@ MACHINE_END
 
 === Device Tree Journey
 
-image::figures/dtc-lifecycle.png[align="center", width=800]
+image::figures/dtc-lifecycle.png[align="center", width=480]
 
 === Device Tree Journey (2)
 
