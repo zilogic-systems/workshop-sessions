@@ -1,0 +1,28 @@
+	  	flash@0 {
+                        compatible = "cfi-flash";
+                        reg = <0x00000000 0x02000000>;
+                        linux,mtd-name = "physmap-flash.0";
+                        bank-width = <2>;
+                        #address-cells = <1>;
+                        #size-cells = <1>;
+
+                        bootloader@0 {
+                                label = "bootloader";
+                                reg = <0x00000 0x40000>;
+                        };
+
+                        bootenv@80000 {
+                                label = "bootenv";
+                                reg = <0x80000 0x40000>;
+                        };
+
+                        kernel@C0000 {
+                                label = "kernel";
+                                reg = <0xC0000 0x400000>;
+                        };
+
+                        rootfs@4C0000 {
+                                label = "rootfs";
+                                reg = <0x4C0000 0x1B40000>;
+                        };
+                };

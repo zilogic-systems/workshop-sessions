@@ -4,14 +4,14 @@
 
 === Flash and Linux Kernel
 
- * Flashes devices are handled in Linux kernel by the Memory
-   Technology Devices(MTD) subsystem.
+ * Flash devices are handled in Linux kernel by the Memory Technology
+   Devices(MTD) subsystem.
 
  * The raw Flash devices like Parallel NOR, NAND & SPI NOR are
-   supported by this subsystem.
+   supported by MTD.
 
  * Parallel NOR resides directly in the processor bus, as a memory
-   mapped device, which the processor can access as if like a memory.
+   mapped device. The processor can access NOR, as if like a memory.
 
  * The NAND or SPI NOR flashes are connected to NAND controller or a
    SPI controller which are generally not memory mapped and requires
@@ -68,7 +68,7 @@ image::figures/mtd-emu.png[align="center", width=400]
   * But unlike a hard-disk, the partition table is specified as a
     kernel boot argument or through the device tree.
 
-  * The MTD partitions has list of partitions their base address and
+  * The MTD partitions has list of partitions, their base address and
     the size.
 
 [style="two-column"]
@@ -79,16 +79,14 @@ image::figures/mtd-emu.png[align="center", width=400]
   * Since NOR flash is in memory bus, it gets connected to the address
     and the data bus.
 
-  * The width of the data us can be of 16 bit or 32 bit based on the
-    flash.
-
-  * The address lines connected would be based on the size of the
+  * The width of the data bus can be of 16 bit or 32 bit based on the
     Flash.
 
+  * The address lines connected, would be based on the size of the
+    Flash.
 
 [role="left"]
 image::figures/nor-connectivity.png[]
-
 
 [role="two-column"]
 === Device Tree Representation for NOR Flash
@@ -98,7 +96,8 @@ image::figures/nor-connectivity.png[]
   * `reg` is used to denote the base and size of the Flash.
 
   * `cfi-flash` driver can query the Flash device and find Flash's
-    size and sector size, so node can be marked `compatible` to it.
+    size and sector size, so node need to be marked `compatible` to
+    it.
 
   * `linux,mtd-name` specifies the name of the Flash device.
 
@@ -109,7 +108,7 @@ image::figures/nor-connectivity.png[]
 ----
 flash@0 {
       	 compatible = "cfi-flash";
-	 reg = <0x0 0x0000000>;
+	 reg = <0x0 0x2000000>;
 	 linux,mtd-name = "nor.0";
 	 bank-width = <2>;
 };
@@ -120,14 +119,15 @@ flash@0 {
 
 [role="right"]
 
-  * The partitions can be represented in the dts shown 
+  * The partitions can be represented in the dts with given
+    properties.
 
   * `label` provides name to the partition.
   
   * `reg` denotes the offset address and size of the partition.
 
-  * `read-only` property can be used if a partition has to marked as
-    ro partition by the kernel.
+  * `read-only` property can be used, if a partition has to be treated
+    as a `ro` partition by the kernel.
 
 [role="left"]
 //[source,dts]
@@ -142,24 +142,26 @@ boot@0 {
 === References for MTD Bindings
 
   * The bindings for the mtd partitions are available in
-    Documentation/devicetree/bindings/mtd/mtd-physmap.txt
+    `Documentation/devicetree/bindings/mtd/mtd-physmap.txt`
 
   * The bindings for the mtd partitions are available in
-    Documentation/devicetree/bindings/mtd/partition.txt
+    `Documentation/devicetree/bindings/mtd/partition.txt`
 
 === Tryout
 
  * As the board has NOR flash of size 32 MB connected to the system
-   bus, add that to the pxabus node of dts.
+   bus, add node for NOR as a child to the pxabus node of dts.
 
  * Then add four partitions of below details
 
    1) bootloader at 0x0 of size 0x40000
-   2) bootenv at 0x80000 of size 0x40000
-   3) kernel at 0xC0000 of size 0x400000
-   4) rootfs at 0x4C0000 of size till flash end
+   2) bootenv at    0x80000 of size 0x40000
+   3) kernel at     0xC0000 of size 0x400000
+   4) rootfs at     0x4C0000 of size till flash end
 
- * Download link:{include:code/nor-support.patch.datauri}["nor-support.patch",filename="nor-support.patch"] and apply to the dts.
+ * Download
+   link:{include:code/nor-support.dts.datauri}["nor-support.dts",filename="nor-support.dts"]
+   and add to the dts.
  
 
 === Testing Flash Devices
@@ -187,16 +189,53 @@ boot@0 {
 ----
 $ cat /proc/mtd
 ----
- 
-  * we can print the contents of the bootenv partitions using
 
+  * The device nodes for the parition should get listed
+
+----
+$ ls /dev/mtd*
+----
+
+=== U-Boot Environment Variables
+
+  * Reboot the board and stop at the U-Boot
+
+  * U-Boot has certain environment variables for storing its runtime
+    configuration, which can be viewed as
+
+----
+U-Boot> printenv
+----
+ 
+  * In the U-Boot it is possible that we can save environment
+    variables in Flash.
+
+----
+U-Boot> saveenv
+----
+
+=== Dumping U-Boot Environment Variables From Linux
+
+  * Boot the system to Linux using
+
+----
+U-Boot> boot
+----
+
+  * In Linux, we can print the contents of the bootenv partitions
+    using hexdump
+  
 ----
 $ hexdump -C /dev/mtd1
 ---- 
 
+  * `hexdump` is a utility which helps to print the content of a
+    binary file, -C option prints in both Hex and ASCII format.
+
+
 === Flash Driver Kernel Configuration
 
-  * The driver for the memory mapped flash device can be enabled as
+  * The driver for the memory mapped flash devices, can be enabled as
 
 ----
 Device drivers --->
@@ -206,7 +245,8 @@ Device drivers --->
 		    	       	      based on OF description 
 ----
 
-  * The driver for parsing the partition table from the DTS can be enabled as
+  * The driver for parsing the partition table from the DTS, can be
+    enabled as
 
 ----
 Device drivers --->
