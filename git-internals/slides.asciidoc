@@ -589,3 +589,11 @@ image::figures/diff.png[align="center"]
 === //
 
 staging == index == cache
+
+=== Try Out
+
+  * Stage the changes corresponding to the spelling fixes
+
+  * Verify the staged changes
+
+  * Commit the staged changes
