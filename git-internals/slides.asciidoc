@@ -372,7 +372,7 @@ image::figures/duplicate-files-across-commits.png[align="center",width="50%"]
 
 == Exploring a Git Repo
 
-=== Initial Contents
+=== Try Out: Initial Contents
 
 ------
 $ mkdir proj
@@ -381,7 +381,7 @@ $ git init
 $ find .git
 ------
 
-=== Exploring a Commit
+=== Try Out: Exploring a Commit
 
 ------
 $ echo "This is a simple hello world file." > hello.txt
@@ -394,7 +394,7 @@ $ find .git
   * Use `git ls-tree <sha1>` to view the tree object
   * Use `git show` to view the blob
 
-=== Handling Duplicates
+=== Try Out: Handling Duplicates
 
   * Create a copy of `hello.txt` and commit it
 +
@@ -407,7 +407,7 @@ $ git commit -a -m "Added world.txt."
   * Verify that there is only one object for in the object database,
     for both the `hello.txt` and `world.txt`
 
-=== Branches
+=== Try Out: Branches
 
   * Find out the current commit SHA1, using `git log`
   * Create a branch called `my-branch`
