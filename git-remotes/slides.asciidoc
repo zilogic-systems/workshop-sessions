@@ -257,7 +257,12 @@ image::figures/push-1.png[]
 
 image::figures/push-2.png[]
 
-=== Verifying the Push
+=== Try Out
+
+  * Fix the spelling of the word `freedom` in `chapter-1.txt` and
+    `chapter-2.txt`, and commito
+
+  * Publish the changes
 
   * Change directory to `userB` and clone the `public` book repository
 
@@ -334,6 +339,21 @@ image::figures/fetch-3.png[align="center"]
 $ git checkout master
 $ git merge origin/master
 ------
+
+=== Try Out
+
+  * Change back to `userA` book repository
+
+  * Fix the missing year in line 8 of `chapter-3.txt` and make a
+    commit
+
+  * Push the changes to the `public` book repository
+
+  * Go back to `userB` book repository
+
+  * Fetch the changes from the repository
+
+  * Get the changes from `origin/master` into `master`
 
 === Adding Remotes
 
