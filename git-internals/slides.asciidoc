@@ -126,7 +126,7 @@ image::figures/no-commit-objects.png[align="center",width="40%"]
 [role="tip"]
 === //
 
-Add support for storing commit objects.
+Add support for storing order of commits.
 
 === Commit Object
 
