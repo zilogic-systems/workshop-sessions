@@ -45,7 +45,7 @@ install:
 	mkdir build
 	for dir in $(sessions); do make -C $$dir $@ install-extra; done
 	cd build; tar --gzip -c --transform "s|^|kp-slides/|" -f kp-slides.tar.gz $(kp-sessions)
-	cd build; tar --gzip -c --transform "s|^|yoctol-slides/|" -f yocto-slides.tar.gz $(yocto-sessions)
+	cd build; tar --gzip -c --transform "s|^|yocto-slides/|" -f yocto-slides.tar.gz $(yocto-sessions)
 
 clean:
 	for dir in $(sessions); do make -C $$dir clean; done
