@@ -315,19 +315,22 @@ $ git merge year-fix
   * The new changes on the branch can be merged in to the current
     branch using the same command
 
+[role="two-column"]
 === Merge Growing Branches
 
-------
-$ git checkout year-fix
-$ ... Edit chapter-3.txt ...
-$ git commit -a -m "..."
-$ git checkout master
-$ git merge year-fix
-------
+[role="left"]
+image::figures/merged-2.png[align="center",width="50%"]
 
   * Checkout `year-fix`
   * In chapter 3, insert `1991` instead of `????` in line 32, and commit
   * Checkout `master`
+
+[role="two-column"]
+=== Merge Growing Branches
+
+[role="left"]
+image::figures/merged-3.png[align="center",width="50%"]
+
   * Merge the changes from `year-fix`.
 
 == Track and Untrack Files
