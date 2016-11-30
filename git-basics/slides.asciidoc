@@ -194,17 +194,22 @@ $ git checkout master
 == Branching Basics
 
 
+[role="two-column"]
 === Branching
 
-  * Branching is useful when fixes have to be made to previous
-    released versions
+[role="left"]
+image::figures/bug-fix.png[style="left",align="center",width="60%"]
 
-  * Also useful when an experimental changes have to be made to the
+[role="right"]
+  * Branching is useful when *bug fixes* have to be made to previous
+    *released versions*
+
+  * Also useful when an *experimental changes* have to be made to the
     repository
 
   * This helps to maintain a clean history in the main trunk
 
-  * Git recommends the creation of a topic branch, for each new
+  * Git recommends the creation of a *topic branch*, for each new
     development task
 
 
