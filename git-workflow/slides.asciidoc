@@ -1,0 +1,162 @@
+= Git Rebase & Git Workflow
+Zilogic Systems <training@zilogic.com>
+
+== History Rewriting
+
+=== Published vs Unpublished History
+
+  * Published history
+    - commit history that has been shared with other users
+
+  * Unpublished history
+    - commit history is local and not been shared with other users
+
+  * Unpublished history can be modified!
+
+=== Amending Commits
+
+  * Commits are generally considered to be immutable
+
+  * The last made commit, if unpublished can be updated
+
+  * Make additional changes to working copy, invoke `git commit` with
+    `--amend` option
+
+  * Instead of a new commit, changes are added to the last commit
+
+  * Useful when a file was forgotten, or a change was missed
+
+=== Try Out
+
+  * Extract a fresh copy of `book.tar.gz`
+  * Fix the spelling of freedom in `chapter-1.txt`
+  * Make a commit
+  * Fix the spelling of freedom in `chapter-2.txt`
+  * Update the previous commit with the new changes
+
+[role="two-column"]
+=== Merging vs Rebasing
+
+[role="left"]
+image::figures/merge-rebase-1.png[align="center",width="50%"]
+
+[role="right"]
+  * Changes can be incorporated from another branch in two ways
+  
+    - Merging
+    - Rebasing
+
+[role="two-column"]
+=== Merging
+
+[role="left"]
+image::figures/merge-rebase-2.png[align="center",width="50%"]
+
+[role="right"]
+  * Creates a new merge commit
+
+  * Commit contains the additional changes from another branch, merged
+    into current branch
++
+-----
+git checkout year-fix
+git merge master
+-----
+
+[role="two-column"]
+=== Rebasing
+
+[role="left"]
+image::figures/merge-rebase-3.png[align="center",width="50%"]
+
+[role="right"]
+  * Commits on the current branch are re-applied onto the tip
+    of another branch
+
+  * All commit objects are re-written
+    - Point to new content
+    - SHA1 of commits are also modified
++
+-----
+git checkout year-fix
+git rebase master
+-----
+
+== Workflows
+
+=== Overview
+
+  * Series of activities need to complete a task
+
+  * Centralized Workflow
+    - small team of trusted developers
+
+  * Forking Workflow
+    - allows collaboration among a larger group of developers
+    - provides a mechanism for code review
+
+== Centralized Workflow
+
+
+== Forking Workflow
+
+[role="two-column"]
+=== Getting Started
+
+[role="left"]
+image::figures/gh-1.png[]
+
+[role="right"]
+  * GitHub and GitLab allows users to create projects
+
+  * For each project a Git repo is created
+
+  * An issue tracker, and wiki is also created
+
+  * Projects have the name `owner/proj-name`
+
+  * Only the owner has write access to project
+
+
+=== Contributing
+
+image::figures/gh-2.png[width="50%",align="center"]
+
+  * When a user wants to contribute, to a project, the user forks the
+    project
+
+  * Creates a new project `user/proj`, clones the project into the Git
+    repo
+
+=== Contributing (2)
+
+image::figures/gh-2.png[width="50%",align="center"]
+
+  * This project is writable by the user
+
+  * User now clones his Git repo, edits, commits, and pushes to his
+    repo
+
+=== Contributing (3)
+
+image::figures/gh-3.png[width="50%",align="center"]
+
+  * User creates a Pull Request (PR), in owner's project
+
+  * Pull request indicates that a set of commits, is ready for inclusion
+
+=== Contributing (4)
+
+image::figures/gh-4.png[width="50%",align="center"]
+
+  * Owner fetches the changes and reviews the changes
+
+  * Provides feedback, if not satisfied
+
+=== Contributing (5)
+
+image::figures/gh-5.png[width="50%",align="center"]
+
+  * Owner merges the changes and pushes to his repo
+
+  * Closes Pull Request
