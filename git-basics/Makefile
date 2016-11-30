@@ -12,6 +12,7 @@ figures/branch-1.png: EXPORT_WIDTH=800
 figures/branch-2.png: EXPORT_WIDTH=800
 figures/merged.png: EXPORT_WIDTH=800
 figures/bug-fix.png: EXPORT_WIDTH=800
+figures/terminology.png: EXPORT_WIDTH=800
 
 clean:
 	rm -f $(images_png)

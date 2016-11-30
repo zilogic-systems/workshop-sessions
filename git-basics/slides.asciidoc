@@ -59,9 +59,13 @@ image::figures/bug-fix.png[style="left",align="center",width="60%"]
     repository or *repo*
   * Collaboration is also handled by the VCS
 
-
+[role="two-column"]
 === Terminology Review
 
+[role="left"]
+image::figures/terminology.png[align="center"]
+
+[role="right"]
   * __Commit__: taking a snapshot, AKA __revision__
   * __Repo__: data store containing previous revsion of source tree
   * __Checkout__: taking a copy of the latest revision for editing
