@@ -26,6 +26,14 @@ Zilogic Systems <training@zilogic.com>
 
   * Useful when a file was forgotten, or a change was missed
 
+=== Demo
+
+  * Extract a fresh copy of `book.tar.gz`
+  * Fix the spelling of freedom in `chapter-1.txt`
+  * Make a commit
+  * Fix the spelling of freedom in `chapter-2.txt`
+  * Update the previous commit with the new changes
+
 === Try Out
 
   * Extract a fresh copy of `book.tar.gz`
@@ -81,6 +89,36 @@ image::figures/merge-rebase-3.png[align="center",width="50%"]
 git checkout year-fix
 git rebase master
 -----
+
+=== Demo
+
+  * Extract a fresh copy of `book.tar.gz`
+
+  * `chapter-3.txt` has an year missing, in line 8
+
+  * Create a bug-fix branch called `year-fix`
+
+  * Insert `1984` instead of `????` in line 8
+
+  * Commit the changes
+
+=== Demo (Contd.)
+
+  * Switch to `master` branch
+
+  * Fix the spelling of the word `long` in `chapter-3.txt`, line 6
+
+  * Commit the change
+
+=== Demo (Contd.)
+
+  * Switch to `year-fix` branch
+
+  * Incorporate the new changes in `master`, using `rebase`
++
+------
+git rebase master
+------
 
 === Try Out
 
