@@ -421,3 +421,21 @@ git checkout -b bugfix HEAD^
   * Practice Git commands using https://github.com/git-game/git-game-v2
 
   * Visual Git Guide https://marklodato.github.io/visual-git-guide/index-en.html
+
+== Questions
+
+== Review
+
+=== Quiz
+
+Which of the following statements are true?
+
+  * [A] Use merge for unpublished branches, and rebase for published
+    branches
+  
+  * [B] In Git, commits once made, cannot be changed
+
+  * [C] Centalized workflow, is used by large teams of untrusted
+    developers
+
+  * [D] Working copy cannot contain changes while doing a rebase

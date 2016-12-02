@@ -599,3 +599,27 @@ staging == index == cache
   * Verify the staged changes
 
   * Commit the staged changes
+
+== Questions
+
+== Review
+
+=== Question
+
+Which of the following objects are stored in the object database?
+
+  * [A] Blobs
+  * [B] Tree Objects
+  * [C] Commit Objects
+  * [D] Branch Objects
+
+=== Question
+
+Which of the following statements are true?
+
+  * [A] SHA1 of two files will never be the same
+  * [B] Merge commits can have more than one parent
+  * [C] Per branch file contains SHA1 of the latest commit in the branch
+  * [D] Two files that have the same content are only represented once
+    in the object database
+  

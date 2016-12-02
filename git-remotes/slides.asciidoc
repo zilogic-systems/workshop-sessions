@@ -427,3 +427,30 @@ $ git fetch <remote-name>
 $ git remote -vv
 ------
 
+== Questions
+
+== Review
+
+[role="two-column"]
+=== Question
+
+[role="left"]
+image::figures/git-merge-2.png[width="50%",align="center"]
+
+[role="right"]
+  * Merging `bug-fix` from master, represents
+
+    - [A] True Merge
+    - [B] Fast Forward Merge
+    - [C] Up-to-date Merge
+    - [D] None of the above
+
+[role="two-column"]
+=== Question
+
+Which of the following statements are true?
+
+  * [A] A bare repository does not contain a working copy
+  * [B] Commits cannot be made on remote tracking branches
+  * [C] Fetch updates only remote tracking branches
+  * [D] Merge conflicts are resolved automatically by Git
