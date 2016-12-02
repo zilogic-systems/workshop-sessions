@@ -91,7 +91,7 @@ $ git merge bug-fix
 
   * Checkout `master` and try merging changes from `year-fix` branch
 
-  * The merge command inidcates a fast-forward was done
+  * The merge command indicates a fast-forward was done
 
   * Verify that using `git branch -v`
 
