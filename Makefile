@@ -1,7 +1,8 @@
 git-sessions =			\
 	git-basics		\
 	git-internals		\
-	git-remotes
+	git-remotes		\
+	git-workflow
 
 git-resources =	git-resources
 
@@ -56,3 +57,4 @@ install:
 
 clean:
 	for dir in $(sessions); do make -C $$dir clean; done
+
