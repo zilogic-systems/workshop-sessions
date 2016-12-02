@@ -1,4 +1,4 @@
-= Git Rebase & Git Workflow
+= Git Workflow
 Zilogic Systems <training@zilogic.com>
 
 == History Rewriting
@@ -73,14 +73,111 @@ image::figures/merge-rebase-3.png[align="center",width="50%"]
   * Commits on the current branch are re-applied onto the tip
     of another branch
 
-  * All commit objects are re-written
+  * New commit objects are re-written
     - Point to new content
-    - SHA1 of commits are also modified
+    - SHA1 of commits are different from previous commits
 +
 -----
 git checkout year-fix
 git rebase master
 -----
+
+=== Try Out
+
+  * Extract a fresh copy of `book.tar.gz`
+
+  * `chapter-3.txt` has an year missing, in line 8
+
+  * Create a bug-fix branch called `year-fix`
+
+  * Insert `1984` instead of `????` in line 8
+
+  * Commit the changes
+
+=== Try Out (Contd.)
+
+  * Switch to `master` branch
+
+  * Fix the spelling of the word `long` in `chapter-3.txt`, line 6
+
+  * Commit the change
+
+=== Try Out (Contd.)
+
+  * Switch to `year-fix` branch
+
+  * Incorporate the new changes in `master`, using `rebase`
++
+------
+git rebase master
+------
+
+=== Rebasing Conflicts
+
+  * Just like merges, conflicts can occur during a rebase
+
+  * Each commit is applied one at a time
+
+  * When a commit does not apply cleanly, rebase stops
+
+  * Indicates the conflicting changes with markers
+
+  * Resolve the conflict, and do a `git rebase --continue`
+
+  * Not a commit is not required
+
+  * The rebase can also be aborted using `git rebase --abort`
+
+=== Advantages of Rebase
+
+  * In both cases, `year-fix` incorporates the new changes from master
+
+  * Rebase maintains a cleaner history, without too many unnecessary
+    merges
+
+  * Thumb-rule:
+    - Use rebase for local topic branches
+    - Use merge published development / bug-fix branches
+
+=== Merge vs Rebase
+
+image::figures/merge-vs-rebase-1.png[align="center",width="20%"]
+
+=== Merge vs Rebase
+
+image::figures/merge-vs-rebase-5.png[align="center",width="20%"]
+
+=== Merge vs Rebase (Contd.)
+
+image::figures/merge-vs-rebase-2.png[align="center",width="20%"]
+
+=== Merge vs Rebase (Contd.)
+
+image::figures/merge-vs-rebase-3.png[align="center",width="20%"]
+
+=== Merge vs Rebase (Contd.)
+
+image::figures/merge-vs-rebase-4.png[align="center",width="20%"]
+
+=== Merge vs Rebase (Contd.)
+
+image::figures/merge-vs-rebase-1.png[align="center",width="20%"]
+
+=== Merge vs Rebase (Contd.)
+
+image::figures/merge-vs-rebase-5.png[align="center",width="20%"]
+
+=== Merge vs Rebase (Contd.)
+
+image::figures/merge-vs-rebase-6.png[align="center",width="20%"]
+
+=== Merge vs Rebase (Contd.)
+
+image::figures/merge-vs-rebase-7.png[align="center",width="20%"]
+
+=== Merge vs Rebase (Contd.)
+
+image::figures/merge-vs-rebase-8.png[align="center",width="20%"]
 
 == Workflows
 
@@ -93,9 +190,45 @@ git rebase master
 
   * Forking Workflow
     - allows collaboration among a larger group of developers
-    - provides a mechanism for code review
+    - provides a mechanism for reviewing changes
 
 == Centralized Workflow
+
+=== Everyone Clones Central Repo
+
+image::figures/central-1.png[width="50%",align="center"]
+
+=== UserA Pushes Changes
+
+image::figures/central-2.png[width="50%",align="center"]
+
+=== UserB Push Fails
+
+image::figures/central-3.png[width="50%",align="center"]
+
+=== UserB Push Fails (Contd.)
+
+image::figures/central-push-fail-1.png[width="30%",align="center"]
+
+=== UserB Fetches and Rebases
+
+image::figures/central-4.png[width="50%",align="center"]
+
+=== UserB Fetches and Rebases (Contd.)
+
+image::figures/central-push-fail-2.png[width="50%",align="center"]
+
+=== UserB Fetches and Rebases (Contd.)
+
+image::figures/central-push-fail-3.png[width="50%",align="center"]
+
+=== UserB Pushes Changes
+
+image::figures/central-5.png[width="50%",align="center"]
+
+=== UserB Pushes Changes (Contd.)
+
+image::figures/central-push-complete.png[width="10%",align="center"]
 
 
 == Forking Workflow
@@ -117,8 +250,7 @@ image::figures/gh-1.png[]
 
   * Only the owner has write access to project
 
-
-=== Contributing
+=== User Forks Project
 
 image::figures/gh-2.png[width="50%",align="center"]
 
@@ -128,16 +260,19 @@ image::figures/gh-2.png[width="50%",align="center"]
   * Creates a new project `user/proj`, clones the project into the Git
     repo
 
-=== Contributing (2)
+=== Topic Branch and Commit
 
 image::figures/gh-2.png[width="50%",align="center"]
 
   * This project is writable by the user
 
-  * User now clones his Git repo, edits, commits, and pushes to his
-    repo
+  * User now clones his Git repo, and publishes topic branch
 
-=== Contributing (3)
+=== Topic Branch and Commit (Contd.)
+
+image::figures/gh-tree-1.png[width="25%",align="center"]
+
+=== Create Pull Request
 
 image::figures/gh-3.png[width="50%",align="center"]
 
@@ -145,18 +280,54 @@ image::figures/gh-3.png[width="50%",align="center"]
 
   * Pull request indicates that a set of commits, is ready for inclusion
 
-=== Contributing (4)
+=== Review Feedback
 
 image::figures/gh-4.png[width="50%",align="center"]
 
   * Owner fetches the changes and reviews the changes
 
-  * Provides feedback, if not satisfied
+  * Provides feedback, if not satisfied, user can commit to topic
+    branch, and push
 
-=== Contributing (5)
+=== Review Feedback
+
+image::figures/gh-tree-2.png[width="25%",align="center"]
+
+=== Close PR
 
 image::figures/gh-5.png[width="50%",align="center"]
 
   * Owner merges the changes and pushes to his repo
 
   * Closes Pull Request
+
+=== Merge Options
+
+  * GitHub allows topic branch to be merged from UI
+
+  * Automatic merge options, on GitHub
+    - Merge
+    - Squash and Merge
+    - Rebase Merge
+
+  * Manual merge in case of conflict
+    - Owner
+    - User
+
+=== Master Advances Before Merge
+
+image::figures/gh-tree-3.png[width="25%",align="center"]
+
+=== Merge
+
+image::figures/gh-tree-4.png[width="25%",align="center"]
+
+=== Squash Merge
+
+image::figures/gh-tree-5.png[width="25%",align="center"]
+
+=== Rebase Merge
+
+image::figures/gh-tree-6.png[width="7%",align="center"]
+
+== Demo
