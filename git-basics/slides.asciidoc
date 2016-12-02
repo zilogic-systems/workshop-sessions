@@ -419,6 +419,14 @@ $ git config --global core.editor your-favourite-editor
 
   * Per project config is stored in `.git/config`
 
+=== Try Out
+
+  * Setup Git in your system by specifying the following configuration
+
+    - `user.name`
+    - `user.email`
+    - `core.editor`
+
 [role="tip"]
 === //
 
