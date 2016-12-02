@@ -309,7 +309,7 @@ image::figures/push-2.png[]
 === Try Out
 
   * Fix the spelling of the word `freedom` in `chapter-1.txt` and
-    `chapter-2.txt`, and commito
+    `chapter-2.txt`, and commit
 
   * Publish the changes
 
