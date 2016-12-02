@@ -369,3 +369,55 @@ image::figures/gh-tree-5.png[width="25%",align="center"]
 image::figures/gh-tree-6.png[width="7%",align="center"]
 
 == Demo
+
+== Tidbits
+
+=== Stash
+
+  * When merging and rebasing the working copy and staging should be
+    clean
+
+  * Changes can be temporarily stored and restored using
++
+------
+$ git stash
+$ git stash pop
+------
+
+=== Reflog
+
+  * In case after a rebase, the original head is required, it can be
+    retreived from the Reflog
+
+  * Reflog contains a history of all SHA1s assumed by HEAD
++
+------
+$ git reflog
+------
+
+=== Relative Refs
+
+  * Instead of specifing actual SHA1s, relative refs can be used
+
+  * `HEAD`: is the checked out commit
+
+  * `HEAD^`: is the parent of the checked-out commit
+
+  * `HEAD^^`: is the grand-parent of the checked-out commit
+
+  * Relative refs are useful when fiddling around with branches and
+    commits
++
+------
+git checkout -b bugfix HEAD^
+------
+
+=== Learning Resources
+
+  * Practice Git branching at http://learngitbranching.js.org/
+
+  * Practice Git commands using https://github.com/git-game/git-game
+
+  * Practice Git commands using https://github.com/git-game/git-game-v2
+
+  * Visual Git Guide https://marklodato.github.io/visual-git-guide/index-en.html
