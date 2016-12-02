@@ -433,7 +433,7 @@ $ git config --global core.editor your-favourite-editor
 Tip: In Windows, use `git config --global --edit` to figure where exactly
 the global config is stored.
 
-=== Initializing an Empty Repo
+=== Try Out: Initializing an Empty Repo
 
   * Create a new project folder
 +
@@ -448,7 +448,7 @@ $ cd proj
 $ git init
 -----
 
-=== Populate the repository
+=== Try Out: Populate the repository
 
   * Create files and add them.
 +
