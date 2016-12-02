@@ -17,6 +17,7 @@ book-git: $(files)
 	cd book; git init
 	cd book; git config user.name "User"
 	cd book; git config user.email user@example.com
+	cd book; git config alias.vb "log --all --decorate --graph --oneline"
 	cd book; git add $^
 	cd book; git commit -a -m "Initial book project."
 
