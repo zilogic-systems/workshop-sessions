@@ -337,6 +337,20 @@ image::figures/merged-3.png[align="center",width="50%"]
 
 === Start Tracking Files
 
+  * Start tracking files using `add` sub-command
++
+------
+git add <filename>
+------
++
+  * Remove files from project using `rm` sub-command
++
+------
+git rm <filename>
+------
+
+=== Try Out
+
   * Create a file called `chapter-4.txt`.
 
   * `git status` will indicate that the file is untracked
@@ -355,7 +369,7 @@ $ git commit -a -m "Added a Chapter 4."
 +
   * `chapter-4.txt` is no longer indicated as untracked
 
-=== Stop Tracking Files
+=== Try Out
 
   * Remove the file `chapter-4.txt`.
 +
