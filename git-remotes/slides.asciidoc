@@ -95,7 +95,7 @@ $ git merge bug-fix
 
   * Verify that using `git branch -v`
 
-=== Merge Conflicts
+=== Demo: Merge Conflicts
 
   * Extract a fresh copy of `book.tar.gz`
 
@@ -124,6 +124,24 @@ $ git merge bug-fix
 
   * To resolve conflict keep the required change, remove conflict
     markers, and do a `git add`, and then `git commit`.
+
+=== Try Out: Merge Conflicts
+
+  * Extract a fresh copy of `book.tar.gz`
+
+  * Create a branch `year-fix`
+
+  * Fix the missing year in line 8, in `chapter-3.txt` with the number
+    `1984`, and commit
+
+  * Checkout `master`
+
+  * Fix the missing year in line 8, in `chapter-3.txt` with the number
+    `1983`, and commit
+
+  * Merge changes from `year-fix`
+
+  * Resolve the conflict and commit
 
 == Remote Repositories
 
@@ -188,6 +206,37 @@ file:///home/userA/book.git
 
   * `/home/userA/book.git` specifies the path to the repository
 
+=== Demo
+
+  * Create three folders `public`, `userA`, `userB`
+  * Changed directory to `public` and extract `book.git.tar.gz`
+  * The final folder structure should be
++
+------
++ public/
+| + book.git/
++ userA/
++ userB/
+------
+
+=== Demo
+
+  * Change directory to `userA` and clone the book repository present
+    in `public`
++
+------
+$ git clone file:///path/to/repo/public/book.git
+------
++
+  * Examine the cloned repository:
++
+------
+$ cd book
+$ ls
+$ git log
+$ git branch
+------
+
 === Try Out
 
   * Create three folders `public`, `userA`, `userB`
@@ -235,7 +284,7 @@ $ git remote -v
   * `origin` is the default name given to the repository from which
     the current repository was cloned
 
-=== Sharing Changes
+=== Demo: Sharing Changes
 
   * Local commits can be published to the remote repository using `git
     push <remote-name> <local-branch-name>:<remote-branch-name>`
@@ -272,7 +321,7 @@ image::figures/push-2.png[]
 
 image::figures/central-repo.png[width="60%",align="center"]
 
-=== Fetching Changes
+=== Demo: Fetching Changes
 
   * Change back to `userA` book repository
 
@@ -326,7 +375,7 @@ image::figures/fetch-2.png[align="center"]
 
 image::figures/fetch-3.png[align="center"]
 
-=== Merging Remote Tracking Branch
+=== Demo: Merging Remote Tracking Branch
 
   * We have two branches `master` and `origin/master`
 
