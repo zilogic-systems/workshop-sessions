@@ -113,8 +113,8 @@ $ git commit -a -m "Some Change"
 
 === Try Out
 
-  * Get the resource tar ball and extract it
-  * The resource tar ball contains a project to develop a book
+  * Extract `book.tar.gz`
+  * The tar ball contains a project to develop a book
   * The project is tracked using Git
   * The `chapter-3.txt` has an author line, which is missing in
     `chapter-1.txt` and `chapter-2.txt`
