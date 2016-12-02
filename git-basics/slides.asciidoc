@@ -430,7 +430,7 @@ $ git config --global core.editor your-favourite-editor
 [role="tip"]
 === //
 
-In Windows, use `git config --global --edit` to figure where exactly
+Tip: In Windows, use `git config --global --edit` to figure where exactly
 the global config is stored.
 
 === Initializing an Empty Repo
