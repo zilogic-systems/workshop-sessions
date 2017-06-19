@@ -1,15 +1,22 @@
-def new():
-    return {}
+def make_cbufs():
+    global tail, head, buf, bufsize
+
+    tail = [None, None]
+    head = [None, None]
+    buf = [None, None]
+    bufsize = [None, None]
 
 def init(cb, size):
-    cb["tail"] = 0
-    cb["head"] = 0
-    cb["buf"] = [None] * size
-    cb["bufsize"] = size
+    global tail, head, buf, bufsize
+
+    tail[cb] = 0
+    head[cb] = 0
+    buf[cb] = [None] * size
+    bufsize[cb] = size
 
 def _increment(cb, counter):
     counter += 1
-    counter %= cb["bufsize"]
+    counter %= bufsize[cb]
     return counter
 
 def add(cb, data):
