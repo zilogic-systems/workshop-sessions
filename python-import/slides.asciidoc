@@ -1,0 +1,154 @@
+= Modules & Imports
+Zilogic Systems
+:data-uri:
+
+== Everything is an Object
+
+=== Function Objects
+
+  * Everything in Python is an object, including functions
+
+  * Functions are instances of class `function`.
++
+[source,python]
+------
+include::code/fobj/fobj[]
+------
+
+=== Functions and Variables
+
+  * Function name is just a variable that holds a function object
+
+  * Can be assigned to any other variable as well
++
+[source,python]
+-------
+include::code/fobj/names[]
+------
+
+== Modules
+
+=== Introduction
+
+  * Modules are like C libraries or Java JAR files
+
+  * Contain a collection of function and class definitions
+
+  * Python file with a `.py` extension is a module
+
+=== Creating a Module
+
+  * The file
+    link:{include:code/lang.py.datauri}["lang.py",filename="lang.py"]
+    contains a bunch of functions
+  
+    - `is_vowel()`
+    - `is_palindrome()`
+    - `make_ing_form()`
+
+=== Using the Module
+
+  * General syntax, `import` statement
++
+------
+import <module-name>
+------
++
+  * 'module-name' is the filename without the `.py` extension
+
+  * Executes the statements with the files, function definitions,
+    class definitions, etc.
+
+  * The definitions are accessible using `module.name` notation
++
+[source,python]
+------
+include::code/iexamples/import[]
+------
+
+=== Try Out
+
+  * Download link:{include:code/lang.py.datauri}["lang.py",filename="lang.py"]
+
+  * Try using the function: `is_palindrome()` and `make_ing_form()`
+
+  * Look for example usage within the file.
+
+=== Why the dot notation?
+
+  * The `module.name` notation is done for the purpose of name-spacing
+
+  * If two modules define function with the same name, they can be
+    uniquely identified with
+
+    - `module1.name()`
+    - `module2.name()`
+
+=== But if it Hurts
+
+  * Typing `module.name` can sometimes be tedious
++
+[source,python]
+------
+include::code/iexamples/import-assign[]
+------
+
+=== Special Python Syntax
+
+  * Special Python syntax, that does just that
++
+------
+from <module> import <name>
+------
++
+  * Previous example could be written as
++
+[source,python]
+------
+include::code/iexamples/import-from[]
+------
+
+=== Try Out
+
+TBD
+
+=== Standard Library
+
+  * Python has a standard library of modules
+
+  * Contains commonly useful functions and classes
++
+[source,python]
+------
+include::code/iexamples/standard[]
+------
+
+=== Packages
+
+   * Modules providing similar functionality can be grouped into a
+     package
+
+   * Modules within a package are referred as `package.module`
++
+------
+import package.module
+------
+
+=== Creating a Package
+
+   * Create a directory called `utils`
+   * Copy file `lang.py` in `utils`
+   * Copy file `cbuf.py` in `utils`
+   * Create an empty file called `__init__.py` in `utils`
++
+[source,python]
+------
+include::code/iexamples/package[]
+------
++
+  * The `__init__.py` is what that tells Python that the directory is
+    package
+
+=== Try Out
+
+TBD
