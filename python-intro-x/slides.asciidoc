@@ -1,0 +1,481 @@
+= Python Introduction
+Zilogic Systems
+:data-uri:
+
+== Introduction to Karel
+
+=== Karel, the Language
+
+  * Karel is an language used for learning and teaching programming
+    for beginners
+
+  * An environment similar to Karel will be used to introduce Python
+
+[role="two-column"]
+=== Karel, the Robot
+
+[role="left"]
+image::levels/level-start-2.png[]
+
+[role="right"]
+  * Karel, simulates a robot, inside a 2D world
+
+  * Karel can move around the world
+
+  * The world has walls, be careful not to collide into them
+
+  * The world can have beepers, devices that emit short sound signals
+
+[role="two-column"]
+=== Karel, the Robot
+
+[role="left"]
+image::levels/level-start-2.png[]
+
+[role="right"]
+  * Karel has sensors to detect walls and beepers
+
+  * Karel can take beepers and store them in his bag
+
+  * Karel can also drop beepers from his bag
+
+[role="two-column"]
+=== Making Karel Move
+
+[role="left"]
+==== Before
+image::levels/level-start-0.png[]
+
+[role="right"]
+==== After
+image::levels/level-end-0.png[]
+
+=== Code
+
+[source,python]
+------
+start()         # Initializes Karel
+
+move()          # Moves 1 Step
+move()          # Moves 1 Step
+move()          # Moves 1 Step
+
+stop()          # Turns off Karel
+------
+
+=== Karel Simulator & Exercises
+
+  * Starting the simulator, and selecting levels
+
+  * After a level is selected, the program can be executed
+
+  * The world should reach the target state, when `stop()` is invoked
+
+=== Try Out
+
+  * Download the template file from FIXME
+  * Add the code to move Karel
+  * Execute the code using the following command
++
+------
+python myprog.py
+------
++
+ * Invokes the Python interpreter with the program file as argument
+
+[role="two-column"]
+=== Making Karel Turn
+
+[role="left"]
+==== Before
+image::levels/level-start-1.png[]
+
+[role="right"]
+==== After
+image::levels/level-end-1.png[]
+
+=== Try Out
+
+  * `turn_left()` function causes Karel to turn left
+
+  * Modify the code as required and execute it
+
+[role="two-column"]
+=== Picking Beepers
+
+[role="left"]
+==== Before
+image::levels/level-start-2.png[]
+
+[role="right"]
+==== After
+image::levels/level-end-2.png[]
+
+=== Try Out
+
+  * `pick_beeper()` function causes Karel to pick a beeper
+
+  * Modify the code as required and execute it
+
+=== Repeating
+
+==== Before
+image::levels/level-start-3.png[]
+
+==== After
+image::levels/level-end-3.png[]
+
+=== Code
+
+[source,python]
+------
+start()
+
+repeat(7):     # Repeats code block, n times
+   move()      # Code block indented by either tab or spaces
+
+stop()
+------
+
+[role="two-column"]
+=== Try Out: Turn Right
+
+[role="left"]
+==== Before
+image::levels/level-start-4.png[]
+
+[role="right"]
+==== After
+image::levels/level-end-4.png[]
+
+=== Try Out: Turn Right (Contd.)
+
+  * No separate `turn_right()` function
+
+  * Turn right is same as turning left 3 times
+
+  * Use `repeat` and `turn_left()` to turn right
+
+=== Try Out: Multi-line Block
+
+==== Before
+image::levels/level-start-5.png[]
+
+==== After
+image::levels/level-end-5.png[]
+
+=== Try Out: Multi-line Block (Contd.)
+
+  * In every iteration, move and pick beeper
+
+  * Make sure all lines within a code block are at the same
+    indentation level
++
+[source,python]
+------
+repeat(7):
+    move()           # Both lines should be
+    pick_beeper()    # indented to same level
+------
+
+=== Finding Beepers
+
+==== Before
+
+image::levels/level-start-6.png[]
+
+==== After
+
+image::levels/level-end-6.png[]
+
+=== Finding Beepers (Contd.)
+
+  * Beepers can be anywhere in the path
+
+  * Karel has sensors to identify if the current location has a beeper
+
+  * `beeper()`
+    - returns `1` if beeper is present
+    - returns `0` if beeper is not present
+
+  * `if` statement can be used to execute code conditionally
+
+=== Algorithm
+
+  * Repeat 7 times:
+    - Move to next location
+    - If beeper present:
+      ** Pick it
+
+=== Code
+
+[source,python]
+------
+repeat(7):
+    move()
+    if beeper():
+        pick_beeper()
+------
+    
+=== Try Out: Stop Before Wall
+
+==== Before
+image::levels/level-start-7.png[]
+
+==== After
+image::levels/level-end-7.png[]
+
+=== Try Out: Stop Before Wall (Contd.)
+
+  * Karel has a sensor to detect a wall
+
+  * `front_is_clear()`
+    - returns `1` if there is no wall in the front
+    - returns `0` otherwise
+
+  * `left_is_clear()`, `right_is_clear()`
+
+  * `break` statement can be used to break out of a loop
+
+=== Try Out: `while` Loop
+
+  * `while` loop has the following syntax
++
+------
+while <cond>:
+    ...
+    code
+    ...
+------
++
+  * Code block is execute, while the condition is `1`
+
+  * Repeat previous exercise using `while` statement
+
+[role="two-column"]
+=== Problem Breakdown
+
+[role="left"]
+==== Before
+image::levels/level-start-8.png[]
+
+[role="right"]
+==== After
+image::levels/level-end-8.png[]
+
+=== Problem Breakdown (Contd.)
+
+  * Step 1: Find Passage
+  * Step 2: Enter Passage
+  * Step 3: Goto Beginning
+  * Step 4: Pick Beeper
+  * Step 5: Turn Around
+  * Step 6: Goto 'Step 1'
+
+=== Top Level Code
+
+[source,python]
+------
+while 1:
+    find_passage()
+    enter_passage()
+    goto_beginning()
+    pick_beeper()
+    turn_around()
+------
+
+=== Writing Custom Functions
+
+[source,python]
+-----
+def turn_around():
+    turn_left()
+    turn_left()
+-----
+
+  * `def` statement is used to define a function
+  * `turn_around` is the name of the function
+  * The code block below specifies the body of the function
+
+=== More Functions
+
+[source,python]
+-----
+def find_passage():
+    repeat(7):
+        if left_is_clear():
+            break
+
+def enter_passage():
+    turn_left()
+    move()
+    turn_left()
+
+def goto_beginning():
+    while front_is_clear():
+        move()
+------
+
+=== Demo
+
+  * Logic for the algorithm has been implemented
+
+  * Let's see it in action
+
+  * It is a good idea to write one function, test it and move on to
+    the next
+
+=== Exit Criteria
+
+  * Stop the loop, when there is no more passage.
+
+  * `find_passage()` is modified to indicate, if a passage was found
+
+  * `return` statement is used to return control and provide a value
+    to the caller
+
+[source,python]
+-----
+def find_passage():
+    repeat(7):
+        if left_is_clear():
+            return 1
+    return 0
+-----
+
+=== Exit Criteria (Contd.)
+
+  * If a pasage is not found we break out of the loop
+
+  * Modified code is shown below
+
+[source,python]
+------
+while 1:
+    if not find_passage():
+        break
+    enter_passage()
+    goto_beginning()
+    pick_beeper()
+    turn_around()
+------
+
+[role="two-column"]
+=== Try Out: Climb Down
+
+[role="left"]
+==== Before
+image::levels/level-start-9.png[]
+
+[role="right"]
+==== After
+image::levels/level-end-9.png[]
+
+[role="two-column"]
+=== Measure Distance
+
+Count the steps to the wall, and put beepers equal to the no. of
+steps.
+
+[role="left"]
+==== Before
+image::levels/level-start-10.png[]
+
+[role="right"]
+==== After
+image::levels/level-end-10.png[]
+
+=== Variables
+
+  * Need to keep track of no. of steps
+
+  * A variable is initialized to zero
++
+------
+count = 0
+------
++
+  * Each time Karel moves, the variable is incremented
++
+------
+count = count + 1
+------
+
+=== Digression: Types
+
+  * Basic Types:
+    - Integers: 1, 123, 43
+    - Floating Point: 1.2, 100.5
+    - Strings: "hello", "world"
+    - Boolean: True, False
+
+  * Type determines
+    - What operations can be performed on the data
+    - Behaviour of the data for an operation
+
+  * Example 1: Division is allowed between integers, but is not allowed
+    between strings.
+
+  * Example 2: '+' operation on integers results in addition, but on
+    strings results in concatenation
+
+=== Variables and Types
+
+  * Python does 'Dynamic Typing'
+
+  * Type of the variable is determined by the type of the data stored
+    in it
+
+  * Type is associated with the data, rather than the variable
+
+[role="two-column"]
+=== Try Out: Measure Wall Length
+
+Count the steps take to cross the wall, and put beepers equal to the
+no. of steps.
+
+[role="left"]
+==== Before
+image::levels/level-start-11.png[]
+
+[role="right"]
+==== After
+image::levels/level-end-11.png[]
+
+
+[role="two-column"]
+=== Conditional Expressions
+
+Pick only three beepers.
+
+[role="left"]
+==== Before
+image::levels/level-start-12.png[]
+
+[role="right"]
+==== After
+image::levels/level-end-12.png[]
+
+=== Code
+
+[source,python]
+------
+count = 0
+repeat(7):
+    move()
+    if beeper() and count < 3:
+        pick_beeper()
+        count = count + 1
+------
+
+[role="two-column"]
+=== Functions and Arguments
+
+[role="left"]
+==== Before
+image::levels/level-start-13.png[]
+
+[role="right"]
+==== After
+image::levels/level-end-13.png[]
+
