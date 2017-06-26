@@ -1,0 +1,471 @@
+= OOP in Python
+Zilogic Systems
+:data-uri:
+
+== Circular Buffer
+
+=== Initial
+
+image::figures/cbuf-init.png[width="40%",align="center"]
+
+  * Fixed size area in memory where data is stored
+  * Variable tail, location where data is to be added next
+  * Variable head, location where data is to be removed next
+
+=== Add
+
+image::figures/cbuf-init.png[width="40%",align="center"]
+
+  * Data is stored in the buffer, at tail
+  * Tail is incremented
+
+=== Add (Contd.)
+
+image::figures/cbuf-add-1.png[width="40%",align="center"]
+
+  * Data is stored in the buffer, at tail
+  * Tail is incremented
+
+=== Add (Contd.)
+
+image::figures/cbuf-add-2.png[width="40%",align="center"]
+
+  * Data is stored in the buffer, at tail
+  * Tail is incremented
+
+=== Remove
+
+image::figures/cbuf-add-2.png[width="40%",align="center"]
+
+  * Data is retreived from the buffer, at head
+  * Head is incremented
+
+=== Remove (Contd.)
+
+image::figures/cbuf-remove-1.png[width="40%",align="center"]
+
+  * Data is retreived from the buffer, at head
+  * Head is incremented
+
+=== Remove (Contd.)
+
+image::figures/cbuf-remove-2.png[width="40%",align="center"]
+
+  * Data is retreived from the buffer, at head
+  * Head is incremented
+
+=== Wrap Over
+
+image::figures/cbuf-wrap-1.png[width="40%",align="center"]
+
+  * Head or tail reaches end of memory area, it wraps to the beginning
+  * Head / Tail increments follow modulo arithmetic
++
+------
+head = (head + 1) % size
+------
+
+=== Wrap Over (Contd.)
+
+image::figures/cbuf-wrap-2.png[width="40%",align="center"]
+
+  * Head or tail reaches end of memory area, it wraps to the beginning
+  * Head / Tail increments follow modulo arithmetic
++
+------
+head = (head + 1) % size
+------
+
+=== Overwrite
+
+image::figures/cbuf-full-1.png[width="40%",align="center"]
+
+  * When buffer is full, old data is overwritten
++
+------
+tail = (tail + 1) % size
+if tail == head:
+    head = (head + 1) % size
+------
+
+=== Overwrite (Contd.)
+
+image::figures/cbuf-full-2.png[width="40%",align="center"]
+
+  * When buffer is full, old data is overwritten
++
+------
+tail = (tail + 1) % size
+if tail == head:
+    head = (head + 1) % size
+------
+
+=== Python Implementation - Init
+
+[source,python]
+-------
+include::code/cbuf-v1/init[]
+-------
+
+=== Python Implementation - Add
+
+[source,python]
+-------
+include::code/cbuf-v1/add[]
+-------
+
+=== Python Implementation - Remove
+
+[source,python]
+-------
+include::code/cbuf-v1/remove[]
+-------
+
+=== Test 1: Simple
+
+[source,python]
+-------
+include::code/cbuf-v1/simple[]
+-------
+
+=== Test 2: Empty
+
+[source,python]
+-------
+include::code/cbuf-v1/empty[]
+-------
+
+=== Test 3: Wrap Around + Overwrite
+
+[source,python]
+-------
+include::code/cbuf-v1/wrap[]
+-------
+
+=== Try Out
+
+  * Download link:{include:code/cbuf-v1/cbuf.py.datauri}["cbuf-v1.py",filename="cbuf-v1.py"]
+
+  * Update the script to include a function `is_empty()`, to check if
+    buffer is empty
+
+  * Hint: If head == tail, the buffer is empty
+
+== Multiple Circular Buffers
+
+=== How?
+
+  * Two sets of global variables
+    - `tail1`, `head1`, `buf1`, `bufsize1`
+    - `tail2`, `head2`, `buf2`, `bufsize2`
+  * Two copies of functions
+    - `init1(size)`, `add1(data)`, ...
+    - `init2(size)`, `add2(data)`, ...
+
+=== What's Wrong?
+
+  * Copying code is a maintenance headache, violation of DRY rule
+
+  * Limited by number of copies
+
+[role="two-column"]
+=== Bundle of Variables
+
+[role="left"]
+image::figures/cbuf-bundle-0.png[align="center",width="70%"]
+
+[role="right"]
+[source,python]
+------
+include::code/cbuf-v3/new[]
+
+include::code/cbuf-v3/init[]
+------
+
+[role="two-column"]
+=== Bundle of Variables
+
+[role="left"]
+image::figures/cbuf-bundle-1.png[align="center",width="70%"]
+
+[role="right"]
+[source,python]
+------
+include::code/cbuf-v3/new[]
+
+include::code/cbuf-v3/init[]
+------
+
+[role="two-column"]
+=== Bundle of Variables
+
+[role="left"]
+image::figures/cbuf-bundle-2.png[align="center",width="70%"]
+
+[role="right"]
+[source,python]
+------
+include::code/cbuf-v3/new[]
+
+include::code/cbuf-v3/init[]
+------
+
+[role="two-column"]
+=== Bundle of Variables
+
+[role="left"]
+image::figures/cbuf-bundle-3.png[align="center",width="70%"]
+
+[role="right"]
+[source,python]
+------
+include::code/cbuf-v3/new[]
+
+include::code/cbuf-v3/init[]
+------
+
+[role="two-column"]
+=== Bundle of Variables
+
+[role="left"]
+image::figures/cbuf-bundle-4.png[align="center",width="70%"]
+
+[role="right"]
+[source,python]
+------
+include::code/cbuf-v3/new[]
+
+include::code/cbuf-v3/init[]
+------
+
+=== Using the Bundle
+
+[source,python]
+------
+include::code/cbuf-v3/bundle[]
+------
+
+=== Circular Buffer Functions
+
+[source,python]
+------
+include::code/cbuf-v3/add[]
+------
+
+[source,python]
+------
+include::code/cbuf-v3/remove[]
+------
+
+=== Multiple Circular Buffers
+
+[source,python]
+------
+include::code/cbuf-v3/multiple[]
+------
+
+=== Naming
+
+  * Bundle of variables is called an object
+
+  * Variables are called attributes of the object
+
+=== Try Out
+
+  * Download link:{include:code/cbuf-v3/cbuf.py.datauri}["cbuf-v3.py",filename="cbuf-v3.py"]
+
+  * Update the script to include a function `is_empty()`, to check if
+    buffer is empty
+
+== Classes
+
+=== Objects and Functions
+
+  * `init()`, `add()` and `remove()` always accept the object as first
+    argument
+
+  * Functions act on the attributes of the object, passed to it
+
+  * Associate / Bind the functions with the object
+
+  * Functions associated with object - methods
+
+=== Classes
+
+  * Mechanism to create an object
+    - Populated with attributes
+    - Associated with methods, that act on the object
+
+=== Defining a Class
+
+[source,python]
+------
+include::code/cbuf-v4/class1[]
+    ...
+include::code/cbuf-v4/class2[]
+    ...
+------
+
+[role="two-column"]
+=== Instantiating the Class
+
+[role="left"]
+[source,python]
+------
+include::code/cbuf-v4/single[]
+------
+
+[role="right"]
+  * `CBuf()` creates the object
+  * Methods are invoked using `object.method()` notation
+  * Object is automatically passed as first argument
+
+=== Multiple Instances
+
+[source,python]
+------
+include::code/cbuf-v4/multiple[]
+------
+
+[role="two-column"]
+=== Encapsulation
+
+[role="left"]
+image::figures/cbuf-object.png[align="center"]
+
+[role="right"]
+
+  * User of the object is not aware of internal attributes
+
+  * Objects is accessed only through the methods
+
+  * Methods manipulate the internal attributes, and ensure internal
+    state is consistent
+
+=== Improvement to Class Definition
+
+  * All objects need to be initialized with attributes after creation
+
+  * The method `__init__()`, if defined, is automatically called
+     after creation
+
+  * `init()` can be renamed to `__init__()`
+
+  * The first argument, is by *convention* called `self`
+
+=== Defining a Class, Revisited
+
+[source,python]
+------
+include::code/cbuf-v6/class1[]
+    ...
+include::code/cbuf-v6/class2[]
+    ...
+------
+
+[role="two-column"]
+=== Instantiating the Class, Revisited
+
+[role="left"]
+[source,python]
+------
+include::code/cbuf-v6/usage[]
+------
+
+[role="right"]
+  * No need to invoke `__init__()`
+
+  * Automatically, invoked when object is created
+
+=== Try Out
+
+  * Download link:{include:code/cbuf-v6/cbuf.py.datauri}["cbuf-v6.py",filename="cbuf-v6.py"]
+
+  * Update the script to include a function `is_empty()`, to check if
+    buffer is empty
+
+== Everything is an Object
+
+=== Lists, Revisited
+
+  * Lists are also objects, constructed from `list()` class
+    - Have internal attributes / state
+    - Methods can be used manipulate the state
+
+  * `append(item)` - adds items to the list
+  * `pop([index])` - removes item at a position from the list
+  * `insert(index, item)` - inserts an item into the list
+
+=== Using List as Stack
+
+[source,python]
+------
+include::code/stack/grow[]
+------
+
+=== Using List as Stack (Contd.)
+
+[source,python]
+------
+include::code/stack/shrink[]
+------
+
+=== Strings, Revisited
+
+  * `split([sep])` - split string using a delimiter
++
+[source,python]
+------
+include::code/strlist/split[]
+------
++
+  * `join(list)` - join strings in the list using the string as separator
++
+[source,python]
+------
+include::code/strlist/join[]
+------
+
+=== Integers, Revisited
+
+  * `int(str, [base])` - constructors an integer object
+  * `base`, if not specified is assumed to be 10
++
+[source,python]
+-----
+include::code/strint/to-int[]
+-----
+
+=== Integers to Strings
+
+  * Simple format conversion
++
+[source,python]
+-----
+include::code/strint/format[]
+-----
+
+=== Integers to Strings (Contd.)
+
+  * Padding and Alignment
++
+[source,python]
+-----
+include::code/strint/pad-align[]
+-----
+
+=== Integers to Strings (Contd.)
+
+  * Fill
++
+[source,python]
+-----
+include::code/strint/fill[]
+-----
+
+=== Try Out
+
+  * Write a function to convert the time from 24 hour format
+    "hh:mm:ss" to 12 hour format, with AM / PM indication
+
+

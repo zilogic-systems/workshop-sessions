@@ -1,0 +1,462 @@
+= Python Introduction: Exercises
+Zilogic Systems
+:data-uri:
+
+== Introduction to Karel
+
+=== Karel, the Language
+
+  * Karel is an language used for learning and teaching programming
+    for beginners
+
+  * An environment similar to Karel will be used to introduce Python
+
+[role="two-column"]
+=== Karel, the Robot
+
+[role="left"]
+image::levels/level-start-2.png[]
+
+[role="right"]
+  * Karel, simulates a robot, inside a 2D world
+
+  * Karel can move around the world
+
+  * The world has walls, be careful not to collide into them
+
+  * The world can have beepers, devices that emit short sound signals
+
+[role="two-column"]
+=== Karel, the Robot
+
+[role="left"]
+image::levels/level-start-2.png[]
+
+[role="right"]
+  * Karel has sensors to detect walls and beepers
+
+  * Karel can take beepers and store them in his bag
+
+  * Karel can also drop beepers from his bag
+
+[role="two-column"]
+=== Making Karel Move
+
+[role="left"]
+==== Before
+image::levels/level-start-0.png[]
+
+[role="right"]
+==== After
+image::levels/level-end-0.png[]
+
+=== Code
+
+[source,python]
+------
+start()         # Initializes Karel
+
+move()          # Moves 1 Step
+move()          # Moves 1 Step
+move()          # Moves 1 Step
+
+stop()          # Turns off Karel
+------
+
+=== Karel Simulator & Exercises
+
+  * Starting the simulator, and selecting levels
+
+  * After a level is selected, the program can be executed
+
+  * The world should reach the target state, when `stop()` is invoked
+
+=== Try Out
+
+  * Create a `.py`, with the following line, will be explained later
++
+[source,python]
+------
+from karel import *
+------
++
+  * Add the code to move Karel
+  * Execute the code using the following command
++
+------
+python myprog.py
+------
++
+ * Invokes the Python interpreter with the program file as argument
+
+[role="two-column"]
+=== Making Karel Turn
+
+[role="left"]
+==== Before
+image::levels/level-start-1.png[]
+
+[role="right"]
+==== After
+image::levels/level-end-1.png[]
+
+=== Try Out
+
+  * `turn_left()` function causes Karel to turn left
+
+  * Modify the code as required and execute it
+
+[role="two-column"]
+=== Picking Beepers
+
+[role="left"]
+==== Before
+image::levels/level-start-2.png[]
+
+[role="right"]
+==== After
+image::levels/level-end-2.png[]
+
+=== Try Out
+
+  * `pick_beeper()` function causes Karel to pick a beeper
+
+  * Modify the code as required and execute it
+
+=== Repeating
+
+==== Before
+image::levels/level-start-3.png[]
+
+==== After
+image::levels/level-end-3.png[]
+
+=== Code
+
+[source,python]
+------
+start()
+
+for i in range(7):
+   move()
+
+stop()
+------
+
+[role="two-column"]
+=== Turn Right
+
+[role="left"]
+==== Before
+image::levels/level-start-4.png[]
+
+[role="right"]
+==== After
+image::levels/level-end-4.png[]
+
+=== Try Out
+
+  * No separate `turn_right()` function
+
+  * Turn right is same as turning left 3 times
+
+  * Repeat `turn_left()` to turn right
+
+=== Multi-line Block
+
+==== Before
+image::levels/level-start-5.png[]
+
+==== After
+image::levels/level-end-5.png[]
+
+=== Try Out
+
+  * In every iteration, move and pick beeper
+
+  * Make sure all lines within a code block are at the same
+    indentation level
++
+[source,python]
+------
+for i in range(7):
+    move()           # Both lines should be
+    pick_beeper()    # indented to same level
+------
+
+=== Finding Beepers
+
+==== Before
+
+image::levels/level-start-6.png[]
+
+==== After
+
+image::levels/level-end-6.png[]
+
+=== Finding Beepers (Contd.)
+
+  * Beepers can be anywhere in the path
+
+  * Karel has sensors to identify if the current location has a beeper
+
+  * `beeper()`
+    - returns `1` if beeper is present
+    - returns `0` if beeper is not present
+
+  * `if` statement can be used to execute code conditionally
+
+=== Algorithm
+
+  * repeat 7 times:
+    - move
+    - if beeper present:
+      ** pick beeper
+
+=== Try Out: Code
+
+[source,python]
+------
+for i in range(7):
+    move()
+    if beeper():
+        pick_beeper()
+------
+    
+=== Stop Before Wall
+
+==== Before
+image::levels/level-start-7.png[]
+
+==== After
+image::levels/level-end-7.png[]
+
+=== Try Out
+
+  * Karel has a sensor to detect a wall
+
+  * `front_is_clear()`
+    - returns `1` if there is no wall in the front
+    - returns `0` otherwise
+
+  * `left_is_clear()`, `right_is_clear()`
+
+  * `break` statement can be used to break out of a loop
+
+=== Try Out: `while` Loop
+
+  * Repeat previous exercise using `while` statement
+
+[role="two-column"]
+=== Climb Up
+
+[role="left"]
+==== Before
+image::levels/level-start-8.png[]
+
+[role="right"]
+==== After
+image::levels/level-end-8.png[]
+
+=== Demo
+
+  * Code a little, test a little
+
+  * Convert code fragments into functions
+
+=== Code
+
+[source,python]
+------
+def find_gap():
+    while front_is_clear():
+        move()
+        if left_is_clear():
+            return True
+    return False
+
+def enter_gap():
+    turn_left()
+    move()
+
+def goto_beginning():
+    turn_left()
+    while front_is_clear():
+        move()
+-------
+
+=== Code (Contd.)
+
+[source,python]
+-------
+def turn_around():
+    turn_left()
+    turn_left()
+
+start()
+while find_gap():
+    enter_gap()
+    goto_beginning()
+    pick_beeper()
+    turn_around()
+stop()
+------
+
+[role="two-column"]
+=== Climb Down
+
+[role="left"]
+==== Before
+image::levels/level-start-9.png[]
+
+[role="right"]
+==== After
+image::levels/level-end-9.png[]
+
+=== Try Out
+
+  * Adapt the previous code to climb down
+
+  * Define a function called `turn_right()`
+
+  * Replace `turn_left()` with `turn_right()`
+
+  * Replace `left_is_clear()` with `right_is_clear()`
+
+[role="two-column"]
+=== Measure Distance
+
+Count the steps to the wall, and put beepers equal to the no. of
+steps.
+
+[role="left"]
+==== Before
+image::levels/level-start-10.png[]
+
+[role="right"]
+==== After
+image::levels/level-end-10.png[]
+
+=== Try Out: Code
+
+[source,python]
+------
+start()
+
+count = 0
+while front_is_clear():
+    move()
+    count = count + 1
+
+for i in range(count):
+    put_beeper()
+
+turn_left()
+move()
+------
+
+[role="two-column"]
+=== Measure Wall Length
+
+Count the steps take to cross the wall, and put beepers equal to the
+no. of steps.
+
+[role="left"]
+==== Before
+image::levels/level-start-11.png[]
+
+[role="right"]
+==== After
+image::levels/level-end-11.png[]
+
+=== Try Out: Algorithm
+
+  * count = 0
+  * while not left_is_clear()
+    - move
+    - count = count + 1
+  * repeat count times
+    - put beeper
+  * move
+
+[role="two-column"]
+=== Conditional Expressions
+
+Pick only three beepers.
+
+[role="left"]
+==== Before
+image::levels/level-start-12.png[]
+
+[role="right"]
+==== After
+image::levels/level-end-12.png[]
+
+=== Try Out: Algorithm
+
+  * count = 0
+  * repeat 7 times:
+    - move
+    - if beeper present and count < 3
+      ** pick beeper
+      ** count = count + 1
+
+[role="two-column"]
+=== Drop Fibo
+
+[role="left"]
+==== Before
+image::levels/level-start-13.png[]
+
+[role="right"]
+==== After
+image::levels/level-end-13.png[]
+
+=== Try Out
+
+  * Write a function `fibo(n)` that provides the nth number in the
+    series
+
+  * In each step, drop the beepers corresponding to the Fibonnaci
+    number
+
+[role="two-column"]
+=== Drop Random
+
+[role="left"]
+==== Before
+image::levels/level-start-14.png[]
+
+[role="right"]
+==== After
+image::levels/level-end-14.png[]
+
+=== Try Out
+
+  * Store the sequence in a list
+
+  * In each step, drop the beepers corresponding to the element in the
+    list
+
+[role="two-column"]
+=== Reverse
+
+[role="left"]
+==== Before
+image::levels/level-start-15.png[]
+
+[role="right"]
+==== After
+image::levels/level-end-15.png[]
+
+=== Try Out
+
+  * Create a list of 7 elements, initialized to zero
++
+------
+count = [0] * 7
+------
++
+  * Each step pick all beepers, and store count in the list
+  * Turn Around
+  * Each step drop beepers corresponding to count in the list
