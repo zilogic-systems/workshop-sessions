@@ -1,4 +1,4 @@
-= Python Introduction
+= Python Introduction: Exercises
 Zilogic Systems
 :data-uri:
 
@@ -73,7 +73,13 @@ stop()          # Turns off Karel
 
 === Try Out
 
-  * Download the template file from FIXME
+  * Create a `.py`, with the following line, will be explained later
++
+[source,python]
+------
+from karel import *
+------
++
   * Add the code to move Karel
   * Execute the code using the following command
 +
@@ -131,14 +137,14 @@ image::levels/level-end-3.png[]
 ------
 start()
 
-repeat(7):     # Repeats code block, n times
-   move()      # Code block indented by either tab or spaces
+for i in range(7):
+   move()
 
 stop()
 ------
 
 [role="two-column"]
-=== Try Out: Turn Right
+=== Turn Right
 
 [role="left"]
 ==== Before
@@ -148,15 +154,15 @@ image::levels/level-start-4.png[]
 ==== After
 image::levels/level-end-4.png[]
 
-=== Try Out: Turn Right (Contd.)
+=== Try Out
 
   * No separate `turn_right()` function
 
   * Turn right is same as turning left 3 times
 
-  * Use `repeat` and `turn_left()` to turn right
+  * Repeat `turn_left()` to turn right
 
-=== Try Out: Multi-line Block
+=== Multi-line Block
 
 ==== Before
 image::levels/level-start-5.png[]
@@ -164,7 +170,7 @@ image::levels/level-start-5.png[]
 ==== After
 image::levels/level-end-5.png[]
 
-=== Try Out: Multi-line Block (Contd.)
+=== Try Out
 
   * In every iteration, move and pick beeper
 
@@ -173,7 +179,7 @@ image::levels/level-end-5.png[]
 +
 [source,python]
 ------
-repeat(7):
+for i in range(7):
     move()           # Both lines should be
     pick_beeper()    # indented to same level
 ------
@@ -202,22 +208,22 @@ image::levels/level-end-6.png[]
 
 === Algorithm
 
-  * Repeat 7 times:
-    - Move to next location
-    - If beeper present:
-      ** Pick it
+  * repeat 7 times:
+    - move
+    - if beeper present:
+      ** pick beeper
 
-=== Code
+=== Try Out: Code
 
 [source,python]
 ------
-repeat(7):
+for i in range(7):
     move()
     if beeper():
         pick_beeper()
 ------
     
-=== Try Out: Stop Before Wall
+=== Stop Before Wall
 
 ==== Before
 image::levels/level-start-7.png[]
@@ -225,7 +231,7 @@ image::levels/level-start-7.png[]
 ==== After
 image::levels/level-end-7.png[]
 
-=== Try Out: Stop Before Wall (Contd.)
+=== Try Out
 
   * Karel has a sensor to detect a wall
 
@@ -239,21 +245,10 @@ image::levels/level-end-7.png[]
 
 === Try Out: `while` Loop
 
-  * `while` loop has the following syntax
-+
-------
-while <cond>:
-    ...
-    code
-    ...
-------
-+
-  * Code block is execute, while the condition is `1`
-
   * Repeat previous exercise using `while` statement
 
 [role="two-column"]
-=== Problem Breakdown
+=== Climb Up
 
 [role="left"]
 ==== Before
@@ -263,105 +258,52 @@ image::levels/level-start-8.png[]
 ==== After
 image::levels/level-end-8.png[]
 
-=== Problem Breakdown (Contd.)
+=== Demo
 
-  * Step 1: Find Passage
-  * Step 2: Enter Passage
-  * Step 3: Goto Beginning
-  * Step 4: Pick Beeper
-  * Step 5: Turn Around
-  * Step 6: Goto 'Step 1'
+  * Code a little, test a little
 
-=== Top Level Code
+  * Convert code fragments into functions
+
+=== Code
 
 [source,python]
 ------
-while 1:
-    find_passage()
-    enter_passage()
-    goto_beginning()
-    pick_beeper()
-    turn_around()
-------
+def find_gap():
+    while front_is_clear():
+        move()
+        if left_is_clear():
+            return True
+    return False
 
-=== Writing Custom Functions
+def enter_gap():
+    turn_left()
+    move()
+
+def goto_beginning():
+    turn_left()
+    while front_is_clear():
+        move()
+-------
+
+=== Code (Contd.)
 
 [source,python]
------
+-------
 def turn_around():
     turn_left()
     turn_left()
------
 
-  * `def` statement is used to define a function
-  * `turn_around` is the name of the function
-  * The code block below specifies the body of the function
-
-=== More Functions
-
-[source,python]
------
-def find_passage():
-    repeat(7):
-        if left_is_clear():
-            break
-
-def enter_passage():
-    turn_left()
-    move()
-    turn_left()
-
-def goto_beginning():
-    while front_is_clear():
-        move()
-------
-
-=== Demo
-
-  * Logic for the algorithm has been implemented
-
-  * Let's see it in action
-
-  * It is a good idea to write one function, test it and move on to
-    the next
-
-=== Exit Criteria
-
-  * Stop the loop, when there is no more passage.
-
-  * `find_passage()` is modified to indicate, if a passage was found
-
-  * `return` statement is used to return control and provide a value
-    to the caller
-
-[source,python]
------
-def find_passage():
-    repeat(7):
-        if left_is_clear():
-            return 1
-    return 0
------
-
-=== Exit Criteria (Contd.)
-
-  * If a pasage is not found we break out of the loop
-
-  * Modified code is shown below
-
-[source,python]
-------
-while 1:
-    if not find_passage():
-        break
-    enter_passage()
+start()
+while find_gap():
+    enter_gap()
     goto_beginning()
     pick_beeper()
     turn_around()
+stop()
 ------
 
 [role="two-column"]
-=== Try Out: Climb Down
+=== Climb Down
 
 [role="left"]
 ==== Before
@@ -370,6 +312,16 @@ image::levels/level-start-9.png[]
 [role="right"]
 ==== After
 image::levels/level-end-9.png[]
+
+=== Try Out
+
+  * Adapt the previous code to climb down
+
+  * Define a function called `turn_right()`
+
+  * Replace `turn_left()` with `turn_right()`
+
+  * Replace `left_is_clear()` with `right_is_clear()`
 
 [role="two-column"]
 === Measure Distance
@@ -385,51 +337,26 @@ image::levels/level-start-10.png[]
 ==== After
 image::levels/level-end-10.png[]
 
-=== Variables
+=== Try Out: Code
 
-  * Need to keep track of no. of steps
-
-  * A variable is initialized to zero
-+
+[source,python]
 ------
+start()
+
 count = 0
+while front_is_clear():
+    move()
+    count = count + 1
+
+for i in range(count):
+    put_beeper()
+
+turn_left()
+move()
 ------
-+
-  * Each time Karel moves, the variable is incremented
-+
-------
-count = count + 1
-------
-
-=== Digression: Types
-
-  * Basic Types:
-    - Integers: 1, 123, 43
-    - Floating Point: 1.2, 100.5
-    - Strings: "hello", "world"
-    - Boolean: True, False
-
-  * Type determines
-    - What operations can be performed on the data
-    - Behaviour of the data for an operation
-
-  * Example 1: Division is allowed between integers, but is not allowed
-    between strings.
-
-  * Example 2: '+' operation on integers results in addition, but on
-    strings results in concatenation
-
-=== Variables and Types
-
-  * Python does 'Dynamic Typing'
-
-  * Type of the variable is determined by the type of the data stored
-    in it
-
-  * Type is associated with the data, rather than the variable
 
 [role="two-column"]
-=== Try Out: Measure Wall Length
+=== Measure Wall Length
 
 Count the steps take to cross the wall, and put beepers equal to the
 no. of steps.
@@ -442,6 +369,15 @@ image::levels/level-start-11.png[]
 ==== After
 image::levels/level-end-11.png[]
 
+=== Try Out: Algorithm
+
+  * count = 0
+  * while not left_is_clear()
+    - move
+    - count = count + 1
+  * repeat count times
+    - put beeper
+  * move
 
 [role="two-column"]
 === Conditional Expressions
@@ -456,20 +392,17 @@ image::levels/level-start-12.png[]
 ==== After
 image::levels/level-end-12.png[]
 
-=== Code
+=== Try Out: Algorithm
 
-[source,python]
-------
-count = 0
-repeat(7):
-    move()
-    if beeper() and count < 3:
-        pick_beeper()
-        count = count + 1
-------
+  * count = 0
+  * repeat 7 times:
+    - move
+    - if beeper present and count < 3
+      ** pick beeper
+      ** count = count + 1
 
 [role="two-column"]
-=== Functions and Arguments
+=== Drop Fibo
 
 [role="left"]
 ==== Before
@@ -479,3 +412,51 @@ image::levels/level-start-13.png[]
 ==== After
 image::levels/level-end-13.png[]
 
+=== Try Out
+
+  * Write a function `fibo(n)` that provides the nth number in the
+    series
+
+  * In each step, drop the beepers corresponding to the Fibonnaci
+    number
+
+[role="two-column"]
+=== Drop Random
+
+[role="left"]
+==== Before
+image::levels/level-start-14.png[]
+
+[role="right"]
+==== After
+image::levels/level-end-14.png[]
+
+=== Try Out
+
+  * Store the sequence in a list
+
+  * In each step, drop the beepers corresponding to the element in the
+    list
+
+[role="two-column"]
+=== Reverse
+
+[role="left"]
+==== Before
+image::levels/level-start-15.png[]
+
+[role="right"]
+==== After
+image::levels/level-end-15.png[]
+
+=== Try Out
+
+  * Create a list of 7 elements, initialized to zero
++
+------
+count = [0] * 7
+------
++
+  * Each step pick all beepers, and store count in the list
+  * Turn Around
+  * Each step drop beepers corresponding to count in the list
