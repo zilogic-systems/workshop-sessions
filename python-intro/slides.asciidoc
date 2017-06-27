@@ -669,3 +669,31 @@ image::figures/slice.png[align="center",width="60%"]
 >>> str[-2:]
 'ld'
 ------
+
+=== Default Arguments
+
+  * An argument to a function can be made optional by specifying a
+    default value
+
+[source,python]
+------
+>>> def hello(name="World"):
+...    print("Hello", name)
+...
+>>> hello()
+------
+
+=== Keyword Arguments
+
+  * Arguments can be specified in a function call, by their parameter
+    names
+
+[source,python]
+------
+>>> def set_color(x, y, color):
+...    print("x", x)
+...    print("y", y)
+...    print("color", color)
+...
+>>> set_color(color=1, x=2, y=3)
+------
