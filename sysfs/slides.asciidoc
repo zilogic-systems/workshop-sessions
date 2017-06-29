@@ -1,0 +1,161 @@
+= Sysfs
+Zilogic Systems
+:data-uri:
+
+== Purpose of Sysfs
+
+=== Role of Sysfs
+
+  * An in-memory filesystem that exports information from kernel-space to user-space.
+  * Exports Kernel datastructures, their attributes and relationships.
+  * Examples: network, filesystems, hardware, drivers, memory.
+  * Introduced by `Patrick Mochel` in the Linux 2.5 Kernel in 2003.
+
+=== *procfs* limitations
+
+  * *procfs* was designed to keep process related information.
+  * Eventually got cluttered with lot of non-process information.
+  * There was no standard format to represent information.
+  * Information was human readable, but not programatically parsable.
+  * Examples:
+	** `/proc/net/packet`
+   	** `/proc/net/wireless`
+	** `/proc/asound/cards`
+
+=== `sysfs` equivalent of `/proc/asound/cards`
+
+[source,bash]
+------------
+$ cat /proc/asound/cards
+ 0 [HDMI           ]: HDA-Intel - HDA Intel HDMI
+                      HDA Intel HDMI at 0xf7d34000 irq 34
+ 1 [PCH            ]: HDA-Intel - HDA Intel PCH
+                      HDA Intel PCH at 0xf7d30000 irq 32
+------------
+
+[source,bash]
+------------
+$ ls /sys/class/sound
+card0	card1
+$ cat /sys/class/sound/card0/id
+HDMI
+$ cat /sys/class/sound/card0/device/irq
+34
+------------
+
+[role="two-column"]
+=== Charateristics of Sysfs
+
+[role="left"]
+  * Exports information in the form of files and directories
+  * Files may support read, write or both operations.
+  * Provides user-friendly interfaces which follows the *one-item per file* rule.
+  * Addition and removal of interfaces associated with devices.
+
+[role="right"]
+image::figures/sys-char.png[align="center",width="100%"]
+
+=== Applications of Sysfs
+
+  * Accessing system information by various user-space applications
+  * Controlling and configuring hardware
+  * Debugging
+
+== /sys/ hierarchy
+
+=== `/sys/class`
+
+  * `class` - grouping devices based on functionality like audio cards, network cards, etc
+  * Controlling and accessing information about these devices.
+  * Similar to `Device Manager` in Windows.
+
+[role="two-column"]
+=== `/sys/class`
+
+[role="left"]
+[source,bash]
+-----------
+$ tree /sys/class/
+├── block
+├── gpio
+├── graphics
+├── input
+├── leds
+├── printer
+├── rtc
+├── sound
+├── spi_master
+├── thermal
+├── tty
+-----------
+
+[role="right"]
+image::figures/device-manager.jpg[align="center",width="100%"]
+
+=== `/sys/bus`
+
+ * Provides support for accessing analog devices.
+ * Examples: Temperature and pressure sensors, Accelerometers, ADC & DAC.
+ * Accessible through `/sys/bus/iio`.
+
+=== Demo: List network device info
+
+ * Information available in `/sys/class/net`.
+
+ * Download
+    link:{include:code/ifconfig.py.datauri}["ifconfig.py",filename="ifconfig.py"]
+
+ * Output:
+
+[source,bash]
+---------------
+$ python3 ifconfig.py
+wlan0	HWaddr ac:d1:b8:09:ab:09
+	MTU:1500
+	RX packets:216089 errors:0
+	TX packets:125334 errors:0
+	RX bytes:116026931	TX bytes:20279921
+---------------
+
+
+=== Demo: List Hard Disk partitions
+
+ * Information available in `/sys/class/block`.
+
+ * Download
+    link:{include:code/disk.py.datauri}["disk.py",filename="disk.py"]
+
+ * Output:
+
+[source,bash]
+-------------
+$ python3 disk.py
+Partition	Size(in MB)
+sda1		832
+sda3		428302
+sda5		10419
+sda6		3528
+sda7		3814
+sda8		952
+sda9		29086
+-------------
+
+=== Tryout: Debug LED
+
+ * Switch `ON` & `OFF` the Debug LED available in `/sys/class/leds/`.
+ * Get the list of triggers supported by the LED.
+ * Note the trigger that is currently associated with the LED.
+ * Enable the `heartbeat` trigger for the Debug LED.
+
+=== `/dev` vs `/sys`
+
+[align="center",width="95%",frame="topbot",options="header"]
+|==================================================================================================================
+^|                    /dev                                ^|          /sys
+| Primary data transfer interface                          | Primary configuration interface
+| Provides a complex `ioctl` based configuration interface  | Provides a very simple and obvious configuration interface
+| Need to write an application to perform control operations using `ioctls` | Control operations are performed by simply accessing the relevant interfaces.
+| `ioctls` are suitable for binary data transfer      | Suitable only for text data
+|==================================================================================================================
+
+== Questions
