@@ -4,16 +4,13 @@
 
 === Introduction
 
-These are the processor pins which can be used for general purpose
-digital input and output.
-
  * General Purpose Input Output(GPIO) are single pin IO, represents
    voltage signal as binary logic level `high` and `low`.
 
- * GPIO `high` maps to voltage closer to VCC and `low` maps to voltage
-   closer to ground.
+ * Typically GPIO `high` maps to voltage closer to VCC and `low` maps
+   to voltage closer to ground.
 
- * Typical `high` state is considered as logical `1` and low as `0`.
+ * `high` state is considered as logical `1` and low as `0`.
 
  * It can operate in both the directions, as an input to sample the
    logic level or as an output to drive any logic level
@@ -22,6 +19,14 @@ digital input and output.
 
  * The pin status can be read or modified from software.
 
+=== GPIO Applications
+
+* Used to control LEDs and sense keys.
+
+* Used to control 7Segment, Stepper Motor etc.,
+
+* Used for 7segment Arrays, LED Matrices & Matrix keypads
+
 [role="two-column"]
 === GPIO Grouping 
 
@@ -29,10 +34,10 @@ digital input and output.
  * The GPIOs are organised as PORTS or BANKS where a set of GPIOs are
    combined together for convenience
 
- * In a 32 bit processors, the ports may have 32 GPIO pins together in
-   a port.
+ * In a 32 bit processors, the ports may have 32 GPIO pins grouped
+   together.
 
- * GPIOs pins are referred as particular pin in a particular port,
+ * GPIOs pins are referred as, particular pin in a particular port,
    Ex:P2_3 - `pin 3 in port 2`
 
 [role="right"]
@@ -67,15 +72,6 @@ For pin `P2_3`,
 | KEY2   | P2_3     | GPIO67
 |====================================
 
-=== GPIO Applications
-
-* Used to control LEDs and sense keys.
-
-* Used to controll 7Segment, Stepper Motor etc.,
-
-* Used for 7segment Arrays, LED Matrices & Matric keypads
-
-* Used for interrupts signalling
 
 [role="two-column"]
 === GPIO in Linux
@@ -88,7 +84,7 @@ For pin `P2_3`,
   inturn calls the processor specific GPIO driver.
 
 [role="right"]
-image::figures/layer.png[]
+image::figures/layer.png[width=150]
 
 == SYSFS GPIO
 
@@ -122,98 +118,156 @@ image::figures/layer.png[]
 === Led Circuitary
 
 [role="left"]
-* The LED's anode is connected to Vcc and LED's cathode is grounded
-  through a 330 ohm resistor.
 
-* A MOSFET is connected between the LED and the ground which acts as a
-  switch.
+* The LED glows when anode is connected to Vcc and it's cathode is
+  grounded.
 
-* A voltage applied to the gate, makes the LED to ground so that it
-  can glow.
+* A current limiting resistor can be used to reduce the current
+  flowing through LED, to reduce burn out of LED.
 
-* GPIO pin connected to the gate, can be used to switch on/off the
-  LED.
+* A electronic switch is connected between LED and ground, which when
+  closed the LED glows.
+
+* The outpin of CPU can be connected to the switch to open or close
+  it.
+
+* MOSFET or Transistor can act as a electronic switch.
 
 [role="right"]
 image::figures/leds.png[]
 
-=== GPIO Access
+=== GPIO Request
 
-The processor pin can be configured as output pin by setting '1' to
-the GPIO direction file
+* The processor pins can be used shared by several peripheral
+  controller.
 
-.Example to set Port 2 and Pin 1 with `1`
+* If needs to be used as GPIO pin it has to be reserved.
+
+* GPIO subsystem of kernel provides sysfs access for reserving a pin
+  and freeing them back.
+
+.Example Requesting GPIO
+----
+$ echo 65 > /sys/class/gpio/export
+----
+
+* You would find `/sys/class/gpio/gpio65` available if no other
+  peripheral subsystem has not reserved it.
+
+* A GPIO pin can be freed as shown below
+
+.Example Freeing GPIO
+----
+$ echo 65 > /sys/class/gpio/unexport
+----
+ 
+=== GPIO Direction
+
+* The processor pin can be configured as output pin by writing 'out'
+to the GPIO direction file
+
+.Example to set GPIO as output
 ----
 $ echo out > /sys/class/gpio/gpio65/direction
 ----
 
- * When value is set to '1' through the value file, it can drive logic
-   level high
+* The processor pin can be configured as output pin by writing 'in' to
+the GPIO direction file
 
-.Example to set Port 2 and Pin 1 with `1`
+.Example to set GPIO pin as input
+----
+$ echo in > /sys/class/gpio/gpio65/direction
+----
+
+=== GPIO State 
+
+ * When value '1' or '0' written in the value file, it can drive logic
+   level high or low.
+
+.Example to set GPIO 65 high
 ----
 $ echo 1 > /sys/class/gpio/gpio65/value
 ----
 
- * When bit value is set to '0' through GPIO Data registers, it can
-   drive digital logic level low
+ * The value file can be read to know the state of input pin.
 
-=== LEDs in Output Mode Contd.
-
-.Example to set Port 2 and Pin 1 with `1`
+.Example to get GPIO state
 ----
-$ echo 1 > /sys/class/gpio/gpio65/value
+$ cat /sys/class/gpio/gpio65/value
 ----
 
-=== LED Glow
+=== LED Glow Program
 
 [source,python]
 ----
 include::led.py[]
 ----
 
-=== LED Blinky
+=== LED Blinky Program
 
 [source,python]
 ----
 include::led-blink.py[]
 ----
+
+=== Try Out
+
+* Glow the tri color LED connected to GPIO64, 65 & 67 through sysfs.
  
+* Modified the LED Blink Code link:{include:code/display-support.patch.datauri}["led-blink.py",filename="display-support.patch"] to change the color of led every one
+  second.
+
 == Keys
+
+=== GPIO Input States
+
+* GPIOs in input mode can be of three states high, low or floating.
+
+* GPIOs if they are not connected to any signal it would be a floating
+  input and said to be open.
+
+* The floating pins doesn't have a fixed state and it would pick near
+  by signal and would have unstable state.
+
+=== Handling GPIOs in Input Mode
+
+* The inputs lines has to be fixed to a default state by tying that
+  - to VCC for default high state or 
+  - to GND for default low state.
+
+* Making a pin to stay high by connecting it to VCC through a resistor
+  is called pull-up.
+
+* Making a pin to stay low by connecting it to GND through a resistor
+  is called pull-down.
 
 [role="two-column"]
 === Keys Circuitary
 
 [role="left"]
-* A key has two terminals, when pressed it mechanically connects the
-  terminals.
+* A key/switch has two terminals, when pressed it mechanically
+  connects the terminals.
 
-* To detect whether a key is pressed/released or idle it has to be
-  sensed.
+* One terminal of switch can be connected to GND other to the input
+  pin.
 
-* one terminal of key can be connected to GND other to the GPIO pin.
+* When the is key pressed the switch is closed and the input pin is
+  grounded.
 
-* The GPIO pin has been defaulted to high level, by a pull-up to VCC
-  through a resistor.
+* if unpressed the switch is open and which would have undefined
+  state.
+
+* The GPIO pin can be defaulted to high level by a pull-up, so input
+  would be high when pin is open.
 
 * When the key is unpressed the GPIO stays high and when pressed it
   gets low.
 
+* To detect whether a key is pressed / released or idle it has to be
+  sensed in program.
+
 [role="right"]
 image::figures/keys.png[]
-
-=== Key Polling
-
-* Since the key press is asynchronous, it has to be polled
-  continuously or periodically.
-
-* Continuously polling for key may burn the CPU or would starve other
-  processes, instead periodical polling can be used.
-
-* Typical key stroke period by humans couldn't be less than few
-  hundred millisecs.
-
-* it's enough that we can poll for key press once in 100msec. 
 
 === Programming for Keys
 
@@ -223,13 +277,27 @@ image::figures/keys.png[]
 include::key.py[]
 ----
 
+=== Key Polling
+
+* Since the key press is asynchronous, it has to be polled
+  continuously or periodically.
+
+* Continuously polling for key may burn the CPU, instead periodical
+  polling should be sufficient for keys.
+
+* Typical key stroke period by humans, couldn't be less than few
+  hundred millisecs.
+
+* it's enough that we can poll for key press once in 100 msec. 
+
 === Key Debounce
 
 * The switches or keys used are mechanical devices and when key is
   pressed or depressed they tend to vibrate creating noises until it
   settles down.
 
-* This condition can be handled in hardware by adding a filter.
+* This condition can be handled in hardware by adding a debounce
+  filter.
 
 * It can also be handled in software by waiting for specific time from
   the event occurence till it settles down.
@@ -289,7 +357,9 @@ include::key-debounce.py[]
 
 * http://slideplayer.com/slide/11129925/
 
-* bhttps://developer.android.com/things/hardware/hardware-101.html
+* https://developer.android.com/things/hardware/hardware-101.html
+
+* https://www.build-electronic-circuits.com/current-limiting-resistor/
 
 == Backup Slides
 
