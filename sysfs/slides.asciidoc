@@ -140,6 +140,26 @@ sda8		952
 sda9		29086
 -------------
 
+=== Demo: Controlling Backlight brightness
+
+ * Backlight can be controlled via `/sys/class/backlight`.
+
+[source,bash]
+--------------
+$ cat /sys/class/backlight/intel_backlight/max_brightness
+4710
+--------------
+
+ * Brightness can be controlled by writing value into `brightness` file.
+ * Invalid values are validated by `sysfs`.
+
+[source,bash]
+--------------
+$ echo 500 > /sys/class/backlight/intel_backlight/brightness
+$ echo 5000 > /sys/class/backlight/intel_backlight/brightness
+bash: echo: write error: Invalid argument
+--------------
+
 === Tryout: Debug LED
 
  * Switch `ON` & `OFF` the Debug LED available in `/sys/class/leds/`.
