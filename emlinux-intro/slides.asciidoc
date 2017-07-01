@@ -4,33 +4,33 @@
 
 === Embedded Vs Open Systems
 
-* Embedded System - Programmable electronics system immersed in a
+* *Embedded System* - Programmable electronics system immersed in a
   larger physical system, and has fixed functionalities.
 
-* Open System - General purpose system which is interoperable and
+* *Open System* - General purpose system which is inter-operable and
   sticks to open standards, whose hardware and software features are
   scaleable and extensible.
 
-* We are in an era of Hybrid embedded systems, where the devices built
+* We are in an era of *Hybrid embedded systems*, where the devices built
   has mixed properties of both embedded system and open system.
 
 * Currently the specific purpose embedded systems are classified as
-  deeply embedded systems.
+  *deeply embedded systems*.
 
 === Embedded Software Model 
 
 * Mostly in deeply embedded systems monolithic binary image of
-  software called as firmware is developed.
+  software called as *firmware* is developed.
  
-* In mid level embedded systems the minimilastic multi-threaded OS or
-  real-time OS (RTOS) is used along with the application code to build
-  the firmware image.
+* In mid level embedded systems the minimalist *multi-threaded OS or
+  real-time OS (RTOS)* is used along with the application code to
+  build the firmware image.
 
 * In above firmware model the software features are freezed at compile
   time itself and it cannot be scaled at later point.
 
-* The high level embedded systems are hybrid and uses general purpose
-  operating systems (GPOS).
+* The high level embedded systems are hybrid and uses *general purpose
+  operating systems (GPOS)*.
 
 === Embedded Software Model Contd.
 
@@ -56,9 +56,9 @@ They are used in
 
  * Follows open standards like POSIX
 
- * Applicatins can be installed or removed at runtime.
+ * Applications can be installed or removed at runtime.
 
- * Applications are untrusted by OS and are provided less priveleges.
+ * Applications are untrusted by OS and are provided less privileges.
 
  * Linux, BSD, MAC, Windows etc.,
 
@@ -69,14 +69,14 @@ image::figures/gpos-stack.png[]
 
 === What is Linux
 
-  * Unix-like: provides an interface similar to the Unix operating
-    system developed by Bell labs.
+  * *Unix-like:* a GPOS provides an interface similar to the Unix
+    operating system developed by Bell labs.
 
-  * multi-tasking: many different applications at the same time
+  * *multi-tasking:* many different applications at the same time
 
-  * multi-user: many different users can use the system 
+  * *multi-user:* many different users can use the system 
 
-  * cross-platform: supports wide variety of hardware - desktops,
+  * *cross-platform:* supports wide variety of hardware - desktops,
     mainframes, supercomputers, gaming stations, mobile phones,
     routers, etc.
 
@@ -88,29 +88,21 @@ image::figures/gpos-stack.png[]
   * User can interact to an UNIX system through `shell` or through
     `desktop environment`.
 
-  * A shell is a command line equivalent of the start menu and the
-    file browser in M$ Windows. A shell provides a means for
+  * A shell is a command line application provides a means for
     navigating through the file system, and launching other programs
     on request.
 
-  * So called because it provides an interface through which the
-    facilities of an operating system is accessed.
-
   * Desktop environment is the graphical replacement for shell and
-    provides much more convenience for desktop usage.
+    provides much more convenience for desktop users.
 
 [role="right"]
 image:figures/unix-rings.png[width=388]
 
-=== Files & Folders
+=== Files in Linux
 
   * Files in GNU/Linux can be broadly classified as follows:
-+
-  1. Regular files
-  2. Directories
-  3. Links, similar to M$ Windows Shortcuts
-  4. Device Files
-+
+    Regular files, Directories, Links & Device files
+
   * In GNU/Linux every device is represented by a file in `/dev`
     directory. For example `/dev/sda` represents the hard disk,
     `/dev/ttyS0` represents the serial port, `/dev/input/mice`
@@ -133,41 +125,8 @@ image:figures/unix-rings.png[width=388]
     - configuration files
     - device files
 
-=== Windows Layout
-
-  * Every operating has a way of laying out different categories of
-    files in the filesystem.
-
-`--------------------`------------------------------------
-Category             Folder
-----------------------------------------------------------
-User's Files         `C:\Documents and Settings`
-Application Programs `C:\Program Files`
-System Programs      `C:\Windows`
-Temporary Files      `C:\Windows\Temp`
-System Configuration `C:\Windows\System32\Config`
-----------------------------------------------------------
-
-=== Linux Layout
-`-----------------------------------------`------------------------
-Category					Directory
--------------------------------------------------------------------
-User's Files					`/home`
-Binaries					`/bin`, `/usr/bin`
-System Binaries					`/sbin`, `/usr/sbin`
-Kernel, Bootloader				`/boot`
-Libraries					`/lib`, `/usr/lib`
-Temporary Files					`/tmp`
-Configuration Files				`/etc`
-Help Files					`/usr/share/doc`
-Architecture-independent application files	`/usr/share`
-Variable data files				`/var`
-Device nodes					`/dev`
-Processes and Kernel information		`/proc`
--------------------------------------------------------------------
-
 [role="two-column"]
-=== Layout Contd.
+=== Layout
 
 [role="left"]
 .Windows XP Layout Tree
@@ -180,7 +139,7 @@ image::figures/linux-layout.png["GNU/Linux Layout Tree"]
 ===  Need for a File Systems
 
   * Data corresponding to a file are stored in sectors of the
-    harddisk.
+    hard-disk.
 
 image::figures/no-fs.png[width=388, align="center"]
     
@@ -208,18 +167,25 @@ image::figures/no-fs.png[width=388, align="center"]
   * Re-use existing Linux resource pool in embedded systems.
 
 === Why Embedded Linux Contd.
+
 .Cons
 
   * Large memory foot print.
+
   * The stock kernel only offers soft real-time capabilities. Third
     party patches are available for latency reduction and adding hard
     real-time capabilities.
+
+=== What is Embedded Linux
+
+  * Customizing the Linux and its allies for a custom target board.
+    - adding additional software for embedded interfaces
+    - removing unnecessary components to reduce time and space 
 
 [style="two-column"]
 === Target Hardware Components
 
 [role="left"]
-
   * Processor
   * Flash
   * SDRAM
@@ -243,8 +209,8 @@ image::figures/hardware.png[]
   * In other words, the standard input and standard output of the
     applications is attached to the serial port.
 
-  * Host system uses a serial terminal program like minicom and
-    hyperterminal to communicate with the target system.
+  * Host system uses a serial terminal program like `minicom` and
+    `hyperterminal` to communicate with the target system.
 
   * Kernel image and filesystem image download is done through
     Ethernet interface. Serial interface is not fast enough.
@@ -255,13 +221,15 @@ image::figures/setup.png[]
 [role="two-column"]
 === Linux Software Components
 
+A bare minimal Linux system needs atleast below components.
+
 [role="left"]
   * Boot Loader
   * Kernel
   * File System
-  * C library
-  * Shell & Utilities
-  * Init & Boot Scripts
+    - C library
+    - Shell & Utilities
+    - Init & Boot Scripts
 
 [role="right"]
 image::figures/boot-timeline.png[width=588]
@@ -269,13 +237,10 @@ image::figures/boot-timeline.png[width=588]
 === Boot Loader
 
   * Low-level hardware initialisation, memory controller
-       initialisation, cache initialisation
+    initialisation, cache initialisation
  
-  * Provide a mechanism to locate, load and execute kernel present
-       in the flash.
-
-  * Provides a mechanism to pass board related information and boot
-    arguments to the kernel.
+  * Provide a mechanism to locate, load and execute kernel with
+    necessary parameter.
 
   * Popular embedded boot loaders are
     - U-boot
@@ -283,10 +248,10 @@ image::figures/boot-timeline.png[width=588]
 
 === Kernel
 
-    1. Create higher level abstractions like files, processes, pipes,
+  * Create higher level abstractions like files, processes, pipes,
        sockets, etc on top of the hardware.
 
-    2. Manage sharing of system resources - CPU, Memory, Devices.
+  * Manage sharing of system resources - CPU, Memory, Devices.
 
 == File System
 
@@ -294,23 +259,29 @@ image::figures/boot-timeline.png[width=588]
 
   * Specifies how files are laid out in a storage medium.
 
-  * Each file system format requires a corresponding filesystem driver.
+  * Various filesystem drivers are available like
 
-  * Various filesystem drivers are available, and depending on the
-    requirement, the appropriate filesystem driver should be used.
+    - *ext2/ext3/vfat* - filesystems commonly used in desktops
 
-    - ext2/ext3 - filesystems commonly used in desktops
+    - *jffs2* - filesystem tuned for Flash based memory devices
 
-    - jffs2 - filesystem tuned for Flash based memory devices
+  * Pseudo filesystems are in-memory file systems which don't persist
+    the data, rather provides realtime information.  
+    - *proc:* process and kernel related information 
+    - *sysfs:* kernel devices related information
     
 === Rootfs Contents
 
+The rootfs has required files for system to function and user to
+use. Bare minimal rootfs would have atleast
+
  * libraries required by applications
- * Shell / Desktop to interact with the systems
+
+ * Shell
+
  * Initscripts to initialize the system
- * Applications
  
-=== Embedded Storage
+=== Storage for Embedded Systems
 
   * Hard disks are not suitable for embedded systems
     - Contain moving parts
@@ -323,17 +294,67 @@ image::figures/boot-timeline.png[width=588]
 
 == ZKit-ARM-VF51
 
-=== Board Details
+=== Base Board Details
 
-* Vybrid VF50 
-  - Cortex A5
-  - 400 MHz
+* The board designed by Zilogic and named as ZKit-ARM-VF51
 
+* This is the platform designed to explore and prototype Linux for
+  various solutions.
+
+* Designed to be low in power consumption so that the device with
+  add-on boards can be powered from USB.
+
+* It has 
+
+  ** Vybrid VF5x 
+     - ARM Cortex A5
+     - 400 MHz
+     - From NXP/Freescale
+
+[role="two-column"]
+=== Base Board Details Continued
+[role="left"]
 * 128 MB RAM
 
 * 128 MB NAND
 
-=== Peripheral Details
+* MicroSD Slot
+
+* Ethernet x 2
+
+* USB host & device
+
+* Raspberry Pi compatible connector for peripherals
+[role="right"]
+image::figures/zkit-arm-vf51.jpg[]
+
+[role="two-column"]
+=== Add-on Board Details
+[role="left"]
+* It is internally code named as `DietIO`
+
+* Has peripherals devices 
+  - LEDs
+  - Keys
+  - 4-Way Key
+  - Monochrome Graphics LCD
+  - POT
+  - LDR
+  - Accelerometer
+[role="right"]
+image::figures/dietio.jpg[]
+
+=== Zkit + DietIO
+image::figures/zkit-dietio.jpg[align="center"]
+
+=== Complete Peripheral Details
 
 image::figures/peripheral-blocks.png[align="center"]
 
+=== Tryout
+
+* Try to check the CPU details by printing `/proc/cpuinfo`
+
+* Try to print the memory usage info from `/proc/meminfo`
+
+* Try to print NAND memory size from `/proc/mtd`
