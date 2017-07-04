@@ -1,0 +1,109 @@
+= ADC Interface
+Zilogic Systems
+:data-uri:
+
+== Analog-to-Digital Converters
+
+=== Overview
+
+image::figures/physical-qty.png[width="640",align="center"]
+
+=== Overview
+
+  * These physical values are always varying time to time.
+
+  * Transducers/sensors convert these physical values into analog
+    electrical values, not consumable by microcontroller.
+
+  * ADC transforms analog electrical values to digital values.
+
+  * The no. of signals that an ADC can handle is called, `channels`.
+
+  * Vice versa is also happening in case of speaker using DAC.
+
+=== Overview
+
+image::figures/flow.png[align="center"]
+
+=== Overview
+
+image::figures/ldr.png[height="480",align="center"]
+
+=== ADC
+
+image::figures/adc-steps.png[align="center"]
+
+
+== Applications
+
+=== Various usage
+
+  * Connecting sensors,
+    - Temperature sensor
+    - LDR
+    - POT
+
+  * Music recording
+
+
+== ADC in Target Board
+
+=== Target
+
+  * 3 ADCs.
+
+  * 18 channels.
+
+  * 2 of 18 channels are connected to Potentiometer and LDR.
+
+
+== ADC in Linux
+
+=== Software Stack
+
+image::figures/adc-linux.png[width="640",align="center"]
+
+=== Sysfs interface
+
+  * In Linux, ADC devices are accessed via sysfs
+
+  * Listed under `/sys/bus/iio/devices`
+
+  * Files in this directory represents digital value corresponds to
+    analog voltage.
+
+=== Sysfs Files
+
+  * `in_voltageX_raw` - contains the converted digital value.
+
+  * `in_voltage_scale` - contains the step constant.
+
+image::figures/adc-scale.png[width="640",align="center"]
+
+=== Access Potentiometer
+
+  * Digital value.
+
+------
+# cat /sys/bus/iio/devices/iio\:device2/in_voltage0_raw
+------
+
+  * Scale value.
+
+------
+# cat /sys/bus/iio/devices/iio\:device2/in_voltage_scale
+------
+
+
+=== Try out
+
+  * Controlling backlight using potentiometer.
+
+  * Download
+    link:{include:code/adc.py.datauri}["ADC library.",filename="adc.py"]
+
+  * Download
+    link:{include:code/pwm.py.datauri}["PWM library.",filename="pwm.py"]
+
+  * Download
+    link:{include:code/demo-pot.py.datauri}["Backlight demo.",filename="demo-pot.py"]
