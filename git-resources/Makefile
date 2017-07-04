@@ -1,6 +1,14 @@
+TOPDIR = ../
 files = $(wildcard chapter-*.txt)
+resources = book.tar.gz book.git.tar.gz tangled-working-copy.tar.gz
 
-all: book.tar.gz book.git.tar.gz tangled-working-copy.tar.gz
+all: $(resources)
+
+install:
+	mkdir -p $(TOPDIR)/build/git-resources
+	cp $(resources) $(TOPDIR)/build/git-resources
+
+install-extra:
 
 book-git: $(files)
 	rm -fr book
@@ -9,6 +17,7 @@ book-git: $(files)
 	cd book; git init
 	cd book; git config user.name "User"
 	cd book; git config user.email user@example.com
+	cd book; git config alias.vb "log --all --decorate --graph --oneline"
 	cd book; git add $^
 	cd book; git commit -a -m "Initial book project."
 

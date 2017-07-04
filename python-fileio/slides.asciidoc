@@ -1,0 +1,248 @@
+= Strings & File IO
+Zilogic Systems
+:data-uri:
+
+== Resources
+
+=== Tamil Font
+
+  * Some slides use a Tamil text, and requires a Unicode Tamil Font
+
+  * Download and Install link:{include:noto-sans-ta.zip.datauri}["Noto Sans Tamil Font",filename="noto-sans-ta.zip"]
+
+== Dealing with Binary Data
+
+=== Bytes
+
+  * So far working with Python object
+
+  * Data needs to be stored to disk, or sent to another computer over
+    the network
+
+  * Data when stored, needs to be converted to bytes
+
+  * Data when read, needs to be converted to bytes
+
+=== Converting to Bytes
+
+  * `struct` module
++
+[source,python]
+-------
+>>> import struct
+>>> struct.pack("I", 156)
+b'\x9c\x00\x00\x00'
+-------
++
+  * First argument `"I"`, specifies that the integer needs to
+    represented as a four byte unsigned value
+
+  * Bytes are provided in native endianness, in Intel, little-endian
+
+  * The return value is of type "byte string", more on this later
+
+=== Converting to Bytes (Contd.)
+
+[source,python]
+------
+>>> struct.pack("H", 156)   # Two byte unsigned
+b'\x9c\x00'
+>>> struct.pack("B", 156)   # One byte unsigned
+b'\x9c'
+>>> struct.pack("i", -1)    # Four byte signed
+b"\xFE\xFF\xFF\xFF"
+>>> struct.pack("<I", 1)    # Four byte unsigned, little-endian
+b"\x01\x00\x00\x00"
+>>> struct.pack(">I", 1)    # Four byte unsigned, big-endian
+b"\x00\x00\x00\x01"
+>>> struct.pack("IB", 1, 2)    # Four byte Integer and a Byte
+b'\x01\x00\00\x00\x02'
+------
+
+=== Converting from Bytes
+
+  * Re-intrepret a series of bytes
++
+[source,python]
+------
+>>> struct.unpack("HB", b'\x01\00\00\00\x02')
+(1, 2)
+------
+
+[role="two-column"]
+=== Writing a File
+
+[role="left"]
+[source,python]
+------
+import struct
+
+fp = open("myfile.dat", "wb")
+bytes = struct.pack(">BHL", 1, 2, 3)
+fp.write(bytes)
+fp.close()
+------
+
+[role="right"]
+   * Open the file first with `open` built-in function
+
+     - Arg 1: filename
+     - Arg 2: mode argument, similar to `fopen()`
+
+   * `open()` returns a file object
+
+   * `write()` method, that takes bytes to be written as argument
+
+   * `close()` method, when done
+
+[role="two-column"]
+=== Reading a File
+
+[role="left"]
+[source,python]
+------
+import struct
+
+fp = open("myfile.dat", "rb")
+bytes = fp.read(7)
+print(struct.unpack(">BHL", bytes))
+fp.close()
+------
+
+[role="right"]
+   * `read()` method, takes the no. of bytes to read as argument
+
+   * If not specified, reads all the bytes
+
+== Dealing with Text
+
+=== How Text is Represented
+
+  * Restrictions:
+
+    - Computers only work with numbers
+
+    - Data is stored and transferred over the network as bytes
+
+  * Encoding
+
+    - Assign a code to each character to be represented
+
+    - Specify a method store the code, as bytes
+
+
+=== ASCII Encoding
+
+    * Code assigned to English alphabets, numbers, punctuation marks, etc.
+
+    * Easy to convert to bytes, since code size is only 7-bits
+
+image::figures/ascii-encoding.png[align="center"]
+
+=== Beyond English Alphabets
+
+  * Unicode was created to represent characters from all languages
+
+  * Each character, from every language, is assigned a unique 'code
+    point'
+
+  * Needs care while converting to bytes, since code point can be 31-bits
+
+image::figures/utf32-ta-encoding.png[align="center"]
+
+=== UTF-32 Encoding
+
+  * This way of representing Unicode, is called UTF-32 encoding
+
+  * Representing text, in UTF-32, can lead lot of wastage of memory
+
+image::figures/utf32-en-encoding.png[align="center"]
+
+=== UTF-8 Encoding
+
+  * UTF-8 defines a transformation that represents Unicode 1 - 4 bytes
+
+  * Lower code points used frequently are represented using 1 byte
+
+  * Higher code points used less frequently are represented using 4 bytes
+    
+image::figures/utf8-encoding.png[align="center",width="60%"]
+
+=== ASCII vs UTF-8
+
+  * For the first 127 characters ASCII and Unicode assign the same
+    code / code points
+
+  * UTF-8 encoding is designed such that the first 127 characters are
+    encoded in a single byte
+
+  * So all valid ASCII files, are also valid UTF-8 files
+
+  * UTF-8 encoding is backwards compatible with ASCII
+
+=== Converting Text to Bytes
+
+  * Strings in Python are represented in Unicode
++
+[source,python]
+------
+>>> print("Hello World")
+Hello World
+>>> print("தமிழ்")
+தமிழ்
+------
++
+  * Provides a mechanism to encode to bytes, using various encodings
++
+[source,python]
+-------
+>>> "அ".encode("utf-8")
+b'\xe0\xae\x85'
+-------
+
+=== Strings vs Byte Strings
+
+  * Two types of string in Python
+
+    - Byte strings are composed of bytes
+    - Strings are composed of Unicode characters
+
+  * Strings should be encoded to bytes before being stored, or sent
+    over the network
+
+  * All file and network related code, work with byte strings
+
+  * If a Unicode string is used, encoding needs to be specified
+
+=== Writing a Text File
+
+[source,python]
+------
+fp = open("myfile.txt", "w", encoding="utf-8")
+fp.write("Welcome to Unicode: தமிழ்")
+fp.close()
+------
+
+=== Reading a File
+
+[source,python]
+------
+fp = open("myfile.txt", "r", encoding="utf-8")
+print(fp.read())
+fp.close()
+------
+
+  * If encoding is not specified, system specific default encoding
+    will be used
+
+  * Trying to decode a UTF-8 text file, as ASCII will result in a
+    run-time error
+
+=== Python Source Code and Unicode
+
+  * By default Python 3 assumes source files to be encoded in UTF-8
+
+  * Enables, string literals to be written in any language
+
+  * Comments can also be written in any language
+

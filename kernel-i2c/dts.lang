@@ -1,0 +1,29 @@
+# language definition file for assembler
+
+comment delim "/*" "*/" multiline nested
+
+preproc = '/.+/'
+
+include "c_string.lang"
+
+keyword = '\<(aliases)?\>' nonsensitive
+# node name
+keyword = '[a-zA-Z0-9_,._+-]+(@[0-9a-fA-F]+)?[[:blank:]]*(?=\{)'
+
+# prop name
+variable = '\<[a-zA-Z0-9,._+?#-]+\>(?=[[:blank:]]*=)' nonsensitive
+# boolean property
+variable = '^[[:blank:]]*[a-zA-Z0-9,._+?#-]+(?=[[:blank:]]*;)'
+
+# phandle
+function = '[a-zA-Z0-9_]+(?=:)'
+# phandle reference
+function = '(?<=&)[a-zA-Z0-9_]+'
+
+number = '0([0-9a-fA-F]+)([hHlLuU]*)'
+number = '((?:0x|0X)[0-9a-fA-F]+|\d*[\.\_]?\d+(?:[eE][\-\+]\d+)?[hHlLuU]*)'
+
+symbol = "~","!","%","^","*","(",")","-","+","=","[",
+        "]","\\",":",";",",",".","/","?","<",">","\|","@"
+	
+include "number.lang"

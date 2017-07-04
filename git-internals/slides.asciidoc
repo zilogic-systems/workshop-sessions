@@ -126,7 +126,7 @@ image::figures/no-commit-objects.png[align="center",width="40%"]
 [role="tip"]
 === //
 
-Add support for storing commit objects.
+Add support for storing order of commits.
 
 === Commit Object
 
@@ -372,7 +372,7 @@ image::figures/duplicate-files-across-commits.png[align="center",width="50%"]
 
 == Exploring a Git Repo
 
-=== Initial Contents
+=== Demo: Initial Contents
 
 ------
 $ mkdir proj
@@ -381,7 +381,9 @@ $ git init
 $ find .git
 ------
 
-=== Exploring a Commit
+  * Does the directory structure look familiar?
+
+=== Demo: Exploring a Commit
 
 ------
 $ echo "This is a simple hello world file." > hello.txt
@@ -394,7 +396,7 @@ $ find .git
   * Use `git ls-tree <sha1>` to view the tree object
   * Use `git show` to view the blob
 
-=== Handling Duplicates
+=== Demo: Handling Duplicates
 
   * Create a copy of `hello.txt` and commit it
 +
@@ -407,7 +409,7 @@ $ git commit -a -m "Added world.txt."
   * Verify that there is only one object for in the object database,
     for both the `hello.txt` and `world.txt`
 
-=== Branches
+=== Demo: Branches
 
   * Find out the current commit SHA1, using `git log`
   * Create a branch called `my-branch`
@@ -423,7 +425,7 @@ $ git checkout -b my-branch
 
   * Verify `.git/HEAD` points to the branch
 
-=== Merges
+=== Demo: Merges
 
   * Create commit on the branch
 
@@ -589,3 +591,35 @@ image::figures/diff.png[align="center"]
 === //
 
 staging == index == cache
+
+=== Try Out
+
+  * Stage the changes corresponding to the spelling fixes
+
+  * Verify the staged changes
+
+  * Commit the staged changes
+
+== Questions
+
+== Review
+
+=== Question
+
+Which of the following objects are stored in the object database?
+
+  * [A] Blobs
+  * [B] Tree Objects
+  * [C] Commit Objects
+  * [D] Branch Objects
+
+=== Question
+
+Which of the following statements are true?
+
+  * [A] SHA1 of two files will never be the same
+  * [B] Merge commits can have more than one parent
+  * [C] Per branch file contains SHA1 of the latest commit in the branch
+  * [D] Two files that have the same content are only represented once
+    in the object database
+  

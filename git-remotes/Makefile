@@ -3,7 +3,9 @@ TOPDIR = ../
 images_dia = $(wildcard figures/*.dia)
 images_png = $(images_dia:.dia=.png)
 
-all: slides.html $(images_png)
+all: slides.html
+
+slides.html: $(images_png)
 
 EXPORT_WIDTH=1600
 

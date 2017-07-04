@@ -8,7 +8,7 @@
   analyze the kernel issues.
 
 * Without any external hw debugger it is possible that Linux kernel
-  could debugged to an extent.
+  could be debugged, to an extent.
 
 == Debugging no bootlog issue using Logbuf
 
@@ -146,6 +146,55 @@ a3ceb040: 00a800b8 a6000000 756e694c 65762078    ........Linux ve
 a3ceb050: 6f697372 2e34206e 2d302e37 30303030    rsion 4.7.0-0000
 ----
 
+=== Tryout
+
+* U-boot supports patching the dtb for testing purpose, We can patch
+  the `compatible` property of `/` node
+
+----
+u-boot> fdt set / compatible marvel,290 
+----
+
+* We can boot the system as shown below
+
+----
+u-boot>setenv bootcmd 'dhcp 0xA1000000 uImage;tftp 0xA2000000 uRamdisk;\ 
+	      tftp 0xA3000000 pxa27x-verdex.dtb; \
+	      fdt set / compatible marvel,290 ;\
+	      bootm 0xA1000000 0xA2000000 0xA3000000'
+----
+
+* The prints which are done before platform device initialization can
+  be obtained by enabling early_printk in the kernel.
+
+----
+  Kernel Hacking --->
+  	 [*] Early printk	 
+  	     - CONFIG_EARLY_PRINTK=y
+  	 [*] Kernel low-level debugging functions
+  	     - CONFIG_DEBUG_LL=y
+----
+
+* We get error messages printed for unrecognized machine
+ 
+----
+Starting kernel ...
+
+
+Error: unrecognized/unsupported device tree compatible list:
+[ 'marvel,290' ]
+
+Available machine support:
+
+
+
+ID (hex)  NAME
+ffffffff  Marvell PXA2xx (Device Tree Support)
+
+Please check your kernel config and/or bootloader.
+
+----
+
 === Debugging the Initcall Sequence
 
 * To check whether initcall of module has happened and when it had
@@ -175,6 +224,12 @@ Target$ dmesg | grep initcall
 * This feature has to be enabled in kernel configuration, by enabling
   CONFIG_PRINTK_TIME
 
+----
+  Kernel Hacking --->
+  	 printk and dmesg options  --->
+	 	[*] Show timing information on printks
+----
+
 * Which can be enabled or disabled using kernel boot argument as shown
   below
 
@@ -197,13 +252,52 @@ u-boot> setenv bootargs $bootargs printk.time=y
   - pr_xxx() which are used for printing in generic drivers
   - dev_xxx() which are used in drivers associated with devices
 
+* We can enable kernel debug prints as below 
+
+----
+  Kernel Hacking --->
+  	 [*] Kernel debugging
+----
+
+=== Debug Prints in Pinmux Subsystem
+
+* We can enable debug print by enabling 
+
+----
+  Device Drivers ---> 
+  	 Pin controllers ---> 
+	     [*] Debug PINCTRL calls (CONFIG_DEBUG_PINCTRL)
+----
+
+* Which would print all the pinmux debug prints as shown below.
+
+----
+[    1.022128] pinctrl core: registered pin 45 (P45) on 40e00054.pinctrl
+[    1.022145] pinctrl core: registered pin 46 (P46) on 40e00054.pinctrl
+[    1.022162] pinctrl core: registered pin 47 (P47) on 40e00054.pinctrl
+
+[    1.734010] pxa27x-pinctrl 40e00054.pinctrl: found group selector 104 for P111
+[    1.734050] pxa27x-pinctrl 40e00054.pinctrl: request pin 32 (P32) for 41100000.mmc
+[    1.734084] pxa27x-pinctrl 40e00054.pinctrl: set_mux(pin=32): af=2 dir=1
+[    1.734117] pxa27x-pinctrl 40e00054.pinctrl: request pin 112 (P112) for 41100000.mmc
+---- 
+
 === Dynamic Prints
 
 * When debug is enabled at top level we would get lot if debug
-  messages printed and it would be tough search the required messages.
+  messages printed and it would be tough to search the required
+  messages.
 
-* Dynamic debugging allows to enable debug prints for certain files
-  and specific function in a file dynamically.
+* Dynamic debugging allows to filter the debug prints for certain
+  files and specific function in a file dynamically.
+
+* We can enable the dynamic debugging support as 
+
+----
+  Kernel Hacking --->
+  	 printk and dmesg options  --->
+	 	[*] Enable dynamic printk() support
+----
 
 === Dyn Debugging Queries
 
@@ -257,7 +351,35 @@ file x.c +p
   passed through kernel boot arguments
 
 ----
-u-boot> setenv bootargs $bootargs dyndbg="file x.c +p"
+u-boot> setenv bootargs $bootargs dyndbg='\"file x.c +p\"'
+----
+
+=== Tryout
+
+* Below would enabled the debug messages with line no, modules name
+  and function name in the platform drivers
+
+----
+u-boot> setenv bootargs $bootargs dyndbg='\"file drivers/of/platform.c +plmf\"' log_buf_len=1M
+----
+
+----
+ 0.787864] platform:of_platform_bus_create:362: of_platform_bus_create() - skipping /cpus, no compatible prop
+[    0.789376] platform:of_platform_bus_create:386:    create child: /pxabus/interrupt-controller@40d00000
+[    0.789857] platform:of_platform_bus_create:386:    create child: /pxabus/gpio@40e00000
+[    0.790546] platform:of_platform_bus_create:386:    create child: /pxabus/uart@40100000
+[    0.790877] platform:of_platform_bus_create:386:    create child: /pxabus/uart@40200000
+[    0.790931] platform:of_platform_bus_create:386:    create child: /pxabus/uart@40700000
+[    0.790958] platform:of_platform_bus_create:386:    create child: /pxabus/uart@41100000
+[    0.790982] platform:of_platform_bus_create:386:    create child: /pxabus/i2c@40301680
+----
+
+* Below command should disable the pinmux drivers related debug messages 
+
+----
+setenv bootargs $bootargs						\ 
+       dyndbg='\"file drivers/pinctrl/pxa/pinctrl-pxa2xx.c -p \;\"' 	\
+        dyndbg='\"file drivers/pinctrl/*.c -p \;\"'
 ----
 
 === Debugging through Sysfs
@@ -285,6 +407,14 @@ $ ls /sys/bus/platform/drivers/smc91x/
 * In devices folder, if find link to the driver or vice versa, we can
   conclude that the device and drivers are bound.
 
+----
+$ find -L /sys/bus/platform/devices -maxdepth 2 -name driver
+----
+
+=== Tryout
+
+ * Enable driver for RTC and test it. 
+ 
 === Debugging through Debugfs
 
 * Kernel provides debug filesystem using which it is possible that

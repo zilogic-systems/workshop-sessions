@@ -1,0 +1,374 @@
+= Linux Userspace GPIO Access
+
+== GPIO
+
+=== Introduction
+
+ * General Purpose Input Output(GPIO) are single pin IO, represents
+   voltage signal as binary logic level `high` and `low`.
+
+ * Typically GPIO `high` maps to voltage closer to VCC and `low` maps
+   to voltage closer to ground.
+
+ * `high` state is considered as logical `1` and low as `0`.
+
+ * It can operate in both the directions, as an input to sample the
+   logic level or as an output to drive any logic level
+
+ * Their direction as input or output can be chosen.
+
+ * The pin status can be read or modified from software.
+
+=== GPIO Applications
+
+* Used to control LEDs and sense keys.
+
+* Used to control 7Segment, Stepper Motor etc.,
+
+* Used for 7segment Arrays, LED Matrices & Matrix keypads
+
+[role="two-column"]
+=== GPIO Grouping 
+
+[role="left"]
+ * The GPIOs are organised as PORTS or BANKS where a set of GPIOs are
+   combined together for convenience
+
+ * In a 32 bit processors, the ports may have 32 GPIO pins grouped
+   together.
+
+ * GPIOs pins are referred as, particular pin in a particular port,
+   Ex:P2_3 - `pin 3 in port 2`
+
+[role="right"]
+image::figures/ports.png[]
+
+=== GPIO Numbering
+
+ * The processor pin has to be configured as GPIO in the pinmux
+   configuration.
+
+ * Vybrid VF510 has PORT0 to PORT5 
+
+ * The pin sequence number can be generated as 
+
+----
+Pin Seq No = PORT * 32 + PIN
+
+For pin `P2_3`,
+
+  2 * 32 + 3 = 67 
+----
+
+=== ZKit GPIO Mappings
+
+[options="header"]
+|====================================
+| Device | Port Pin | Pin Sequence No
+| LED1   | P2_6     | GPIO70
+| LED2   | P2_0     | GPIO64
+| LED3   | P2_1     | GPIO65
+| KEY1   | P2_5     | GPIO69
+| KEY2   | P2_3     | GPIO67
+|====================================
+
+
+[role="two-column"]
+=== GPIO in Linux
+
+[role="left"]
+* In Linux the gpio interfaces can be accessed from userspace
+  application through sysfs.
+
+* The access to sysfs goes to generic GPIO driver called `gpiolib` which
+  inturn calls the processor specific GPIO driver.
+
+[role="right"]
+image::figures/layer.png[width=150]
+
+== SYSFS GPIO
+
+[role="two-column"]
+=== GPIO Files in Sysfs
+
+[role="left"]
+* Inside `sysfs` in path '/sys/class/gpio` we have files which allows
+  to monitor and control the GPIO.
+
+* For each GPIO a folder '/sys/class/gpio/gpio<no>' is created and it
+  would have below files.
+
+* the `direction` file allows to control direction of pin and `value`
+  file would allow to access the pin state.
+
+
+[role="right"]
+----
+
+/sys/class/gpio/
+| -- gpio<no>
+     | -- value
+     ` -- direction 
+
+----
+
+== LEDs
+
+[role="two-column"]
+=== Led Circuitary
+
+[role="left"]
+
+* The LED glows when anode is connected to Vcc and it's cathode is
+  grounded.
+
+* A current limiting resistor can be used to reduce the current
+  flowing through LED, to reduce burn out of LED.
+
+* A electronic switch is connected between LED and ground, which when
+  closed the LED glows.
+
+* The outpin of CPU can be connected to the switch to open or close
+  it.
+
+* MOSFET or Transistor can act as a electronic switch.
+
+[role="right"]
+image::figures/leds.png[]
+
+=== GPIO Request
+
+* The processor pins can be used shared by several peripheral
+  controller.
+
+* If needs to be used as GPIO pin it has to be reserved.
+
+* GPIO subsystem of kernel provides sysfs access for reserving a pin
+  and freeing them back.
+
+.Example Requesting GPIO
+----
+$ echo 65 > /sys/class/gpio/export
+----
+
+* You would find `/sys/class/gpio/gpio65` available if no other
+  peripheral subsystem has not reserved it.
+
+* A GPIO pin can be freed as shown below
+
+.Example Freeing GPIO
+----
+$ echo 65 > /sys/class/gpio/unexport
+----
+ 
+=== GPIO Direction
+
+* The processor pin can be configured as output pin by writing 'out'
+to the GPIO direction file
+
+.Example to set GPIO as output
+----
+$ echo out > /sys/class/gpio/gpio65/direction
+----
+
+* The processor pin can be configured as output pin by writing 'in' to
+the GPIO direction file
+
+.Example to set GPIO pin as input
+----
+$ echo in > /sys/class/gpio/gpio65/direction
+----
+
+=== GPIO State 
+
+ * When value '1' or '0' written in the value file, it can drive logic
+   level high or low.
+
+.Example to set GPIO 65 high
+----
+$ echo 1 > /sys/class/gpio/gpio65/value
+----
+
+ * The value file can be read to know the state of input pin.
+
+.Example to get GPIO state
+----
+$ cat /sys/class/gpio/gpio65/value
+----
+
+=== LED Glow Program
+
+[source,python]
+----
+include::led.py[]
+----
+
+=== LED Blinky Program
+
+[source,python]
+----
+include::led-blink.py[]
+----
+
+=== Try Out
+
+* Glow the tri color LED connected to GPIO64, 65 & 67 through sysfs.
+ 
+* Modified the LED Blink Code link:{include:code/display-support.patch.datauri}["led-blink.py",filename="display-support.patch"] to change the color of led every one
+  second.
+
+== Keys
+
+=== GPIO Input States
+
+* GPIOs in input mode can be of three states high, low or floating.
+
+* GPIOs if they are not connected to any signal it would be a floating
+  input and said to be open.
+
+* The floating pins doesn't have a fixed state and it would pick near
+  by signal and would have unstable state.
+
+=== Handling GPIOs in Input Mode
+
+* The inputs lines has to be fixed to a default state by tying that
+  - to VCC for default high state or 
+  - to GND for default low state.
+
+* Making a pin to stay high by connecting it to VCC through a resistor
+  is called pull-up.
+
+* Making a pin to stay low by connecting it to GND through a resistor
+  is called pull-down.
+
+[role="two-column"]
+=== Keys Circuitary
+
+[role="left"]
+* A key/switch has two terminals, when pressed it mechanically
+  connects the terminals.
+
+* One terminal of switch can be connected to GND other to the input
+  pin.
+
+* When the is key pressed the switch is closed and the input pin is
+  grounded.
+
+* if unpressed the switch is open and which would have undefined
+  state.
+
+* The GPIO pin can be defaulted to high level by a pull-up, so input
+  would be high when pin is open.
+
+* When the key is unpressed the GPIO stays high and when pressed it
+  gets low.
+
+* To detect whether a key is pressed / released or idle it has to be
+  sensed in program.
+
+[role="right"]
+image::figures/keys.png[]
+
+=== Programming for Keys
+
+.Key Sample Code
+[source,python]
+----
+include::key.py[]
+----
+
+=== Key Polling
+
+* Since the key press is asynchronous, it has to be polled
+  continuously or periodically.
+
+* Continuously polling for key may burn the CPU, instead periodical
+  polling should be sufficient for keys.
+
+* Typical key stroke period by humans, couldn't be less than few
+  hundred millisecs.
+
+* it's enough that we can poll for key press once in 100 msec. 
+
+=== Key Debounce
+
+* The switches or keys used are mechanical devices and when key is
+  pressed or depressed they tend to vibrate creating noises until it
+  settles down.
+
+* This condition can be handled in hardware by adding a debounce
+  filter.
+
+* It can also be handled in software by waiting for specific time from
+  the event occurence till it settles down.
+
+* This delay time is typically around few hundred millisecond and
+  called debounce delay.
+
+=== Programming with Key Debounce
+
+.Key Debounce Sample Code
+[source,python]
+----
+include::key-debounce.py[]
+----
+
+=== Error Handling
+
+* Above example codes doesn't handle error conditions to keep the
+  program simple to follow.
+
+* A proper code needs to handle below given errors.
+
+* General file access errors like file non existence and permission
+  issues.
+
+* If key is already exported then you cannot export it again.
+
+* If a gpio file is not created, then you cannot the access the value
+  and direction file.
+
+* If the gpio pin usage is completed it can be unexported by righting
+  to `unexport` file.
+ 
+== GPIO Usage Models
+
+=== Various GPIO Usage patterns
+
+* Individual GPIOs for single LED & Key.
+
+* Parallel GPIOs for 7Seg, Stepper Motor etc.,
+
+* Multiplexed GPIOs for Multi Seven Segment Display, Matrix Keypad
+  etc.,
+
+* GPIOs can be coupled to with timer for timed signalling or to create
+  pulse trains of various width.
+
+* Can be used as an interrupt source from external devices.
+
+* GPIOs as its name suggests, has countless possibility that using
+  which we can build simple busses like I2C, 1 wire, SPI and complex
+  Memory bus using bitbanging technique.
+
+== References
+
+=== Links
+
+* http://slideplayer.com/slide/11129925/
+
+* https://developer.android.com/things/hardware/hardware-101.html
+
+* https://www.build-electronic-circuits.com/current-limiting-resistor/
+
+== Backup Slides
+
+=== ZKit GPIO Mappings
+
+* GPIO4    - PTD24 - P2_6 -  RGPIO[70] - LED1
+* GPIO23   - PTD29 - P2_0  - RPGIO[64] - LED2
+* GPIO24   - PTD30 - P2_1  - RGPIO[65] - LED3
+
+* GPIO17   - PTD25 - P2_5  - RGPIO[69] - KEY1
+* GPIO27   - PTD27 - P2_3  - RGPIO[67] - KEY2
+

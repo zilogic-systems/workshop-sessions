@@ -74,7 +74,7 @@ image::figures/ethernet-connectivity.png[align="center", width=1024]
    denotes how many arguments represent a interrupt.
 
 [role="left"]
-[source,dts]
+//[source,dts]
 ----
 gpio@40{
          .....
@@ -90,7 +90,7 @@ gpio@40{
 
  * The dts node can be written as 
 
-[source,dts]
+//[source,dts]
 ----
 mac: ethernet@04000300 {
 	compatible = "smsc,lan91c94";

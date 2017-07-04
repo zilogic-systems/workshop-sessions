@@ -1,3 +1,11 @@
+git-sessions =			\
+	git-basics		\
+	git-internals		\
+	git-remotes		\
+	git-workflow
+
+git-resources =	git-resources
+
 yocto-sessions = 		\
 	autotools		\
 	bitbake-data-model	\
@@ -27,9 +35,14 @@ kp-sessions =			\
 	kernel-dt-drivers	\
 	dt-debugging		\
 	kernel-ethernet		\
-	kernel-flash
+	kernel-flash		\
+	kernel-soc		\
+	kernel-dt-by-example	\
+	kernel-gpio		\
+	kernel-pinctrl		\
+	kernel-i2c
 
-sessions = $(yocto-sessions) $(kp-sessions)
+sessions = $(git-sessions) $(git-resources) $(yocto-sessions) $(kp-sessions)
 
 all:
 	for dir in $(sessions); do make -C $$dir; done
@@ -39,7 +52,9 @@ install:
 	mkdir build
 	for dir in $(sessions); do make -C $$dir $@ install-extra; done
 	cd build; tar --gzip -c --transform "s|^|kp-slides/|" -f kp-slides.tar.gz $(kp-sessions)
-	cd build; tar --gzip -c --transform "s|^|yoctol-slides/|" -f yocto-slides.tar.gz $(yocto-sessions)
+	cd build; tar --gzip -c --transform "s|^|yocto-slides/|" -f yocto-slides.tar.gz $(yocto-sessions)
+	cd build; tar --gzip -c --transform "s|^|git-slides/|" -f git-slides.tar.gz $(git-sessions)
 
 clean:
 	for dir in $(sessions); do make -C $$dir clean; done
+

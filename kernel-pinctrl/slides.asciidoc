@@ -162,7 +162,72 @@ ffuart_pins: ff {
 };
 ------
 
-=== I2C
+== MMC Example
+
+=== Pinmux for MMC
+
+[options="header"]
+|======
+| GPIO		| Function
+| P32		| MMCLK
+| P112		| MMCMD
+| P92		| MMDAT<0>
+| P109		| MMDAT<1>
+| P110		| MMDAT<2>
+| P111		| MMDAT<3>
+|======
+
+=== Add MMC Node
+
+[source,dts]
+------
+mmc0: mmc@41100000 {
+   status = "okay";
+   pinctrl-names = "default";
+   pinctrl-0 = <&mmc_pins>;
+};
+------
+
+=== Add Pin Configuration Node
+
+[source,dts]
+------
+mmc_pins: mmc {
+	mux_p32 {
+		pins = "P32";
+		function = "MMCLK";
+	};
+
+	mux_p112 {
+		pins = "P112";
+		function = "MMCMD";
+	};
+
+	mux_p92 {
+		pins = "P92";
+		function = "MMDAT<0>";
+	};
+
+	mux_p109 {
+		pins = "P109";
+		function = "MMDAT<1>";
+	};
+
+	mux_p110 {
+		pins = "P110";
+		function = "MMDAT<2>";
+	};
+
+	mux_p111 {
+		pins = "P111";
+		function = "MMDAT<3>";
+	};
+};
+------
+
+== I2C Example
+
+=== Pinmux for I2C
 
 [options="header",width="50%"]
 |======
@@ -188,18 +253,9 @@ i2c_pins: i2c {
 };
 ------
 
-== Extra Slides
+=== Try Out
 
-=== MMC
+ * Add pin configuration for I2C
+ * Verify the change using the visualizer
 
-[options="header"]
-|======
-| GPIO		| Function
-| P32		| MMCLK
-| P112		| MMCMD
-| P92		| MMDAT<0>
-| P109		| MMDAT<1>
-| P110		| MMDAT<2>
-| P111		| MMDAT<3>
-|======
 

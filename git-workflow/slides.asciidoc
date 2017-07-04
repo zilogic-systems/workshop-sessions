@@ -1,0 +1,441 @@
+= Git Workflow
+Zilogic Systems <training@zilogic.com>
+
+== History Rewriting
+
+=== Published vs Unpublished History
+
+  * Published history
+    - commit history that has been shared with other users
+
+  * Unpublished history
+    - commit history is local and not been shared with other users
+
+  * Unpublished history can be modified!
+
+=== Amending Commits
+
+  * Commits are generally considered to be immutable
+
+  * The last made commit, if unpublished can be updated
+
+  * Make additional changes to working copy, invoke `git commit` with
+    `--amend` option
+
+  * Instead of a new commit, changes are added to the last commit
+
+  * Useful when a file was forgotten, or a change was missed
+
+=== Demo
+
+  * Extract a fresh copy of `book.tar.gz`
+  * Fix the spelling of freedom in `chapter-1.txt`
+  * Make a commit
+  * Fix the spelling of freedom in `chapter-2.txt`
+  * Update the previous commit with the new changes
+
+=== Try Out
+
+  * Extract a fresh copy of `book.tar.gz`
+  * Fix the spelling of freedom in `chapter-1.txt`
+  * Make a commit
+  * Fix the spelling of freedom in `chapter-2.txt`
+  * Update the previous commit with the new changes
+
+[role="two-column"]
+=== Merging vs Rebasing
+
+[role="left"]
+image::figures/merge-rebase-1.png[align="center",width="50%"]
+
+[role="right"]
+  * Changes can be incorporated from another branch in two ways
+  
+    - Merging
+    - Rebasing
+
+[role="two-column"]
+=== Merging
+
+[role="left"]
+image::figures/merge-rebase-2.png[align="center",width="50%"]
+
+[role="right"]
+  * Creates a new merge commit
+
+  * Commit contains the additional changes from another branch, merged
+    into current branch
++
+-----
+git checkout year-fix
+git merge master
+-----
+
+[role="two-column"]
+=== Rebasing
+
+[role="left"]
+image::figures/merge-rebase-3.png[align="center",width="50%"]
+
+[role="right"]
+  * Commits on the current branch are re-applied onto the tip
+    of another branch
+
+  * New commit objects are re-written
+    - Point to new content
+    - SHA1 of commits are different from previous commits
++
+-----
+git checkout year-fix
+git rebase master
+-----
+
+=== Demo
+
+  * Extract a fresh copy of `book.tar.gz`
+
+  * `chapter-3.txt` has an year missing, in line 8
+
+  * Create a bug-fix branch called `year-fix`
+
+  * Insert `1984` instead of `????` in line 8
+
+  * Commit the changes
+
+=== Demo (Contd.)
+
+  * Switch to `master` branch
+
+  * Fix the spelling of the word `long` in `chapter-3.txt`, line 6
+
+  * Commit the change
+
+=== Demo (Contd.)
+
+  * Switch to `year-fix` branch
+
+  * Incorporate the new changes in `master`, using `rebase`
++
+------
+git rebase master
+------
+
+=== Try Out
+
+  * Extract a fresh copy of `book.tar.gz`
+
+  * `chapter-3.txt` has an year missing, in line 8
+
+  * Create a bug-fix branch called `year-fix`
+
+  * Insert `1984` instead of `????` in line 8
+
+  * Commit the changes
+
+=== Try Out (Contd.)
+
+  * Switch to `master` branch
+
+  * Fix the spelling of the word `long` in `chapter-3.txt`, line 6
+
+  * Commit the change
+
+=== Try Out (Contd.)
+
+  * Switch to `year-fix` branch
+
+  * Incorporate the new changes in `master`, using `rebase`
++
+------
+git rebase master
+------
+
+=== Rebasing Conflicts
+
+  * Just like merges, conflicts can occur during a rebase
+
+  * Each commit is applied one at a time
+
+  * When a commit does not apply cleanly, rebase stops
+
+  * Indicates the conflicting changes with markers
+
+  * Resolve the conflict, and do a `git rebase --continue`
+
+  * Not a commit is not required
+
+  * The rebase can also be aborted using `git rebase --abort`
+
+=== Advantages of Rebase
+
+  * In both cases, `year-fix` incorporates the new changes from master
+
+  * Rebase maintains a cleaner history, without too many unnecessary
+    merges
+
+  * Thumb-rule:
+    - Use rebase for local topic branches
+    - Use merge published development / bug-fix branches
+
+=== Merge vs Rebase
+
+image::figures/merge-vs-rebase-1.png[align="center",width="20%"]
+
+=== Merge vs Rebase
+
+image::figures/merge-vs-rebase-5.png[align="center",width="20%"]
+
+=== Merge vs Rebase (Contd.)
+
+image::figures/merge-vs-rebase-2.png[align="center",width="20%"]
+
+=== Merge vs Rebase (Contd.)
+
+image::figures/merge-vs-rebase-3.png[align="center",width="20%"]
+
+=== Merge vs Rebase (Contd.)
+
+image::figures/merge-vs-rebase-4.png[align="center",width="20%"]
+
+=== Merge vs Rebase (Contd.)
+
+image::figures/merge-vs-rebase-1.png[align="center",width="20%"]
+
+=== Merge vs Rebase (Contd.)
+
+image::figures/merge-vs-rebase-5.png[align="center",width="20%"]
+
+=== Merge vs Rebase (Contd.)
+
+image::figures/merge-vs-rebase-6.png[align="center",width="20%"]
+
+=== Merge vs Rebase (Contd.)
+
+image::figures/merge-vs-rebase-7.png[align="center",width="20%"]
+
+=== Merge vs Rebase (Contd.)
+
+image::figures/merge-vs-rebase-8.png[align="center",width="20%"]
+
+== Workflows
+
+=== Overview
+
+  * Series of activities need to complete a task
+
+  * Centralized Workflow
+    - small team of trusted developers
+
+  * Forking Workflow
+    - allows collaboration among a larger group of developers
+    - provides a mechanism for reviewing changes
+
+== Centralized Workflow
+
+=== Everyone Clones Central Repo
+
+image::figures/central-1.png[width="50%",align="center"]
+
+=== UserA Pushes Changes
+
+image::figures/central-2.png[width="50%",align="center"]
+
+=== UserB Push Fails
+
+image::figures/central-3.png[width="50%",align="center"]
+
+=== UserB Push Fails (Contd.)
+
+image::figures/central-push-fail-1.png[width="30%",align="center"]
+
+=== UserB Fetches and Rebases
+
+image::figures/central-4.png[width="50%",align="center"]
+
+=== UserB Fetches and Rebases (Contd.)
+
+image::figures/central-push-fail-2.png[width="50%",align="center"]
+
+=== UserB Fetches and Rebases (Contd.)
+
+image::figures/central-push-fail-3.png[width="50%",align="center"]
+
+=== UserB Pushes Changes
+
+image::figures/central-5.png[width="50%",align="center"]
+
+=== UserB Pushes Changes (Contd.)
+
+image::figures/central-push-complete.png[width="10%",align="center"]
+
+
+== Forking Workflow
+
+[role="two-column"]
+=== Getting Started
+
+[role="left"]
+image::figures/gh-1.png[]
+
+[role="right"]
+  * GitHub and GitLab allows users to create projects
+
+  * For each project a Git repo is created
+
+  * An issue tracker, and wiki is also created
+
+  * Projects have the name `owner/proj-name`
+
+  * Only the owner has write access to project
+
+=== User Forks Project
+
+image::figures/gh-2.png[width="50%",align="center"]
+
+  * When a user wants to contribute, to a project, the user forks the
+    project
+
+  * Creates a new project `user/proj`, clones the project into the Git
+    repo
+
+=== Topic Branch and Commit
+
+image::figures/gh-2.png[width="50%",align="center"]
+
+  * This project is writable by the user
+
+  * User now clones his Git repo, and publishes topic branch
+
+=== Topic Branch and Commit (Contd.)
+
+image::figures/gh-tree-1.png[width="25%",align="center"]
+
+=== Create Pull Request
+
+image::figures/gh-3.png[width="50%",align="center"]
+
+  * User creates a Pull Request (PR), in owner's project
+
+  * Pull request indicates that a set of commits, is ready for inclusion
+
+=== Review Feedback
+
+image::figures/gh-4.png[width="50%",align="center"]
+
+  * Owner fetches the changes and reviews the changes
+
+  * Provides feedback, if not satisfied, user can commit to topic
+    branch, and push
+
+=== Review Feedback
+
+image::figures/gh-tree-2.png[width="25%",align="center"]
+
+=== Close PR
+
+image::figures/gh-5.png[width="50%",align="center"]
+
+  * Owner merges the changes and pushes to his repo
+
+  * Closes Pull Request
+
+=== Merge Options
+
+  * GitHub allows topic branch to be merged from UI
+
+  * Automatic merge options, on GitHub
+    - Merge
+    - Squash and Merge
+    - Rebase Merge
+
+  * Manual merge in case of conflict
+    - Owner
+    - User
+
+=== Master Advances Before Merge
+
+image::figures/gh-tree-3.png[width="25%",align="center"]
+
+=== Merge
+
+image::figures/gh-tree-4.png[width="25%",align="center"]
+
+=== Squash Merge
+
+image::figures/gh-tree-5.png[width="25%",align="center"]
+
+=== Rebase Merge
+
+image::figures/gh-tree-6.png[width="7%",align="center"]
+
+== Demo
+
+== Tidbits
+
+=== Stash
+
+  * When merging and rebasing the working copy and staging should be
+    clean
+
+  * Changes can be temporarily stored and restored using
++
+------
+$ git stash
+$ git stash pop
+------
+
+=== Reflog
+
+  * In case after a rebase, the original head is required, it can be
+    retreived from the Reflog
+
+  * Reflog contains a history of all SHA1s assumed by HEAD
++
+------
+$ git reflog
+------
+
+=== Relative Refs
+
+  * Instead of specifing actual SHA1s, relative refs can be used
+
+  * `HEAD`: is the checked out commit
+
+  * `HEAD^`: is the parent of the checked-out commit
+
+  * `HEAD^^`: is the grand-parent of the checked-out commit
+
+  * Relative refs are useful when fiddling around with branches and
+    commits
++
+------
+git checkout -b bugfix HEAD^
+------
+
+=== Learning Resources
+
+  * Practice Git branching at http://learngitbranching.js.org/
+
+  * Practice Git commands using https://github.com/git-game/git-game
+
+  * Practice Git commands using https://github.com/git-game/git-game-v2
+
+  * Visual Git Guide https://marklodato.github.io/visual-git-guide/index-en.html
+
+== Questions
+
+== Review
+
+=== Quiz
+
+Which of the following statements are true?
+
+  * [A] Use merge for unpublished branches, and rebase for published
+    branches
+  
+  * [B] In Git, commits once made, cannot be changed
+
+  * [C] Centalized workflow, is used by large teams of untrusted
+    developers
+
+  * [D] Working copy cannot contain changes while doing a rebase

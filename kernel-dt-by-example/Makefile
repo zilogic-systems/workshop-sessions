@@ -4,10 +4,14 @@ EXPORT_WIDTH  = 1024
 
 images_dia = $(wildcard figures/*.dia)
 images_png = $(images_dia:.dia=.png)
+datauris = code/v6/full.datauri code/layered.dts.datauri
+
+all: v2-dts-split v3-dts-split v4-dts-split v5-dts-split v6-dts-split v7-dts-split slides.html
 
 figures/dts-inheritance.png: EXPORT_WIDTH = 2048
 
-all: v2-dts-split v3-dts-split v4-dts-split v5-dts-split v6-dts-split v7-dts-split slides.html
+code/v6/full.datauri: MIMETYPE="text/plain;charset=us-ascii"
+code/layered.dts.datauri: MIMETYPE="text/plain;charset=us-ascii"
 
 v2-dts-split:
 	python $(TOPDIR)/scripts/split.py code/v2.dts
@@ -27,7 +31,7 @@ v6-dts-split:
 v7-dts-split:
 	python $(TOPDIR)/scripts/split.py code/v7.dts
 
-slides.html: $(images_png) 
+slides.html: $(images_png) $(datauris)
 
 clean:
 	rm -f $(images_png)
