@@ -1,24 +1,17 @@
 import time
+from gpio import GPIO
 
-KEY = 67
+key = GPIO("67")
+key.exportPin()
+key.dir("in")
 
-export_key = open("/sys/class/gpio/export", "r+")
-export_key.write(key)
-export_key.close()
-
-key_direction = open("/sys/class/gpio/gpio"+KEY+"/direction", "r+")
-key_direction.write("in")
-key_direction.close()
-
-key_value = open("/sys/class/gpio/gpio"+KEY+"/value", "r+")
-
-print "Press Key1\n"
+print("Press Key1")
 while True:
-    key_value = key_value.read()
+    key_state = key.read()
 
-    if key_value == 0:
-        print "Key is pressed\n"
+    if int(key_state) == 0:
+        print("Key is pressed\n")
         break
-    time.sleep(0.2)
+    time.sleep(0.1)
 
-key_value.close()
+key.unexportPin()

@@ -65,9 +65,9 @@ For pin `P2_3`,
 [options="header"]
 |====================================
 | Device | Port Pin | Pin Sequence No
-| LED1   | P2_6     | GPIO70
-| LED2   | P2_0     | GPIO64
-| LED3   | P2_1     | GPIO65
+| RLED   | P2_6     | GPIO70
+| BLED   | P2_0     | GPIO64
+| GLED   | P2_1     | GPIO65
 | KEY1   | P2_5     | GPIO69
 | KEY2   | P2_3     | GPIO67
 |====================================
@@ -84,7 +84,7 @@ For pin `P2_3`,
   inturn calls the processor specific GPIO driver.
 
 [role="right"]
-image::figures/layer.png[width=150]
+image::figures/layer.png[width=350]
 
 == SYSFS GPIO
 
@@ -100,7 +100,6 @@ image::figures/layer.png[width=150]
 
 * the `direction` file allows to control direction of pin and `value`
   file would allow to access the pin state.
-
 
 [role="right"]
 ----
@@ -122,14 +121,22 @@ image::figures/layer.png[width=150]
 * The LED glows when anode is connected to Vcc and it's cathode is
   grounded.
 
-* A current limiting resistor can be used to reduce the current
-  flowing through LED, to reduce burn out of LED.
-
 * A electronic switch is connected between LED and ground, which when
   closed the LED glows.
 
 * The outpin of CPU can be connected to the switch to open or close
   it.
+
+[role="right"]
+image::figures/led-simple.png[]
+
+
+[role="two-column"]
+=== Led Circuitary
+
+[role="left"]
+* A current limiting resistor can be used to reduce the current
+  flowing through LED, to reduce burn out of LED.
 
 * MOSFET or Transistor can act as a electronic switch.
 
@@ -138,25 +145,21 @@ image::figures/leds.png[]
 
 === GPIO Request
 
-* The processor pins can be used shared by several peripheral
-  controller.
+* The processor pins are shared by several peripheral controller, If
+  needs to be used as GPIO pin, it has to be reserved.
 
-* If needs to be used as GPIO pin it has to be reserved.
+* GPIO subsystem of kernel provides sysfs access, for reserving a pin
+  as GPIO and freeing them back.
 
-* GPIO subsystem of kernel provides sysfs access for reserving a pin
-  and freeing them back.
-
-.Example Requesting GPIO
 ----
 $ echo 65 > /sys/class/gpio/export
 ----
 
-* You would find `/sys/class/gpio/gpio65` available if no other
+* You would find `/sys/class/gpio/gpio65` available, if no other
   peripheral subsystem has not reserved it.
 
 * A GPIO pin can be freed as shown below
 
-.Example Freeing GPIO
 ----
 $ echo 65 > /sys/class/gpio/unexport
 ----
@@ -166,7 +169,6 @@ $ echo 65 > /sys/class/gpio/unexport
 * The processor pin can be configured as output pin by writing 'out'
 to the GPIO direction file
 
-.Example to set GPIO as output
 ----
 $ echo out > /sys/class/gpio/gpio65/direction
 ----
@@ -174,7 +176,6 @@ $ echo out > /sys/class/gpio/gpio65/direction
 * The processor pin can be configured as output pin by writing 'in' to
 the GPIO direction file
 
-.Example to set GPIO pin as input
 ----
 $ echo in > /sys/class/gpio/gpio65/direction
 ----
@@ -184,14 +185,12 @@ $ echo in > /sys/class/gpio/gpio65/direction
  * When value '1' or '0' written in the value file, it can drive logic
    level high or low.
 
-.Example to set GPIO 65 high
 ----
 $ echo 1 > /sys/class/gpio/gpio65/value
 ----
 
  * The value file can be read to know the state of input pin.
 
-.Example to get GPIO state
 ----
 $ cat /sys/class/gpio/gpio65/value
 ----
@@ -200,22 +199,40 @@ $ cat /sys/class/gpio/gpio65/value
 
 [source,python]
 ----
-include::led.py[]
+include::code/led.py[]
+----
+
+=== GPIO class
+
+[source,python]
+----
+include::code/gpio.py[]
 ----
 
 === LED Blinky Program
 
+The GPIO related actions are implemented as a GPIO class and it is
+used in blink code.
+link:{include:code/gpio.py.datauri}["gpio.py",filename="gpio.py"]
+
 [source,python]
 ----
-include::led-blink.py[]
+include::code/led-blink.py[]
 ----
 
 === Try Out
 
-* Glow the tri color LED connected to GPIO64, 65 & 67 through sysfs.
+* Glow the tri color LED connected to GPIO64, 65 & 67 through command
+  line.
  
-* Modified the LED Blink Code link:{include:code/display-support.patch.datauri}["led-blink.py",filename="display-support.patch"] to change the color of led every one
-  second.
+* Modify the LED Blink Code
+  link:{include:code/led-blink.py.datauri}["led-blink.py",filename="led-blink.py"]
+  to change the color of led every one second.
+
+=== Try Out Codes
+
+* Code for LED Color change is
+  link:{include:code/led-chcolor.py.datauri}["led-chcolor.py",filename="led-chcolor.py"]
 
 == Keys
 
@@ -235,16 +252,15 @@ include::led-blink.py[]
   - to VCC for default high state or 
   - to GND for default low state.
 
-* Making a pin to stay high by connecting it to VCC through a resistor
-  is called pull-up.
+* Making a pin to stay high, by connecting it to VCC through a
+  resistor is called pull-up.
 
-* Making a pin to stay low by connecting it to GND through a resistor
+* Making a pin to stay low, by connecting it to GND through a resistor
   is called pull-down.
 
-[role="two-column"]
+
 === Keys Circuitary
 
-[role="left"]
 * A key/switch has two terminals, when pressed it mechanically
   connects the terminals.
 
@@ -257,13 +273,17 @@ include::led-blink.py[]
 * if unpressed the switch is open and which would have undefined
   state.
 
+[role="two-column"]
+=== Keys Circuitary Contd.
+
+[role="left"]
 * The GPIO pin can be defaulted to high level by a pull-up, so input
   would be high when pin is open.
 
 * When the key is unpressed the GPIO stays high and when pressed it
   gets low.
 
-* To detect whether a key is pressed / released or idle it has to be
+* To detect whether a key is pressed / released or idle, pin has to be
   sensed in program.
 
 [role="right"]
@@ -271,10 +291,9 @@ image::figures/keys.png[]
 
 === Programming for Keys
 
-.Key Sample Code
 [source,python]
 ----
-include::key.py[]
+include::code/key.py[]
 ----
 
 === Key Polling
@@ -307,49 +326,49 @@ include::key.py[]
 
 === Programming with Key Debounce
 
-.Key Debounce Sample Code
 [source,python]
 ----
-include::key-debounce.py[]
+include::code/key-debounce.py[]
 ----
 
-=== Error Handling
+=== Tryout
 
-* Above example codes doesn't handle error conditions to keep the
-  program simple to follow.
+* Modify the code
+  link:{include:code/key-debounce.py.datauri}["key-debounce.py",filename="key-debounce.py"]
+  to show key status
+  - print "Key 1 Pressed" in LCD, when Key 1 pressed
+  - glow GREEN LED, when Key 2 pressed 
 
-* A proper code needs to handle below given errors.
+=== Tryout Codes
 
-* General file access errors like file non existence and permission
-  issues.
+* The code for the tryout is 
+  link:{include:code/key-status.py.datauri}["key-status.py",filename="key-status.py"]
 
-* If key is already exported then you cannot export it again.
-
-* If a gpio file is not created, then you cannot the access the value
-  and direction file.
-
-* If the gpio pin usage is completed it can be unexported by righting
-  to `unexport` file.
- 
 == GPIO Usage Models
 
 === Various GPIO Usage patterns
 
-* Individual GPIOs for single LED & Key.
+* Individual GPIOs for single LED, Keys, Relays, Reed switches and
+  solenoid valves.
 
-* Parallel GPIOs for 7Seg, Stepper Motor etc.,
+* Parallel GPIOs for 7 Segment, Stepper Motor etc.,
 
-* Multiplexed GPIOs for Multi Seven Segment Display, Matrix Keypad
-  etc.,
+* Multiplexed GPIOs for Multi Seven Segment Array, Matrix Keypad etc.,
 
-* GPIOs can be coupled to with timer for timed signalling or to create
+* GPIOs can be coupled with timer for periodic signalling or to create
   pulse trains of various width.
 
-* Can be used as an interrupt source from external devices.
+=== Bitbanging
 
 * GPIOs as its name suggests, has countless possibility that using
-  which we can build simple busses like I2C, 1 wire, SPI and complex
-  Memory bus using bitbanging technique.
+  which we can build simple busses like 
+  - I2C, 
+  - 1 wire, 
+  - SPI and 
+  - even complex Memory bus
+
+* This done using Bitbanging is a technique, which allows to simulate
+  serial busses using software over GPIO.
 
 == References
 
@@ -359,16 +378,23 @@ include::key-debounce.py[]
 
 * https://developer.android.com/things/hardware/hardware-101.html
 
-* https://www.build-electronic-circuits.com/current-limiting-resistor/
-
 == Backup Slides
 
-=== ZKit GPIO Mappings
 
-* GPIO4    - PTD24 - P2_6 -  RGPIO[70] - LED1
-* GPIO23   - PTD29 - P2_0  - RPGIO[64] - LED2
-* GPIO24   - PTD30 - P2_1  - RGPIO[65] - LED3
+[role="two-column"]
+=== Seven Seg
 
-* GPIO17   - PTD25 - P2_5  - RGPIO[69] - KEY1
-* GPIO27   - PTD27 - P2_3  - RGPIO[67] - KEY2
+[role="left"]
+image::figures/segment.png[width=300]
+
+[role="right"]
+image::figures/sseg-pinmap.png[]
+
+=== Program for Seven Segment
+
+[source,python]
+----
+include::code/sseg.py[]
+----
+
 

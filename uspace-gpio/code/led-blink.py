@@ -1,20 +1,15 @@
 import time
+from gpio import GPIO
 
-led = 64
+blue = GPIO("64")
+blue.exportPin()
+blue.dir("out")
 
-export_led = open("/sys/class/gpio/export", "r+")
-export_led.write(led)
-
-led_direction = open("/sys/class/gpio/gpio"+led+"/direction", "r+")
-led_direction.write("out")
-
-led_value = open("/sys/class/gpio/gpio"+led+"/value", "r+")
-
-while True:
-    led_value.write(1)
+for count in range(5): 
+    blue.write("1")
     time.sleep(1)
-    led_value.write(0)
 
-export_led.close()
-led_direction.close()
-led_value.close()
+    blue.write("0")
+    time.sleep(1)
+
+blue.unexportPin()
