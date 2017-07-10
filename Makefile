@@ -42,7 +42,17 @@ kp-sessions =			\
 	kernel-pinctrl		\
 	kernel-i2c
 
-sessions = $(git-sessions) $(git-resources) $(yocto-sessions) $(kp-sessions)
+eldi-sessions = 		\
+	python-intro		\
+	python-intro-x		\
+	python-import		\
+	python-fileio		\
+	python-oop		\
+	emlinux-intro		\
+	uspace-gpio		\
+	uspace-pwm		
+
+sessions = $(git-sessions) $(git-resources) $(yocto-sessions) $(kp-sessions) $(eldi-sessions)
 
 all:
 	for dir in $(sessions); do make -C $$dir; done
@@ -54,6 +64,7 @@ install:
 	cd build; tar --gzip -c --transform "s|^|kp-slides/|" -f kp-slides.tar.gz $(kp-sessions)
 	cd build; tar --gzip -c --transform "s|^|yocto-slides/|" -f yocto-slides.tar.gz $(yocto-sessions)
 	cd build; tar --gzip -c --transform "s|^|git-slides/|" -f git-slides.tar.gz $(git-sessions)
+	cd build; tar --gzip -c --transform "s|^|eldi-slides/|" -f eldi-slides.tar.gz $(eldi-sessions)
 
 clean:
 	for dir in $(sessions); do make -C $$dir clean; done
