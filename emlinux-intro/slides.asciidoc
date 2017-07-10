@@ -34,7 +34,7 @@
 
 === Embedded Software Model Contd.
 
-image::figures/embedded-software-model.png[]
+image::figures/embedded-software-model.png[align="center"]
 
 === High Level Embedded Systems Application
 
@@ -210,7 +210,7 @@ image::figures/hardware.png[]
     applications is attached to the serial port.
 
   * Host system uses a serial terminal program like `minicom` and
-    `hyperterminal` to communicate with the target system.
+    `putty` to communicate with the target system.
 
   * Kernel image and filesystem image download is done through
     Ethernet interface. Serial interface is not fast enough.
@@ -301,8 +301,8 @@ use. Bare minimal rootfs would have atleast
 * This is the platform designed to explore and prototype Linux for
   various solutions.
 
-* Designed to be low in power consumption so that the device with
-  add-on boards can be powered from USB.
+* Designed to be low in power consumption, so that even with add-on
+  boards, it can be powered from USB cable.
 
 * It has 
 
@@ -353,8 +353,20 @@ image::figures/peripheral-blocks.png[align="center"]
 
 === Tryout
 
-* Try to check the CPU details by printing `/proc/cpuinfo`
+* Use Putty in Windows or Minicom to access debug console of board.
 
-* Try to print the memory usage info from `/proc/meminfo`
+  - Check the `COM` number from `device manager` in Windows or
+    `ttyUSBx` node from `dmesg` of Linux.
+  - Use baudrate as `115200`, data config as `8N1` and flow control as
+    `none`.
+  - reset the board and observe the bootloader and kernel boot flow.
+ 
+* In target board 
 
-* Try to print NAND memory size from `/proc/mtd`
+  - Try to print the CPU details from `/proc/cpuinfo` using `cat`.
+
+  - Try to print the memory usage info from `/proc/meminfo`
+
+  - Try to print NAND memory size from `/proc/mtd`
+
+  - Try listing the contents of `/` using `ls` 
