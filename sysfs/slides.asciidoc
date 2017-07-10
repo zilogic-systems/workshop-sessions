@@ -179,3 +179,8 @@ bash: echo: write error: Invalid argument
 |==================================================================================================================
 
 == Questions
+
+=== Credits
+
+ * http://www.freeiconspng.com
+ * http://www.iconsdb.com/black-icons
