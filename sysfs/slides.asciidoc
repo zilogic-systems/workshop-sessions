@@ -4,12 +4,24 @@ Zilogic Systems
 
 == Purpose of Sysfs
 
-=== Role of Sysfs
+=== Accessing Kernel Data
 
-  * An in-memory filesystem that exports information from kernel-space to user-space.
-  * Exports Kernel datastructures, their attributes and relationships.
-  * Examples: network, filesystems, hardware, drivers, memory.
-  * Introduced by `Patrick Mochel` in the Linux 2.5 Kernel in 2003.
+  * There has always been a need to access kernel data from system
+    programs
+
+  * `/proc` was introduced to export process information from kernel
+
+  * `ps` uses it to print the list of processes in the system
+
+=== Hardware Information
+
+  * As the hardware grew complex, it became necessary to export
+    hardware information to system programs
+
+    - `ifconfig`
+    - `lspci`
+    - `lsusb`
+    - `parted`
 
 === *procfs* limitations
 
@@ -21,6 +33,13 @@ Zilogic Systems
 	** `/proc/net/packet`
    	** `/proc/net/wireless`
 	** `/proc/asound/cards`
+
+=== Sysfs
+
+  * An in-memory filesystem that exports information from kernel-space to user-space.
+  * Exports Kernel datastructures, their attributes and relationships.
+  * Examples: network, filesystems, hardware, drivers, memory.
+  * Introduced by `Patrick Mochel` in the Linux 2.5 Kernel in 2003.
 
 === `sysfs` equivalent of `/proc/asound/cards`
 
