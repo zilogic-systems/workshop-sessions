@@ -120,7 +120,7 @@ image::figures/device-manager.jpg[align="center",width="100%"]
  * Examples: Temperature and pressure sensors, Accelerometers, ADC & DAC.
  * Accessible through `/sys/bus/iio`.
 
-=== Demo: List network device info
+=== Demo: Network Interfaces
 
  * Information available in `/sys/class/net`.
 
@@ -139,30 +139,7 @@ wlan0	HWaddr ac:d1:b8:09:ab:09
 	RX bytes:116026931	TX bytes:20279921
 ---------------
 
-
-=== Demo: List Hard Disk partitions
-
- * Information available in `/sys/class/block`.
-
- * Download
-    link:{include:code/disk.py.datauri}["disk.py",filename="disk.py"]
-
- * Output:
-
-[source,bash]
--------------
-$ python3 disk.py
-Partition	Size(in MB)
-sda1		832
-sda3		428302
-sda5		10419
-sda6		3528
-sda7		3814
-sda8		952
-sda9		29086
--------------
-
-=== Demo: Controlling Backlight brightness
+=== Demo: Backlight
 
  * Backlight can be controlled via `/sys/class/backlight`.
 
@@ -182,27 +159,39 @@ $ echo 5000 > /sys/class/backlight/intel_backlight/brightness
 bash: echo: write error: Invalid argument
 --------------
 
-=== Tryout: Debug LED
+=== Demo: RFKill
 
- * Switch `ON` & `OFF` the Debug LED available in `/sys/class/leds/`.
- * Get the list of triggers supported by the LED.
- * Note the trigger that is currently associated with the LED.
- * Enable the `heartbeat` trigger for the Debug LED.
+ * Radio interfaces can be turned on / off using RFKill Switch.
+ * Device is accessible from `/sys/class/rfkill`.
+ * Separate switch for WiFi, Bluetooth, etc.
+
+[source,bash]
+--------------
+$ cd /sys/class/rfkill/rfkill0
+$ cat name
+$ echo 1 > soft   # Activate Kill Switch
+$ echo 0 > soft   # Deactivate Kill Switch
+--------------
 
 === `/dev` vs `/sys`
 
 [align="center",width="95%",frame="topbot",options="header"]
-|==================================================================================================================
-^|                    /dev                                ^|          /sys
-| Primary data transfer interface                          | Primary configuration interface
-| Provides a complex `ioctl` based configuration interface  | Provides a very simple and obvious configuration interface
-| Need to write an application to perform control operations using `ioctls` | Control operations are performed by simply accessing the relevant interfaces.
-| `ioctls` are suitable for binary data transfer      | Suitable only for text data
-|==================================================================================================================
+|======
+^| /dev  ^| /sys
+
+| Primary data transfer interface
+| Primary configuration interface
+
+| Provides a complex `ioctl` based configuration interface
+| Provides a very simple and obvious configuration interface
+
+| Need to write an application to perform control operations using `ioctls`
+| Control operations are performed by simply accessing the relevant interfaces.
+
+| `ioctls` are suitable for binary data transfer
+| Suitable only for text data
+
+|======
 
 == Questions
 
-=== Credits
-
- * http://www.freeiconspng.com
- * http://www.iconsdb.com/black-icons
