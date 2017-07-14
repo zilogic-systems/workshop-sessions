@@ -1,29 +1,41 @@
 from os import listdir
 from os.path import join
 
-sys_path = "/sys/class/net"
+SYS_PATH = "/sys/class/net"
 
-basic_info = ["address", "mtu"]
+BASIC_INFO = ["address",
+              "mtu",
+              "statistics/rx_packets",
+              "statistics/rx_errors",
+              "statistics/tx_packets",
+              "statistics/tx_errors",
+              "statistics/rx_bytes",
+              "statistics/tx_bytes"]
 
-statistics_info = ["rx_packets", "rx_errors",
-                   "tx_packets", "tx_errors",
-                   "rx_bytes", "tx_bytes"]
+def cat(atdir, filename):
+    path = join(atdir, filename)
+    with open(path, 'r') as fp:
+        data = fp.read()
+    return data.strip()
 
-def read_path(*args):
-    path = join(sys_path, *args)
-    return open(path, 'r').read()[:-1]
+def main():
+    for interface in listdir(SYS_PATH):
+        interface_path = join(SYS_PATH, interface)
 
-for interface in listdir(sys_path):
-    for info in basic_info:
-        exec('%s = "%s"' % (info, read_path(interface, info)))
+        params = {"interface": interface}
+        for info in BASIC_INFO:
+            params[info] = cat(interface_path, info)
 
-    print('{}\tHWaddr {}'.format(interface, address))
-    print('\tMTU:{}'.format(mtu))
+        fmt = """
+{interface}\tHWaddr {address}
+\tMTU:{mtu}
+\tRX packets:{statistics/rx_packets} errors:{statistics/rx_errors}
+\tTX packets:{statistics/tx_packets} errors:{statistics/tx_errors}
+\tRX bytes:{statistics/tx_bytes} TX bytes:{statistics/tx_bytes}
+""".strip()
 
-    for info in statistics_info:
-        exec('%s = "%s"' % (info, read_path(interface, "statistics", info)))
+        print(fmt.format_map(params))
+        print()
 
-    print('\tRX packets:{} errors:{}'.format(rx_packets, rx_errors))
-    print('\tTX packets:{} errors:{}'.format(tx_packets, tx_errors))
-    print('\tRX bytes:{}\tTX bytes:{}'.format(rx_bytes, tx_bytes))
-    print('')
+if __name__ == "__main__":
+    main()
