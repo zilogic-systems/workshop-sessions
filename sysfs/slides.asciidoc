@@ -77,15 +77,18 @@ image::figures/sys-char.png[align="center",width="100%"]
 === Applications of Sysfs
 
   * Accessing system information by various user-space applications
+
   * Controlling and configuring hardware
-  * Debugging
 
 == /sys/ hierarchy
 
 === `/sys/class`
 
-  * `class` - grouping devices based on functionality like audio cards, network cards, etc
+  * `class` - grouping devices based on functionality like audio
+    cards, network cards, etc
+  
   * Controlling and accessing information about these devices.
+  
   * Similar to `Device Manager` in Windows.
 
 [role="two-column"]
