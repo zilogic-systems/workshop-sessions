@@ -282,3 +282,12 @@ image::figures/avg-duty.png["Voltage variation with duty cycle",width=388, align
 ------
 include::code/dcmotor.py[]
 ------
+
+=== Tryout
+
+Try to develop a code a which allows increasing and decreasing the DC motor speed with keys
+
+=== Tryout Code
+
+The code for tryout is available in 
+link:{include:code/dcmotor-key.py.datauri}["dcmotor-key.py",filename="dcmotor-key.py"]
