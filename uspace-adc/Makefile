@@ -8,7 +8,6 @@ datauris   = code/adc.py.datauri \
 	     code/pwm.py.datauri \
 	     code/demo-pot.py.datauri
 
-
 all: slides.html
 
 slides.html: $(images_png) $(datauris)

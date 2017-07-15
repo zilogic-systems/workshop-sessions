@@ -1,30 +1,39 @@
-class PWM(object):
-    def __init__(self, channel):
-        self.device = "/sys/class/pwm/pwmchip16"
-        self.exportpath = self.device + "/export"
-        self.unexportpath = self.device + "/unexport"
-        self.channel = self.device + "/pwm%d" % channel
-        self.period = self.channel + "/period"
-        self.duty = self.channel + "/duty_cycle"
-        self.enable = self.channel + "/enable"
-        self.export_path(channel)
+from os.path import exists
 
-    def fileIOpwm(self, path, data):
-        fd = open(path, "wb")
-        fd.write((str(data)+'\n').encode('ascii'))
-        fd.close()
+__pwm_path = "/sys/class/pwm/pwmchip16/pwm{}"
+__pwm_export_path = "/sys/class/pwm/pwmchip16//export"
+__pwm_unexport_path = "/sys/class/pwm/pwmchip16/unexport"
+__pwm_period_path = "/sys/class/pwm/pwmchip16/pwm{}/period"
+__pwm_dutycycle_path = "/sys/class/pwm/pwmchip16/pwm{}/duty_cycle"
+__pwm_enable_path = "/sys/class/pwm/pwmchip16/pwm{}/enable"
 
-    def export_path(self, channel):
-        self.fileIOpwm(self.exportpath, channel)
+def cat(file):
+    file = open(file, "r")
+    value = file.read()
+    file.close()
+    return value
 
-    def set_period(self, period):
-        self.fileIOpwm(self.period, period)
+def echo(value, file):
+    file = open(file, "w")
+    file.write(value)
+    file.close()
 
-    def set_duty(self, duty):
-        self.fileIOpwm(self.duty, duty)
+def pwm_export_channel(channel):
+    if not exists(__pwm_path.format(channel)):
+        echo(str(channel), __pwm_export_path)
 
-    def enable_pwm(self, flag):
-        self.fileIOpwm(self.enable, flag)
+def pwm_unexport_channel(channel):
+    if exists(__pwm_path.format(pin)):
+        echo(str(pin), __pwm_unexport_path)
 
-    def unexport_path(self, channel):
-        self.fileIOpwm(self.unexportpath, channel)
+def pwm_set_period(channel, period):
+    echo(str(period), __pwm_period_path.format(channel))
+
+def pwm_set_dutycycle(channel, dutycycle):
+    echo(str(dutycycle), __pwm_dutycycle_path.format(channel))
+
+def pwm_enable(channel):
+    echo(str(1), __pwm_enable_path.format(channel))
+
+def pwm_disable(channel):
+    echo(str(0), __pwm_enable_path.format(channel))

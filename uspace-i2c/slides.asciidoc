@@ -157,9 +157,6 @@ image::figures/i2c-linux.png[width="640",align="center"]
   * Extra `ioctl` operations while accessing the i2c devices can be
     done using `SMBus`.
 
-  * Download
-    link:{include:code/smbus.py.datauri}["SMBus library here",filename="smbus.py"]
-
   * SMBus provides apis for selecting the I2C slave.
 
 
@@ -172,12 +169,17 @@ image::figures/i2c-linux.png[width="640",align="center"]
 include::code/smbus-access.py[]
 ------
 
+[role="two-column"]
 ===  Demo
 
+[role="left"]
   * Accessing Accelerometer
 
   * Download
     link:{include:code/accelerometer.py.datauri}["Accerlerometer Demo",filename="accelerometer.py"]
+
+[role="right"]
+image::figures/accelerometer.png[align="center"]
 
 
 === 4-way Key Datasheet

@@ -1,12 +1,13 @@
-import adc
-import pwm
+from adc import *
+from pwm import *
 
-backlight = pwm.PWM(0)
-backlight.set_period(100000)
-backlight.set_duty(100000)
-backlight.enable_pwm(1)
-pot = adc.ADC(1)
+pot = 1
+bklight = 0
+pwm_export_channel(bklight)
+pwm_set_period(bklight, 100000)
+pwm_set_dutycycle(bklight, 100000)
+pwm_enable(bklight)
 
 while True:
-    volt = pot.read_value()
-    backlight.set_duty(volt)
+    volt = adc_read_value(pot)
+    pwm_set_dutycycle(bklight, volt)

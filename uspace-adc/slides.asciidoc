@@ -25,9 +25,15 @@ image::figures/physical-qty.png[width="640",align="center"]
 
 image::figures/flow.png[align="center"]
 
+[role="two-column"]
 === Overview
 
-image::figures/ldr.png[height="480",align="center"]
+[role="left"]
+  * For a change in physical quantity a corresponding change in
+    voltage will be observed.
+
+[role="right"]
+image::figures/sensor.png[height="320",align="center"]
 
 === ADC
 
@@ -61,7 +67,7 @@ image::figures/adc-steps.png[align="center"]
 
 === Software Stack
 
-image::figures/adc-linux.png[width="640",align="center"]
+image::figures/adc-linux.png[align="center"]
 
 === Sysfs interface
 
@@ -78,9 +84,22 @@ image::figures/adc-linux.png[width="640",align="center"]
 
   * `in_voltage_scale` - contains the step constant.
 
-image::figures/adc-scale.png[width="640",align="center"]
+=== Calculation
 
-=== Access Potentiometer
+image::figures/adc-scale.png[align="center"]
+
+[role="two-column"]
+=== Accessing LDR
+
+[role="left"]
+  * LDR - Light Dependent Resistor.
+  * When exposed ot bright light, provides low voltage.
+  * When it is dark, provides high voltage.
+
+[role="right"]
+image::figures/ldr.png[align="center"]
+
+=== Accessing LDR
 
   * Digital value.
 
@@ -95,15 +114,34 @@ image::figures/adc-scale.png[width="640",align="center"]
 ------
 
 
-=== Try out
+=== ADC library
 
-  * Controlling backlight using potentiometer.
+  * Accessing LDR using ADC library.
 
   * Download
     link:{include:code/adc.py.datauri}["ADC library.",filename="adc.py"]
 
+[source, py]
+------
+>>> from adc import *
+>>> pot = 1
+>>>
+>>> while True:
+>>>     print("{:.2}".format(adc_read_value(pot)))
+------
+
+=== Try Out
+
+  * Accessing Potentiometer using ADC library.
+
+[role="two-column"]
+=== Try Out-1
+
+[role="left"]
+image::figures/backlight.png[align="center"]
+
+[role="right"]
   * Download
     link:{include:code/pwm.py.datauri}["PWM library.",filename="pwm.py"]
 
-  * Download
-    link:{include:code/demo-pot.py.datauri}["Backlight demo.",filename="demo-pot.py"]
+  * Using PWM APIs control LCD Backlight by changing Potentiometer.

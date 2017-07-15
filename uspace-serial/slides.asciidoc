@@ -165,7 +165,7 @@ include::code/uart-gsm.py[]
 
 === Linux TTY Software Stack
 
-image::figures/uart-linux.png[width="640",align="center"]
+image::figures/uart-linux.png[align="center"]
 
 
 == Accessing Serial Device
@@ -188,7 +188,5 @@ include::code/uart-comm.py[]
   * Try to display text in serial LCD.
 
   * Open serial LCD using pyserial.
-
-  * Get input `name` from user.
 
   * Send text data in serial and get it displayed.
