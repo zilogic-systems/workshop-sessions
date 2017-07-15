@@ -2,9 +2,12 @@
 
 == GPIO
 
+[role="two-column"]
 === Introduction
 
- * General Purpose Input Output(GPIO) are single pin IO, represents
+[role="left"]
+
+ * *General Purpose Input Output(GPIO)* are single pin IO, represents
    voltage signal as binary logic level `high` and `low`.
 
  * Typically GPIO `high` maps to voltage closer to VCC and `low` maps
@@ -12,8 +15,13 @@
 
  * `high` state is considered as logical `1` and low as `0`.
 
- * It can operate in both the directions, as an input to sample the
-   logic level or as an output to drive any logic level
+[role="right"]
+image::figures/gpio-bistate.png[]
+
+=== GPIO Direction
+
+ * It can operate in both the directions, as an `input` to sample the
+   logic level or as an `output` to drive any logic level
 
  * Their direction as input or output can be chosen.
 
@@ -21,18 +29,42 @@
 
 === GPIO Applications
 
-* Used to control LEDs and sense keys.
+* Used to control LEDs, valves and Relays
+
+* Used to sense keys.
 
 * Used to control 7Segment, Stepper Motor etc.,
 
-* Used for 7segment Arrays, LED Matrices & Matrix keypads
+* Used for LED Matrices & Matrix keypads
+
+[role="two-column"]
+=== GPIO Controller
+
+[role="left"]
+
+* GPIO controller is the hardware which provides register interface
+  using which the pin status can be accessed.
+
+[role="right"]
+image::figures/gpio-ctrl.png[]
+
+[role="two-column"]
+=== GPIO Controller Contd.
+
+[role="left"]
+
+* GPIO controller resides in the memory bus of the SOC.
+
+[role="right"]
+image::figures/gpio-arm.png[]
 
 [role="two-column"]
 === GPIO Grouping 
 
 [role="left"]
- * The GPIOs are organised as PORTS or BANKS where a set of GPIOs are
-   combined together for convenience
+
+ * In a GPIO controller, the GPIOs are organised as PORTS or BANKS
+   where a set of GPIOs are combined together for convenience
 
  * In a 32 bit processors, the ports may have 32 GPIO pins grouped
    together.
@@ -130,7 +162,6 @@ image::figures/layer.png[width=350]
 [role="right"]
 image::figures/led-simple.png[]
 
-
 [role="two-column"]
 === Led Circuitary
 
@@ -202,7 +233,7 @@ $ cat /sys/class/gpio/gpio65/value
 include::code/led.py[]
 ----
 
-=== GPIO class
+=== GPIO Module
 
 [source,python]
 ----
@@ -212,7 +243,7 @@ include::code/gpio.py[]
 === LED Blinky Program
 
 The GPIO related actions are implemented as a GPIO class and it is
-used in blink code.
+used in blink code 
 link:{include:code/gpio.py.datauri}["gpio.py",filename="gpio.py"]
 
 [source,python]
@@ -222,7 +253,7 @@ include::code/led-blink.py[]
 
 === Try Out
 
-* Glow the tri color LED connected to GPIO64, 65 & 67 through command
+* Glow the tri color LED connected to GPIO64, 65 & 70 through command
   line.
  
 * Modify the LED Blink Code
@@ -236,32 +267,40 @@ include::code/led-blink.py[]
 
 == Keys
 
+[role="two-column"]
 === GPIO Input States
-
-* GPIOs in input mode can be of three states high, low or floating.
+[role="left"]
+* GPIOs in input mode can be of three states `high`, `low` or `floating`.
 
 * GPIOs if they are not connected to any signal it would be a floating
   input and said to be open.
 
-* The floating pins doesn't have a fixed state and it would pick near
-  by signal and would have unstable state.
+* The `floating pins` doesn't have a fixed state and it would pick
+  near by signal and would have unstable state.
 
+[role="right"]
+image::figures/gpio-states.png[]
+
+
+[role="two-column"]
 === Handling GPIOs in Input Mode
-
+[role="left"]
 * The inputs lines has to be fixed to a default state by tying that
-  - to VCC for default high state or 
-  - to GND for default low state.
+  - to *VCC* for default high state or 
+  - to *GND* for default low state.
 
 * Making a pin to stay high, by connecting it to VCC through a
-  resistor is called pull-up.
+  resistor is called `pull-up`.
 
 * Making a pin to stay low, by connecting it to GND through a resistor
-  is called pull-down.
+  is called `pull-down`.
 
+[role="right"]
+image::figures/gpio-pullupdown.png[]
 
 === Keys Circuitary
 
-* A key/switch has two terminals, when pressed it mechanically
+* A key/switch has *two* terminals, when pressed it mechanically
   connects the terminals.
 
 * One terminal of switch can be connected to GND other to the input
@@ -298,7 +337,7 @@ include::code/key.py[]
 
 === Key Polling
 
-* Since the key press is asynchronous, it has to be polled
+* Since the key press is `asynchronous`, it has to be polled
   continuously or periodically.
 
 * Continuously polling for key may burn the CPU, instead periodical
@@ -307,12 +346,15 @@ include::code/key.py[]
 * Typical key stroke period by humans, couldn't be less than few
   hundred millisecs.
 
-* it's enough that we can poll for key press once in 100 msec. 
+* it's enough that we can poll for key press once in `100 msec`. 
 
+[role="two-column"]
 === Key Debounce
 
+[role="left"]
+
 * The switches or keys used are mechanical devices and when key is
-  pressed or depressed they tend to vibrate creating noises until it
+  pressed or depressed they tend to *vibrate* creating noises until it
   settles down.
 
 * This condition can be handled in hardware by adding a debounce
@@ -321,8 +363,12 @@ include::code/key.py[]
 * It can also be handled in software by waiting for specific time from
   the event occurence till it settles down.
 
-* This delay time is typically around few hundred millisecond and
-  called debounce delay.
+* This delay time is typically around `few hundred millisecond` and
+  called `debounce delay`.
+
+[role="right"]
+
+image::figures/debounce.png[]
 
 === Programming with Key Debounce
 
@@ -379,7 +425,6 @@ include::code/key-debounce.py[]
 * https://developer.android.com/things/hardware/hardware-101.html
 
 == Backup Slides
-
 
 [role="two-column"]
 === Seven Seg

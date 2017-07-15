@@ -1,42 +1,39 @@
-#!/usr/bin/python
-class GPIO(object):
-    def __init__(self, pin):
-        self.pin = pin
-        self.gpio_path = "/sys/class/gpio/"
-        self.export_path = self.gpio_path+"export"
-        self.unexport_path = self.gpio_path+"unexport"
-        self.value_path = self.gpio_path+"gpio"+self.pin+"/value"
-        self.direction_path = self.gpio_path+"gpio"+self.pin+"/direction"
+from os.path import exists
 
-    def exportPin(self):
-        gpio_export = open(self.export_path, "w")
-        gpio_export.write(self.pin)
-        gpio_export.close()
+__gpio_path = "/sys/class/gpio/gpio{}"
+__gpio_export_path = "/sys/class/gpio/export"
+__gpio_unexport_path = "/sys/class/gpio/unexport"
+__gpio_direction_path = "/sys/class/gpio/gpio{}/direction"
+__gpio_value_path = "/sys/class/gpio/gpio{}/value"
 
-    def unexportPin(self):
-        gpio_unexport = open(self.unexport_path, "w")
-        gpio_unexport.write(self.pin)
-        gpio_unexport.close()
+def cat(file):
+    file = open(file, "r")
+    value = file.read()
+    file.close()
+    return value
 
-    def readDir(self):
-        gpio_dir = open(self.direction_path, "r")
-        dir_status = gpio_dir.read()
-        gpio_dir.close()
+def echo(value, file):
+    file = open(file, "w")
+    file.write(value)
+    file.close()
 
-    def write(self, value):
-        gpio_write = open(self.value_path, "w")
-        gpio_write.write(value)
-        gpio_write.close()
+def gpio_export_pin(pin):
+    if not exists(__gpio_path.format(pin)):
+        echo(str(pin), __gpio_export_path)
 
-    def dir(self, direction):
-        gpio_dir = open(self.direction_path, "w")
-        gpio_dir.write(direction)
-        if direction == "out":
-            self.write("0")
-        gpio_dir.close()
+def gpio_unexport_pin(pin):
+    if exists(__gpio_path.format(pin)):
+        echo(str(pin), __gpio_unexport_path)
 
-    def read(self):
-        gpio_read = open(self.value_path, "r")
-        value = gpio_read.read()
-        gpio_read.close()
-        return value
+def gpio_get_direction(pin):
+    return cat(__gpio_direction_path.format(pin))
+
+def gpio_set_direction(pin, direction):
+    echo(direction, __gpio_direction_path.format(pin))
+
+def gpio_get_value(pin):
+    value = cat(__gpio_value_path.format(pin))
+    return int(value)
+
+def gpio_set_value(pin, value):
+    echo(str(value), __gpio_value_path.format(pin))

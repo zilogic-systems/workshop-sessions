@@ -1,14 +1,14 @@
-import time
-from gpio import GPIO
+from gpio import *
 
-enable = GPIO("63")
-enable.exportPin()
-enable.dir("out")
+ON = 64
 
-gpio_pin = ["70", "69", "67"]
+gpio_export_pin(ON)
+gpio_set_direction(ON, "out")
+gpio_set_value(ON, 1)
+
+gpio_pins = ["70", "69", "67"]
 
 for i in gpio_pin:
-        pin = GPIO(i)
-        pin.exportPin()
-        pin.dir("out")
-        pin.write("1")
+    gpio_export_pin(gpio_pins[i])
+    gpio_set_direction(gpio_pins[i], "out")
+    gpio_set_value(gpio_pins[i], 1)
