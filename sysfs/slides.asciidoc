@@ -15,8 +15,8 @@ Zilogic Systems
 
 === Hardware Information
 
-  * As the hardware grew complex, it became necessary to export
-    hardware information to system programs
+  * As hardware grew complex, it became necessary to export hardware
+    information to system programs
 
     - `ifconfig`
     - `lspci`
@@ -116,9 +116,12 @@ image::figures/device-manager.jpg[align="center",width="100%"]
 
 === `/sys/bus`
 
- * Provides support for accessing analog devices.
- * Examples: Temperature and pressure sensors, Accelerometers, ADC & DAC.
- * Accessible through `/sys/bus/iio`.
+  * Groups devices based on their interface
+    - USB
+    - I2C
+    - PCI
+
+  * Just another way of viewing the devices in the system
 
 === Demo: Network Interfaces
 
@@ -173,25 +176,14 @@ $ echo 1 > soft   # Activate Kill Switch
 $ echo 0 > soft   # Deactivate Kill Switch
 --------------
 
-=== `/dev` vs `/sys`
+=== ioctl vs sys
 
-[align="center",width="95%",frame="topbot",options="header"]
-|======
-^| /dev  ^| /sys
+  * ioctl and sysfs provide overlapping functionality
 
-| Primary data transfer interface
-| Primary configuration interface
+  * Rule to choose between ioctl and sysfs
 
-| Provides a complex `ioctl` based configuration interface
-| Provides a very simple and obvious configuration interface
-
-| Need to write an application to perform control operations using `ioctls`
-| Control operations are performed by simply accessing the relevant interfaces.
-
-| `ioctls` are suitable for binary data transfer
-| Suitable only for text data
-
-|======
+    - Do not create device file, just to provide ioctl
+    - Use sysfs instead
 
 == Questions
 
