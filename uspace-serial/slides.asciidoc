@@ -1,0 +1,192 @@
+= Serial Communication (UART)
+Zilogic Systems
+:data-uri:
+
+== UART - Overview
+
+=== UART
+
+  * UART stands for Universal Asynchronous Receiver/Transmitter (UART)
+
+  * Takes bytes of data and transmits the individual bits in a
+    sequential fashion.
+
+  * At the destination, a second UART re-assembles the bits into
+    complete bytes.
+
+  * Cost effective than parallel communication.
+
+  * Serial ports operate at certain speeds called `baudrautes`.
+
+
+=== UART (Contd.)
+
+image::figures/uart-shift-register.gif[align="center"]
+
+[role="two-column"]
+=== RS232
+
+[role="left"]
+image::figures/rs232.png[align="center",width="280"]
+
+[role="right"]
+
+  * Electrical characteristics.
+
+  * Timing of signals.
+
+  * The meaning of signals
+
+  * The physical size and pin out in connectors.
+
+
+=== RS232 (Contd.)
+
+*Out of board connection.*
+
+Problems:
+
+  * Connecting across boards cause interference.
+
+  * Attenuation due to long distance.
+
+  * When connecting to specific devices, extra signals are required.
+    Example: Modem.
+
+Solutions:
+
+  * Choosing wide range of voltages. (-15V to +15V)
+
+  * Add extra signals to ensure integrity and provide new features.
+
+
+=== RS232 (Contd.)
+
+image::figures/serial-data.png[align="center"]
+
+  * Logic one is defined as a negative voltage and the signal
+    condition is called `marking`.
+
+  * Logic zero is positive voltage and the signal condition is
+    termed `spacing`.
+
+== Applications
+
+=== Communication Interface
+
+  * Bluetooth Module.
+
+  * GPS & GSM Modems.
+
+  * WiFi Module.
+
+  * Zigbee Module.
+
+  * Debug interface.
+
+  * and so on...
+
+== UART in Target Board
+
+[role="two-column"]
+=== Target
+
+[role="right"]
+image::figures/serial-lcd-interface.png[align="center"]
+
+[role="left"]
+There are 3 UARTs available on board,
+
+  * Debug Console. (UART A)
+
+  * Serial LCD. (UART B)
+
+  * Available for external devices. (UART C)
+
+== Serial in Linux
+
+=== File interface
+
+  * In Linux, Serial ports can be accessed like a file.
+
+  * It can be accessed using a dev interface, `/dev/tty<Serial Port>`.
+
+  * Doing fileio operations on this device file, will be reflected as
+    send and receive transactions in the port.
+
+=== stty
+
+  * Default configurations of a serial port may not be compatible.
+
+  * Configurations can be set through commandline using `stty`.
+
+  * Set baudrate using stty,
+
+------
+# stty -F /dev/tty<serial port> <baudrate>
+------
+
+  * After setting baudrate, we can write data.
+
+------
+# echo "Hello" > /dev/tty<serial port>
+------
+
+
+=== Demo
+
+*Accessing GSM module.*
+
+* Set baudrate using stty.
+
+------
+# stty -F /dev/ttyUSB0 115200
+------
+
+* GSM access
+
+[source,py]
+------
+include::code/uart-gsm.py[]
+------
+
+=== File Interface
+
+  * In Linux, serial devices are named, `ttyxxx`.
+
+  * Serial devices requires operations more than fileio over it.
+
+  * These additional operations are done using ioctls.
+
+  * Configurations such as baudrates, start and stop bits, no. of
+    characters per transaction, parity, mode of operation, etc are
+    made by invoking these ioctls.
+
+
+=== Linux TTY Software Stack
+
+image::figures/uart-linux.png[align="center"]
+
+
+== Accessing Serial Device
+
+=== PySerial
+
+  * For accessing the serial devices, we can use Python library called
+    `PySerial`.
+
+  * Setting up the configurations like baudrate, timeout, etc will be
+    done using this library.
+
+[source,py]
+------
+include::code/uart-comm.py[]
+------
+
+=== Try Out
+
+  * Try to display text in serial LCD.
+
+  * Open serial LCD using pyserial.
+
+  * Send text data in serial and get it displayed.

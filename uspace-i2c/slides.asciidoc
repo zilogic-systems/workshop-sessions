@@ -1,0 +1,197 @@
+= I2C Interface
+Zilogic Systems
+:data-uri:
+
+== I2C Bus - Overview
+
+=== History
+
+  * `Inter-Integrated Circuit` (I2C) is a low speed serial bus.
+
+  * Developed by Philips for a TV set.
+
+  * It connects peripheral devices to Microcontroller Unit.
+
+  * No. of wires reduced to two (clock and data) for connecting devices.
+
+  * To avoid EMI and ESD while memory mapped I/O.
+
+=== Features
+
+  * It operates at one of the clock rates,
+    - 100kHz - Standard mode.
+    - 400kHz - Fast mode.
+    - 1  MHz - Fast+ mode.
+    - 3.4MHz - High Speed mode.
+
+  * The CPU is the master on the bus, and the peripherals are
+    slaves. Only the master can initiate a transaction.
+
+  * Each slave will have 7-bit address.
+
+=== Features
+
+image::figures/i2c-drop.png[align="center"]
+
+[role="two-column"]
+=== Features
+
+[role="left"]
+image::figures/master-slave.png[align="center"]
+
+[role="right"]
+  * Master provides clock and starts transaction.
+
+  * The master can address a peripheral and send data to it, or
+    receive data from it.
+
+  * If 7-bit address is used, maximum of 127 devices can be connected.
+
+
+[role="two-column"]
+=== Features
+
+[role="left"]
+image::figures/soc-cntlr.png[align="center"]
+
+[role="right"]
+  * SoC's CPU is memory mapped to I2C controller.
+
+  * Each I2C controller owns a bus.
+
+  * Example: If 2x I2C controller in Soc, 2x I2C Bus.
+
+== I2C Protocol
+
+=== I2C Transactions
+
+An I2C transaction between a master and a slave can be broken down to
+two phases.
+
+  * Address Phase
+  * Data Phase
+
+image::figures/i2c-transaction.png[align="center"]
+
+
+=== Register transactions
+
+For accessing the slave registers, master has to
+
+  * Write the register address to be accessed.
+
+  * Then read or write data to the device.
+
+  * For transactions which involves both write and read operations,
+    a re-start needs to happen.
+
+=== Register transactions
+
+image::figures/i2c-reg-transaction.png[align="center"]
+
+== Applications
+
+=== Communication Interface
+
+  * To interface IO expanders.
+
+  * To interface with ADC and DAC.
+
+  * To interface touch screen.
+
+  * Used in many sound cards in configuration.
+
+  * and so on...
+
+== I2C in Target Board
+
+[role="two-column"]
+=== Target
+
+[role="right"]
+image::figures/i2c-target.png[height="480", align="center"]
+
+[role="left"]
+The following devices are connected on board,
+
+  * RTC
+
+  * Accelerometer
+
+  * 4-way key.
+
+== I2C in Linux
+
+=== File interface
+
+  * In Linux, I2C Bus can be accessed like a file.
+
+  * It can be accessed using a dev interface, `/dec/i2c-<bus no.>`.
+
+  * Doing fileio operations on this device file, will be reflected as
+    send and receive transactions in the bus.
+
+=== i2ctools
+
+  * A set of tools to access I2C in linux.
+
+  * `i2cdetect` provides the list of device addresses, connected in
+    the bus.
+
+
+=== Linux I2C Software Stack
+
+image::figures/i2c-linux.png[width="640",align="center"]
+
+== Accessing I2C Device
+
+=== SMBus
+
+  * Normal and register transaction methods.
+
+  * FileIO operations are not sufficient to select and register access
+    I2C devices.
+
+  * For operations more than fileIO, we need to use `ioctl`.
+
+  * Extra `ioctl` operations while accessing the i2c devices can be
+    done using `SMBus`.
+
+  * SMBus provides apis for selecting the I2C slave.
+
+
+=== SMBus
+
+  * Opening and reading the device requires the following steps.
+
+[source, py]
+------
+include::code/smbus-access.py[]
+------
+
+[role="two-column"]
+===  Demo
+
+[role="left"]
+  * Accessing Accelerometer
+
+  * Download
+    link:{include:code/accelerometer.py.datauri}["Accerlerometer Demo",filename="accelerometer.py"]
+
+[role="right"]
+image::figures/accelerometer.png[align="center"]
+
+
+=== 4-way Key Datasheet
+
+image::figures/4-way-key-datasheet.png[align="center",width="720"]
+
+=== Try Out
+
+  * Try to access 4-way key.
+
+  * Detect the device is connected in the bus.
+
+  * Read the status register and data register.
+
+  * Use smbus apis to read current key value.
