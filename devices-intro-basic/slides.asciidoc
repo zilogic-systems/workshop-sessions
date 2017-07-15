@@ -1,0 +1,223 @@
+= Device Interfacing
+Zilogic Systems
+:data-uri:
+:kernel-porting:
+
+== Introduction
+
+=== Overview
+
+ * Memory Interfacing
+ * Device Interfacing
+   - MMIO
+   - Controller Based IO
+
+== Memory Interfacing
+
+=== RAM
+
+image::figures/ram.png[width="20%",align="center"]
+
+=== RAM Interfacing
+
+image::figures/single-ram.png[width="60%",align="center"]
+
+=== Write Transaction
+
+image::figures/mem-write-req-1.png[width="60%",align="center"]
+
+=== Write Transaction
+
+image::figures/mem-write-req-2.png[width="60%",align="center"]
+
+=== Read Transaction
+
+image::figures/mem-read-req-1.png[width="60%",align="center"]
+
+=== Read Transaction
+
+image::figures/mem-read-req-2.png[width="60%",align="center"]
+
+=== Multiple RAM Chips
+
+  * What if we wanted 32 bytes of RAM?
+  * And we have only 16 byte RAM chips
+
+=== Two RAM Chips
+
+image::figures/two-ram-nodecode.png[width="60%",align="center"]
+
+=== Decoding Logic
+
+  * Each RAM is assigned:
+    - base
+    - size
+
+=== Assignment for RAM1 and RAM2
+
+  * RAM1
+    - base: `0x00`
+    - size: `0x0F`
+    - range: `0x00 - 0xF`
+
+  * RAM2:
+    - base: `0x10`
+    - size: `0x0F`
+    - range: `0x10 - 0x1F`
+
+=== Memory Map
+
+image::figures/memory-map.png[width="30%",align="center"]
+
+=== Decoding Logic: Operation
+
+  * if `address in range`:
+  
+    - `address = address - base`
+    - perform read / write
+
+  * else:
+
+    - ignore
+
+=== With Decoding Logic
+
+image::figures/two-ram-1.png[width="60%",align="center"]
+
+=== With Decoding Logic
+
+image::figures/two-ram-2.png[width="60%",align="center"]
+
+=== With Decoding Logic
+
+image::figures/two-ram-3.png[width="60%",align="center"]
+
+=== With Decoding Logic
+
+image::figures/two-ram-4.png[width="60%",align="center"]
+
+== Device Interfacing
+
+=== Seven Segment Display
+
+image::figures/7-segment.png[width="70%",align="center"]
+
+=== Seven Segment Display
+
+image::figures/7-segment-data.png[width="70%",align="center"]
+
+=== Replace RAM with Display
+
+image::figures/two-ram.png[width="50%",align="center"]
+
+=== Replace RAM with Display
+
+image::figures/ram-display.png[width="80%",align="center"]
+
+=== Memory Mapped IO
+
+image::figures/ram-display.png[width="80%",align="center"]
+
+=== Accessing Device from a C Program
+
+[source,c]
+------
+unsigned char *p;
+
+p = 0x10;   /* point it to device register */
+*p = 0x5;   /* write to the device register */
+------
+
+=== Memory Map
+
+image::figures/memory-map-display.png[width="30%",align="center"]
+
+=== Example: Display Controller
+
+image::figures/display-controller.png[width="70%",align="center"]
+
+Each pixel on the screen is controlled by 3 memory locations,
+corresponding to R, G and B.
+
+[role="two-column"]
+=== Example: Serial Controller
+
+[role="left"]
+image::figures/serial-controller.png[align="center"]
+
+[role="right"]
+  * Data written to the TX register, is transmitted out
+
+  * Data received, is available from the RX register
+
+  * Data rate, and other comm. parameters can be specified through the
+    CTL register
+
+
+[role="tip"]
+=== //
+
+But how does the USB mouse / keyboard talk to the CPU?
+
+=== Controller Based IO
+
+image::figures/io-controller.png[width="75%",align="center"]
+
+=== Why?
+
+  * I2C and SPI Bus
+    - Reduces no. of pins on the chip
+    - Saves board space, since only fewer lines are required
+
+  * USB Bus
+    - Serial interface reduces no. of wires
+    - Decreases the thicknes of cable, improves flexibility
+    - Simplified connector
+
+[role="two-column"]
+=== ARM SoC
+
+[role="left"]
+image::figures/arm-soc.png[align="center"]
+
+[role="right"]
+   * To access a device that is not memory mapped, the corresponding
+     controller is required
+
+   * System-on-Chips have many controllers on a single chip, to
+     interface with various kinds of devices
+
+== MMIO Example
+
+=== SRC Registers
+
+[options="header",width="75%",align="center"]
+|======
+| Address	| Name	| Description
+| 0x4006_E000	| SCR	| SRC Control Register
+| 0x4006_E004	| SBMR1	| SRC Boot Mode Register 1
+| 0x4006_E008 	| SRSR	| SRC Status Register
+|======
+
+=== Try Out
+
+  * Viewing the SCR register, from U-Boot prompt
++
+------
+U-Boot> md 0x4006E000 1
+------
++
+  * Setting bit 12 of SCR register
++
+------
+U-Boot> mw 0x4006E000 0x1000
+------
+
+=== Conclusion
+
+  * Served to refresh microprocessor and device interfacing
+    fundamentals
+
+  * Explored the hardware setup
+
+  * Re-inforced the idea of memory mapped IO with example
