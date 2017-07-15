@@ -58,8 +58,8 @@ clean:
 	rm -fr code/stack
 	rm -fr code/strlist
 	rm -fr code/strint
-	find . -name *~ -delete
-	find . -name *.pyc -delete
+	find . -name "*~" -delete
+	find . -name "*.pyc" -delete
 	rm -fr code/__pycache__
 
 include $(TOPDIR)/stylesheets/Makefile.rules

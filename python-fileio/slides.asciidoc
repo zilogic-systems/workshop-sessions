@@ -2,13 +2,28 @@
 Zilogic Systems
 :data-uri:
 
-== Resources
+== Introduction
 
-=== Tamil Font
+=== Overview
+
+  * Working with Binary Data
+
+  * Wokring with Text Files
+
+=== Binary vs Text
+
+  * Computers and programs are supposed to work with binary files
+  
+  * Human beings are supposed to work with text files
+
+  * Examples?
+
+=== Resource: Tamil Font
 
   * Some slides use a Tamil text, and requires a Unicode Tamil Font
 
-  * Download and Install link:{include:noto-sans-ta.zip.datauri}["Noto Sans Tamil Font",filename="noto-sans-ta.zip"]
+  * Download and Install link:{include:noto-sans-ta.zip.datauri}["Noto
+    Sans Tamil Font",filename="noto-sans-ta.zip"]
 
 == Dealing with Binary Data
 
@@ -45,17 +60,17 @@ b'\x9c\x00\x00\x00'
 
 [source,python]
 ------
->>> struct.pack("H", 156)   # Two byte unsigned
+>>> struct.pack("H", 156)   # Unsigned Half-Word
 b'\x9c\x00'
->>> struct.pack("B", 156)   # One byte unsigned
+>>> struct.pack("B", 156)   # Unsigned Byte
 b'\x9c'
->>> struct.pack("i", -1)    # Four byte signed
+>>> struct.pack("i", -1)    # Signed Integer
 b"\xFE\xFF\xFF\xFF"
->>> struct.pack("<I", 1)    # Four byte unsigned, little-endian
+>>> struct.pack("<I", 1)    # Unsigned Integer, little-endian
 b"\x01\x00\x00\x00"
->>> struct.pack(">I", 1)    # Four byte unsigned, big-endian
+>>> struct.pack(">I", 1)    # Unsigned Integer, big-endian
 b"\x00\x00\x00\x01"
->>> struct.pack("IB", 1, 2)    # Four byte Integer and a Byte
+>>> struct.pack("IB", 1, 2)    # Unsigned Integer and a Byte
 b'\x01\x00\00\x00\x02'
 ------
 
@@ -65,7 +80,7 @@ b'\x01\x00\00\x00\x02'
 +
 [source,python]
 ------
->>> struct.unpack("HB", b'\x01\00\00\00\x02')
+>>> struct.unpack("HB", b'\x01\00\x02')
 (1, 2)
 ------
 
@@ -214,6 +229,17 @@ b'\xe0\xae\x85'
 
   * If a Unicode string is used, encoding needs to be specified
 
+=== Try Out
+
+  * Encode the character "அ" using
+    - UTF-32
+    - UTF-16
+    - UTF-8
+
+  * How many bytes do you get in each case?
+
+  * BOM Character: 0xFEFF
+
 === Writing a Text File
 
 [source,python]
@@ -246,3 +272,10 @@ fp.close()
 
   * Comments can also be written in any language
 
+=== Try Out
+
+  * `readline()` method, reads a line of text, from a file
+
+  * `readline()` returns an empty string when EOF is reached
+
+  * Write a program to print atmost 5 lines from a line

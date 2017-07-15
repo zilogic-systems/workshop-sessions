@@ -1,0 +1,189 @@
+= Sysfs
+Zilogic Systems
+:data-uri:
+
+== Purpose of Sysfs
+
+=== Accessing Kernel Data
+
+  * There has always been a need to access kernel data from system
+    programs
+
+  * `/proc` was introduced to export process information from kernel
+
+  * `ps` uses it to print the list of processes in the system
+
+=== Hardware Information
+
+  * As hardware grew complex, it became necessary to export hardware
+    information to system programs
+
+    - `ifconfig`
+    - `lspci`
+    - `lsusb`
+    - `parted`
+
+=== *procfs* limitations
+
+  * *procfs* was designed to keep process related information.
+  * Eventually got cluttered with lot of non-process information.
+  * There was no standard format to represent information.
+  * Information was human readable, but not programatically parsable.
+  * Examples:
+	** `/proc/net/packet`
+   	** `/proc/net/wireless`
+	** `/proc/asound/cards`
+
+=== Sysfs
+
+  * An in-memory filesystem that exports information from kernel-space to user-space.
+  * Exports Kernel datastructures, their attributes and relationships.
+  * Examples: network, filesystems, hardware, drivers, memory.
+  * Introduced by `Patrick Mochel` in the Linux 2.5 Kernel in 2003.
+
+=== `sysfs` equivalent of `/proc/asound/cards`
+
+[source,bash]
+------------
+$ cat /proc/asound/cards
+ 0 [HDMI           ]: HDA-Intel - HDA Intel HDMI
+                      HDA Intel HDMI at 0xf7d34000 irq 34
+ 1 [PCH            ]: HDA-Intel - HDA Intel PCH
+                      HDA Intel PCH at 0xf7d30000 irq 32
+------------
+
+[source,bash]
+------------
+$ ls /sys/class/sound
+card0	card1
+$ cat /sys/class/sound/card0/id
+HDMI
+$ cat /sys/class/sound/card0/device/irq
+34
+------------
+
+[role="two-column"]
+=== Charateristics of Sysfs
+
+[role="left"]
+  * Exports information in the form of files and directories
+  * Files may support read, write or both operations.
+  * Provides user-friendly interfaces which follows the *one-item per file* rule.
+  * Addition and removal of interfaces associated with devices.
+
+[role="right"]
+image::figures/sys-char.png[align="center",width="100%"]
+
+=== Applications of Sysfs
+
+  * Accessing system information by various user-space applications
+
+  * Controlling and configuring hardware
+
+== /sys/ hierarchy
+
+=== `/sys/class`
+
+  * `class` - grouping devices based on functionality like audio
+    cards, network cards, etc
+  
+  * Controlling and accessing information about these devices.
+  
+  * Similar to `Device Manager` in Windows.
+
+[role="two-column"]
+=== `/sys/class`
+
+[role="left"]
+[source,bash]
+-----------
+$ tree /sys/class/
+├── block
+├── gpio
+├── graphics
+├── input
+├── leds
+├── printer
+├── rtc
+├── sound
+├── spi_master
+├── thermal
+├── tty
+-----------
+
+[role="right"]
+image::figures/device-manager.jpg[align="center",width="100%"]
+
+=== `/sys/bus`
+
+  * Groups devices based on their interface
+    - USB
+    - I2C
+    - PCI
+
+  * Just another way of viewing the devices in the system
+
+=== Demo: Network Interfaces
+
+ * Information available in `/sys/class/net`.
+
+ * Download
+    link:{include:code/ifconfig.py.datauri}["ifconfig.py",filename="ifconfig.py"]
+
+ * Output:
+
+[source,bash]
+---------------
+$ python3 ifconfig.py
+wlan0	HWaddr ac:d1:b8:09:ab:09
+	MTU:1500
+	RX packets:216089 errors:0
+	TX packets:125334 errors:0
+	RX bytes:116026931	TX bytes:20279921
+---------------
+
+=== Demo: Backlight
+
+ * Backlight can be controlled via `/sys/class/backlight`.
+
+[source,bash]
+--------------
+$ cat /sys/class/backlight/intel_backlight/max_brightness
+4710
+--------------
+
+ * Brightness can be controlled by writing value into `brightness` file.
+ * Invalid values are validated by `sysfs`.
+
+[source,bash]
+--------------
+$ echo 500 > /sys/class/backlight/intel_backlight/brightness
+$ echo 5000 > /sys/class/backlight/intel_backlight/brightness
+bash: echo: write error: Invalid argument
+--------------
+
+=== Demo: RFKill
+
+ * Radio interfaces can be turned on / off using RFKill Switch.
+ * Device is accessible from `/sys/class/rfkill`.
+ * Separate switch for WiFi, Bluetooth, etc.
+
+[source,bash]
+--------------
+$ cd /sys/class/rfkill/rfkill0
+$ cat name
+$ echo 1 > soft   # Activate Kill Switch
+$ echo 0 > soft   # Deactivate Kill Switch
+--------------
+
+=== ioctl vs sys
+
+  * ioctl and sysfs provide overlapping functionality
+
+  * Rule to choose between ioctl and sysfs
+
+    - Do not create device file, just to provide ioctl
+    - Use sysfs instead
+
+== Questions
+
