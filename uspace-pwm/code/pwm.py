@@ -1,54 +1,39 @@
-#!/usr/bin/python
-class PWM(object):
-    def __init__(self, channel):
-        self.channel = channel
-        self.pwmchip_path = "/sys/class/pwm/pwmchip16/"
-        self.export_path = self.pwmchip_path+"export"
-        self.unexport_path = self.pwmchip_path+"unexport"
-        self.pwm_path = self.pwmchip_path+"pwm"+self.channel+"/"
-        self.dutycycle = self.pwm_path+"duty_cycle"
-        self.period = self.pwm_path+"period"
-        self.enable = self.pwm_path+"enable"
-        self.polarity = self.pwm_path+"polarity"
+from os.path import exists
 
-    def export_channel(self):
-        export_ch = open(self.export_path, "w")
-        export_ch.write(self.channel)
-        export_ch.close()
+__pwm_path = "/sys/class/pwm/pwmchip16/pwm{}"
+__pwm_export_path = "/sys/class/pwm/pwmchip16//export"
+__pwm_unexport_path = "/sys/class/pwm/pwmchip16/unexport"
+__pwm_period_path = "/sys/class/pwm/pwmchip16/pwm{}/period"
+__pwm_dutycycle_path = "/sys/class/pwm/pwmchip16/pwm{}/duty_cycle"
+__pwm_enable_path = "/sys/class/pwm/pwmchip16/pwm{}/enable"
 
-    def set_period_ns(self, period_ns):
-        period = open(self.period, "w")
-        period.write(period_ns)
-        period.close()
+def cat(file):
+    file = open(file, "r")
+    value = file.read()
+    file.close()
+    return value
 
-    def set_dutycycle_ns(self, dutycycle_ns):
-        dutycycle = open(self.dutycycle, "w")
-        dutycycle.write(dutycycle_ns)
-        dutycycle.close()
+def echo(value, file):
+    file = open(file, "w")
+    file.write(value)
+    file.close()
 
-    def start(self):
-        enable = open(self.enable, "w")
-        enable.write("1")
-        enable.close()
+def pwm_export_channel(channel):
+    if not exists(__pwm_path.format(channel)):
+        echo(str(channel), __pwm_export_path)
 
-    def stop(self):
-        dutycycle = open(self.dutycycle, "w")
-        dutycycle.write("0")
-        dutycycle.close()
-        enable = open(self.enable, "w")
-        enable.write("0")
-        enable.close()
+def pwm_unexport_channel(channel):
+    if exists(__pwm_path.format(channel)):
+        echo(str(channel), __pwm_unexport_path)
 
-    def polarity(self, direction):
-        polarity = open(self.polarity, "w")
-        polarity.write(direction)
-        polarity.close()
+def pwm_set_period(channel, period):
+    echo(str(period), __pwm_period_path.format(channel))
 
-    def unexport_channel(self):
-        dutycycle = open(self.dutycycle, "w")
-        dutycycle.write("0")
-        dutycycle.close()
-        unexport = open(self.unexport_path, "w")
-        unexport.write(self.channel)
-        unexport.close()
-        
+def pwm_set_dutycycle(channel, dutycycle):
+    echo(str(dutycycle), __pwm_dutycycle_path.format(channel))
+
+def pwm_enable(channel):
+    echo(str(1), __pwm_enable_path.format(channel))
+
+def pwm_disable(channel):
+    echo(str(0), __pwm_enable_path.format(channel))

@@ -31,7 +31,7 @@ while cycle != 0:
     duty_cycle.write(str(cycle))
     duty_cycle.flush()
     time.sleep(0.1)
-    
+
 duty_cycle.close()
 
 enable.write("0")

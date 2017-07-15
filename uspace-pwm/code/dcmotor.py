@@ -1,43 +1,45 @@
 #!/usr/bin/python
-from pwm import PWM
-from gpio import GPIO
+from pwm import *
+from gpio import *
 import time
 
+KEY1 = 67
+KEY2 = 69
+MOTOR = 1
 
-key1 = GPIO("67")
-key1.exportPin()
-key1.dir("in")
+gpio_export_pin(KEY1)
+gpio_export_pin(KEY2)
 
-key2 = GPIO("69")
-key2.exportPin()
-key2.dir("in")
+gpio_set_direction(KEY1, "in")
+gpio_set_direction(KEY2, "in")
 
-motor = PWM("1")
-motor.export_channel()
+pwm_export_channel(MOTOR)
 
-period = "10000000"
-motor.set_period_ns(period)
+period = 10000000
+
+pwm_set_period(MOTOR, period)
+
 duty = 7000000
 
-while True:    
-    key1_value = key1.read()
-    key2_value = key2.read()
+while True:
+    key1_value = gpio_get_value(KEY1)
+    key2_value = gpio_get_value(KEY2)
 
-    if int(key1_value) == 0:
+    if key1_value == 0:
         duty = duty - 1000000
-        if str(duty) == "4000000":
+        if duty == 4000000:
             break
-        motor.set_dutycycle_ns(str(duty))
-        motor.start()
-    if int(key2_value) == 0:
+        pwm_set_dutycycle(MOTOR, duty)
+        pwm_start(MOTOR)
+    if key2_value == 0:
         duty = duty + 1000000
-        if str(duty) == period:
+        if duty == period:
             break
-        motor.set_dutycycle_ns(str(duty))
-        motor.start()
+        pwm_set_dutycycle(MOTOR, duty)
+        pwm_enable(MOTOR)
     time.sleep(0.2)
 
-motor.stop()
-motor.unexport_channel()
-key1.unexportPin()
-key2.unexportPin()
+pwm_disable(MOTOR)
+pwm_unexport_channel(MOTOR)
+gpio_unexport_pin(KEY1)
+gpio_unexport_pin(KEY2)
