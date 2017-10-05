@@ -1,4 +1,5 @@
 = Linux Userspace GPIO Access
+Zilogic Systems
 
 == GPIO
 
@@ -27,15 +28,11 @@ image::figures/gpio-bistate.png[]
 
  * The pin status can be read or modified from software.
 
-=== GPIO Applications
+=== GPIO Ports and Pins
 
-* Used to control LEDs, valves and Relays
+ * The GPIO controllers are also called GPIO ports.
 
-* Used to sense keys.
-
-* Used to control 7Segment, Stepper Motor etc.,
-
-* Used for LED Matrices & Matrix keypads
+ * A GPIO ports, controls a set of GPIO pins
 
 [role="two-column"]
 === GPIO Controller
@@ -58,41 +55,29 @@ image::figures/gpio-ctrl.png[]
 [role="right"]
 image::figures/gpio-arm.png[]
 
-[role="two-column"]
-=== GPIO Grouping 
-
-[role="left"]
-
- * In a GPIO controller, the GPIOs are organised as PORTS or BANKS
-   where a set of GPIOs are combined together for convenience
-
- * In a 32 bit processors, the ports may have 32 GPIO pins grouped
-   together.
-
- * GPIOs pins are referred as, particular pin in a particular port,
-   Ex:P2_3 - `pin 3 in port 2`
-
-[role="right"]
-image::figures/ports.png[]
-
 === GPIO Numbering
 
  * The processor pin has to be configured as GPIO in the pinmux
    configuration.
 
- * Vybrid VF510 has PORT0 to PORT5 
+ * GPIOs pins are referred as, particular pin in a particular port
+ 
+ * Example: P2_3 - pin 3 in port 2
 
- * The pin sequence number can be generated as 
+=== Linux GPIO Numbering
 
-----
-Pin Seq No = PORT * 32 + PIN
+ * Vybrid VF510 has 6 GPIO ports, Port 0 - Port 5
 
-For pin `P2_3`,
+ * Each port controls 32 pins
 
-  2 * 32 + 3 = 67 
-----
+ * Pins are numbered sequentially
 
-=== ZKit GPIO Mappings
+   - Port 0, Pin Numbers: 0 - 31
+   - Port 1, Pin Numbers: 32 - 63
+   - Port 2, Pin Numbers: 64 - 95
+   - ...
+
+=== GPIO Usage in ZKit-ARM-VF51
 
 [options="header"]
 |====================================
@@ -103,20 +88,6 @@ For pin `P2_3`,
 | KEY1   | P2_5     | GPIO69
 | KEY2   | P2_3     | GPIO67
 |====================================
-
-
-[role="two-column"]
-=== GPIO in Linux
-
-[role="left"]
-* In Linux the gpio interfaces can be accessed from userspace
-  application through sysfs.
-
-* The access to sysfs goes to generic GPIO driver called `gpiolib` which
-  inturn calls the processor specific GPIO driver.
-
-[role="right"]
-image::figures/layer.png[width=350]
 
 == SYSFS GPIO
 
@@ -135,18 +106,16 @@ image::figures/layer.png[width=350]
 
 [role="right"]
 ----
-
 /sys/class/gpio/
 | -- gpio<no>
      | -- value
      ` -- direction 
-
 ----
 
 == LEDs
 
 [role="two-column"]
-=== Led Circuitary
+=== LED Circuitry
 
 [role="left"]
 
@@ -163,7 +132,7 @@ image::figures/layer.png[width=350]
 image::figures/led-simple.png[]
 
 [role="two-column"]
-=== Led Circuitary
+=== LED Circuitry
 
 [role="left"]
 * A current limiting resistor can be used to reduce the current
@@ -176,11 +145,12 @@ image::figures/leds.png[]
 
 === GPIO Request
 
-* The processor pins are shared by several peripheral controller, If
-  needs to be used as GPIO pin, it has to be reserved.
+* GPIOs can be used internally by other kernel subsystems
 
-* GPIO subsystem of kernel provides sysfs access, for reserving a pin
-  as GPIO and freeing them back.
+* GPIO has to be made available to user, by the kernel, before they
+  can be used
+
+* If GPIO is used by kernel, this will fail
 
 ----
 $ echo 65 > /sys/class/gpio/export
@@ -298,7 +268,7 @@ image::figures/gpio-states.png[]
 [role="right"]
 image::figures/gpio-pullupdown.png[]
 
-=== Keys Circuitary
+=== Keys Circuitry
 
 * A key/switch has *two* terminals, when pressed it mechanically
   connects the terminals.
@@ -313,7 +283,7 @@ image::figures/gpio-pullupdown.png[]
   state.
 
 [role="two-column"]
-=== Keys Circuitary Contd.
+=== Keys Circuitry Contd.
 
 [role="left"]
 * The GPIO pin can be defaulted to high level by a pull-up, so input
@@ -328,49 +298,7 @@ image::figures/gpio-pullupdown.png[]
 [role="right"]
 image::figures/keys.png[]
 
-=== Programming for Keys
-
-[source,python]
-----
-include::code/key.py[]
-----
-
-=== Key Polling
-
-* Since the key press is `asynchronous`, it has to be polled
-  continuously or periodically.
-
-* Continuously polling for key may burn the CPU, instead periodical
-  polling should be sufficient for keys.
-
-* Typical key stroke period by humans, couldn't be less than few
-  hundred millisecs.
-
-* it's enough that we can poll for key press once in `100 msec`. 
-
-[role="two-column"]
-=== Key Debounce
-
-[role="left"]
-
-* The switches or keys used are mechanical devices and when key is
-  pressed or depressed they tend to *vibrate* creating noises until it
-  settles down.
-
-* This condition can be handled in hardware by adding a debounce
-  filter.
-
-* It can also be handled in software by waiting for specific time from
-  the event occurence till it settles down.
-
-* This delay time is typically around `few hundred millisecond` and
-  called `debounce delay`.
-
-[role="right"]
-
-image::figures/debounce.png[]
-
-=== Programming with Key Debounce
+=== Code
 
 [source,python]
 ----
@@ -389,32 +317,6 @@ include::code/key-debounce.py[]
 
 * The code for the tryout is 
   link:{include:code/key-status.py.datauri}["key-status.py",filename="key-status.py"]
-
-== GPIO Usage Models
-
-=== Various GPIO Usage patterns
-
-* Individual GPIOs for single LED, Keys, Relays, Reed switches and
-  solenoid valves.
-
-* Parallel GPIOs for 7 Segment, Stepper Motor etc.,
-
-* Multiplexed GPIOs for Multi Seven Segment Array, Matrix Keypad etc.,
-
-* GPIOs can be coupled with timer for periodic signalling or to create
-  pulse trains of various width.
-
-=== Bitbanging
-
-* GPIOs as its name suggests, has countless possibility that using
-  which we can build simple busses like 
-  - I2C, 
-  - 1 wire, 
-  - SPI and 
-  - even complex Memory bus
-
-* This done using Bitbanging is a technique, which allows to simulate
-  serial busses using software over GPIO.
 
 == References
 
@@ -442,4 +344,75 @@ image::figures/sseg-pinmap.png[]
 include::code/sseg.py[]
 ----
 
+== GPIO Usage Models
+
+=== Various GPIO Usage patterns
+
+* Individual GPIOs for single LED, Keys, Relays, Reed switches and
+  solenoid valves.
+
+* Parallel GPIOs for 7 Segment, Stepper Motor etc.,
+
+* Multiplexed GPIOs for Multi Seven Segment Array, Matrix Keypad etc.,
+
+* GPIOs can be coupled with timer for periodic signalling or to create
+  pulse trains of various width.
+
+=== Bitbanging
+
+* GPIOs as its name suggests, has countless possibility that using
+  which we can build simple busses like 
+  - I2C, 
+  - 1 wire, 
+  - SPI and 
+  - even complex Memory bus
+
+* This done using Bitbanging is a technique, which allows to simulate
+  serial busses using software over GPIO.
+
+=== Key Debounce
+
+* The switches or keys used are mechanical devices and when key is
+  pressed or depressed they tend to vibrate creating noises until it
+  settles down.
+
+* This condition can be handled in hardware by adding a debounce
+  filter.
+
+* It can also be handled in software by waiting for specific time from
+  the event occurence till it settles down.
+
+* This delay time is typically around few hundred millisecond and
+  called debounce delay.
+
+=== Programming for Keys
+
+[source,python]
+----
+include::code/key.py[]
+----
+
+=== Key Polling
+
+* Since the key press is asynchronous, it has to be polled
+  continuously or periodically.
+
+* Continuously polling for key may burn the CPU, instead periodical
+  polling should be sufficient for keys.
+
+* Typical key stroke period by humans, couldn't be less than few
+  hundred millisecs.
+
+* it's enough that we can poll for key press once in 100 msec. 
+
+=== Sensors and Actuators
+
+ * Sensors - produces two values 'on' or 'off'
+   - Door Sensor
+   - Presence Sensor
+   - Smoke Detector
+
+ * Actuators
+   - Relays: Turn ON / OFF Appliances
+   - Solenoids
 
