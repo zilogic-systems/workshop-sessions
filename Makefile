@@ -6,6 +6,16 @@ git-sessions =			\
 
 git-resources =	git-resources
 
+python-sessions = 		\
+	python-intro		\
+	python-intro-x		\
+	python-oop		\
+	python-import		\
+	python-fileio		\
+	python-types		\
+	python-errors		\
+	python-unittest-basic
+
 yocto-sessions = 		\
 	autotools		\
 	bitbake-data-model	\
