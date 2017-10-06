@@ -1,37 +1,33 @@
 from time import sleep
-import serial
 from gpio import *
 
 KEY1 = 67
 KEY2 = 69
-LED = 64
+
+RLED = 70
+GLED = 65
 
 gpio_export_pin(KEY1)
 gpio_export_pin(KEY2)
-gpio_export_pin(LED)
+gpio_export_pin(RLED)
+gpio_export_pin(GLED)
 
 gpio_set_direction(KEY1, "in")
 gpio_set_direction(KEY2, "in")
-gpio_set_direction(LED, "out")
-
-ser = serial.Serial('/dev/ttyLP1', 9600)
-ser.write(b'Press any key\n')
+gpio_set_direction(RLED, "out")
+gpio_set_direction(GLED, "out")
 
 while True:
     key1_value = gpio_get_value(KEY1)
-    key2_value = gpio_get_value(KEY2)
+    gpio_set_value(RLED, key1_value)
 
-    if key1_value == 0:
-        ser.write(b'Key1 Pressed\n')
-    if key2_value == 0:
-        gpio_set_value(LED, 1)
-        break
+    key2_value = gpio_get_value(KEY2)
+    gpio_set_value(GLED, key2_value)
 
     sleep(0.2)
-    gpio_set_value(LED, 0)
 
 gpio_unexport_pin(KEY1)
 gpio_unexport_pin(KEY2)
-gpio_unexport_pin(LED)
 
-ser.close()
+gpio_unexport_pin(RLED)
+gpio_unexport_pin(GLED)
