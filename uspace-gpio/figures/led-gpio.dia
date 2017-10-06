@@ -68,7 +68,7 @@
         <dia:point val="17,10"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="17,9.405;19.055,10.15"/>
+        <dia:rectangle val="17,9.2445;19.5605,10.2335"/>
       </dia:attribute>
       <dia:attribute name="text">
         <dia:composite type="text">
@@ -79,7 +79,7 @@
             <dia:font family="sans" style="0" name="Helvetica"/>
           </dia:attribute>
           <dia:attribute name="height">
-            <dia:real val="0.80000000000000004"/>
+            <dia:real val="0.98777773976325989"/>
           </dia:attribute>
           <dia:attribute name="pos">
             <dia:point val="17,10"/>
@@ -101,7 +101,7 @@
         <dia:point val="21,14"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="21,13.405;22.52,14.15"/>
+        <dia:rectangle val="21,13.2675;22.8775,14.1875"/>
       </dia:attribute>
       <dia:attribute name="text">
         <dia:composite type="text">
@@ -112,7 +112,7 @@
             <dia:font family="sans" style="0" name="Helvetica"/>
           </dia:attribute>
           <dia:attribute name="height">
-            <dia:real val="0.80000000000000004"/>
+            <dia:real val="0.98777773976325989"/>
           </dia:attribute>
           <dia:attribute name="pos">
             <dia:point val="21,14"/>
