@@ -40,8 +40,8 @@ image::figures/mem-read-req-2.png[width="60%",align="center"]
 
 === Multiple RAM Chips
 
-  * What if we wanted 32 bytes of RAM?
-  * And we have only 16 byte RAM chips
+  * What if we wanted 8 bytes of RAM?
+  * And we have only 4 byte RAM chips
 
 === Address for RAM1 and RAM2
 
