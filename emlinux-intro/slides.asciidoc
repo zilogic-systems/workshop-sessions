@@ -51,6 +51,8 @@ They are used in
 
 [role="left"]
 
+ * Supports running several applications together.
+
  * It would be multi-layered with multiple software components
    integrated together.
 
@@ -88,20 +90,35 @@ image::figures/gpos-stack.png[]
   * User can interact to an UNIX system through `shell` or through
     `desktop environment`.
 
-  * A shell is a command line application provides a means for
+  * A *shell* is a command line application provides a means for
     navigating through the file system, and launching other programs
     on request.
 
-  * Desktop environment is the graphical replacement for shell and
+  * *Desktop environment* is the graphical replacement for shell and
     provides much more convenience for desktop users.
 
 [role="right"]
-image:figures/unix-rings.png[width=388]
+image:figures/unix-rings.png[width=588]
 
 === Files in Linux
 
+  * `File system` allows to organize the user's data as `files` in a
+    convenient way in the storage devices.
+
   * Files in GNU/Linux can be broadly classified as follows:
-    Regular files, Directories, Links & Device files
+    - `Regular files` like text files, images, binaries, pdfs etc., 
+    - `Directories` to group the related files
+    - `Links` is like shorcuts in windows
+    - And `Device files` which allows to access devices
+
+//////
+=== Special Filesystems
+
+  * `procfs` - provides process and kernel related information as files.
+
+  * `sysfs`  - provides devices related information as files.
+
+=== Device Files
 
   * In GNU/Linux every device is represented by a file in `/dev`
     directory. For example `/dev/sda` represents the hard disk,
@@ -114,16 +131,15 @@ image:figures/unix-rings.png[width=388]
 
 === File System Tree
 
-  * File - important abstraction in Linux.
-
   * A file system tree, with all the necessary files is required for
     Linux system to boot.
 
-  * Import files present in the file system tree include
+  * Files present in the file system tree include
     - system programs
     - application programs
     - configuration files
     - device files
+
 
 [role="two-column"]
 === Layout
@@ -151,6 +167,7 @@ image::figures/no-fs.png[width=388, align="center"]
 
   * The filesystem maintains a table, that maps filenames to the
     sectors that contain the contents of the file.
+//////
 
 == Embedded Linux
 
@@ -182,6 +199,9 @@ image::figures/no-fs.png[width=388, align="center"]
     - adding additional software for embedded interfaces
     - removing unnecessary components to reduce time and space 
 
+=== Desktop Components
+image::figures/desktop.png[width=600, align="center"]
+
 [style="two-column"]
 === Target Hardware Components
 
@@ -209,15 +229,19 @@ image::figures/hardware.png[]
   * In other words, the standard input and standard output of the
     applications is attached to the serial port.
 
+
+[role="right"]
+image::figures/setup.png[]
+
+=== Development Setup Contd.
+
   * Host system uses a serial terminal program like `minicom` and
     `putty` to communicate with the target system.
 
   * Kernel image and filesystem image download is done through
     Ethernet interface. Serial interface is not fast enough.
 
-[role="right"]
-image::figures/setup.png[]
-
+///////
 [role="two-column"]
 === Linux Software Components
 
@@ -291,6 +315,7 @@ use. Bare minimal rootfs would have atleast
   * Replaced by non-volatile memory devices - Flash
 
   * Embedded Linux systems require > 4MB of Flash memory.
+///////
 
 == ZKit-ARM-VF51
 
@@ -326,7 +351,7 @@ use. Bare minimal rootfs would have atleast
 
 * Raspberry Pi compatible connector for peripherals
 [role="right"]
-image::figures/zkit-arm-vf51.jpg[]
+image::figures/zkit-arm-vf51.jpg[align="center"]
 
 [role="two-column"]
 === Add-on Board Details
@@ -359,14 +384,24 @@ image::figures/peripheral-blocks.png[align="center"]
     `ttyUSBx` node from `dmesg` of Linux.
   - Use baudrate as `115200`, data config as `8N1` and flow control as
     `none`.
-  - reset the board and observe the bootloader and kernel boot flow.
+
+=== Tryout Contd.
  
-* In target board 
+  
+  * Write a hello world python code in your laptop.
+  
+  * In target board, type 
+ 
+----
+ $ cat > hello.py
 
-  - Try to print the CPU details from `/proc/cpuinfo` using `cat`.
+----
 
-  - Try to print the memory usage info from `/proc/meminfo`
+  - and copy paste the code to the target board's terminal.
 
-  - Try to print NAND memory size from `/proc/mtd`
+  - The press `CTRL+D` to save the copied content to the file in
+    the target board.
 
-  - Try listing the contents of `/` using `ls` 
+  - execute the `hello.py` in target board. 
+
+
