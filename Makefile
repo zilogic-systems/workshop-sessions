@@ -6,6 +6,16 @@ git-sessions =			\
 
 git-resources =	git-resources
 
+python-sessions = 		\
+	python-intro		\
+	python-intro-x		\
+	python-oop		\
+	python-import		\
+	python-fileio		\
+	python-types		\
+	python-errors		\
+	python-unittest-basic
+
 yocto-sessions = 		\
 	autotools		\
 	bitbake-data-model	\
@@ -43,14 +53,13 @@ kp-sessions =			\
 	kernel-i2c
 
 eldi-sessions = 		\
-	python-intro		\
-	python-intro-x		\
-	python-import		\
-	python-fileio		\
-	python-oop		\
 	emlinux-intro		\
+	devices-intro-basic	\
+	driver-intro		\
+	uspace-i2c		\
+	sysfs			\
 	uspace-gpio		\
-	uspace-pwm		
+	uspace-pwm
 
 sessions = $(git-sessions) $(git-resources) $(yocto-sessions) $(kp-sessions) $(eldi-sessions)
 

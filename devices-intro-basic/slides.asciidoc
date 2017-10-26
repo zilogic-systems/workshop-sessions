@@ -40,61 +40,37 @@ image::figures/mem-read-req-2.png[width="60%",align="center"]
 
 === Multiple RAM Chips
 
-  * What if we wanted 32 bytes of RAM?
-  * And we have only 16 byte RAM chips
+  * What if we wanted 8 bytes of RAM?
+  * And we have only 4 byte RAM chips
 
-=== Two RAM Chips
+=== Address for RAM1 and RAM2
 
-image::figures/two-ram-nodecode.png[width="60%",align="center"]
+  * RAM1: `00` - `03`
+  * RAM2: `10` - `13`
 
-=== Decoding Logic
+=== Multiple RAM Chips
 
-  * Each RAM is assigned:
-    - base
-    - size
+image::figures/two-ram-1.png[width="60%",align="center"]
 
-=== Assignment for RAM1 and RAM2
+=== Multiple RAM Chips
 
-  * RAM1
-    - base: `0x00`
-    - size: `0x0F`
-    - range: `0x00 - 0xF`
+image::figures/two-ram-2.png[width="60%",align="center"]
 
-  * RAM2:
-    - base: `0x10`
-    - size: `0x0F`
-    - range: `0x10 - 0x1F`
+=== Multiple RAM Chips
+
+image::figures/two-ram-3.png[width="60%",align="center"]
+
+=== Multiple RAM Chips
+
+image::figures/two-ram-4.png[width="60%",align="center"]
 
 === Memory Map
 
 image::figures/memory-map.png[width="30%",align="center"]
 
-=== Decoding Logic: Operation
+=== System Bus
 
-  * if `address in range`:
-  
-    - `address = address - base`
-    - perform read / write
-
-  * else:
-
-    - ignore
-
-=== With Decoding Logic
-
-image::figures/two-ram-1.png[width="60%",align="center"]
-
-=== With Decoding Logic
-
-image::figures/two-ram-2.png[width="60%",align="center"]
-
-=== With Decoding Logic
-
-image::figures/two-ram-3.png[width="60%",align="center"]
-
-=== With Decoding Logic
-
-image::figures/two-ram-4.png[width="60%",align="center"]
+image::figures/system-bus.png[width="40%",align="center"]
 
 == Device Interfacing
 
@@ -125,7 +101,7 @@ image::figures/ram-display.png[width="80%",align="center"]
 unsigned char *p;
 
 p = 0x10;   /* point it to device register */
-*p = 0x5;   /* write to the device register */
+*p = 5;   /* write to the device register */
 ------
 
 === Memory Map

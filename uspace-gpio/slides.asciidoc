@@ -1,22 +1,100 @@
-= Linux Userspace GPIO Access
+= Linux GPIO
+Zilogic Systems
+
+== Circuit Symbols
+
+=== Circuit Schematic
+
+image::figures/circuit-1.png[width="50%",align="center"]
+
+=== Circuit Schematic (Contd.)
+
+image::figures/circuit-2.png[width="15%",align="center"]
+
+== Sensors with Binary Output
+
+[role="two-column"]
+=== PIR Sensor
+
+[role="left"]
+image::figures/pir.jpg[]
+
+[role="right"]
+  * PIR Sensor: **P**assive **I**nfra**r**ed Sensor
+
+  * Detects presence of humans by measuring radiated infrared light
+
+[role="two-column"]
+=== Reed Switch
+
+[role="left"]
+image::figures/reed-switch.jpg[]
+
+[role="right"]
+   * Reed switch, detects the presence of a magnet
+
+   * When a magnet comes closer to the switch the switch
+     closes
+
+   * Can be used as a door sensor
+
+[role="two-column"]
+=== Gas Detector
+
+[role="left"]
+image::figures/smoke-sensor.jpg[]
+
+[role="right"]
+  * Gas sensors, detects the presence of
+    - Smoke
+    - Alcohol
+    - Carbon Monoxide
+
+=== Simplified Digital Sensor Model
+
+  * Sensor measures a parameter and outputs `1` or `0`
+    - Indicates `1`, by connecting output to VCC
+    - Indicates `0`, by connecting output to GND
+
+image::figures/sensor-model.png[width="50%",align="center"]
+
+== Binary Control
+
+[role="two-column"]
+=== Relay
+
+[role="left"]
+image::figures/relay.jpg[]
+
+[role="right"]
+  * Electrically controlled switch
+
+  * 230V AC appliance can be turned on / off based on input
+
+[role="two-column"]
+=== Solenoid Valve
+
+[role="left"]
+image::figures/solenoid-valve.jpg[]
+
+[role="right"]
+  * Electrically controlled valve
+
+  * Flow can switched on / off based on input
 
 == GPIO
 
 [role="two-column"]
-=== Introduction
+=== GPIO Controller
 
 [role="left"]
+* GPIO controller is the hardware which provides register interface
+  using which the pin status can be accessed.
 
- * *General Purpose Input Output(GPIO)* are single pin IO, represents
-   voltage signal as binary logic level `high` and `low`.
-
- * Typically GPIO `high` maps to voltage closer to VCC and `low` maps
-   to voltage closer to ground.
-
- * `high` state is considered as logical `1` and low as `0`.
+* GPIO controller resides in the memory bus of the SOC.
 
 [role="right"]
-image::figures/gpio-bistate.png[]
+image::figures/gpio-arm.png[]
 
 === GPIO Direction
 
@@ -27,72 +105,30 @@ image::figures/gpio-bistate.png[]
 
  * The pin status can be read or modified from software.
 
-=== GPIO Applications
+=== GPIO Ports and Pins
 
-* Used to control LEDs, valves and Relays
+ * The GPIO controllers are also called GPIO ports.
 
-* Used to sense keys.
+ * A GPIO ports, controls a set of GPIO pins
 
-* Used to control 7Segment, Stepper Motor etc.,
+ * GPIOs pins are referred as, particular pin in a particular port
+ 
+ * Example: P2_3 - pin 3 in port 2
 
-* Used for LED Matrices & Matrix keypads
+=== Linux GPIO Numbering
 
-[role="two-column"]
-=== GPIO Controller
+ * Vybrid VF510 has 6 GPIO ports, Port 0 - Port 5
 
-[role="left"]
+ * Each port controls 32 pins
 
-* GPIO controller is the hardware which provides register interface
-  using which the pin status can be accessed.
+ * Pins are numbered sequentially
 
-[role="right"]
-image::figures/gpio-ctrl.png[]
+   - Port 0, Pin Numbers: 0 - 31
+   - Port 1, Pin Numbers: 32 - 63
+   - Port 2, Pin Numbers: 64 - 95
+   - ...
 
-[role="two-column"]
-=== GPIO Controller Contd.
-
-[role="left"]
-
-* GPIO controller resides in the memory bus of the SOC.
-
-[role="right"]
-image::figures/gpio-arm.png[]
-
-[role="two-column"]
-=== GPIO Grouping 
-
-[role="left"]
-
- * In a GPIO controller, the GPIOs are organised as PORTS or BANKS
-   where a set of GPIOs are combined together for convenience
-
- * In a 32 bit processors, the ports may have 32 GPIO pins grouped
-   together.
-
- * GPIOs pins are referred as, particular pin in a particular port,
-   Ex:P2_3 - `pin 3 in port 2`
-
-[role="right"]
-image::figures/ports.png[]
-
-=== GPIO Numbering
-
- * The processor pin has to be configured as GPIO in the pinmux
-   configuration.
-
- * Vybrid VF510 has PORT0 to PORT5 
-
- * The pin sequence number can be generated as 
-
-----
-Pin Seq No = PORT * 32 + PIN
-
-For pin `P2_3`,
-
-  2 * 32 + 3 = 67 
-----
-
-=== ZKit GPIO Mappings
+=== GPIO Usage in ZKit-ARM-VF51
 
 [options="header"]
 |====================================
@@ -104,30 +140,16 @@ For pin `P2_3`,
 | KEY2   | P2_3     | GPIO67
 |====================================
 
-
-[role="two-column"]
-=== GPIO in Linux
-
-[role="left"]
-* In Linux the gpio interfaces can be accessed from userspace
-  application through sysfs.
-
-* The access to sysfs goes to generic GPIO driver called `gpiolib` which
-  inturn calls the processor specific GPIO driver.
-
-[role="right"]
-image::figures/layer.png[width=350]
-
 == SYSFS GPIO
 
 [role="two-column"]
 === GPIO Files in Sysfs
 
 [role="left"]
-* Inside `sysfs` in path '/sys/class/gpio` we have files which allows
+* Inside `sysfs` in path `/sys/class/gpio` we have files which allows
   to monitor and control the GPIO.
 
-* For each GPIO a folder '/sys/class/gpio/gpio<no>' is created and it
+* For each GPIO a folder `/sys/class/gpio/gpio<no>` is created and it
   would have below files.
 
 * the `direction` file allows to control direction of pin and `value`
@@ -135,52 +157,38 @@ image::figures/layer.png[width=350]
 
 [role="right"]
 ----
-
 /sys/class/gpio/
 | -- gpio<no>
      | -- value
      ` -- direction 
-
 ----
 
 == LEDs
 
-[role="two-column"]
-=== Led Circuitary
+=== LED Circuit
 
-[role="left"]
+image::figures/led-circuit.png[width="15%",align="center"]
 
-* The LED glows when anode is connected to Vcc and it's cathode is
-  grounded.
+=== LED Switch
 
-* A electronic switch is connected between LED and ground, which when
-  closed the LED glows.
+image::figures/led-switch.png[width="15%",align="center"]
 
-* The outpin of CPU can be connected to the switch to open or close
-  it.
+=== LED Control
 
-[role="right"]
-image::figures/led-simple.png[]
+image::figures/led-control.png[width="15%",align="center"]
 
-[role="two-column"]
-=== Led Circuitary
+=== GPIO LED Control
 
-[role="left"]
-* A current limiting resistor can be used to reduce the current
-  flowing through LED, to reduce burn out of LED.
-
-* MOSFET or Transistor can act as a electronic switch.
-
-[role="right"]
-image::figures/leds.png[]
+image::figures/led-gpio.png[width="30%",align="center"]
 
 === GPIO Request
 
-* The processor pins are shared by several peripheral controller, If
-  needs to be used as GPIO pin, it has to be reserved.
+* GPIOs can be used internally by other kernel subsystems
 
-* GPIO subsystem of kernel provides sysfs access, for reserving a pin
-  as GPIO and freeing them back.
+* GPIO has to be made available to user, by the kernel, before they
+  can be used
+
+* If GPIO is used by kernel, this will fail
 
 ----
 $ echo 65 > /sys/class/gpio/export
@@ -267,128 +275,77 @@ include::code/led-blink.py[]
 
 == Keys
 
-[role="two-column"]
-=== GPIO Input States
-[role="left"]
-* GPIOs in input mode can be of three states `high`, `low` or `floating`.
+=== Key Circuit
 
-* GPIOs if they are not connected to any signal it would be a floating
-  input and said to be open.
+image::figures/keys.png[width="50%",align="center"]
+
+=== Input States
+
+* Digital inputs can be of three states `high`, `low` or `floating`.
+
+* If they are not connected to any signal it would be a floating input
+  and said to be open.
 
 * The `floating pins` doesn't have a fixed state and it would pick
   near by signal and would have unstable state.
 
-[role="right"]
-image::figures/gpio-states.png[]
-
-
 [role="two-column"]
-=== Handling GPIOs in Input Mode
+=== Default Value
 [role="left"]
 * The inputs lines has to be fixed to a default state by tying that
   - to *VCC* for default high state or 
   - to *GND* for default low state.
 
 * Making a pin to stay high, by connecting it to VCC through a
-  resistor is called `pull-up`.
+  resistor is called `weak pull-up`.
 
 * Making a pin to stay low, by connecting it to GND through a resistor
-  is called `pull-down`.
+  is called `weak pull-down`.
 
 [role="right"]
-image::figures/gpio-pullupdown.png[]
+image::figures/keys-pullup.png[]
 
-=== Keys Circuitary
-
-* A key/switch has *two* terminals, when pressed it mechanically
-  connects the terminals.
-
-* One terminal of switch can be connected to GND other to the input
-  pin.
-
-* When the is key pressed the switch is closed and the input pin is
-  grounded.
-
-* if unpressed the switch is open and which would have undefined
-  state.
-
-[role="two-column"]
-=== Keys Circuitary Contd.
-
-[role="left"]
-* The GPIO pin can be defaulted to high level by a pull-up, so input
-  would be high when pin is open.
-
-* When the key is unpressed the GPIO stays high and when pressed it
-  gets low.
-
-* To detect whether a key is pressed / released or idle, pin has to be
-  sensed in program.
-
-[role="right"]
-image::figures/keys.png[]
-
-=== Programming for Keys
-
-[source,python]
-----
-include::code/key.py[]
-----
-
-=== Key Polling
-
-* Since the key press is `asynchronous`, it has to be polled
-  continuously or periodically.
-
-* Continuously polling for key may burn the CPU, instead periodical
-  polling should be sufficient for keys.
-
-* Typical key stroke period by humans, couldn't be less than few
-  hundred millisecs.
-
-* it's enough that we can poll for key press once in `100 msec`. 
-
-[role="two-column"]
-=== Key Debounce
-
-[role="left"]
-
-* The switches or keys used are mechanical devices and when key is
-  pressed or depressed they tend to *vibrate* creating noises until it
-  settles down.
-
-* This condition can be handled in hardware by adding a debounce
-  filter.
-
-* It can also be handled in software by waiting for specific time from
-  the event occurence till it settles down.
-
-* This delay time is typically around `few hundred millisecond` and
-  called `debounce delay`.
-
-[role="right"]
-
-image::figures/debounce.png[]
-
-=== Programming with Key Debounce
+=== Code
 
 [source,python]
 ----
 include::code/key-debounce.py[]
 ----
 
-=== Tryout
+=== Try Out
 
-* Modify the code
-  link:{include:code/key-debounce.py.datauri}["key-debounce.py",filename="key-debounce.py"]
-  to show key status
-  - print "Key 1 Pressed" in LCD, when Key 1 pressed
-  - glow GREEN LED, when Key 2 pressed 
+  * Modify
+    link:{include:code/key-debounce.py.datauri}["key.py",filename="key.py"],
+    to glow
 
-=== Tryout Codes
+    - Red LED, when Key 1 pressed
+    - Green LED, when Key 2 pressed 
 
-* The code for the tryout is 
-  link:{include:code/key-status.py.datauri}["key-status.py",filename="key-status.py"]
+== References
+
+=== Links
+
+* http://slideplayer.com/slide/11129925/
+
+* https://developer.android.com/things/hardware/hardware-101.html
+
+== Backup Slides
+
+[role="two-column"]
+=== Seven Seg
+
+[role="left"]
+image::figures/segment.png[width=300]
+
+[role="right"]
+image::figures/sseg-pinmap.png[]
+
+=== Program for Seven Segment
+
+[source,python]
+----
+include::code/sseg.py[]
+----
 
 == GPIO Usage Models
 
@@ -416,30 +373,71 @@ include::code/key-debounce.py[]
 * This done using Bitbanging is a technique, which allows to simulate
   serial busses using software over GPIO.
 
-== References
+=== Key Debounce
 
-=== Links
+* The switches or keys used are mechanical devices and when key is
+  pressed or depressed they tend to vibrate creating noises until it
+  settles down.
 
-* http://slideplayer.com/slide/11129925/
+* This condition can be handled in hardware by adding a debounce
+  filter.
 
-* https://developer.android.com/things/hardware/hardware-101.html
+* It can also be handled in software by waiting for specific time from
+  the event occurence till it settles down.
 
-== Backup Slides
+* This delay time is typically around few hundred millisecond and
+  called debounce delay.
 
-[role="two-column"]
-=== Seven Seg
-
-[role="left"]
-image::figures/segment.png[width=300]
-
-[role="right"]
-image::figures/sseg-pinmap.png[]
-
-=== Program for Seven Segment
+=== Programming for Keys
 
 [source,python]
 ----
-include::code/sseg.py[]
+include::code/key.py[]
 ----
+
+=== Key Polling
+
+* Since the key press is asynchronous, it has to be polled
+  continuously or periodically.
+
+* Continuously polling for key may burn the CPU, instead periodical
+  polling should be sufficient for keys.
+
+* Typical key stroke period by humans, couldn't be less than few
+  hundred millisecs.
+
+* it's enough that we can poll for key press once in 100 msec. 
+
+=== Sensors and Actuators
+
+ * Sensors - produces two values 'on' or 'off'
+   - Door Sensor
+   - Presence Sensor
+   - Smoke Detector
+
+ * Actuators
+   - Relays: Turn ON / OFF Appliances
+   - Solenoids
+
+[role="two-column"]
+=== Introduction
+
+[role="left"]
+
+ * *General Purpose Input Output(GPIO)* are single pin IO, represents
+   voltage signal as binary logic level `high` and `low`.
+
+ * Typically GPIO `high` maps to voltage closer to VCC and `low` maps
+   to voltage closer to ground.
+
+ * `high` state is considered as logical `1` and low as `0`.
+
+[role="right"]
+image::figures/gpio-bistate.png[]
+
+=== Try Out Code
+
+* The code for the tryout is 
+  link:{include:code/key-status.py.datauri}["key-status.py",filename="key-status.py"]
 
 

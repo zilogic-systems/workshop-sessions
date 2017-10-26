@@ -62,8 +62,34 @@
       </dia:composite>
     </dia:attribute>
   </dia:diagramdata>
-  <dia:layer name="Background" visible="true">
-    <dia:object type="Standard - ZigZagLine" version="1" id="O0">
+  <dia:layer name="Background" visible="true" active="true">
+    <dia:object type="Standard - Box" version="0" id="O0">
+      <dia:attribute name="obj_pos">
+        <dia:point val="9,6"/>
+      </dia:attribute>
+      <dia:attribute name="obj_bb">
+        <dia:rectangle val="8.95,5.95;34.55,21.05"/>
+      </dia:attribute>
+      <dia:attribute name="elem_corner">
+        <dia:point val="9,6"/>
+      </dia:attribute>
+      <dia:attribute name="elem_width">
+        <dia:real val="25.5"/>
+      </dia:attribute>
+      <dia:attribute name="elem_height">
+        <dia:real val="15"/>
+      </dia:attribute>
+      <dia:attribute name="border_color">
+        <dia:color val="#ffffff"/>
+      </dia:attribute>
+      <dia:attribute name="show_background">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="corner_radius">
+        <dia:real val="1.1754946310819804e-39"/>
+      </dia:attribute>
+    </dia:object>
+    <dia:object type="Standard - ZigZagLine" version="1" id="O1">
       <dia:attribute name="obj_pos">
         <dia:point val="10,12"/>
       </dia:attribute>
@@ -87,7 +113,7 @@
         <dia:boolean val="false"/>
       </dia:attribute>
     </dia:object>
-    <dia:object type="Standard - ZigZagLine" version="1" id="O1">
+    <dia:object type="Standard - ZigZagLine" version="1" id="O2">
       <dia:attribute name="obj_pos">
         <dia:point val="15,12"/>
       </dia:attribute>
@@ -111,7 +137,7 @@
         <dia:boolean val="false"/>
       </dia:attribute>
     </dia:object>
-    <dia:object type="Standard - ZigZagLine" version="1" id="O2">
+    <dia:object type="Standard - ZigZagLine" version="1" id="O3">
       <dia:attribute name="obj_pos">
         <dia:point val="20,12"/>
       </dia:attribute>
@@ -135,7 +161,7 @@
         <dia:boolean val="false"/>
       </dia:attribute>
     </dia:object>
-    <dia:object type="Standard - ZigZagLine" version="1" id="O3">
+    <dia:object type="Standard - ZigZagLine" version="1" id="O4">
       <dia:attribute name="obj_pos">
         <dia:point val="25,12"/>
       </dia:attribute>
@@ -159,17 +185,17 @@
         <dia:boolean val="false"/>
       </dia:attribute>
     </dia:object>
-    <dia:object type="Standard - Text" version="1" id="O4">
+    <dia:object type="Standard - Text" version="1" id="O5">
       <dia:attribute name="obj_pos">
         <dia:point val="10,7"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="10,6.2775;16.0725,7.545"/>
+        <dia:rectangle val="10,6.2575;17.6125,7.1875"/>
       </dia:attribute>
       <dia:attribute name="text">
         <dia:composite type="text">
           <dia:attribute name="string">
-            <dia:string>#Duty Cycle: 20%#</dia:string>
+            <dia:string>#20% ON, 80 % OFF#</dia:string>
           </dia:attribute>
           <dia:attribute name="font">
             <dia:font family="sans" style="0" name="Helvetica"/>
@@ -193,7 +219,7 @@
       </dia:attribute>
     </dia:object>
     <dia:group>
-      <dia:object type="Standard - ZigZagLine" version="1" id="O5">
+      <dia:object type="Standard - ZigZagLine" version="1" id="O6">
         <dia:attribute name="obj_pos">
           <dia:point val="10,20"/>
         </dia:attribute>
@@ -217,7 +243,7 @@
           <dia:boolean val="false"/>
         </dia:attribute>
       </dia:object>
-      <dia:object type="Standard - ZigZagLine" version="1" id="O6">
+      <dia:object type="Standard - ZigZagLine" version="1" id="O7">
         <dia:attribute name="obj_pos">
           <dia:point val="15,20"/>
         </dia:attribute>
@@ -241,7 +267,7 @@
           <dia:boolean val="false"/>
         </dia:attribute>
       </dia:object>
-      <dia:object type="Standard - ZigZagLine" version="1" id="O7">
+      <dia:object type="Standard - ZigZagLine" version="1" id="O8">
         <dia:attribute name="obj_pos">
           <dia:point val="20,20"/>
         </dia:attribute>
@@ -265,7 +291,7 @@
           <dia:boolean val="false"/>
         </dia:attribute>
       </dia:object>
-      <dia:object type="Standard - ZigZagLine" version="1" id="O8">
+      <dia:object type="Standard - ZigZagLine" version="1" id="O9">
         <dia:attribute name="obj_pos">
           <dia:point val="25,20"/>
         </dia:attribute>
@@ -290,17 +316,17 @@
         </dia:attribute>
       </dia:object>
     </dia:group>
-    <dia:object type="Standard - Text" version="1" id="O9">
+    <dia:object type="Standard - Text" version="1" id="O10">
       <dia:attribute name="obj_pos">
         <dia:point val="10,15"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="10,14.2775;16.0725,15.545"/>
+        <dia:rectangle val="10,14.2342;17.6358,15.234"/>
       </dia:attribute>
       <dia:attribute name="text">
         <dia:composite type="text">
           <dia:attribute name="string">
-            <dia:string>#Duty Cycle: 60%#</dia:string>
+            <dia:string>#60% ON, 40 % OFF#</dia:string>
           </dia:attribute>
           <dia:attribute name="font">
             <dia:font family="sans" style="0" name="Helvetica"/>
@@ -323,30 +349,106 @@
         <dia:enum val="3"/>
       </dia:attribute>
     </dia:object>
-    <dia:object type="Standard - Box" version="0" id="O10">
+    <dia:object type="Standard - Line" version="0" id="O11">
       <dia:attribute name="obj_pos">
-        <dia:point val="9,6"/>
+        <dia:point val="10,11"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="8.95,5.95;34.55,21.05"/>
+        <dia:rectangle val="9.95,10.95;33.05,11.05"/>
       </dia:attribute>
-      <dia:attribute name="elem_corner">
-        <dia:point val="9,6"/>
+      <dia:attribute name="conn_endpoints">
+        <dia:point val="10,11"/>
+        <dia:point val="33,11"/>
       </dia:attribute>
-      <dia:attribute name="elem_width">
-        <dia:real val="25.5"/>
+      <dia:attribute name="numcp">
+        <dia:int val="1"/>
       </dia:attribute>
-      <dia:attribute name="elem_height">
-        <dia:real val="15"/>
+      <dia:attribute name="line_style">
+        <dia:enum val="4"/>
       </dia:attribute>
-      <dia:attribute name="border_color">
-        <dia:color val="#ffffff"/>
+    </dia:object>
+    <dia:object type="Standard - Text" version="1" id="O12">
+      <dia:attribute name="obj_pos">
+        <dia:point val="31,10"/>
       </dia:attribute>
-      <dia:attribute name="show_background">
-        <dia:boolean val="false"/>
+      <dia:attribute name="obj_bb">
+        <dia:rectangle val="29.0025,9.6275;32.9975,10.3725"/>
       </dia:attribute>
-      <dia:attribute name="corner_radius">
-        <dia:real val="1.1754946310819804e-39"/>
+      <dia:attribute name="text">
+        <dia:composite type="text">
+          <dia:attribute name="string">
+            <dia:string>#Avg. Voltage#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="font">
+            <dia:font family="sans" style="0" name="Helvetica"/>
+          </dia:attribute>
+          <dia:attribute name="height">
+            <dia:real val="0.80000000000000004"/>
+          </dia:attribute>
+          <dia:attribute name="pos">
+            <dia:point val="31,10.2225"/>
+          </dia:attribute>
+          <dia:attribute name="color">
+            <dia:color val="#000000"/>
+          </dia:attribute>
+          <dia:attribute name="alignment">
+            <dia:enum val="1"/>
+          </dia:attribute>
+        </dia:composite>
+      </dia:attribute>
+      <dia:attribute name="valign">
+        <dia:enum val="2"/>
+      </dia:attribute>
+    </dia:object>
+    <dia:object type="Standard - Line" version="0" id="O13">
+      <dia:attribute name="obj_pos">
+        <dia:point val="10,17"/>
+      </dia:attribute>
+      <dia:attribute name="obj_bb">
+        <dia:rectangle val="9.95,16.95;33.05,17.05"/>
+      </dia:attribute>
+      <dia:attribute name="conn_endpoints">
+        <dia:point val="10,17"/>
+        <dia:point val="33,17"/>
+      </dia:attribute>
+      <dia:attribute name="numcp">
+        <dia:int val="1"/>
+      </dia:attribute>
+      <dia:attribute name="line_style">
+        <dia:enum val="4"/>
+      </dia:attribute>
+    </dia:object>
+    <dia:object type="Standard - Text" version="1" id="O14">
+      <dia:attribute name="obj_pos">
+        <dia:point val="31,16"/>
+      </dia:attribute>
+      <dia:attribute name="obj_bb">
+        <dia:rectangle val="29.0025,15.6275;32.9975,16.3725"/>
+      </dia:attribute>
+      <dia:attribute name="text">
+        <dia:composite type="text">
+          <dia:attribute name="string">
+            <dia:string>#Avg. Voltage#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="font">
+            <dia:font family="sans" style="0" name="Helvetica"/>
+          </dia:attribute>
+          <dia:attribute name="height">
+            <dia:real val="0.80000000000000004"/>
+          </dia:attribute>
+          <dia:attribute name="pos">
+            <dia:point val="31,16.2225"/>
+          </dia:attribute>
+          <dia:attribute name="color">
+            <dia:color val="#000000"/>
+          </dia:attribute>
+          <dia:attribute name="alignment">
+            <dia:enum val="1"/>
+          </dia:attribute>
+        </dia:composite>
+      </dia:attribute>
+      <dia:attribute name="valign">
+        <dia:enum val="2"/>
       </dia:attribute>
     </dia:object>
   </dia:layer>
