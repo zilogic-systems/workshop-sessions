@@ -1,0 +1,11 @@
+== TODO
+
+ * Need to set bidirectional shared clipboard when creating disk image itself.
+
+== Known Issues
+
+ * Vagrant adds the default shared folder mapping, but fails to mount it.
+
+ * Packed Vagrantfile is not initialized for some reason.
+
+ * Defining no. of cpus in "Vagrantfile" does not work.

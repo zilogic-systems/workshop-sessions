@@ -1,0 +1,59 @@
+- name: Linux Device Drivers workshop
+  hosts: localhost
+  tasks:
+
+  - apt_repository: repo="deb [trusted=yes] https://pike.zilogic.com/zdrive/debian/repo/ wheezy main" update_cache=yes
+  - apt_repository: repo="deb http://http.debian.net/debian jessie-backports main" state=present update_cache=yes
+  - apt: name={{ item }} state=latest install_recommends=no
+    with_items:
+    - diffutils
+    - task-lxde-desktop
+    - policykit-1
+    - file
+    - iceweasel
+    - build-essential
+    - gcc-arm
+    - gcc-arm-linux
+    - chromium
+    - bc
+    - u-boot-tools
+    - libncurses5-dev
+    - python-pip
+    - xz-utils
+    - bzip2
+    - lzop
+    - device-tree-compiler
+    - minicom
+
+    # ccache for caching kernel build
+    - ccache
+
+  - copy: >
+      src=/usr/bin/ccache
+      dest=/usr/local/bin/ccache
+      owner=root
+      group=root
+      mode=755
+
+  - file: >
+      dest=/usr/local/bin/{{ item }}
+      src=ccache
+      state=link
+      owner=root
+      group=root
+    with_items:
+      - gcc
+      - g++
+      - cc
+      - c++
+      - arm-none-linux-gnueabi-c++
+      - arm-none-linux-gnueabi-cc
+      - arm-none-linux-gnueabi-gcc
+      - arm-none-linux-gnueabi-g++
+
+# usermod
+  # Add user account with groups dialout and kvm
+  - user: >
+      name=vagrant
+      groups=dialout,vboxsf
+      append=yes
