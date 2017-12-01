@@ -25,6 +25,10 @@
     - device-tree-compiler
     - minicom
 
+    # Install TFTP
+    - xinetd
+    - tftpd
+
     # ccache for caching kernel build
     - ccache
 
@@ -35,6 +39,20 @@
       group=root
       mode=755
 
+  # Setup TFTP Server
+  - copy: >
+      src=files/xinetd.d/tftp
+      dest=/etc/xinetd.d/tftp
+      owner=root group=root mode=644
+    notify:
+      - restart xinetd
+
+  - file: >
+      path=/tftpboot
+      state=directory
+      mode=1777
+
+  # Create symlinks for using ccache
   - file: >
       dest=/usr/local/bin/{{ item }}
       src=ccache
@@ -57,3 +75,7 @@
       name=vagrant
       groups=dialout,vboxsf
       append=yes
+
+  handlers:
+    - name: restart xinetd
+      service: name=xinetd state=restarted

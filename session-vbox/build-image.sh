@@ -205,6 +205,7 @@ fi
 
 if [ "x$LINUXDEVICEDRIVERSENABLE" == "xenable" ];then
     scp $SSHOPTION -P 22222 playbooks/linux-device-drivers.yml vagrant@localhost:playbook.yml
+    scp -r $SSHOPTION -P 22222 files vagrant@localhost:
     # ccache.tar should be available locally
     cat ccache.tar.xz | ssh $SSHOPTION -p 22222 vagrant@localhost "tar -xJf - -C ~/"
 fi
