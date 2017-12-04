@@ -179,6 +179,10 @@ fi
 
 vboxmanage modifyvm "${BOX_NAME}" --memory 2048
 
+# Fix "Invalid Settings Detected" error in VirtualBox GUI because of
+# low video memory
+vboxmanage modifyvm "${BOX_NAME}" --vram 256
+
 # Set bidirectional shared clipboard
 vboxmanage modifyvm "${BOX_NAME}" --clipboard bidirectional
 
