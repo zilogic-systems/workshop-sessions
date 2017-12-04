@@ -179,6 +179,9 @@ fi
 
 vboxmanage modifyvm "${BOX_NAME}" --memory 2048
 
+# Set bidirectional shared clipboard
+vboxmanage modifyvm "${BOX_NAME}" --clipboard bidirectional
+
 vboxmanage startvm "${BOX_NAME}" --type headless
 
 sleep 10

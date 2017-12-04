@@ -1,7 +1,5 @@
 == TODO
 
- * Need to set bidirectional shared clipboard when creating disk image.
-
  * Need to add USB filters for USB-UART and USB-Ethernet when creating disk image.
 
  * Add proper configuration for network interfaces in /etc/network/interfaces.
