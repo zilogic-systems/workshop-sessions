@@ -101,6 +101,9 @@
       groups=dialout,vboxsf
       append=yes
 
+  # Clean up apt cache
+  - command: apt-get clean
+
   handlers:
     - name: restart xinetd
       service: name=xinetd state=restarted
