@@ -32,6 +32,31 @@
     # ccache for caching kernel build
     - ccache
 
+    # Images required for TFTP boot
+    - vybrid-eldi
+
+    # Install patches
+    - buildroot-vybrid
+
+  - get_url:
+      url: https://www.kernel.org/pub/linux/kernel/v4.x/linux-4.4.39.tar.xz
+      dest: /usr/share/buildroot-vybrid/linux-4.4.39.tar.xz
+
+  # Copy resources to TFTP folder
+  - copy: >
+      src=/usr/share/buildroot-eldi-vybrid/images/uImage
+      dest=/tftpboot/uImage
+      owner=vagrant
+      group=vagrant
+      mode=644
+
+  - copy: >
+      src=/usr/share/buildroot-eldi-vybrid/images/vf500-colibri-zkit-base.dtb
+      dest=/tftpboot/colibri.dtb
+      owner=vagrant
+      group=vagrant
+      mode=644
+
   - copy: >
       src=/usr/bin/ccache
       dest=/usr/local/bin/ccache
