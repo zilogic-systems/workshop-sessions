@@ -1,0 +1,358 @@
+= Linux I/O
+Zilogic Systems
+
+== Subsystem Model
+
+[role="two-column"]
+=== Subsystems
+[role="left"]
+ * Linux follows subsystem model and for each of the peripheral
+   interface, their exists a subsystem.
+
+ * A subsystem is a stack of drivers, which work together to provide a
+   common behaviour and abstration, across the platforms.
+
+ * The processor or board or both together, represented as platform in
+   Linux.
+[role="right"]
+image::figures/subsystem.png[align="center",width="65%"]
+
+[role="two-column"]
+=== Framework
+[role="left"]
+ * Subsystem has common `framework` drivers called as `class` drivers
+   provide a well-defined APIs, for other drivers to use them.
+
+ * Beneath the framework, their exists `Producers` drivers which
+   implement platform specific code.
+
+ * `Consumers` are the drivers which is on top of framework drivers,
+   which uses the interfaces provided by framework..
+
+[role="right"]
+image::figures/class-model.png[align="center",width="65%"]
+
+== Communication Model
+ 
+=== Userspace Communication Layers
+
+image::figures/app-interfaces.png[align="center",width="75%"]
+
+=== Types
+
+ * Log Model - Drivers prints information and userspace can get them
+   through log buffer.
+
+ * File Model - Driver can talk to application through file system
+   APIs.
+   - character and block devices
+   - sysfs, configfs, procfs and debugfs
+
+ * Socket Model - Driver can talk to application through `netlink`
+   sockets.
+
+== GPIO Subsystem 
+
+=== GPIO
+
+ * GPIO is one of the simplest form of IO interface provided by most
+   of the SoCs.
+
+ * Kernel has GPIO subsystem through which, it provides convenient
+   APIs for GPIO access.
+
+[role="two-column"]
+=== GPIO Library.
+
+[role="left"]
+
+* Linux kernel's GPIO subsystem supports APIs to access GPIOs through
+  a kernel driver called `gpiolib`.
+
+* Other kernel drivers can use these APIs to use GPIO functionalities
+  by including the header file `linux/gpio.h`
+
+[role="right"]
+image::figures/gpio-framework.png[align="center",width="65%"]
+
+[role="two-column"]
+=== GPIO Chip Driver
+
+[role="left"]
+* GPIO controller is the hardware which provides register interface
+  using which the pin status can be accessed.
+
+* GPIO controller resides in the memory bus of the SOC.
+
+* There exists a platform specific driver for the GPIO controller
+  called `gpiochip driver`.
+
+[role="right"]
+image::figures/gpio-arm.png[]
+
+== Handling GPIOs
+
+=== GPIO Mapping in ZKit-ARM-VF51
+
+[options="header"]
+|====================================
+| Device | Port Pin | Pin Sequence No
+| RLED   | P2_6     | GPIO70
+| BLED   | P2_0     | GPIO64
+| GLED   | P2_1     | GPIO65
+| KEY1   | P2_5     | GPIO67
+| KEY3   | P2_3     | GPIO69
+|====================================
+
+== Output Device
+
+=== GPIO LED Control
+
+image::figures/led-gpio.png[width="30%",align="center"]
+
+== Kernel GPIO Operations
+
+=== LED Glow Headers
+
+[source,c]
+----
+include::code/led/led.def[]
+----
+
+=== LED Glow Init
+
+[source,c]
+----
+include::code/led/led.init[]
+----
+
+=== LED Glow Exit
+
+[source,c]
+----
+include::code/led/led.exit[]
+----
+
+=== GPIO Request
+
+* GPIOs can be used internally by other kernel drivers, it has to be
+  reserved by the driver, before they can be used, and can free it
+  after use, using below APIs,
+
+[source,c]
+----
+int gpio_request(unsigned int gpio_no, const char * label);
+
+void gpio_free(unsigned int gpio_no);
+----
+	**  `label` is the name to the pin. 
+        **  If GPIO is used by other drivers, this will fail
+
+ 
+=== GPIO Direction
+
+* The processor pin can be configured as output pin or input pin by
+
+[source,c]
+----
+int gpio_direction_input(unsigned int gpio_no);
+
+int gpio_direction_output(unsigned int gpio_no, int gpio_state);
+----
+
+  ** `gpio_no`    - valid gpio pin number
+  ** `gpio_state` -  1 / 0 
+
+=== GPIO State Value
+
+ * When value '1' or '0' set, it can drive logic
+   level high or low.
+
+[source,c]
+----
+void gpio_set_value(unsigned int gpio, int value);
+
+int gpio_get_value(unsigned int gpio);
+----
+
+=== Handling Multiple GPIOs 
+[source,c]
+----
+include::code/multi-led/multi-led.def[]
+----
+
+=== Handling Multiple GPIOs Init
+[source,c]
+----
+include::code/multi-led/multi-led.init[]
+----
+
+=== Try Out
+
+* Modify the LED Code to glow green color referring below table
+  link:{include:code/multi-led/multi-led.full.datauri}["multi-led.c",filename="multi-led.c"]
+
+|==================================
+|RED(70)|GREEN(65)|BLUE(64)|OUTPUT
+|0      |0        |0       |BLACK
+|1      |0        |0       |RED
+|1      |1        |0       |YELLOW
+|0      |1        |0       |GREEN
+|0      |1        |1       |CYAN
+|0      |0        |1       |BLUE
+|1      |0        |1       |MAGENTA
+|1      |1        |1       |SILVER
+|==================================
+
+== Input Devices
+
+=== Key Circuit
+
+image::figures/keys.png[width="50%",align="center"]
+
+[role="two-column"]
+=== Key's Default State
+[role="left"]
+* The GPIO pin is pulled high, to default the line to `high` state
+  when key is `unpressed`.
+ 
+* When Key is `pressed` the line goes `low`
+
+* GPIOs on input direction can sense the key activities.
+
+[role="right"]
+image::figures/keys-pullup.png[]
+
+=== Try Out
+
+* Modify the led glow code, to print whether KEY1 is pressed, while
+  loading the driver.
+  link:{include:code/led/led.full.datauri}["led.c",filename="led.c"]
+
+=== Code - Key Sense Headers
+
+[source,c]
+----
+include::code/key/key.def[]
+----
+
+=== Code - Key Sense Init
+
+[source,c]
+----
+include::code/key/key.init[]
+----
+=== Code - Key Sense Exit
+
+[source,c]
+----
+include::code/key/key.exit[]
+----
+
+== Runtime Changes & Testing
+
+=== Module Parameters
+
+* Kernel supports passing parameters to the driver while loading the
+  driver through insmod, it is called module params.
+
+* The params of loaded modules can be altered using
+  `/sys/modules/<module>/<param>`
+
+* This can be used to change the behaviour of the driver at load time.
+
+* Sometime helpful for testing and debugging.
+
+=== Module Params Definition
+
+[source,c]
+----
+include::code/led-params/led-params.def[]
+----
+
+=== Module Params Init
+
+[source,c]
+----
+include::code/led-params/led-params.init[]
+----
+
+=== Demo
+
+* We can modify the value of module parameter while loading the driver
+
+[source,sh]
+----
+$ insmod led-params.ko
+---- 
+
+=== Params Through Sysfs
+
+* We can get the current value of the module_param from sysfs
+
+[source,sh]
+----
+cat /sys/module/led_params/parameters/led_color        
+----
+
+* Module parameters can also be modified through sysfs
+
+[source,sh]
+----
+echo 5 > /sys/module/led_params/parameters/led_color        
+----
+
+== Debugging 
+
+=== Debugfs
+
+* A pseudo filesystem supported by kernel to driver developers to
+  expose certain debug information to userspace as files.
+
+* We can access debug information by mounting debugfs as
+
+[source,sh]
+----
+$ mount -t debugfs none /sys/kernel/debug
+----
+
+=== GPIO in Debugfs
+
+* if a GPIO request fails, can be investigated by looking in to the
+  debugfs
+
+[source,sh]
+----
+$ cat /sys/kernel/debug/gpio   
+----
+
+== Subsystem Over Subsystem
+
+[role="two-column"]
+=== Led Over GPIO
+[role="left"]
+* There can be scenarios where one subsystem uses APIs of other
+  subsytem.
+
+* There exists `led` subsystem, which can call APIs of `gpio`
+  subsystem.
+
+* `led` subsystem provides common implementation like blinking led,
+  brightness control and event triggers.
+
+[role="right"]
+image::figures/multi-subsystem.png[align="center",width="65%"]
+
+== Exercises 
+
+=== GPIO Input - Key 2 Handling
+
+* Modify the key scan code to print whether KEY2 is released while
+  removing the driver
+  link:{include:code/key/key.full.datauri}["key.c",filename="key.c"]
+
+=== GPIO Input & Output - Glow LED with Key Press
+
+* Modify the key scan code to glow LED when key 1 is pressed on insmod.
+  link:{include:code/key/key.full.datauri}["key.c",filename="key.c"]
+

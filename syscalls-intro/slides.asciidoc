@@ -1,0 +1,382 @@
+= Linux Syscalls Introduction
+
+== Role of Operating System
+ 
+[role="two-column"]
+=== No OS Model
+[role="left"]
+
+  * With bare metal programming without OS., application code can
+    access resources CPU, memory & io devices directly.
+
+  * Bare metal programs don't have any restriction on accessing these
+    resources.
+
+  * Most of the bare metal programs are single task application,
+    created at compile time by system developers and won't be changing
+    on run-time.
+
+[role="right"]
+image::figures/no-os.png[]
+
+=== GPOS Model
+[role="right"]
+image::figures/gpos-layers.png[]
+
+=== GPOS Model
+
+  * Kernel is a software which supports multi-tasking ie, creating and
+    executing multiple processes simultaneously.
+
+  * Kernel allows all other processses sharing resources like CPU,
+    RAM, Harddisk etc.,
+
+  * Kernel arbitrates the access to shared resources among multiple
+    processes to avoid contention.
+
+  * Processes are not allowed to access the shared resources directly.
+
+=== Scope of a Task
+
+The kernel to have better control over the tasks, it has to ensure
+that
+
+* Processess should have an isolated environment, where they have
+  their own private memory, 
+   - only they could access it 
+   - and only that they could access.
+
+* The Processes should request kernel for any other resource access,
+  out of its isolation.
+
+=== Scope of Kernel
+
+Kernel has to ensure that
+
+* the processes can share the common resources
+
+* Process doesn't step over other process
+
+* Processes doesn't step over the kernel
+
+* Process can request kernel to proxy the access to the shared
+  resources.
+
+* Process can request kernel to proxy the communication to other task.
+
+[role="two-column"]  
+=== Kernel and Syscalls
+[role="left"]
+
+  * Resource accesses are provided by OS through higher level
+    abstractions like files, processes, sockets, etc.
+ 
+  * The kernel provides these abstrations, to create and manipulate
+    resources, as `system calls`.
+
+[role="right"]
+image::figures/gpos-stack.png[]
+
+== Principle of Least Privilege
+
+=== Address Space Isolation
+
+  * For each process separate address space
+
+  * For kernel separate address space
+
+  * Operating system achieves process isolation through `MMU`.
+
+  * So address space means separate `page table entries` for kernel
+    and each process.
+
+=== Privilege Separation
+
+  * Address space for kernel is called `kernel space`.
+
+  * Address space for process is called `user space`.
+
+  * Kernel space code can access user space memory, but not the
+    reverse.
+
+  * This privilege separation is achieved through processor's
+    `privilege modes` feature.
+
+=== Privilege Escalation
+
+  * The user space application, if they want to access kernel
+    functions, they need to get to elevated to Kernel privilege.
+
+  * The escalation from user privilege to kernel privilege is done by
+    `software interrupts or traps`.
+
+== Address Space Isolation
+
+[role="two-column"]  
+=== Memory Sections
+[role="left"]
+
+  * Every process is associated with instructions to execute (code)
+    and global data, stack and heap (data).
+
+  * The kernel also has associated code and data.
+
+[role="right"]
+image::figures/sections.png[]
+
+[role="two-column"]  
+=== Address Space Co-existence 
+[role="left"]
+
+  * The process has to invoke the functions, inside the kernel to
+    access shared resources.
+
+  * One way to organize the memory map of the process is to map the
+    user code, user data, kernel code and kernel data into the
+    process's virtual address space.
+
+[role="right"]
+image::figures/process_mm.png[]
+
+== Address Space Split
+
+=== 3G / 1G Split  
+
+  * The top `3GB `of virtual address space is used for the mapping the
+    user code and data and the bottom `1GB` of virtual address space is
+    used for mapping the kernel code and data.
+
+  * When the scheduler switches between various processes the mapping
+    for top 3GB of virtual address will keep switching to the
+    corresponding process code and data. 
+
+  * but the bottom 1GB will be always mapped to the same kernel code
+    and data.
+
+=== Advantage
+
+  * This allows kernel to read and write data to the process's memory.
+
+  * When the process wants to execute the system call, it can directly
+    branch to the kernel function, if it knows the absolute address of
+    them.
+
+=== Process Switching
+
+* On bootup kernel adds page table entries for it's own memory into
+  MMU, so it can execute and access memory.
+
+* And for each process there exists page table entries created by
+  kernel allowing the process to access only it's own memory.
+
+* When a process gets scheduled kernel loads the process's page table
+  entries into MMU.
+
+* When scheduled out, page table entries of process is unmappped from
+  MMU.
+
+===  Process 1
+image::figures/context1.png[]
+
+=== Proccess 2
+image::figures/context1.png[]
+
+=== Protecting the Kernel
+
+  * But with this setup, the process can now modify the kernel code
+    and data at will. This can result in jeopardizing the stability of
+    the system.
+
+== Privilege Separation
+
+=== Privilege Separation
+
+ * To ensure protection to kernel, there needs elevated privilege to
+   the kernel.
+
+ * The `kernel` needs to access everything, so its given `higher
+   privilege` for unrestricted access.
+ 
+ * `Process` meant to to have restricted access, is given `lesser
+   privilege`.
+
+=== CPU Modes and Privilege Levels
+
+ * CPUs have multilple modes that allows the software to run in
+   different privilege levels.
+
+ * Two level privileges in ARM 
+   - Supervisor - high privilege
+   - User - less privilege
+ 
+ * Fource level privileges in x86  
+   - Protection Ring 0 - Supervisor
+   - Protection Ring 3 - User
+
+=== CPU Privilege Modes and OS
+
+  * In supervisor mode, the processor can execute any
+    instruction, and can access any memory location.
+
+  * In user mode, the processor cannot execute certain instructions,
+    and cannot access certain memory locations.
+
+  * For example the processor cannot execute instructions that modify
+    the page tables, in user mode.
+
+  * The kernel code executes in superuser mode, and user code executes
+    in user mode.
+
+=== Address Space Privileges
+
+  * The page tables has a flag that indicate whether a page is a
+    supervisor page.
+
+  * supervisor pages can be accessed only when the processor is in
+    supervisor mode.
+
+  * User mode pages can be accessed when the processor is in either
+    user or supervisor mode.
+
+  * The pages corresponding to user code and data are indicated as
+    user pages.
+
+  * The pages corresponding to kernel code and data are indicated as
+    supervisor pages.
+
+== Privilege Escalation
+
+=== Interrupts for Escalatation
+
+  * The processor switches to supervisor mode under only one
+    circumstance - when an interrupt occurs.
+
+  * When an interrupt occurs the processor switches to supervisor and
+    transfers control to the preset address.
+
+  * The preset address generally contains kernel code that handles the
+    interrupts.
+
+=== Traps
+
+  * Interrupts can occur due to hardware devices asserting the
+    interrupt line - these are called hardware interrupts.
+
+  * Interrupts can also be triggered using an instruction, these are
+    called software interrupts or traps.
+
+  * When a trap is executed, the processor switches to supervisor and
+    transfers control to another preset address.
+
+=== Trap Call
+image::figures/trap.png[] 
+
+== Internals of Syscalls
+
+=== System Calls From Userpace
+
+  * Each system call is given a unique no in the kernel.
+
+  * When the user process wants to execute a system call, 
+
+    - it stores the system call no. and its arguments in specific CPU
+      registers
+ 
+    - and triggers a software interrupt.
+
+  * This implementation is available in libc
+
+=== Syscalls in Kernel Space
+
+  * The processor switches to supervisor, and starts executing the
+    trap handler. The trap handler is part of the kernel code.
+
+  * The trap handler uses the system call no. to index into system
+    call table, and then branches to the specified system call.
+ 
+  * returns through the same path.
+
+=== Controlled Privilege Escalation
+
+  * Userspace can run only kernel space functions, which are exposed
+    as system calls.
+
+  * Thus we are able to achieve controlled access to the system calls,
+    through the privilege modes and the trap mechanism.
+
+=== Syscall Sequence
+image::figures/sc-sequence.png[]
+
+== Debugging Syscalls
+
+=== Strace
+
+  * `strace` - traces system calls and signals of a process.
+
+  * It intercepts and records the system calls which are called by a
+    process and the signals which are received by a process.
+
+  * Usually errors from system calls are printed using `perror()`. But
+    this does not provide information like the arguments passed and
+    exactly which call triggered the error.
+
+  * `strace` provides information like the arguments to the system
+    call, return values, errors if any, the time spent in a system
+    call, whether signals occurred during the operation.
+
+=== Strace Usage
+
+  * For the simplest case has the following format
+
+------
+strace <program>
+------
+
+  * Options are available to provide additional information and filter
+    away unwanted information.
+
+  * `-e trace=syscall1,syscall2,...`
+  * `-e trace=class` class is `file`,`process`,`network`,`signal`,`ipc`, ...
+  * `-e signal=signal1,signal2...`
+  * `-T` print time spent in each syscall
+  * `-c` per syscall statistics - time spent, no. of calls, errors
+  * `-p pid` attach to a running process
+
+=== Strace for Parameters
+
+  * Stracing a process can show the syscalls used, their arguments and
+    the return value, as in below example
+
+----
+$ strace cat /dev/null
+....
+open("/dev/null", O_RDONLY|O_LARGEFILE) = 3
+read(3, "", 4096)                       = 0
+close(3)                                = 0
+....
+----
+
+=== Analogy to RPC
+
+  * If we consider Processes as a client, requesting a special action
+    from the kernel which acts as a server and then sycall are
+    something like a remote procedure call.(RPC)
+
+
+=== References 
+
+* http://events.linuxfoundation.org/sites/events/files/slides/elc_2016_mem_0.pdf
+
+* http://www.linux.it/~rubini/docs/ksys/
+
+* https://blog.packagecloud.io/eng/2016/04/05/the-definitive-guide-to-linux-system-calls/
+
+* http://www3.cs.stonybrook.edu/~porter/courses/cse506/f11/slides/interrupts.pdf
+
+* http://davisdoesdownunder.blogspot.in/2011/02/linux-syscall-vsyscall-and-vdso-oh-my.html
+
+* http://www.tldp.org/HOWTO/html_single/Module-HOWTO/
+
+* https://www.ibm.com/developerworks/community/blogs/58e72888-6340-46ac-b488-d31aa4058e9c/entry/linux_system_calls20?lang=en
+
+* http://faculty.salina.k-state.edu/tim/ossg/Introduction/sys_calls.html	

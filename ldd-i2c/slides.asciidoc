@@ -1,0 +1,314 @@
+= Kernel I2C
+
+== Kernel Model for Bus Interface 
+
+=== I2C
+
+* Let's try to understand how Linux subsystems are designed for little
+  complex peripheral interface, I2C.
+
+* I2C is a bus where multiple devices are connected to each other.
+
+* Layering has little changes here when compared to GPIO.
+
+=== GPIO vs I2C 
+
+ * In GPIO 
+   - pins are dedicated to consumer drivers, on request.
+   - consumer drivers can access their pins simultaneously.
+
+ * In I2C, 
+   - the same bus is shared by several drivers, so its time
+     multiplexed.
+   - consumer driver has to wait, if the bus is occupied by other.
+   - I2C core driver has to take care of bus multiplexing.
+
+== I2C Bus - Overview
+
+=== Properties
+
+* Multidrop bus with link layer protocol.
+
+* Multimaster bus with bus arbitration.
+
+image::figures/i2c-drop.png[align="center"]
+
+=== Link Layer Features
+
+* Supports unique address of each device on the bus.
+
+* Each I2C frame has address of the destination device.
+
+* Bidirectional protocol, so the write or read operation needs to
+  mentioned part of frame.
+
+* Reliability is imparted by adding `ACK/NACK`.
+
+* Flow control is achieved through `clock stretching`.
+
+=== I2C Transactions
+image::figures/i2c-transaction.png[align="center"]
+
+[role="two-column"]
+=== I2C Controller
+
+[role="left"]
+image::figures/soc-cntlr.png[align="center"]
+
+[role="right"]
+  * SoC's CPU is memory mapped to I2C controller.
+
+  * Each I2C controller owns a bus.
+
+  * Example: If 2x I2C controller in Soc, 2x I2C Bus.
+
+== I2C in Kernel
+
+=== Linux I2C Subsystem
+
+image::figures/i2c-linux.png[width="640",align="center"]
+
+=== I2C Controller/Adapter
+
+  * The I2C Controller itself, is handled by an I2C Bus Controller
+    driver.
+
+  * Once the I2C Controller driver is available, the I2C peripherals
+    can be accessed using the I2C APIs available in the Linux kernel.
+
+  * Linux refers the I2C controller as I2C bus adapter, and it is
+    represented by an instance of `struct i2c_adapter`.
+
+=== Viewing Adapters
+
+  * Each I2C bus in the system is identified by a unique no. The I2C
+    Controllers and their unique no. can be obtained from sysfs 
+
+[source,sh]
+----
+ls /sys/class/i2c-dev/
+----
+
+=== Getting I2C Adapter
+
+  * Before accessing an I2C device, the corresponding controller's
+    `struct i2c_adapter` has to be obtained, using `i2c_get_adapter()`
+
+[source,c]
+----
+struct i2c_adapter * i2c_get_adapter(nr)
+
+int nr;
+----
+
+  * Takes I2C controller's number as argument and returns the
+    i2c_adapter for it.
+
+  * Returns NULL if the adapter is not available.
+
+=== I2C Device/Client
+
+  * Linux refers the I2C slave devices as an I2C client.
+
+  * The I2C Device, is represented by an instance of `struct
+    i2c_client`.
+
+=== Getting I2C Client
+
+  * Before accessing an I2C device, the corresponding `struct
+    i2c_client` has to obtained, using `i2c_new_device()`
+
+[source,c]
+------
+client = i2c_new_device(adapter, board_info);
+
+struct i2c_adapater * adapter;
+struct i2c_board_info * board_info;
+struct i2c_client * client;
+------
+
+  * The I2C controller to which the I2C device is attached is passed
+    as the first argument.
+
+  * The details about the device is passed to `i2c_new_device()` using
+    `struct i2c_board_info`, as the second argument.
+
+=== Defining I2C board Info
+
+  * The two required members of `struct i2c_board_info` are
+    . `type` - the name of the device
+    . `addr` - the addr of the device
+
+  * `i2c_new_device()` returns NULL, if the address is invalid, or
+    address is in use.
+
+  * Example of creating a new I2C device.
+
+[source,c]
+------
+struct i2c_board_info board_info = { .type = "lcd", .addr = 0x10 };
+client = i2c_new_device(adapter, &board_info);
+------
+
+=== Freeing I2C Client
+
+  * Once done with, the `struct i2c_client` has to be freed, using
+    `i2c_unregister_device(client)`
+
+=== I2C Transactions
+
+   * Data can be sent to and received from an I2C Device using
+     `i2c_master_send()` and `i2c_master_recv()`.
+
+[source,c]
+------
+ret = i2c_master_send(client, buf, count);
+ret = i2c_master_recv(client, buf, count);
+
+struct i2c_client * client;
+char * buf;
+int count;
+int ret;
+------
+
+  * The function returns a negative error code, or the no. of bytes
+    transmitted/received.
+
+== I2C in Target Board
+
+[role="two-column"]
+=== Target Devices
+[role="left"]
+
+* LCD
+
+* 4-way key.
+
+[role="right"]
+image::figures/i2c-target.png[height="480", align="center"]
+
+=== I2C LCD Datasheet
+
+  * The LCD device address is 0x40.
+
+  * The LCD device has two registers
+
+|=============================
+|Address  |Register
+|`0x00`	  |`DATA` Register
+|`0x01`	  |`CLEAR` Register
+|=============================
+
+  * When a byte is written to the `DATA` register the corresponding
+    ASCII character is displayed at the current cursor position.
+
+  * When any byte is written to `CLEAR` register, it would clear the
+    LCD content.
+
+=== Code - LCD Headers
+
+[source,c]
+----
+include::code/lcd/lcd.def[]
+----
+
+=== Code - LCD Init
+
+[source,c]
+----
+include::code/lcd/lcd.init[]
+----
+=== Code - LCD Exit
+
+[source,c]
+----
+include::code/lcd/lcd.exit[]
+----
+
+=== Tryout
+
+ * Modify the LCD code
+    link:{include:code/lcd/lcd.full.datauri}["lcd.c",filename="lcd.c"], and
+    add support for clear support.
+
+== Debugging I2C
+
+=== I2C Dev Interface
+
+  * In Linux, I2C Bus can be accessed using a dev interface,
+    `/dev/i2c-<bus no.>`.
+
+  * `i2ctools` package provides commands to test I2C.
+
+  * `i2cdetect` provides the list of device addresses, connected in
+    the bus.
+
+=== Ftrace
+
+[source,sh]
+----
+$ echo 1 >/sys/kernel/debug/tracing/events/i2c/enable
+----
+
+[source,sh]
+----
+echo adapter_nr==1 >/sys/kernel/debug/tracing/events/i2c/filter
+----
+
+[source,sh]
+----
+$ cat /sys/kernel/debug/tracing/trace > out.txt
+----
+
+== Exercises
+
+=== 4-way Key Datasheet
+
+* Develop a code which reads the i2c-key device's status and data
+  register, then prints the key pressed.
+
+image::figures/4-way-key-datasheet.png[align="center",width="720"]
+
+
+=== Code - Ikey Headers
+
+[source,c]
+----
+include::code/ikey/ikey.def[]
+----
+
+=== Code - IKey Init
+
+[source,c]
+----
+include::code/ikey/ikey.init[]
+----
+=== Code - IKey Exit
+
+[source,c]
+----
+include::code/ikey/ikey.exit[]
+----
+
+=== Tryout
+
+ * Modify the Key code
+    link:{include:code/ikey/ikey.full.datauri}["key.c",filename="key.c"], and
+    add support for glowing LED on key press
+
+== Model for Busses
+
+=== I2C to USB 
+
+* Similar to I2C, the same model is what used in USB kind of
+  subsystesm also.
+
+* Understanding simpler I2C like bus model, can be a stepping stone to
+  move towards complex busses like USB.
+
+* Instead of simpler I2C APIs, we may need to ramp up on complex APIs
+  of USB subsystem.
+
+=== USB Model
+
+image::figures/usb-linux.png[width="580",align="center"]

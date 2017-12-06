@@ -368,8 +368,39 @@ image::figures/zkit-arm-vf51.jpg[align="center"]
   - Accelerometer
 [role="right"]
 image::figures/dietio.jpg[]
+//////
+=== Add-on Board Design
 
+* The board has an ARM Cortex-M3 micro-controller which acts as a
+  co-processor performing an IO bridging.
+
+* Perpiheral devices in diet-io board are relayed to host processor
+  through this io-bridge.
+
+* Certain devices are pass through where it is forwarded without any
+  modification.
+
+* Certain devices are exposed to Host CPU through different busses,
+  for ex: 4-way keys are connected to GPIO of io-bridge, but exposed
+  as I2C device to host processor.
+
+* io-bridge software running in co-processor takes care of above
+  pass-through and convertion.
+
+=== Advantage of IO Bridge
+
+* Host processor can have possibility of testing various devices
+  through various busses.
+
+* Complex devices can be presented with simple register sets.
+
+* With help of IO Bridge a key can be presented to Host processor
+  through GPIO interface or I2C interface.
+
+* Testing host processor's interfaces becomes easy.
+//////
 === Zkit + DietIO
+
 image::figures/zkit-dietio.jpg[align="center"]
 
 === Complete Peripheral Details
