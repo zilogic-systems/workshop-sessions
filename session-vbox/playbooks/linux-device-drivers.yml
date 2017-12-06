@@ -38,6 +38,9 @@
     # Install patches
     - buildroot-vybrid
 
+    # Setup DHCP Server
+    - dnsmasq
+
   - get_url:
       url: https://www.kernel.org/pub/linux/kernel/v4.x/linux-4.4.39.tar.xz
       dest: /usr/share/buildroot-vybrid/linux-4.4.39.tar.xz
@@ -71,6 +74,13 @@
       owner=root group=root mode=644
     notify:
       - restart xinetd
+
+  - copy: >
+      src=files/dnsmasq.conf
+      dest=/etc/dnsmasq.conf
+      owner=root
+      group=root
+      mode=644
 
   - file: >
       path=/tftpboot
