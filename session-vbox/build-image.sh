@@ -186,6 +186,12 @@ vboxmanage modifyvm "${BOX_NAME}" --vram 256
 # Set bidirectional shared clipboard
 vboxmanage modifyvm "${BOX_NAME}" --clipboard bidirectional
 
+# Add USB filters for USB-UART and USB-Ethernet
+vboxmanage usbfilter add 0 --target "${BOX_NAME}" \
+	   --name "USB-UART" --vendorid 10c4 --productid ea60
+vboxmanage usbfilter add 1 --target "${BOX_NAME}" \
+	   --name "USB-Ethernet" --vendorid 0525 --productid a4a2
+
 vboxmanage startvm "${BOX_NAME}" --type headless
 
 sleep 10
