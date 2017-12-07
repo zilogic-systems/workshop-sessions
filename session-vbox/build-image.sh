@@ -174,7 +174,10 @@ if [ "x$GUESTADDITIONSENABLE" == "xenable" ];then
 fi
 
 if [ "x$USBPASSTHROUGHENABLE" == "xenable" ];then
-    vboxmanage modifyvm "${BOX_NAME}" --usb on --usbehci on
+    # Strange network communication issues happen with USB 2.0 &
+    # 3.0. So, USB 1.0 is enabled by disabling both USB 2.0(EHCI) and
+    # USB 3.0(XHCI) controllers.
+    vboxmanage modifyvm "${BOX_NAME}" --usb on --usbehci off --usbxhci off
 fi
 
 vboxmanage modifyvm "${BOX_NAME}" --memory 2048
