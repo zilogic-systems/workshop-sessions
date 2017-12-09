@@ -1,14 +1,11 @@
 == TODO
 
- * Need to add USB filters for USB-UART and USB-Ethernet when creating disk image.
-
- * Select USB 1.1(OHCI) as the default controller when creating the image.
-
- * Add proper configuration for network interfaces in /etc/network/interfaces.
-
 == Known Issues
 
- * Vagrant adds the default shared folder mapping, but fails to mount it.
+ * Vagrant adds the default shared folder mapping, but fails to mount
+   it. This is temporarily fixed by manually selecting the
+   "Auto-mount" option availabe in VirtualBox GUI under "Shared
+   Folders" section.
 
  * Packed Vagrantfile is not initialized for some reason.
 
