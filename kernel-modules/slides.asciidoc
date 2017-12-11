@@ -40,6 +40,8 @@ Zilogic Systems
     - Hardware will be detected at boot time and only the required
       modules will be loaded into the kernel
 
+=== Advantages of Kernel Modules (Contd.)
+
   * Shorter Development Cycle
     - Edit - Compile - Reboot cycle
     - Edit - Compile - Unload - Load cycle
@@ -62,11 +64,11 @@ Zilogic Systems
 ------
 [~]$ lsmod
 Module                  Size  Used by
-psmouse                35016  0 
-radeon                 99744  2 
+psmouse                35016  0
+radeon                 99744  2
 ...
 usbcore               112644  2 uhci_hcd
-processor              28840  0 
+processor              28840  0
 ------
 
 === Unloading a Module
@@ -89,7 +91,7 @@ rtc                    12372  0
   * `insmod` command takes the complete path to the module as argument
 
 ------
-[~]$ sudo insmod /lib/modules/2.6.18/kernel/drivers/char/rtc.ko 
+[~]$ sudo insmod /lib/modules/2.6.18/kernel/drivers/char/rtc.ko
 [~]$ lsmod | grep rtc
 rtc                    12372  0
 ------
@@ -99,12 +101,12 @@ rtc                    12372  0
   * Command `modinfo` provides details about a module
 +
 ------
-[~]$ /sbin/modinfo /lib/modules/2.6.18/kernel/drivers/block/loop.ko 
+[~]$ /sbin/modinfo /lib/modules/2.6.18/kernel/drivers/block/loop.ko
 filename:       /lib/modules/2.6.18/kernel/drivers/block/loop.ko
 license:        GPL
 alias:          block-major-7-*
 vermagic:       2.6.18 SMP mod_unload 686 REGPARM gcc-4.1
-depends:        
+depends:
 parm:           max_loop:Maximum number of loop devices (1-256) (int)
 ------
 

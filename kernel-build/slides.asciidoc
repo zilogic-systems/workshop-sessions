@@ -10,12 +10,18 @@ Zilogic Systems
   * The mainline git repository of the Linux can be obtained using
 +
 -------
-git clone git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git 
+git clone git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
 -------
 +
   * Each subsystem maintainer has a separate tree
 
   * Subsystem specific tree can be obtained from `MAINTAINERS`
+
+
+=== Kernel Versioning Scheme
+
+image::figures/kernel-releases.png[width="35%",align="center"]
+
 
 === Kernel Development Process
 
@@ -52,32 +58,32 @@ git clone git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
 
   * Stable kernels are numbered `4.23.1`, `4.23.2`, etc.
 
-=== Kernel Versioning Scheme
-
-image::figures/kernel-releases.png[width="35%",align="center"]
 
 === Try Out
 
   * Pre-downloaded kernel for the workshop is available from
 +
 ------
-/usr/share/workshop/kp/linux-4.7.tar.xz
+/usr/share/buildroot-vybrid/linux-4.4.39.tar.xz
 ------
 +
   * Copy the kernel to the home directory and extract the kernel
 +
 ------
-cp /usr/share/workshop/kp/linux-4.7.tar.xz .
-tar -x -f linux-4.7.tar.xz
+cp /usr/share/buildroot-vybrid/linux-4.4.39.tar.xz .
+tar -x -f linux-4.4.39.tar.xz
 ------
 
 === Try Out
 
-  * The kernel needs to be patched with Gumstix Verdex support
+  * The kernel needs to be patched.
 +
 ------
-cd linux-4.7
-patch -p1 < /usr/share/workshop/kp/verdex.patch
+cd linux-4.4.39
+PATCH_DIR="/usr/share/buildroot-vybrid/patches/linux"
+patch -p1 < $PATCH_DIR/0001-linux-toradex.patch
+patch -p1 < $PATCH_DIR/0002-linux-zilogic.patch
+patch -p1 < $PATCH_DIR/0003-linux-rndis.patch
 ------
 
 == Kernel Build
@@ -106,19 +112,21 @@ patch -p1 < /usr/share/workshop/kp/verdex.patch
     - what are not required
     - what features are required as modules
 
+=== Kernel Configuration (Contd.)
+
   * Pre-canned configurations are available and can be invoked using
     `make` targets with `_defconfig` suffix
 +
 ------
 export ARCH=arm
-make verdex_dt_defconfig
+make zkit_arm_vf51_defconfig
 ------
 +
   * Creates `.config` containing the selected configuration
 
 === Kernel Build
 
-  * Command to build the kernel and the DTBs
+  * Command to build the kernel.
 +
 -----
 export CROSS_COMPILE=arm-none-linux-gnueabi-
@@ -128,30 +136,31 @@ make -j4
    * Command to build the uImage
 +
 -----
-make uImage
+make uImage LOADADDR=0x80008000
 -----
 
 === Try Out
 
-  * Build the kernel, DTBs and generate the uImage
+  * Build the kernel and generate the uImage
   * Verify that the kernel image is available from
     `arch/arm/boot/uImage`
   * Copy the kernel to `/tftpboot`
-  * Boot Qemu to verify that the kernel boots
+  * Boot Vybrid board to verify that the kernel boots
 
 === Kernel Configuration Changes
 
-  * The kernel displays a logo at bootup
+  * The kernel displays a version number at bootup.
 
-  * This can be changed to black and white by making following
-    configuration changes
+  * This can be customized by changing the following configuration.
 +
 ------
-Device Drivers > Graphics Support > Bootup Logo
-    [*]   Standard black and white Linux logo
-    [ ]   Standard 16-color Linux logo
-    [ ]   Standard 224-color Linux logo
+General Setup >
+	() Local version - append to kernel release
 ------
++
+  * Add a custom string in this configuration.
+
+  * Look for this string in your kernel boot log.
 
 === Try Out
 
@@ -171,5 +180,5 @@ Device Drivers > Graphics Support > Bootup Logo
     - `mrproper`: `clean` + remove `.config`
     - `distclean`: `mrproper` + patch files + backup files
 
-  * Order of greater cleanliness 
+  * Order of greater cleanliness
     - `distclean > mrproper > clean`
