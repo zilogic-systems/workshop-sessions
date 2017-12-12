@@ -1,0 +1,517 @@
+= Writing Kernel Modules
+Zilogic Systems
+
+== Introduction
+
+=== Overview
+
+  * Hello World, Kernel Module
+  * Callbacks
+  * Application vs Modules
+  * Memory Mapped IO
+
+== Hello World
+
+=== Hello World Module
+
+ * Requirements:
+   - Print "Hello World" on module load
+   - Print "Goodbye World" on module unload
+
+ * Kernel interacts with administrator through log messages
+
+=== User Space Logging
+
+ * Programs, that run without user interaction, record interesting
+   events (like errors) in a log file
+
+ * Examples: Web server, FTP server
+
+ * Applications uses `syslog()` API to store log messages
+
+ * When applications submit log messages through the `syslog()` API,
+   the log messages are sent the system daemon `syslogd`
+
+[role="two-column"]
+=== Kernel Logging
+
+[role="left"]
+image::figures/klog.png["Journey of kernel log message", width="40%", align="center"]
+
+[role="right"]
+ * The kernel also logs interesting events.
+
+ * The kernel stores the log messages in an in memory circular buffer,
+   the log buffer. The log buffer can be accessed using `/proc/kmsg`.
+
+ * The daemon `klogd` is in charge of getting kernel log messages from
+   `/proc/kmsg` and submitting them to `syslogd` using the `syslog()`
+   API.
+
+== Simplified Hello World
+
+=== Code
+
+[source,c]
+------
+include::code/simple/simple.c[]
+------
+
+=== Comments
+
+  * `init_module()` is called when the module is loaded into the
+    kernel. It is generally used for registering further callbacks
+    with the kernel.
+
+  * `cleanup_module()` is called when the module is removed from the
+    kernel. It reverses what `init_module()` has done.
+
+  * If `init_module()` is successful, it should return with a `0`. Any
+    other return value, causes the module loading to fail, and the
+    module will not be loaded into the kernel.
+
+  * The header file `linux/module.h` is to be included in all kernel
+    modules.
+
+=== Printing Log Messages
+    
+  * The `printk()` function is used to store messages in the kernel
+    log buffer, which will then eventually get passed onto
+    syslog.
+
+  * `printk()` under certain conditions also causes the message to be
+    displayed on the console.
+
+=== Makefile
+
+  * The `Makefile` indicates the names of the object files to be
+    created, to kernel build system. This is done by setting the
+    variable `obj-m` to the `.o` files to be built.
++
+------
+obj-m := hello.o
+------
++
+  * A pre-built kernel tree is required to build the kernel
+    modules.
+
+=== Building Kernel Module
+
+  * To build the kernel module, first change to the kernel tree and
+    invoke `make` as shown below.
++
+------
+cd /path/to/kernel/tree
+make modules M=/path/to/module
+------
++
+  * The `modules` target is used to build kernel modules.
+
+  * By setting the `M` variable to the path of our kernel module, we
+    are requesting the kernel's build system to build our kernel
+    module.
+
+=== Alternate Method
+
+  * Building module from within the module source directory
++
+------
+make -C /path/to/kernel/tree modules M=$PWD
+------
+
+=== Clean Target
+
+  * The files generated during the build can be cleaned using the
+    kernel's `clean` target.
++
+------
+make -C /path/to/kernel/tree clean M=$PWD
+------
+
+=== Testing the Module
+
+  * When the module is loaded into the kernel, the `init_module()`
+    function is executed by the kernel. The module then sends out a
+    kernel log message. The message can be viewed in the following
+    ways.
+
+    - The log message gets printed on the console.
+
+    - The message can be seen by using the `dmesg` command, which
+      prints the contents of the kernel's log message buffer.
+
+    - The message can be seen in the log file `/var/log/messages`.
+
+=== Try Out
+
+  * Get the `simple` module:
+    link:{include:code/simple.tar.gz.datauri}["simple.tar.gz",filename="simple.tar.gz"]
+
+  * Compile the `simple` module
+
+  * Load the module on the board and observe the log messages
+
+== Better Hello World
+
+=== Code
+
+[source, c]
+------
+include::code/hello/hello.c[]
+------
+
+=== Custom Init and Exit
+
+  * Custom names are used for init and exit function.
+
+  * The functions are indicated to the kernel using the
+    `module_init()` and `module_exit()` macros.
++
+[source,c]
+------
+#define module_init(fn)  int init_module() { return fn(); }
+#define module_exit(fn)  void cleanup_module() { fn(); }
+------
+
+=== Module License
+
+  * A third macro `MODULE_LICENSE()` is used to indicate under which
+    license the module is being distributed.
+
+  * If this license is not GPL or BSD, the kernel is marked
+    tainted.
+
+  * The kernel developers will not offer support when the debug
+    messages indicate the kernel is tainted.
+
+=== Try Out
+
+  * Get the `hello` module:
+    link:{include:code/hello.tar.gz.datauri}["hello.tar.gz",filename="hello.tar.gz"]
+
+  * Compile the `hello` module
+
+  * Reboot the board
+
+  * Load the module on the board and observe the log messages
+
+  * Check if you get the "Kernel Tainted" message
+
+== Callbacks
+
+=== Reboot Notifier
+
+  * Requirements
+    - Kernel module to print a message during system reboot
+    - Using reboot notifier callbacks
+
+=== Reboot Notifier
+
+[source,c]
+------
+include::code/reboot/reboot.c[]
+------
+
+=== Callback Registration
+
+[source,c]
+------
+#include <linux/reboot.h>
+
+int register_reboot_notifier(nb)
+struct notifier_block *nb;
+------
+
+image::figures/notifier-list-1.png[align="center"]
+
+=== Callback Registration
+
+[source,c]
+------
+#include <linux/reboot.h>
+
+int register_reboot_notifier(nb)
+struct notifier_block *nb;
+------
+
+image::figures/notifier-list-2.png[align="center"]
+
+=== Callback Execution
+
+  * Registered callbacks invoked during system reboot
+
+  * Pseudocode for invocation of callback
++
+[source, python]
+-------
+for nb in notifier_list:
+    nb.notifier_call()
+-------
+
+=== Try Out
+
+  * Get the `reboot` module:
+    link:{include:code/reboot.tar.gz.datauri}["reboot.tar.gz",filename="reboot.tar.gz"]
+
+  * Compile the `reboot` module
+
+  * Load the module on the board
+
+  * Reboot the board using the `reboot` command
+
+  * Observe the log messages
+
+== Application vs Modules
+
+=== C library
+
+  * User applications are linked with the standard C library
+
+  * Applications have access to all standard C library functions
+
+  * Kernel modules are linked only with kernel
+
+  * The kernel does not contain the entire standard C library
+
+=== Implication
+
+  * Some commonly used functions are implemented in the kernel
+
+  * But the entire standard C library is not available
+
+  * Refer the kernel documentation / source code
+
+=== Privilege levels
+
+  * Kernel code runs with privilege level 0
+
+  * User applications run with privilege level 3
+
+  * Kernel modules, become part of the kernel, and execute with
+    privilege level 0
+
+=== Implication
+
+  * Driver developers must take utmost care while writing kernel code
+
+  * A mistake in the code, can jeopardize the stability of the system
+
+=== SMP Concurrency
+
+image::figures/concurrency-0.png[align="center",width="50%"]
+
+  * User space programs only execute in one CPU
+  * Functions cannot get executed in parallel
+
+=== SMP Concurrency
+
+image::figures/concurrency-1.png[align="center",width="50%"]
+
+  * User space programs only execute in one CPU
+  * Functions cannot get executed in parallel
+
+=== SMP Concurrency
+
+image::figures/concurrency-2.png[align="center",width="50%"]
+
+  * Two processes can invoke the driver from two different CPUs
+  * Functions within the driver can get executed in parallel
+
+=== Implication
+
+  * Driver developers should take into account concurrency
+
+  * Ensure that shared global data is locked while accessing
+
+  * Only SMP Concurrency, was shown, but there other reasons for
+    concurrency as well
+
+=== Floating Point Operations
+
+image::figures/context-0.png[align="center",width="40%"]
+
+  * CPU registers holds part of current execution state
+
+=== Floating Point Operations
+
+image::figures/context-1.png[align="center",width="40%"]
+
+  * Saved when switching to kernel space
+
+=== Floating Point Operations
+
+image::figures/context-2.png[align="center",width="40%"]
+
+  * Restored when returning back to user space
+
+=== Floating Point Operations
+
+image::figures/context-3.png[align="center",width="40%"]
+
+  * Apart from CPU registers, FPU also has registers
+
+=== Floating Point Operations
+
+image::figures/context-4.png[align="center",width="40%"]
+
+  * FPU state is not saved, when switching to kernel space
+
+=== Floating Point Operations
+
+image::figures/context-5.png[align="center",width="40%"]
+
+  * FPU state is not restored, when switching back to user space
+
+=== Implication
+
+  * Kernel code, should not perform floating point operations
+
+  * Else, the user process FPU state will be clobbered
+
+  * FPU state is not saved, since floating point operations are not
+    generally required in the kernel
+
+  * Overhead of saving and restoring FPU state is avoided
+
+=== Kernel ABI
+
+ * Kernel does not have a stable ABI
+
+ * Kernel 3.0.101
++
+[source,c]
+------
+blkdev_fsync(struct file* filp, int datasync)
+------
++
+ * Kernel 3.2.94
++
+[source,c]
+------
+blkdev_fsync(struct file* filp, loff_t start, loff_t end, int datasync)
+------
+
+=== Kernel ABI
+
+  * Kernel ABI changes with configuration
+
+  * Structure size and members might differ if configuration is different
++
+[source,c]
+------
+struct gpio_chip {
+	const char *label;
+	...
+#if defined(CONFIG_OF_GPIO)
+	struct device_node *of_node;
+	int of_gpio_n_cells;
+	...
+#endif
+        ...
+};
+------
+
+[role="two-column"]
+=== Implication
+
+[role="left"]
+image::figures/kernel-version.png[align="center"]
+
+[role="right"]
+ * Modules are built against kernel
+   - particular version
+   - specific configuration
+
+ * Any changes in the kernel will result in incompatibility between
+   the kernel
+    - function argument changes
+    - structure field changes
+
+=== Implication
+
+  * Kernel version and certain config. options are stored in the
+    module
+
+  * The `modinfo` command can be used to view this information
+
+  * The kernel checks the module version and configuration while the
+    module is loaded
+
+== Memory Mapped IO
+
+=== Trigger System Reset
+
+  * Requirement
+    - On module load, reset the system
+    - Using the System Reset Controller
+
+=== System Reset Controller
+
+[options="header",width="75%",align="center"]
+|======
+| Address	| Name	| Description
+| 0x4006_E000	| SCR	| SRC Control Register
+| 0x4006_E004	| SBMR1	| SRC Boot Mode Register 1
+| 0x4006_E008 	| SRSR	| SRC Status Register
+|======
+
+=== SRC Control Register
+
+  * Bit 12: `SW_RST`
+    - `0`: Software reset not requested
+    - `1`: Software reset requested
+
+=== Kernel API
+
+ * The kernel provides API to access memory mapped devices
+
+ * To create page table entries use `ioremap()`
+
+ * To remove the page table entries created use `iounmap()`
++
+[source,c]
+------
+#include <asm/io.h>
+vaddr = ioremap(phyaddr, size);
+iounmap(vaddr)
+
+unsigned long phyaddr;
+unsigned long size;
+void *vaddr;
+------
+
+=== IO Memory Write / READ
+
+[source,c]
+------
+#include <asm/io.h>
+
+iowrite8(val8, addr);
+iowrite16(val16, addr);
+iowrite32(val32, addr);
+
+val8 = ioread8(addr);
+val16 = ioread16(addr);
+val32 = ioread32(addr);
+
+void *addr;
+u8 val8;
+u16 val16;
+u32 val32;
+------
+
+=== Code
+
+[source,c]
+------
+include::code/reset/reset.c[]
+------
+
+=== Try Out
+
+  * Get the `reset` module:
+    link:{include:code/reset.tar.gz.datauri}["reset.tar.gz",filename="reset.tar.gz"]
+
+  * Compile the `reset` module
+
+  * Load the module on the board and check if the board is restarted
