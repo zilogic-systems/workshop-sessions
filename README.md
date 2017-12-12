@@ -9,6 +9,7 @@ by Zilogic.
   * Dive Into Yocto, Workshop. For details see http://www.zilogic.com/yocto-poky-training.html
   * ARM Bare Metal Programming, Workshop. For details see
     http://www.zilogic.com/arm-linker-script-training.html
+  * Kernel Porting Workshop. For details see http://www.zilogic.com/linux-kernel-porting-training.html
 
 ## Git Basics Workshop: Sessions
 
@@ -40,5 +41,23 @@ by Zilogic.
   * [Role of Linker](arm-linker)
   * [Linker Scripts](arm-lds)
   * [C Startup Code](arm-cstartup)
-  * Device Interfacing
-  * Using C Library
+  * [Using C Library](arm-libc)
+
+## Kernel Porting, Workshop: Sessions
+
+  * [The Linux Kernel](kernel-build)
+  * [Device Interfacing](devices-intro)
+  * [Introduction to Drivers](kernel-driver)
+  * [Bus Model](kernel-bus-model)
+  * [Device Tree Syntax](kernel-dt-syntax)
+  * [SoC Architecture](kernel-soc)
+  * [Device Tree by Example](kernel-dt-by-example)
+  * [Flash in DTS](kernel-flash)
+  * [Ethernet in DTS](kernel-ethernet)
+  * [I2C in DTS](kernel-i2c)
+  * [LCD Display in DTS](kernel-display)
+  * [GPIOs in DTS](kernel-gpio)
+  * [Pin Control in DTS](kernel-pinctrl)
+  * [Drivers for Device Tree](kernel-dt-drivers)
+  * [Device Tree at Boot](kernel-boot)
+  * [Debugging Device Tree Issue](dt-debugging)
