@@ -4,7 +4,7 @@
 #include <linux/interrupt.h>
 #include <linux/gpio.h>
 
-#define KEY_GPIO 4
+#define KEY_GPIO 67
 
 /* ### START: handler */
 static irqreturn_t key_handler(int irq, void *dev)

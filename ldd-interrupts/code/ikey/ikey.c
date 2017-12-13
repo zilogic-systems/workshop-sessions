@@ -6,19 +6,21 @@
 #include <linux/i2c.h>
 #include <linux/wait.h>
 #include <linux/kfifo.h>
+#include <linux/gpio.h>
 #include <asm/uaccess.h>
 
 #define REG_STAT_ADDR  0x0
 #define REG_DATA_ADDR  0x1
 
+static void ikey_bh(struct work_struct *work);
+
 static struct i2c_client * client;
 static int major;
-
-static void ikey_poll(struct work_struct *work);
-DEFINE_KFIFO(ikey_fifo, char, 256);
-DECLARE_DELAYED_WORK(ikey_work, ikey_poll);
+static DEFINE_KFIFO(ikey_fifo, char, 256);
+static DECLARE_WORK(ikey_work, ikey_bh);
 static DECLARE_WAIT_QUEUE_HEAD(ikey_wq);
-static int ikey_poll_stop = 0;
+
+#define INT_GPIO 66
 
 static void ikey_reg_read(char addr, char *data)
 {
@@ -38,11 +40,18 @@ static bool ikey_get(char * ikey)
 	return true;
 }
 
-/* ### START: poll */
-static void ikey_poll(struct work_struct *work)
+/* ### START: handler */
+static irqreturn_t ikey_handler(int irq, void * dev)
+{
+	schedule_work(&ikey_work);
+	return IRQ_HANDLED;
+}
+/* ### END: handler */
+
+/* ### START: bh */
+static void ikey_bh(struct work_struct *work)
 {
 	bool data_available = false;
-
 	while (1) {
 		bool ret;
 		char key;
@@ -54,14 +63,10 @@ static void ikey_poll(struct work_struct *work)
 		kfifo_put(&ikey_fifo, key);
 		data_available = true;
 	}
-
 	if (data_available)
 		wake_up(&ikey_wq);
-
-	if (!ikey_poll_stop)
-		schedule_delayed_work(&ikey_work, HZ / 5);
 }
-/* ### END: poll */
+/* ### END: bh */
 
 /* ### START: read */
 static ssize_t ikey_read(struct file *file, char __user * buf,
@@ -76,7 +81,6 @@ static ssize_t ikey_read(struct file *file, char __user * buf,
 
 	for (i = 0; i < count; i++) {
 		char ikey;
-
 		if (kfifo_get(&ikey_fifo, &ikey) == 0)
 			break;
 		if (put_user(ikey + '0', buf + i))
@@ -95,7 +99,8 @@ static const struct file_operations ikey_fops = {
 static int ikey_init(void)
 {
 	struct i2c_adapter * adapter;
-	struct i2c_board_info board_info = { .type = "ikey", .addr = 0x20 };
+	struct i2c_board_info board_info = { .type = "ikey", .addr = 0x54 };
+	int irq;
 	int err = 0;
 
 	adapter = i2c_get_adapter(0);
@@ -111,17 +116,37 @@ static int ikey_init(void)
 		err = -ENODEV;
 		goto err_exit;
 	}
+	
+	err = gpio_request(INT_GPIO, "ikey-irq");
+	if (err) {
+		printk("ikey: error requesting irq gpio");
+		goto err_free_client;
+	}
+	
+
+	gpio_direction_input(INT_GPIO);
+
+	irq = gpio_to_irq(INT_GPIO);
+	err = request_irq(irq, ikey_handler, IRQF_TRIGGER_RISING, "ikey", 0);
+	if (err) {
+		printk("ikey: error requesting IRQ");
+		goto err_free_gpio;
+	}
 
 	major = register_chrdev(0, "ikey", &ikey_fops);
 	if (major < 0) {
 		printk("ikey: could not register char. device\n");
 		err = major;
-		goto err_free_client;
+		goto err_free_irq;
 	}
-
-	schedule_delayed_work(&ikey_work, HZ / 5);
-
+	
 	return 0;
+
+err_free_irq:
+	free_irq(irq, "ikey");
+
+err_free_gpio:
+	gpio_free(INT_GPIO);
 
 err_free_client:
 	i2c_unregister_device(client);
@@ -132,10 +157,12 @@ err_exit:
 
 static void ikey_exit(void)
 {
-	ikey_poll_stop = 1;
-	cancel_delayed_work_sync(&ikey_work);
-	
+	int irq;
+
 	unregister_chrdev(major, "ikey");
+	irq = gpio_to_irq(INT_GPIO);
+	free_irq(irq, 0);
+	gpio_free(INT_GPIO);
 	i2c_unregister_device(client);
 }
 
