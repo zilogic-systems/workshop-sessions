@@ -62,7 +62,7 @@ static const struct file_operations ikey_fops = {
 static int ikey_init(void)
 {
 	struct i2c_adapter * adapter;
-	struct i2c_board_info board_info = { .type = "ikey", .addr = 0x54 };
+	struct i2c_board_info board_info = { .type = "ikey", .addr = 0x20 };
 	int err = 0;
 
 	adapter = i2c_get_adapter(0);
