@@ -33,7 +33,7 @@
     - ccache
 
     # Images required for TFTP boot
-    - vybrid-eldi
+    - vybrid-ldd
 
     # Install patches
     - buildroot-vybrid
@@ -41,21 +41,36 @@
     # Setup DHCP Server
     - dnsmasq
 
+    # Install editor
+    - mg
+
   - get_url:
       url: https://www.kernel.org/pub/linux/kernel/v4.x/linux-4.4.39.tar.xz
       dest: /usr/share/buildroot-vybrid/linux-4.4.39.tar.xz
 
+  - file: >
+      path=/tftpboot
+      state=directory
+      mode=1777
+
   # Copy resources to TFTP folder
   - copy: >
-      src=/usr/share/buildroot-eldi-vybrid/images/uImage
+      src=/usr/share/buildroot-ldd-vybrid/images/uImage
       dest=/tftpboot/uImage
       owner=vagrant
       group=vagrant
       mode=644
 
   - copy: >
-      src=/usr/share/buildroot-eldi-vybrid/images/vf500-colibri-zkit-base.dtb
+      src=/usr/share/buildroot-ldd-vybrid/images/vf500-colibri-zkit-base.dtb
       dest=/tftpboot/colibri.dtb
+      owner=vagrant
+      group=vagrant
+      mode=644
+
+  - copy: >
+      src=/usr/share/buildroot-ldd-vybrid/images/uRamdisk
+      dest=/tftpboot/uRamdisk
       owner=vagrant
       group=vagrant
       mode=644
@@ -88,11 +103,6 @@
       owner=root
       group=root
       mode=644
-
-  - file: >
-      path=/tftpboot
-      state=directory
-      mode=1777
 
   # Create symlinks for using ccache
   - file: >
