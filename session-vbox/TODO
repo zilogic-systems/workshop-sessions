@@ -1,5 +1,9 @@
 == TODO
 
+ * Build script needs to be made idempotent.
+
+ * Need to speed up build using apt cache.
+
 == Known Issues
 
  * Vagrant adds the default shared folder mapping, but fails to mount
@@ -12,3 +16,6 @@
  * Defining no. of cpus in "Vagrantfile" does not work.
 
  * Network communication problems occur with USB 2.0 & 3.0.
+
+ * Avoid building modules in shared folder as the filesystem does not
+   support linux permissions and symbolic links.
