@@ -1,0 +1,312 @@
+= Character Devices - II
+Zilogic Systems
+
+== Introduction
+
+=== Overview
+
+  * I2C Key Driver
+  * I2C Key Driver with FIFO
+  * Blocking IO
+  * Blocking I2C Key Driver
+  * Problems
+    - System Call Restart
+    - Thundering Herd
+
+== I2C Key Driver, v1.0
+
+=== Requirement
+
+  * Read: read key from device and return to caller
+  * If no data available return with error
+
+=== Design
+
+image::figures/ikey-v1-design.png[align="center",width="65%"]
+
+=== Pseudocode: Init
+
+[source,c]
+------
+int ikey_init(void)
+{
+	adapter = i2c_get_adapter(0);
+	client = i2c_new_device(adapter, &board_info);
+	major = register_chrdev(0, "ikey", &ikey_fops);
+	return 0;
+}
+------
+
+=== Code: Read
+
+[source,c]
+------
+include::code/ikey-v1/ikey/read[]
+------
+
+=== Try Out
+
+  * Get the `ikey-v1` driver module:
+    link:{include:cdist/ikey-v1.tar.gz.datauri}["ikey-v1.tar.gz",filename="ikey-v1.tar.gz"]
+
+  * Compile the `ikey-v1` module, and load the module
+
+  * Create the device node and test with `cat`
+
+  * Press more than 4 keys, and trying reading from the device file
+
+=== Cons
+
+  * Hardware FIFO is limited: 4 character
+
+  * If application delays data read, key presses can be lost
+
+== I2C Key Driver, v2.0
+
+=== In-memory FIFO and Polling
+
+  * Every 200 ms
+    - Get data from I2C Key and add to in-memory FIFO
+
+  * Use work queues to schedule the work
+
+  * Read callback should read data from in-memory FIFO
+
+=== Design
+
+image::figures/ikey-v2-design.png[align="center",width="85%"]
+
+=== Code: Poll
+
+[source,c]
+------
+include::code/ikey-v2/ikey/poll[]
+------
+
+=== Code: Read
+
+[source,c]
+------
+include::code/ikey-v2/ikey/read[]
+------
+
+=== Try Out
+
+  * Get the `ikey-v2` driver module:
+    link:{include:cdist/ikey-v2.tar.gz.datauri}["ikey-v2.tar.gz",filename="ikey-v2.tar.gz"]
+
+  * Compile the `ikey-v2` module, and load the module
+
+  * Create the device node and test with `cat`
+
+  * Press more than 4 keys, and trying reading from the device file
+
+== Blocking IO
+
+=== Process States
+
+image::figures/process-states-1.png[width="50%",align="center"]
+
+=== Process States
+
+image::figures/process-states-2.png[width="50%",align="center"]
+
+=== Process States
+
+image::figures/process-states-3.png[width="50%",align="center"]
+
+=== Process States
+
+image::figures/process-states-4.png[width="50%",align="center"]
+
+=== Process States
+
+image::figures/process-states-5.png[width="50%",align="center"]
+
+
+=== No Data Available
+
+  * Syscall behaviour when data not avaiable
+
+    - Return error with errno set to `EAGAIN`
+    - Block till data becomes availables
+
+  * Default is to block
+  * Can be changed using `O_NONBLOCK` flag in `open()`
+
+=== Implementing Blocking IO
+
+  * Multiple processes could be waiting for the same resource
+
+  * A queue is required to maintain a list of processes
+
+  * When resource is not available, process is put sleep, and added to
+    the queue
+
+  * When resource becomes available the processes in the queue are
+    woken up
+
+== I2C Key Driver, v3.0
+
+=== Blocking Support
+
+  * Requirements
+
+    - While reading, if no data is available should block
+
+    - If data is available, should provide the read data
+
+=== Pseudocode: Read
+
+[source,c]
+------
+static ssize_t ikey_read(struct file *file, char __user * buf,
+			size_t count, loff_t * ppos)
+{
+	wait_event(ikey_wq, !kfifo_is_empty(&ikey_fifo));
+
+	for (i = 0; i < count; i++) {
+		kfifo_get(&ikey_fifo, &ikey);
+		put_user(ikey + '0', buf + i);
+	}
+
+	return i;
+}
+------
+
+=== Wait Event API
+
+[source,c]
+------
+#define wait_event(wq, condition)  ...
+------
+
+  * `wq` is the wait queue in which the process will be added before
+    sleeping.
+
+  * `condition` is a C expression
+
+  * Waits until `condition` evaluates to true
+
+=== Operation
+
+image::figures/wait-event.png[width="50%",align="center"]
+
+=== Code: Read
+
+[source,c]
+------
+include::code/ikey-v3/ikey/read[]
+-------
+
+=== Code: Poll
+
+[source,c]
+------
+include::code/ikey-v3/ikey/poll[]
+-------
+
+=== Wake up API
+
+[source,c]
+------
+#define wake_up(wq) ...
+------
+
+  * `wq` is the wait queue to be woken
+
+=== Operation
+
+image::figures/wake-up.png[width="50%",align="center"]
+
+=== Try Out
+
+  * Get the `ikey-v3` driver module:
+    link:{include:cdist/ikey-v3.tar.gz.datauri}["ikey-v3.tar.gz",filename="ikey-v3.tar.gz"]
+
+  * Compile the `ikey-v3` module, and load the module
+
+  * Create the device node and test with `cat`
+
+  * Press Ctrl-C to terminate the `cat` process, what do you observe?
+
+=== System Call Restart
+
+image::figures/signals-1.png[width="50%",align="center"]
+
+=== System Call Restart
+
+image::figures/signals-2.png[width="50%",align="center"]
+
+=== System Call Restart
+
+image::figures/signals-3.png[width="50%",align="center"]
+
+=== System Call Restart
+
+image::figures/signals-4.png[width="50%",align="center"]
+
+=== System Call Restart
+
+image::figures/signals-5.png[width="50%",align="center"]
+
+=== System Call Restart
+
+image::figures/signals-6.png[width="50%",align="center"]
+
+=== Interruptible Sleep
+
+  * `wait_event_interruptible()`
+
+  * Returns:
+    - `0`, if `wake_up()` invoked, and resource available
+    - `-ERESTARTSYS`, if signal was received
+
+=== Try Out
+
+  * Modify `ikey-v3` to use `wait_event_interruptible()`
++
+[source,c]
+------
+ret = wait_event_interruptible(&ikey_wq, !kfifo_is_empty(&ikey_fifo));
+if (ret != 0)
+    return -ERESTARTSYS;
+------
++
+  * Compile, load and test
+
+  * Press Ctrl-C to terminate the `cat` process, does it work now?
+
+=== Thundering Herd
+
+  * Problem: Multiple processes can be waiting for a resource
+
+    - When resource becomes available all processes are woken-up
+
+    - One of the woken processes gets scheduled, takes the resource
+
+    - All other processes, will not get the resource, and go to sleep
+
+  * Pseudocode of `wait_event` macro
++
+[source,c]
+------
+while (!condition) {
+  current->state = STATE_INTERRUPTIBLE_SLEEP;
+  add_to_wait_queue(wq);
+  schedule();
+}
+------
+
+== Summary
+
+=== I2C Key Driver
+
+  * v1.0: Simple, direct hardware read
+
+  * v2.0: In-memory FIFO, to buffer data
+
+  * v3.0: Blocking IO
+
+    - Interruptible Sleep
+    - Thundering Herd
