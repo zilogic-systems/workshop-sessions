@@ -1,5 +1,9 @@
 sudo mount /dev/dvd /mnt &&
 
+# Delay is required due to some race condition which causes GPG
+# signature verification error when updating package lists.
+sleep 10 &&
+
 sudo apt-get update &&
 
 sudo apt-get install build-essential bzip2 \
