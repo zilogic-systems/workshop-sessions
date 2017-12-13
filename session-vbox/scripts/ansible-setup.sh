@@ -9,6 +9,12 @@ sudo apt-get -f install &&
 
 sudo apt-get install ansible --no-install-recommends -y  &&
 
+# Make ansible-setup available in VM
+sudo mkdir -p /usr/share/ansible-setup &&
+sudo cp ~/playbook.yml /usr/share/ansible-setup &&
+sudo cp ~/hosts.txt /usr/share/ansible-setup &&
+sudo cp -r ~/files /usr/share/ansible-setup &&
+
 sudo mv ~/playbook.yml /tmp/playbook.yml &&
 sudo mv ~/hosts.txt /tmp/hosts.txt &&
 sudo mv ~/files /tmp/ &&
