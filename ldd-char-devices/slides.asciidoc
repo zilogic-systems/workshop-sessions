@@ -1,0 +1,484 @@
+= Character Device Drivers
+Zilogic Systems
+
+== Introduction
+
+=== Overview
+
+  * Y Driver
+  * Echo Driver
+  * I2C LCD Driver
+
+== Y Driver
+
+=== Y Driver: Requirements
+
+ * When device file is read, should provide following the character sequence
+   - `'y'`
+   - `'\n'`
+
+=== Code: Init
+
+[source,c]
+------
+include::code/y/y/init[]
+------
+
+=== Character Driver Registration
+
+  * Kernel API to register character driver
++
+[source,c]
+------
+#include <linux/fs.h>
+ret = register_chrdev(major, name, fops);
+
+int ret;
+unsigned int major;
+char * name;
+struct file_operations * fops;
+------
++
+  * `major` specifies the major no. to be associated with the driver
+
+  * A major no. not used by any driver can be specified as the major
+    no
+
+=== Character Driver Registration
+
+  * Kernel API to register character driver
++
+[source,c]
+------
+#include <linux/fs.h>
+ret = register_chrdev(major, name, fops);
+
+int ret;
+unsigned int major;
+char * name;
+struct file_operations * fops;
+------
++
+  * If the `major` is specified as `0`, the kernel allocates a free
+    available major no
+
+  * The allocated major no. can be determined from `/proc/devices`
+
+=== Character Driver Registration
+
+  * Kernel API to register character driver
++
+[source,c]
+------
+#include <linux/fs.h>
+ret = register_chrdev(major, name, fops);
+
+int ret;
+unsigned int major;
+char * name;
+struct file_operations * fops;
+------
++
+  * The name of the device as it will appear in `/proc/devices` is
+    specified by `name`
+
+=== Character Driver Registration
+
+  * Kernel API to register character driver
++
+[source,c]
+------
+#include <linux/fs.h>
+ret = register_chrdev(major, name, fops);
+
+int ret;
+unsigned int major;
+char * name;
+struct file_operations * fops;
+------
++
+  * Returns the registered major no. on success
+
+  * Returns a negative error code on failure
+
+=== Code: File Operations
+
+  * Character device callbacks
++
+[source,c]
+------
+include::code/y/y/fops[]
+------
++
+  * The `read()` callback is invoked, when the device file is read
+
+  * The `owner` specifies the module, that this callback is part of
+
+  * Used to ensure that the module is not removed when device file is in use
+
+=== Read System Call
+
+[source,c]
+------
+ssize_t read(int fd, void *buf, size_t count);
+------
+
+  * When `read` system call is invoked on the device file, the `read`
+    callback is invoked
+
+  * `fd` is converted to a pointer to the file table
+
+  * Additional info about the current file offset is also passed to the callback
+
+=== Pseudocode: Read
+
+[source,c]
+------
+static ssize_t y_read(struct file *file, char *buf, size_t count,
+                      loff_t * ppos)
+{
+	size_t i;
+
+	if (count == 1)
+	        return -EINVAL;
+	if (count % 2 != 0)
+		count--;
+	for (i = 0; i < count; i += 2) {
+		buf[i] = 'y';
+		buf[i + 1] = '\n';
+	}
+
+	return count;
+}
+------
+
+=== Accessing User Space
+
+image::figures/uspace-access-0.png[width="60%",align="center"]
+
+=== Accessing User Space
+
+image::figures/uspace-access-1.png[width="60%",align="center"]
+
+=== Accessing User Space (Contd.)
+
+image::figures/uspace-access-2.png[width="60%",align="center"]
+
+=== Accessing User Space (Contd.)
+
+image::figures/uspace-access-3.png[width="60%",align="center"]
+
+=== Accessing User Space (Contd.)
+
+image::figures/uspace-access-4.png[width="60%",align="center"]
+
+=== Accessing User Space (Contd.)
+
+image::figures/uspace-access-5.png[width="60%",align="center"]
+
+=== Accessing User Space (Contd.)
+
+image::figures/uspace-access-6.png[width="60%",align="center"]
+
+
+=== Copying Data To User Space
+
+[source,c]
+-------
+#include <asm/uaccess.h>
+
+ret = put_user(x, ptr)
+
+int ret;
+T x;
+T *ptr;
+-------
+
+  * `ptr` pointer to user space buffer, to store data to
+  * `x` variable containing the data to be stored
+  * no. of bytes copied depends on `sizeof` variable `x`
+
+=== Copying Data To User Space
+
+[source,c]
+-------
+#include <asm/uaccess.h>
+
+ret = put_user(x, ptr)
+
+int ret;
+T x;
+T *ptr;
+-------
+
+  * returns `0` on success
+  * returns negative error code, if pointer validation fails
+
+=== Copying Data From User Space
+
+[source,c]
+-------
+#include <asm/uaccess.h>
+
+ret = get_user(x, ptr)
+
+int ret;
+T x;
+T *ptr;
+-------
+
+  * Similar to `put_user()`, except for the direction of transfer
+
+=== Pseudocode: Read
+
+[source,c]
+------
+static ssize_t y_read(struct file *file, char *buf, size_t count,
+                      loff_t *ppos)
+{
+	size_t i;
+
+	if (count == 1)
+	        return -EINVAL;
+	if (count % 2 != 0)
+		count--;
+	for (i = 0; i < count; i += 2) {
+		buf[i] = 'y';
+		buf[i + 1] = '\n';
+	}
+
+	return count;
+}
+------
+
+=== Code: Read
+
+[source,c]
+------
+include::code/y/y/read[]
+------
+
+=== Code: Exit
+
+[source,c]
+------
+include::code/y/y/exit[]
+------
+
+=== Try Out
+
+  * Get the `y` driver module:
+    link:{include:code/y.tar.gz.datauri}["y.tar.gz",filename="y.tar.gz"]
+
+  * Compile the `y` module, and load the module
+
+=== Try Out
+
+  * Determine the major number allocated from `/proc/devices`.
++
+------
+# cat /proc/devices
+------
++
+  * Create the device node using `mknod`
++
+------
+# mknod /dev/y MAJOR 0
+------
++
+  * Replace `MAJOR` with major no. from `/proc/devices`
+
+=== Try Out
+
+  * Read the device file using `cat`
++
+------
+# cat /dev/y
+------
++
+  * Use it with `rm` to answer interactive questions, with answer `y`
+
+== Echo Driver
+
+=== Requirements
+
+   * When device is written, data should be stored in a FIFO
+
+   * When device is read, data should be provided from the FIFO
+
+   * When device file is opened for writing, the FIFO should be
+     cleared
+
+=== Kernel FIFO
+
+   * Circular buffers are widely used in device drivers
+
+   * Useful for moving data between callbacks
+
+=== Kernel FIFO (Contd.)
+
+image::figures/kfifo-0.png[align="center"]
+
+=== Kernel FIFO (Contd.)
+
+image::figures/kfifo-1.png[align="center"]
+
+=== Kernel FIFO (Contd.)
+
+image::figures/kfifo-2.png[align="center"]
+
+=== Kernel FIFO (Contd.)
+
+image::figures/kfifo-3.png[align="center"]
+
+=== Kernel FIFO (Contd.)
+
+image::figures/kfifo-3-1.png[align="center"]
+
+=== Kernel FIFO (Contd.)
+
+image::figures/kfifo-4.png[align="center"]
+
+=== Kernel FIFO (Contd.)
+
+image::figures/kfifo-4-1.png[align="center"]
+
+=== Kernel FIFO (Contd.)
+
+image::figures/kfifo-5.png[align="center"]
+
+=== Code: Global Data
+
+[source,c]
+------
+include::code/echo/echo/global[]
+------
+
+=== Defining a KFIFO
+
+  * Create and initialize a global KFIFO variable
++
+[source,c]
+-------
+DEFINE_KFIFO(fifo, type, size);
+-------
++
+  * `fifo` specifies the variable name
+  * `type` specifies the type of the FIFO elements
+  * `size` specifies the number of elements in the fifo
+
+=== Code: File Operations
+
+[source,c]
+------
+include::code/echo/echo/fops[]
+------
+
+=== Code: Read
+
+[source,c]
+------
+include::code/echo/echo/read[]
+------
+
+=== KFIFO: Removing Data
+
+  * API to remove data from the KFIFO
++
+[source,c]
+------
+kfifo_get(fifo, val)
+------
++
+  * `fifo` is the address of the KFIFO
+  * `val` is the address where removed data is to be stored
+  * Returns the number of items removed
+  * Returns `0` if the KFIFO was empty
+
+=== Code: Write
+
+[source,c]
+------
+include::code/echo/echo/write[]
+------
+
+=== KFIFO: Adding Data
+
+  * API to add data to the KFIFO
++
+[source,c]
+------
+kfifo_put(fifo, val)
+------
++
+  * `fifo` is the address of the KFIFO
+  * `val` is the data to be stored
+  * Returns the number of items stored
+  * Returns `0` if the KFIFO was full
+
+=== Code: Open
+
+[source,c]
+------
+include::code/echo/echo/open[]
+------
+
+=== File Open Flags
+
+image::figures/open-flags.png[align="center",width="40%"]
+
+
+=== KFIFO: Clearing Data
+
+  * API to remove all data from the KFIFO
++
+[source,c]
+------
+kfifo_reset(fifo)
+------
++
+  * `fifo` is the address of the KFIFO
+
+=== Try Out
+
+  * Get the `echo` module:
+    link:{include:cdist/echo.tar.gz.datauri}["echo.tar.gz",filename="echo.tar.gz"]
+
+  * Compile the `echo` module
+
+  * Load the `echo` module
+
+  * Create the device node `/dev/echo` with appropriate major number
+
+=== Try Out
+
+  * Write data to `/dev/echo` using echo
+
+  * Read data from `/dev/echo`
+
+  * Write data and then append data to `/dev/echo`
+
+== I2C LCD Driver
+
+=== Try Out
+
+  * Requirement
+    - Writing to the LCD device, should cause the data to be displayed
+      on the display
+
+  * Get the `lcd` skeleton module:
+    link:{include:code/lcd.tar.gz.datauri}["lcd.tar.gz",filename="lcd.tar.gz"]
+
+== Questions
+
+== Advanced Bits
+
+=== `__user` Macro
+
+  * Used to annotate pointer variables
+
+  * Indicates that the pointer contains an address pointing to a user space buffer
+
+  * Should not be directly de-referenced
+
+  * This is used by static code analysis tools like 'sparse'
