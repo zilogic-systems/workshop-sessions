@@ -6,6 +6,7 @@
 #include <linux/fs.h>
 #include <linux/cdev.h>
 #include <linux/kfifo.h>
+#include <linux/ctype.h>
 
 #include <asm/uaccess.h>
 
@@ -40,7 +41,7 @@ static ssize_t echo_write(struct file * file, const char __user * buf,
 		if (get_user(ch, buf + i))
 			return -EFAULT;
 		ch = tolower(ch);
-		if (kfifo_put(&echo_fifo, &ch) != 1)
+		if (kfifo_put(&echo_fifo, ch) != 1)
 			break;
 	}
 
