@@ -1,0 +1,438 @@
+= Interrupts
+Zilogic Systems
+
+== Overview
+
+=== Topics
+
+ * Interrupts
+   - Handling
+   - Sharing
+   - Multiplexing
+   - Triggering
+   - Cascading
+ * Kernel Interrupts
+ * I2C Key Driver
+
+== Interrupts
+
+=== Interrupt Handling
+
+image::figures/interrupt-handler-0.png[width="65%",align="center"]
+
+=== Interrupt Handling
+
+image::figures/interrupt-handler-1.png[width="65%",align="center"]
+
+=== Interrupt Handling
+
+image::figures/interrupt-handler-0.png[width="65%",align="center"]
+
+=== Interrupt Handling
+
+image::figures/interrupt-handler-1.png[width="65%",align="center"]
+
+=== Interrupt Handling
+
+image::figures/interrupt-handler-2.png[width="65%",align="center"]
+
+=== Interrupt Handling
+
+image::figures/interrupt-handler-3.png[width="65%",align="center"]
+
+=== Interrupt Handling
+
+image::figures/interrupt-handler-4.png[width="65%",align="center"]
+
+=== Interrput Sharing
+
+image::figures/interrupt-share-1.png[width="65%",align="center"]
+
+=== Interrput Sharing
+
+image::figures/interrupt-share-2.png[width="65%",align="center"]
+
+=== Interrput Sharing
+
+image::figures/interrupt-share-3.png[width="65%",align="center"]
+
+=== Interrput Sharing
+
+image::figures/interrupt-share-4.png[width="65%",align="center"]
+
+=== Interrput Sharing
+
+image::figures/interrupt-share-5.png[width="65%",align="center"]
+
+=== Interrput Sharing
+
+image::figures/interrupt-share-6.png[width="65%",align="center"]
+
+=== Interrput Sharing
+
+image::figures/interrupt-share-7.png[width="65%",align="center"]
+
+=== Interrput Sharing
+
+image::figures/interrupt-share-8.png[width="65%",align="center"]
+
+=== Pros and Cons
+
+  * Pros:
+    - Allows multiple device to interrupt the CPU
+
+  * Cons:
+    - For each interrupt, all devices connected to interrupt line should be checked
+
+=== Interrupt Multiplexing
+
+image::figures/interrupt-mux-1.png[width="60%",align="center"]
+
+=== Interrupt Multiplexing
+
+image::figures/interrupt-mux-2.png[width="60%",align="center"]
+
+=== Interrupt Multiplexing
+
+image::figures/interrupt-mux-3.png[width="60%",align="center"]
+
+=== Interrupt Multiplexing
+
+image::figures/interrupt-mux-4.png[width="60%",align="center"]
+
+=== Interrupt Multiplexing
+
+image::figures/interrupt-mux-5.png[width="60%",align="center"]
+
+=== Interrupt Triggering
+
+image::figures/interrupt-trigger-1.png[width="60%",align="center"]
+
+=== Interrupt Triggering
+
+image::figures/interrupt-trigger-2.png[width="60%",align="center"]
+
+=== Interrupt Triggering
+
+image::figures/interrupt-trigger-3.png[width="60%",align="center"]
+
+=== Interrupt Triggering
+
+image::figures/interrupt-trigger-4.png[width="60%",align="center"]
+
+=== Interrupt Triggering
+
+image::figures/interrupt-trigger-5.png[width="60%",align="center"]
+
+=== PIC Cascading
+
+image::figures/pic-cascade-1.png[width="70%",align="center"]
+	
+=== PIC Cascading
+
+image::figures/pic-cascade-3.png[width="70%",align="center"]
+
+=== PIC Cascading
+
+image::figures/pic-cascade-4.png[width="70%",align="center"]
+
+=== PIC Cascading
+
+image::figures/pic-cascade-5.png[width="70%",align="center"]
+
+=== PIC Cascading
+
+image::figures/pic-cascade-6.png[width="70%",align="center"]
+
+== Kernel Interrupts API
+
+=== IRQ Numbering
+
+ * Each IRQ line is given a unique no. by the Linux kernel
+
+ * When PICs are cascaded the Linux kernel allocates IRQ numbers so
+   that they do not overlap
+
+=== Interrupt Debugging
+
+ * `/proc/interrupts`
+   - shows the driver associated with each interrupt line
+   - the no. of times a particular interrupt has occured
++
+------
+            CPU0       
+  1:        390       AIC  at91_tick, rtc0, ttyS0
+ 10:          0       AIC  at91_udc
+ 12:          0       AIC  atmel_spi.0
+ 19:       2658       AIC  tc_clkevt
+ 20:          0       AIC  ohci_hcd:usb1
+ 21:       1577       AIC  eth0
+101:          0      GPIO  at91_udc
+Err:          0
+------
+
+=== Key Interrupt
+
+  * Requirements
+    - When the key is pressed, print "key pressed" message
+    - When the key is released, print "key released" message
+    - Should be done using an interrupt handler / callback
+
+=== Pseudocode: Init
+
+[source,c]
+------
+static int key_init(void)
+{
+	...
+	gpio_request(KEY_GPIO, "key");
+	...
+	gpio_direction_input(KEY_GPIO);
+	
+	irq = gpio_to_irq(KEY_GPIO);
+	request_irq(irq, key_handler,
+	            IRQF_TRIGGER_RISING | IRQF_TRIGGER_FALLING,
+		    "key", 0);
+	...
+	return 0;
+}
+------
+
+=== Registering Interrupt Callback
+
+[source,c]
+------
+#include <linux/interrupt.h>
+ret = request_irq(irq, handler, flags, name, dev);
+
+int ret;
+unsigned int irq;
+irqreturn_t (*handler)(int, void *),
+unsigned long flags, 
+const char * name;
+void * dev;
+------
+
+  * `irq` is the interrupt line to register callback for
+  * `handler` is the callback function to be invoked
+
+=== Registering Interrupt Callback
+
+[source,c]
+------
+#include <linux/interrupt.h>
+ret = request_irq(irq, handler, flags, name, dev);
+
+int ret;
+unsigned int irq;
+irqreturn_t (*handler)(int, void *),
+unsigned long flags, 
+const char * name;
+void * dev;
+------
+
+  * `flags` specify the interrupt trigger type
+  * `name` is the name for the device, that will appear in `/proc/interrupts`
+  * `dev` is data pointer that will be passed to the handler
+
+=== Code: Handler
+
+[source,c]
+------
+include::code/key/key/handler[]
+-------
+
+=== Interrupt Trigger Type
+
+  * The interrupt type flag is used to configure the PIC
+  * Edge Trigger Interrupts
+    - `IRQF_TRIGGER_RISING`
+    - `IRQF_TRIGGER_FALLING`
+  * Level Triggered Interrupts
+    - `IRQF_TRIGGER_HIGH`
+    - `IRQF_TRIGGER_LOW`
+
+=== Code: Exit
+
+[source,c]
+------
+include::code/key/key/exit[]
+-------
+
+=== De-registering Interrupt Callback
+
+[source,c]
+------
+#include <linux/interrupt.h>
+free_irq(irq, dev);
+
+unsigned int irq;
+void * dev;
+------
+
+  * `irq` is the interrupt line
+  * `dev` is the data pointer that was specified during registration
+
+=== Try Out
+
+  * Get the `key` module:
+    link:{include:cdist/key.tar.gz.datauri}["key.tar.gz",filename="key.tar.gz"]
+
+  * Load the module
+
+  * Check `/proc/interrupts` to verify that interrupt handler has been
+    registered
+
+  * Press the key, and test the module
+
+  * Verify the interrupt count in `/proc/interrupts`
+
+=== Algo: Receiving Interrupts
+
+  * Register interrupt handler with `request_irq()`
+  * Enable interrupts in the device
+
+=== Algo: Handling Interrupts
+
+  * Check if the device has interrupted, if not return `IRQ_NONE`.
+  * Acknowledge the interrupt
+  * Perform device specific action
+  * Return `IRQ_HANDLED`
+
+=== FIXME: Shared Interrupts
+
+== I2C Key Driver
+
+=== With Interrupt Support
+
+  * Requirements
+
+    - While reading if no data is available should block
+
+    - If data is available should provide the read data
+
+    - Instead of polling periodically, schedule work from interrupt handler
+
+=== v2.0 / v3.0 Design
+
+image::figures/ikey-v2-design.png[width="75%",align="center"]
+
+=== v4.0 Design
+
+image::figures/ikey-v4-design.png[width="75%",align="center"]
+
+=== Pseudocode: Init
+
+[source,c]
+------
+static int ikey_init(void)
+{
+	adapter = i2c_get_adapter(0);
+	client = i2c_new_device(adapter, &board_info);
+
+	gpio_request(INT_GPIO, "ikey-irq");
+	gpio_direction_input(INT_GPIO);
+	irq = gpio_to_irq(INT_GPIO);
+	request_irq(irq, ikey_handler, IRQF_TRIGGER_RISING, "ikey", 0);
+
+	major = register_chrdev(0, "ikey", &ikey_fops);
+	return 0;
+}
+------
+
+=== Pseudocode: Read
+
+[source,c]
+------
+static ssize_t ikey_read(struct file *file, char __user * buf,
+			size_t count, loff_t * ppos)
+{
+	wait_event_interruptible(ikey_wq, !kfifo_is_empty(&ikey_fifo));
+
+	for (i = 0; i < count; i++) {
+		kfifo_get(&ikey_fifo, &ikey);
+		put_user(ikey + '0', buf + i);
+	}
+
+	return i;
+}
+------
+
+=== Code: Read
+
+[source,c]
+------
+include::code/i2c-key/i2c-key/read[]
+-------
+
+=== Code: Handler
+
+[source,c]
+------
+include::code/i2c-key/i2c-key/handler[]
+-------
+
+=== Try Out
+
+  * Get the `key` module:
+    link:{include:cdist/key.tar.gz.datauri}["key.tar.gz",filename="key.tar.gz"]
+
+  * Load the module, and create device nodes
+
+  * Read from `/dev/key` using `cat`
+
+  * What happens when no data is available
+
+=== Try Out
+
+  * Modify the program to use `wait_event` instead of
+    `wait_event_interruptible`
+
+  * Read from `/dev/key` using `cat`
+
+  * Try terminating `cat` using `Ctrl-C`
+
+== Execution Contexts
+
+=== Kernel Code Execution
+
+  * On behalf of a process - syscall invocation
+    - Process Context
+
+  * On behalf of a hardware interrupt
+    - Interrupt Context
+
+=== Process Context
+
+  * If data is not avilable, current process can be put to sleep
+
+  * Using `wait_event()` and friends
+
+  * Kernel threads, also run in process context
+
+  * No restriction on Kernel APIs
+
+=== Interrupt Context
+
+  * Interrupt handlers are not associated with a process
+
+  * Cannot invoke `wait_event()`
+
+  * And any kernel API that invokes `wait_event()`
+
+=== Kernel APIs
+
+  * Which of the following APIs can potentially block?
+    - `msleep()`
+    - `put_user()` and `get_user()`
+    - `i2c_send()` and `i2c_receive()`
+    - `wake_up()`
+
+=== Bottom Half Execution
+
+  * If blocking calls needs to be executed in interrupt context
+
+  * Actual handling is deferred to a work
+
+  * Work executes in a worker thread, where blocking calls can be
+    invoked

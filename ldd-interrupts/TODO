@@ -1,0 +1,3 @@
+  * GPIO controller as cascaded PIC
+  * Fix ack order
+  * Also specify interrupt handling for level interrupts
