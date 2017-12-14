@@ -1,0 +1,68 @@
+= Demystifying Device Drivers
+Zilogic Systems
+
+== What to Expect?
+
+=== Resources
+
+image::figures/ldd-cover.jpg[width="30%",align="center"]
+
+=== Resources
+
+image::figures/lkd-cover.jpg[width="30%",align="center"]
+
+=== Resources
+
+image::figures/lwn.png[width="50%",align="center"]
+
+=== Road Blocks
+
+  * Learning to write drivers requires good inter-disciplinary
+    knowlege:
+  
+    - Microprocessors
+    - Operating Systems
+    - POSIX System Calls
+    - Linux Kernel Model
+
+== How are we going to do it?
+
+=== Big Picture
+
+  * Day 1: How the Kernel Works
+
+  * Day 2: Device Driver Fundamentals
+
+=== Day 1: How the Kernel Works
+
+  * How Kernel Manages Memory
+  * How Kernel Services Work
+  * How Kernel Drivers Work
+  * How Kernel Manages Files
+  * How Kernel Code is Built
+  * How Kernel Modules Work
+  * How Kernel Manages GPIOs
+  * How Kernel Manages Time
+  * How Kernel Defers Execution
+
+=== Day 2: Device Driver Fundamentals
+
+  * I2C Interface
+  * Writing a Characters
+  * Blocking IO
+  * Using Interrupts
+  * Execution Contexts
+  * Concurrency and Locking
+  * Bus Model
+
+=== Zen of the Workshop
+
+  * Our Philosophy
+
+    - Provide Meaningful Mental Models
+    - Use Examples to Explain Concepts
+    - Build Examples Incrementally, Gradually Increasing Complexity
+    - Use Simple Devices, Focus on the Driver, Not on the Device
+    - Study, Test and Absorb the Example Code
+
+== Demystifying Linux Device Drivers
