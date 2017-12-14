@@ -192,7 +192,7 @@ include::code/multi-led/multi-led.init[]
 === Try Out
 
 * Modify the LED Code to glow green color referring below table
-  link:{include:code/multi-led/multi-led.full.datauri}["multi-led.c",filename="multi-led.c"]
+  link:{include:cdist/multi-led.tar.gz.datauri}["multi-led.tar.gz",filename="multi-led.tar.gz"]
 
 |==================================
 |RED(70)|GREEN(65)|BLUE(64)|OUTPUT
@@ -250,7 +250,7 @@ include::code/key/key.exit[]
 
 * Modify the key code, to print whether KEY2 status , while loading
   the driver.
-  link:{include:code/key/key.full.datauri}["key.c",filename="key.c"]
+  link:{include:cdist/key.tar.gz.datauri}["key.tar.gz",filename="key.tar.gz"]
 
 == Subsystem Over Subsystem
 

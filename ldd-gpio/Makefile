@@ -40,7 +40,8 @@ buildtar:
 slides.html: $(images_png) $(datauris)
 
 clean:
-	rm -f $(images_png) $(datauris) $(dl-files)
+	rm -f $(images_png) $(datauris) 
+	rm -rf cdist code/*/
 	rm -f slides.html
 
 include $(TOPDIR)/stylesheets/Makefile.rules
