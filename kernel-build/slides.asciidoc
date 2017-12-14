@@ -67,11 +67,11 @@ image::figures/kernel-releases.png[width="35%",align="center"]
 /usr/share/buildroot-vybrid/linux-4.4.39.tar.xz
 ------
 +
-  * Copy the kernel to the home directory and extract the kernel
+  * Extract the kernel to the home directory
 +
 ------
-cp /usr/share/buildroot-vybrid/linux-4.4.39.tar.xz .
-tar -x -f linux-4.4.39.tar.xz
+cd $HOME
+tar -x -f /usr/share/buildroot-vybrid/linux-4.4.39.tar.xz
 ------
 
 === Try Out
@@ -144,30 +144,6 @@ make uImage LOADADDR=0x80008000
   * Build the kernel and generate the uImage
   * Verify that the kernel image is available from
     `arch/arm/boot/uImage`
-  * Copy the kernel to `/tftpboot`
-  * Boot Vybrid board to verify that the kernel boots
-
-=== Kernel Configuration Changes
-
-  * The kernel displays a version number at bootup.
-
-  * This can be customized by changing the following configuration.
-+
-------
-General Setup >
-	() Local version - append to kernel release
-------
-+
-  * Add a custom string in this configuration.
-
-  * Look for this string in your kernel boot log.
-
-=== Try Out
-
-  * Make the mentioned configuration changes
-
-  * Build, boot and verify that the configuration changes have taken
-    effect
 
 === Clean Targets
 
