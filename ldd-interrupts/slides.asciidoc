@@ -362,14 +362,14 @@ static ssize_t ikey_read(struct file *file, char __user * buf,
 
 [source,c]
 ------
-include::code/i2c-key/i2c-key/read[]
+include::code/ikey/ikey/read[]
 -------
 
 === Code: Handler
 
 [source,c]
 ------
-include::code/i2c-key/i2c-key/handler[]
+include::code/ikey/ikey/handler[]
 -------
 
 === Try Out

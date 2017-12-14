@@ -5,9 +5,9 @@ EXPORT_WIDTH  = 1024
 images_dia = $(wildcard figures/*.dia)
 images_png = $(images_dia:.dia=.png)
 
-datauris = cdist/key.tar.gz.datauri cdist/i2c-key.tar.gz.datauri
+datauris = cdist/key.tar.gz.datauri cdist/ikey.tar.gz.datauri
 
-all: key-split i2c-key-split slides.html
+all: key-split ikey-split slides.html
 
 %.tar.gz.datauri: MIMETYPE="application/gzip"
 
@@ -17,17 +17,17 @@ cdist/key.tar.gz:
 	cp code/key/Makefile cdist/key/
 	tar --gzip -C cdist -c -f cdist/key.tar.gz key
 
-cdist/i2c-key.tar.gz:
-	mkdir -p cdist/i2c-key
-	cp code/i2c-key/i2c-key/all cdist/i2c-key/i2c-key.c
-	cp code/i2c-key/Makefile cdist/i2c-key/
-	tar --gzip -C cdist -c -f cdist/i2c-key.tar.gz i2c-key
+cdist/ikey.tar.gz:
+	mkdir -p cdist/ikey
+	cp code/ikey/ikey/all cdist/ikey/ikey.c
+	cp code/ikey/Makefile cdist/ikey/
+	tar --gzip -C cdist -c -f cdist/ikey.tar.gz ikey
 
 key-split:
 	python $(TOPDIR)/scripts/split.py code/key/key.c
 
-i2c-key-split:
-	python $(TOPDIR)/scripts/split.py code/i2c-key/i2c-key.c
+ikey-split:
+	python $(TOPDIR)/scripts/split.py code/ikey/ikey.c
 
 %.tar.gz.datauri: MIMETYPE="application/gzip"
 
