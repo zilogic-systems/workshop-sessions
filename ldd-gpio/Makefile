@@ -15,14 +15,27 @@ full = $(sources:%.c=%.full.datauri)
 def = $(sources:%.c=%.def.datauri)
 init = $(sources:%.c=%.init.datauri)
 exit = $(sources:%.c=%.exit.datauri)
-datauris = $(full) $(def) $(init) $(exit)
+tar = $(patsubst %, cdist/%.tar.gz.datauri, $(notdir $(basename $(srcpath))))
+datauris = $(full) $(def) $(init) $(exit) $(tar)
 
-code/%.datauri: MIMETYPE="text/plain;charset=us-ascii"
+code/%.datauri: MIMETYPE="text/plain;charset-us-ascii"
 
-all: split slides.html
+cdist/%.tar.gz.datauri: MIMETYPE="application/gzip"
+
+all: split buildtar slides.html
 
 split:
 	for i in $(srcpath);do	python $(TOPDIR)/scripts/split.py $$i; done;
+
+buildtar:
+	echo $(tar)
+	mkdir -p cdist;
+	for i in $(srcpath);\
+	do mkdir -p cdist/`basename $$i .c`;\
+	cp $$i cdist/`basename $$i .c`;\
+	echo "obj-m = `basename $$i .c`.o" > cdist/`basename $$i .c`/Makefile;\
+	cat code/Makefile.mod >> cdist/`basename $$i .c`/Makefile;\
+	tar -czf "cdist/`basename $$i .c`.tar.gz" -Ccdist `basename $$i .c`;done  
 
 slides.html: $(images_png) $(datauris)
 
