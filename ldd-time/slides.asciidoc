@@ -82,7 +82,7 @@ include::code/led-blink-delay/led-blink-delay.exit[]
 === Try Out
 
 * Modify the LED blinking code to blink in green color
-  link:{include:code/led-blink-delay/led-blink-delay.full.datauri}["led-blink-delay.c",filename="led-blink-delay.c"]
+  link:{include:cdist/led-blink-delay.tar.gz.datauri}["led-blink-delay.tar.gz",filename="led-blink-delay.tar.gz"]
 
 == Internals of Delay
 
@@ -225,7 +225,7 @@ include::code/led-blink-wq/led-blink-wq.exit[]
 === Try Out
 
 * Modify the LED blinking code to blink in green color
-  link:{include:code/led-blink-wq/led-blink-wq.full.datauri}["led-blink-wq.c",filename="led-blink-wq.c"]
+  link:{include:cdist/led-blink-wq.tar.gz.datauri}["led-blink-wq.tar.gz",filename="led-blink-wq.tar.gz"]
 
 === Using Workqueue
 
@@ -389,7 +389,7 @@ include::code/key-scan/key-scan.init[]
 === Try Out - Key Scan 
 
 * Build and test key-scan code
-  link:{include:code/key-scan/key-scan.full.datauri}["key-scan.c",filename="key-scan.c"]
+  link:{include:cdist/key-scan.tar.gz.datauri}["key-scan.tar.gz",filename="key-scan.tar.gz"]
 
 == Explore It Yourself
 
