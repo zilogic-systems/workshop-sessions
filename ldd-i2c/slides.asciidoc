@@ -219,7 +219,7 @@ include::code/lcd/lcd.exit[]
 === Tryout
 
  * Modify the LCD code
-    link:{include:code/lcd/lcd.full.datauri}["lcd.c",filename="lcd.c"], and
+    link:{include:cdist/lcd.tar.gz.datauri}["lcd.tar.gz",filename="lcd.tar.gz"], and
     add support for clear support.
 
 === 4-way Key Datasheet
@@ -249,7 +249,7 @@ include::code/ikey/ikey.exit[]
 === Tryout
 
  * Build and test the i2c key code
-    link:{include:code/ikey/ikey.full.datauri}["ikey.c",filename="ikey.c"].
+    link:{include:cdist/ikey.tar.gz.datauri}["ikey.tar.gz",filename="ikey.tar.gz"].
 
 == Model for Busses
 
