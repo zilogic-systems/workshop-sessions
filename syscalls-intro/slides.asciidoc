@@ -1,7 +1,7 @@
 = Linux Syscalls
 
 == Role of Operating System
-
+/////
 [role="two-column"]
 === No OS Model
 [role="left"]
@@ -32,6 +32,7 @@ image::figures/no-os.png[width=300, align="center"]
 === GPOS Model
 [role="right"]
 image::figures/gpos-layers.png[width=400, align="center"]
+/////
 
 === Scope of a Process
 
@@ -115,7 +116,7 @@ image::figures/kernelpage.png[align="center"]
 === Privilege Escalation
 
   * The user space application, if they want to access kernel
-    functions, they need to get to elevated to Kernel privilege.
+    functions, they need to get elevated to Kernel privilege.
 
   * The escalation from user privilege to kernel privilege is done by
     `software interrupts or traps`.
@@ -123,7 +124,7 @@ image::figures/kernelpage.png[align="center"]
 === Trap Call
 image::figures/trap.png[align="center"] 
 
-== Address Space Isolation
+== Address Space Isolation in Detail
 
 [role="two-column"]  
 === Memory Sections
@@ -200,7 +201,7 @@ image::figures/context2.png[width=700,align="center"]
     and data at will. This can result in jeopardizing the stability of
     the system.
 
-== Privilege Separation
+== Privilege Separation in Detail
 
 === Privilege Separation
 
@@ -242,7 +243,7 @@ image::figures/context2.png[width=700,align="center"]
 
 === Address Space Privileges
 
-  * The page tables has a flag that indicate whether a page is a
+  * The page tables have a flag that indicate whether a page is a
     supervisor page.
 
   * supervisor pages can be accessed only when the processor is in
@@ -257,7 +258,7 @@ image::figures/context2.png[width=700,align="center"]
   * The pages corresponding to kernel code and data are indicated as
     supervisor pages.
 
-== Privilege Escalation
+== Privilege Escalation in Detail
 
 === Interrupts for Escalatation
 

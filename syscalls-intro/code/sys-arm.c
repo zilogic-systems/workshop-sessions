@@ -30,7 +30,7 @@ int main()
 
 	rc = __syscall2(CHMOD, "/home/user/a.txt", 0777);
 
-	if (rc == -1)
+	if (rc != -1)
 		printf("Permission Changed\n");
 	else
 		printf("Error\n");
