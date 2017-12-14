@@ -23,15 +23,16 @@ image::figures/subsystem.png[align="center",width="65%"]
  * Subsystem has common `framework` drivers called as `class` drivers
    provide a well-defined APIs, for other drivers to use them.
 
- * Beneath the framework, their exists `Producers` drivers which
+ * Beneath the framework, there exists `Producers` drivers which
    implement platform specific code.
 
  * `Consumers` are the drivers which is on top of framework drivers,
-   which uses the interfaces provided by framework..
+   which uses the interfaces provided by framework.
 
 [role="right"]
 image::figures/class-model.png[align="center",width="65%"]
 
+/////
 == Communication Model
  
 === Userspace Communication Layers
@@ -50,6 +51,7 @@ image::figures/app-interfaces.png[align="center",width="75%"]
 
  * Socket Model - Driver can talk to application through `netlink`
    sockets.
+/////
 
 == GPIO Subsystem 
 
@@ -146,8 +148,8 @@ int gpio_request(unsigned int gpio_no, const char * label);
 void gpio_free(unsigned int gpio_no);
 ----
 	**  `label` is the name to the pin. 
-        **  If GPIO is used by other drivers, this will fail
-
+        **  If GPIO is used by other drivers, this will return negative
+            error no
  
 === GPIO Direction
 
@@ -223,11 +225,6 @@ image::figures/keys.png[width="50%",align="center"]
 [role="right"]
 image::figures/keys-pullup.png[]
 
-=== Try Out
-
-* Modify the led glow code, to print whether KEY1 is pressed, while
-  loading the driver.
-  link:{include:code/led/led.full.datauri}["led.c",filename="led.c"]
 
 === Code - Key Sense Headers
 
@@ -249,9 +246,32 @@ include::code/key/key.init[]
 include::code/key/key.exit[]
 ----
 
-== Runtime Changes & Testing
+=== Try Out
 
-=== Module Parameters
+* Modify the key code, to print whether KEY2 status , while loading
+  the driver.
+  link:{include:code/key/key.full.datauri}["key.c",filename="key.c"]
+
+== Subsystem Over Subsystem
+
+[role="two-column"]
+=== Led Over GPIO
+[role="left"]
+* There can be scenarios where one subsystem uses APIs of other
+  subsytem.
+
+* There exists `led` subsystem, which can call APIs of `gpio`
+  subsystem.
+
+* `led` subsystem provides common implementation like blinking led,
+  brightness control and event triggers.
+
+[role="right"]
+image::figures/multi-subsystem.png[align="center",width="65%"]
+
+== Explore It Yourself 
+
+=== Runtime Changes & Testing Using Module Parameters
 
 * Kernel supports passing parameters to the driver while loading the
   driver through insmod, it is called module params.
@@ -277,34 +297,16 @@ include::code/led-params/led-params.def[]
 include::code/led-params/led-params.init[]
 ----
 
-=== Demo
+=== Params Through Insmod
 
 * We can modify the value of module parameter while loading the driver
 
 [source,sh]
 ----
-$ insmod led-params.ko
+$ insmod led-params.ko led_color=5
 ---- 
 
-=== Params Through Sysfs
-
-* We can get the current value of the module_param from sysfs
-
-[source,sh]
-----
-cat /sys/module/led_params/parameters/led_color        
-----
-
-* Module parameters can also be modified through sysfs
-
-[source,sh]
-----
-echo 5 > /sys/module/led_params/parameters/led_color        
-----
-
-== Debugging 
-
-=== Debugfs
+=== Debugging Using Debugfs
 
 * A pseudo filesystem supported by kernel to driver developers to
   expose certain debug information to userspace as files.
@@ -326,30 +328,7 @@ $ mount -t debugfs none /sys/kernel/debug
 $ cat /sys/kernel/debug/gpio   
 ----
 
-== Subsystem Over Subsystem
-
-[role="two-column"]
-=== Led Over GPIO
-[role="left"]
-* There can be scenarios where one subsystem uses APIs of other
-  subsytem.
-
-* There exists `led` subsystem, which can call APIs of `gpio`
-  subsystem.
-
-* `led` subsystem provides common implementation like blinking led,
-  brightness control and event triggers.
-
-[role="right"]
-image::figures/multi-subsystem.png[align="center",width="65%"]
-
 == Exercises 
-
-=== GPIO Input - Key 2 Handling
-
-* Modify the key scan code to print whether KEY2 is released while
-  removing the driver
-  link:{include:code/key/key.full.datauri}["key.c",filename="key.c"]
 
 === GPIO Input & Output - Glow LED with Key Press
 

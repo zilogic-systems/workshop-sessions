@@ -7,31 +7,41 @@
  * Two or more instance of a same method executed on same time
    constitutes to concurrency.
 
- * A method suspended in-between and another instance of it invoked
-   doesn't affect the previous invocation, its again concurrency.
+ * A method is suspended in-between and 
+    - another instance of the same is invoked,
+    - if they could run without descrepancy, 
+    - its also concurrency.
 
  * methods of program executed in any order, doesn't affect the final
-   result, then they would support concurrency.
+   result, then they can support concurrency.
 
-=== Types Concurrency
+=== Sources of Concurrency
 
- * Concurrency due to multiple CPU is called true concurrency, where
-   parallellism.
+  * `SMP` - two or more processors can be executing kernel code at the
+    same time.
 
- * Concurrency due to interleaving of execution is called
-   pseudo-concurrency.
+  * `Sleeping` - kernel code in process context can give up the
+    processor by invoking the scheduler, and another process could
+    start executing.
+
+  * `Pre-emption` - kernel code in process context can be pre-empted by
+    the scheduler and another process could be executed.
+
+  * `Interrupts` - interrupts can occur at anytime causing the current
+    code to be pre-empted and the interrupt handler to be executed.
 
 == Multiprocessing Models
 
-=== SMP vs AMP
+=== SMP vs UP
 
-* SMP 
+* UP - Uni Processor
+  - only single core, scope for concurrency is just preemption and
+    interrupts
+
+* SMP - Symmetric Multiprocessor
   - A system with multiple CPUs of same architecture
   - Single kernel spans across the CPUs 
-
-* AMP 
-  - A system with multiple CPUs of different architecture.
-  - two or more kernels run simultaneously  
+  - same code can run simultaneously on two cores.
 
 === SMP Issues
 
@@ -40,49 +50,39 @@
 
 * Which may be potentially a problem if it is not taken care properly.
 
-* 
-=== Sources of Concurrency
+=== Types of Concurrency
 
-  * SMP - two or more processors can be executing kernel code at the
-    same time.
+ * Concurrency due to multiple CPU is called `true concurrency`, can
+   considered as parallellism.
 
-  * Sleeping - kernel code in process context can give up the
-    processor by invoking the scheduler, and another process could
-    start executing.
-
-  * Pre-emption - kernel code in process context can be pre-empted by
-    the scheduler and another process could be executed.
-
-  * Interrupts - interrupts can occur at anytime causing the current
-    code to be pre-empted and the interrupt handler to be executed.
+ * Concurrency due to interleaving of execution is called
+   `pseudo-concurrency`.
 
   * Concurrency due to sleeping, pre-emption and interrupts comes
     under pseudo-concurrency.
 
-=== Interrupts Revisited
+=== Solving Concurrency Issues
 
-------
-void disable_irq(unsigned int irq);
-void enble_irq(unsigned int irq);
-void local_irq_disable();
-void local_irq_enable();
-------
+  * May need to disable pre-emption
 
-.Local and System Interrupt Disable
-image::figures/irq.png["Local and System Interrupt Disable",width=432]
+  * May need to disable interrupts
 
-  * Disabling of interrupts during interrupt handler execution.
+== Descrepancies of Concurrency
 
 === Critical Region and Race Conditions
 
 Critical Region:: 
-Code path that accesses a shared global data.
+
+* Code path that accesses a shared global data.
 
 Race Condition::
-When multiple threads are in the critical region that access the same
-global data, we have a race condition. It is called a race condition
-because the result depends on the order of execution of the threads,
-rather than the instructions in a single thread.
+
+* When multiple threads are in the critical region that access the same
+  global data, we have a race condition. 
+
+* It is called a race condition because the result depends on the
+  order of execution of the threads, rather than the instructions in a
+  single thread.
 
 === No race, with luck
 
@@ -120,42 +120,42 @@ increment i (8)
 writeback i (8)    
 ------------------------------------------
 
-=== Mutex
+== Synchronization
 
-  * When the lock is not available it puts the process to sleep.
+=== Mutual Exclusion
+
+* When one thread is accessing a shared data, other thread has to be
+  excluded from accesing the shared data.
+
+* This is achieved by locking mechanism,
+  - who ever accesses the shared data, checks and acquires a lock,
+
+  - other thread if finds lock acquired by other waits until the lock
+    is released.
+
+=== Lock Scenarios
+
+* Short term locks
+  - execution time is less between acquiring and releasing a lock
+
+  - can be a busyloop lock, since lock-in period is less.
+
+* Long term locks
+  - execution or waiting period is long.
+
+  - should be using an yielding lock, as CPU can be given to other
+    process
+
+=== Mutex for Serialization
+
+  * Mutex is an yielding lock
+
+  * When the lock is not available, it puts the process to sleep.
+  
   * Can be used to protect a shared data between process contexts.
+  
   * Cannot be used in interrupt context because it sleeps if lock is
     not available.
-
-  * Defining a mutex.
-
-------
-struct mutex mylock;
-------
-
-  * Defining a mutex and initializing it.
-
-------
-DEFINE_MUTEX(mylock);
-------
-
-  * Initializing a mutex at run time.
-
-------
-void mutex_init(struct mutex *lock);
-------
-
-  * Acquiring the lock.
-
-------
-void mutex_lock(struct mutex *lock);
-------
-
-  * Releasing the lock.
-
-------
-void mutex_unlock(struct mutex *lock);
-------
 
 === Locking with Mutex (SMP case)
 
@@ -163,16 +163,16 @@ void mutex_unlock(struct mutex *lock);
 Thread A           Thread B
 ------------------------------------------
 mutex_lock	   mutex_lock sleeps
-fetch i (7)        -
-increment i (8)    -
-writeback i (8)    -
+fetch i (7)            -
+increment i (8)        -
+writeback i (8)        -
 mutex_unlock
--		   woken up
--		   mutex_lock
--		   fetch i (8)
--		   increment i (9)
--		   writeback i (9)
--		   mutex_unlock
+     -		   woken up
+     -		   mutex_lock
+     -		   fetch i (8)
+     -		   increment i (9)
+     -		   writeback i (9)
+     -		   mutex_unlock
 ------------------------------------------
 
 === Locking with Mutex (Pre-emption case)
@@ -183,21 +183,72 @@ Thread A           Thread B
 mutex_lock
 fetch i (7)        
 increment i (8)    
--		   mutex_lock sleeps
-writeback i (8)	   -
-mutex_unlock	   -
--		   woken up
--		   mutex_lock
--		   fetch i (8)
--		   increment i (9)
--		   writeback i (9)
--		   mutex_unlock
+      -		   mutex_lock sleeps
+writeback i (8)	        -
+mutex_unlock	        -
+      -		   woken up
+      -		   mutex_lock
+      -		   fetch i (8)
+      -		   increment i (9)
+      -		   writeback i (9)
+      -		   mutex_unlock
 ------------------------------------------
+
+== Using Mutex
+
+=== Initializing Mutex
+
+  * Defining a mutex and initializing it.
+
+[source,c]
+------
+struct mutex mylock;
+
+DEFINE_MUTEX(mylock);
+------
+
+  * Initializing a mutex at run time.
+
+------
+void mutex_init(struct mutex *lock);
+------
+
+=== Acquiring and Releasing the lock.
+
+[source,c]
+------
+void mutex_lock(struct mutex *lock);
+
+void mutex_unlock(struct mutex *lock);
+------
+
+=== I2C Key Headers
+
+[source,c]
+----
+include::code/ikey-mutex/ikey-mutex.def[]
+----
+
+=== I2C Key BH
+
+[source,c]
+----
+include::code/ikey-mutex/ikey-mutex.bh[]
+----
+
+=== I2C Key Read
+
+[source,c]
+----
+include::code/ikey-mutex/ikey-mutex.read[]
+----
 
 === Spin Locks
 
-  * When lock is available, disables process pre-emption, and sets a
-    flag.
+  * Spinlocks are busy looping locks
+
+  * When lock is available, disables process pre-emption in single
+    core processor, and sets a lock flag.
 
   * When lock is not available runs a tight loop checking the flag.
 
@@ -206,26 +257,30 @@ mutex_unlock	   -
   * A variant of spin lock can also disable interrupts before
     acquiring the lock.
 
-  * Can be used to protect a shared data between process context and
-    interrupt context and between interrupt contexts.
+=== Advantages of Spinlocks
+
+  * Can be used to protect a shared data between process contexts.
+
+  * Can also be used to protect a shared data between 
+    - process context and interrupt context 
+    - between interrupt contexts.
 
   * Disabling interrupts only disables interrupts in the current
     processor, so interrupts can still occur in another processor.
 
-  * Much faster that mutexes, since it does not put a process to
+  * Much faster than mutexes, since it does not put a process to
     sleep.
 
-=== Using Spinlock
+== Using Spinlock
 
-  * Defining a spin lock.
-
-------
-spinlock_t mylock;
-------
+=== Initializing Spinlock
 
   * Defining a spin lock and initializing it.
 
+[source,c]
 ------
+spinlock_t mylock;
+
 spinlock_t mylock = SPIN_LOCK_UNLOCKED;
 ------
 
@@ -235,18 +290,17 @@ spinlock_t mylock = SPIN_LOCK_UNLOCKED;
 spin_lock_init(spinlock_t *mylock);
 ------
 
-  * Acquiring the lock.
+=== Acquiring Spinlock
+
+  * Acquiring and releasing the lock.
 
 ------
 void spin_lock(spinlock_t *lock);
-------
 
-  * Releasing the lock.
-
-------
 void spin_unlock(spinlock_t *lock);
 ------
 
+=== Spinlocks with Interrupts
   * Acquiring the lock and disabling interrupts.
 
 ------
@@ -262,6 +316,41 @@ void spin_lock_irqrestore(spinlock_t *lock, unsigned long flags);
   * Code that runs with a spin lock acquired should not sleep or there
     is a possibility of dead locking.
 
+=== What to Lock?
+
+  * Always lock data, not the code.
+
+  * For each shared data, make sure there is lock to protect its
+    access.
+
+=== Choosing a Locking Scheme
+
+  * Between two `process context`
+    - spin_lock, if it is short and does not sleep.
+    - mutex, if it sleeps.
+
+  * Between `process context` and `interrupt context`
+    - spin_lock_irqsave
+
+  * Between two `interrupts`
+    - spin_lock_irqsave
+
+=== Choosing a Locking Scheme Flowchart
+
+image::figures/choose-lock.png["Choosing a Locking Scheme",width=1024,align="center"]
+
+== Explore It Yourself
+
+== Deadlocks
+
+=== Deadlocks
+
+  * Deadlock refers to a specific condition when two or more processes
+    are each waiting for another to release a resource
+
+  * Impact of Deadlock 
+    - Mutex - sleep for ever
+    - Spinlock - spin for ever
 
 === Deadlocking by sleeping
 
@@ -274,33 +363,7 @@ sleep		   XX Dead Lock XX
 XX Dead Lock XX 
 ------------------------------------------
 
-=== What to Lock?
-
-  * Always lock data, not the code.
-  * For each shared data, make sure there is lock to protect its
-    access.
-
-=== Choosing a Locking Scheme
-
-  * Between two process context
-    - spin_lock, if it is short and does not sleep.
-    - mutex, if it sleeps.
-
-  * Between process context and interrupt context
-    - spin_lock_irqsave
-
-  * Between two interrupts
-    - spin_lock_irqsave
-
-=== Choosing a Locking Scheme Flowchart
-image::figures/choose-lock.png["Choosing a Locking Scheme",width=432]
-
-=== Deadlocks
-
-  * Deadlock refers to a specific condition when two or more processes
-    are each waiting for another to release a resource
-
-  * Deadly Embrace
+=== Deadly Embrace
 
 .Deadly Embrace, ABBA Deadlock
 `------------------`----------------------
@@ -311,12 +374,43 @@ lock B Sleep	   lock A Sleep
 XX Dead Lock XX	   XX Dead Lock XX
 ------------------------------------------
 
-  * Mutex - sleep for ever
-  * Spinlock - spin for ever
-
-  * Double Acquire Deadlock - can happen when a function calls another
+=== Double Acquire Deadlock 
+- can happen when a function calls another
     function that acquires the same lock. 
+
+.Double Acquire
+`------------------`----------------------
+Thread A           Thread B
+------------------------------------------
+lock A		   lock B
+Func()	   	   lock A Sleep
+  - lock(A)	   XX Dead Lock XX
+------------------------------------------
+
+/////
+=== Disabling Interrupts 
+
+* By disabling interrupts appropriately the concurrency related issues
+  can be solved.
+
+[source,c]
+------
+void disable_irq(unsigned int irq);
+void enable_irq(unsigned int irq);
+void local_irq_disable();
+void local_irq_enable();
+void local_irq_save();
+void local_irq_restore();
+------
+
+.Local and System Interrupt Disable
+image::figures/irq.png["Local and System Interrupt Disable",width=432]
+
+  * Disabling of interrupts during interrupt handler execution.
+////
 
 === References
 
 * https://www.slideshare.net/hemanthvenkatesh33/driver-parallelism
+
+* https://stackoverflow.com/questions/2559602/spin-lock-irqsave-vs-spin-lock-irq

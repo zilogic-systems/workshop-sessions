@@ -372,11 +372,6 @@ ps ax | grep '\[kworker.*\]'
 
 image::figures/workqueue.png["Workqueue", align="center",width=732]
 
-=== Try Out 1 - Key Scan 
-
-* Modify the LED blinking code to use for key scanning
-  link:{include:code/led-blink-wq/led-blink-wq.full.datauri}["led-blink-wq.c",filename="led-blink-wq.c"]
-
 === Key Scan - Definitions
 
 [source,c]
@@ -391,9 +386,14 @@ include::code/key-scan/key-scan.def[]
 include::code/key-scan/key-scan.init[]
 -----
 
-== Function Call Debugging
+=== Try Out - Key Scan 
 
-=== Ftrace
+* Build and test key-scan code
+  link:{include:code/key-scan/key-scan.full.datauri}["key-scan.c",filename="key-scan.c"]
+
+== Explore It Yourself
+
+=== Ftrace - Function Call Debugging
 
 * Tracing utility part of Linux kernel
 
@@ -420,6 +420,25 @@ $ cat /sys/kernel/debug/tracing/trace_pipe > out.txt
 $ cat out.txt | grep "blink_led"
 ----
 
+=== Workqueue Testing Through Sysfs Module Params
+
+* Build and load the code
+  link:{include:code/led-blink-wq-param/led-blink-wq-param.full.datauri}["led-blink-wq-param.c",filename="led-blink-wq-param.c"]
+
+* We can get the current value of the module_param from sysfs
+
+[source,sh]
+----
+cat /sys/module/led-blink-wq-param/parameters/led_color        
+----
+
+* Module parameters can also be modified through sysfs
+
+[source,sh]
+----
+echo 5 > /sys/module/led-blink-wq-param/parameters/led_color        
+----
+
 == Exercises
 
 === Workqueue & GPIO - Key and LED
@@ -431,7 +450,3 @@ $ cat out.txt | grep "blink_led"
     - Red LED, when Key 1 pressed
     - Green LED, when Key 2 pressed 
 
-=== Modules Param - LED Color Through 
-
-* Modify the workqueue code for blinking, to get the LED color through
-  modules param.

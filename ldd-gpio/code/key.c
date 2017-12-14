@@ -9,23 +9,22 @@
 /* ### END: key.def */
 
 /* ### START: key.init */
-
 static int key_init(void)
 {
      int ret;
 
-     ret = gpio_request(KEY_PIN, "key1");
-     if (ret)
+     if (ret = gpio_request(KEY_PIN, "key1"))
           return ret;
     
      gpio_direction_input(KEY_PIN);
 
-     if (!gpio_get_value(KEY_PIN))
+     if (gpio_get_value(KEY_PIN) == 0)
           printk("Key 1 - Pressed\n");
+     else
+	  printk("Key 1 - UnPressed\n");
 
      return 0;
 }
-
 /* ### END: key.init */
 
 /* ### START: key.exit */

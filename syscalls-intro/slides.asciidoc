@@ -1,32 +1,25 @@
-= Linux Syscalls Introduction
+= Linux Syscalls
 
 == Role of Operating System
- 
+
 [role="two-column"]
 === No OS Model
 [role="left"]
 
-  * With bare metal programming without OS., application code can
-    access resources CPU, memory & io devices directly.
+  * With bare metal programming without OS., application can access
+    all the devices directly.
 
-  * Bare metal programs don't have any restriction on accessing these
-    resources.
+  * Don't have any restriction on accessing these resources.
 
-  * Most of the bare metal programs are single task application,
-    created at compile time by system developers and won't be changing
-    on run-time.
-
+  * Mostly single task applications.
+   
 [role="right"]
-image::figures/no-os.png[]
-
-=== GPOS Model
-[role="right"]
-image::figures/gpos-layers.png[]
+image::figures/no-os.png[width=300, align="center"]
 
 === GPOS Model
 
-  * Kernel is a software which supports multi-tasking ie, creating and
-    executing multiple processes simultaneously.
+  * Kernel is a software which supports multi-tasking, 
+    - creates and executes multiple processes simultaneously.
 
   * Kernel allows all other processses sharing resources like CPU,
     RAM, Harddisk etc.,
@@ -36,7 +29,11 @@ image::figures/gpos-layers.png[]
 
   * Processes are not allowed to access the shared resources directly.
 
-=== Scope of a Task
+=== GPOS Model
+[role="right"]
+image::figures/gpos-layers.png[width=400, align="center"]
+
+=== Scope of a Process
 
 The kernel to have better control over the tasks, it has to ensure
 that
@@ -53,16 +50,17 @@ that
 
 Kernel has to ensure that
 
-* the processes can share the common resources
+  * the processes can share the common resources
 
-* Process doesn't step over other process
+  * Process doesn't step over other process
 
-* Processes doesn't step over the kernel
+  * Processes doesn't step over the kernel
 
-* Process can request kernel to proxy the access to the shared
-  resources.
+  * Process can request kernel to proxy the access to the shared
+    resources.
 
-* Process can request kernel to proxy the communication to other task.
+  * Process can request kernel to proxy the communication to other
+    task.
 
 [role="two-column"]  
 === Kernel and Syscalls
@@ -81,14 +79,18 @@ image::figures/gpos-stack.png[]
 
 === Address Space Isolation
 
-  * For each process separate address space
+  * For each process, separate address space
 
   * For kernel separate address space
 
   * Operating system achieves process isolation through `MMU`.
 
-  * So address space means separate `page table entries` for kernel
-    and each process.
+  * Address space denotes separate `page table entries` for kernel and
+    each process, which would be mutually exclusive.
+
+=== MMU for Page Access
+
+image::figures/pagefault.png[align="center"]
 
 === Privilege Separation
 
@@ -102,6 +104,14 @@ image::figures/gpos-stack.png[]
   * This privilege separation is achieved through processor's
     `privilege modes` feature.
 
+=== MMU for User Space
+
+image::figures/userpage.png[align="center"]
+
+=== MMU for Kernel Space
+
+image::figures/kernelpage.png[align="center"]
+
 === Privilege Escalation
 
   * The user space application, if they want to access kernel
@@ -109,6 +119,9 @@ image::figures/gpos-stack.png[]
 
   * The escalation from user privilege to kernel privilege is done by
     `software interrupts or traps`.
+
+=== Trap Call
+image::figures/trap.png[align="center"] 
 
 == Address Space Isolation
 
@@ -142,9 +155,9 @@ image::figures/process_mm.png[]
 
 === 3G / 1G Split  
 
-  * The top `3GB `of virtual address space is used for the mapping the
-    user code and data and the bottom `1GB` of virtual address space is
-    used for mapping the kernel code and data.
+  * The top `3GB` of virtual address space is used for the mapping the
+    user code and data and the bottom `1GB` of virtual address space
+    is used for mapping the kernel code and data.
 
   * When the scheduler switches between various processes the mapping
     for top 3GB of virtual address will keep switching to the
@@ -176,10 +189,10 @@ image::figures/process_mm.png[]
   MMU.
 
 ===  Process 1
-image::figures/context1.png[]
+image::figures/context1.png[width=700,align="center"]
 
 === Proccess 2
-image::figures/context1.png[]
+image::figures/context2.png[width=700,align="center"]
 
 === Protecting the Kernel
 
@@ -197,7 +210,7 @@ image::figures/context1.png[]
  * The `kernel` needs to access everything, so its given `higher
    privilege` for unrestricted access.
  
- * `Process` meant to to have restricted access, is given `lesser
+ * `Process` meant to have restricted access, is given `lesser
    privilege`.
 
 === CPU Modes and Privilege Levels
@@ -206,12 +219,12 @@ image::figures/context1.png[]
    different privilege levels.
 
  * Two level privileges in ARM 
-   - Supervisor - high privilege
-   - User - less privilege
+   - `Supervisor` - high privilege
+   - `User` - less privilege
  
  * Fource level privileges in x86  
-   - Protection Ring 0 - Supervisor
-   - Protection Ring 3 - User
+   - Protection `Ring 0` - Supervisor
+   - Protection `Ring 3` - User
 
 === CPU Privilege Modes and OS
 
@@ -269,11 +282,11 @@ image::figures/context1.png[]
     transfers control to another preset address.
 
 === Trap Call
-image::figures/trap.png[] 
+image::figures/trap.png[align="center"] 
 
 == Internals of Syscalls
 
-=== System Calls From Userpace
+=== System Calls From Userspace
 
   * Each system call is given a unique no in the kernel.
 
@@ -305,7 +318,7 @@ image::figures/trap.png[]
     through the privilege modes and the trap mechanism.
 
 === Syscall Sequence
-image::figures/sc-sequence.png[]
+image::figures/sc-sequence.png[align="center"]
 
 == Debugging Syscalls
 
@@ -316,31 +329,9 @@ image::figures/sc-sequence.png[]
   * It intercepts and records the system calls which are called by a
     process and the signals which are received by a process.
 
-  * Usually errors from system calls are printed using `perror()`. But
-    this does not provide information like the arguments passed and
-    exactly which call triggered the error.
-
   * `strace` provides information like the arguments to the system
     call, return values, errors if any, the time spent in a system
     call, whether signals occurred during the operation.
-
-=== Strace Usage
-
-  * For the simplest case has the following format
-
-------
-strace <program>
-------
-
-  * Options are available to provide additional information and filter
-    away unwanted information.
-
-  * `-e trace=syscall1,syscall2,...`
-  * `-e trace=class` class is `file`,`process`,`network`,`signal`,`ipc`, ...
-  * `-e signal=signal1,signal2...`
-  * `-T` print time spent in each syscall
-  * `-c` per syscall statistics - time spent, no. of calls, errors
-  * `-p pid` attach to a running process
 
 === Strace for Parameters
 
@@ -356,12 +347,15 @@ close(3)                                = 0
 ....
 ----
 
+/////
 === Analogy to RPC
 
-  * If we consider Processes as a client, requesting a special action
-    from the kernel which acts as a server and then sycall are
-    something like a remote procedure call.(RPC)
+  * If we consider 
+    - process as a client
+    - kernel which acts as a server
 
+  * requesting a special action through syscall, resembled a remote
+    procedure call(RPC).
 
 === References 
 
@@ -380,3 +374,6 @@ close(3)                                = 0
 * https://www.ibm.com/developerworks/community/blogs/58e72888-6340-46ac-b488-d31aa4058e9c/entry/linux_system_calls20?lang=en
 
 * http://faculty.salina.k-state.edu/tim/ossg/Introduction/sys_calls.html	
+
+* https://syscalls.kernelgrok.com/
+/////

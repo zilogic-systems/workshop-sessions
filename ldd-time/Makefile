@@ -7,6 +7,7 @@ images_png = $(images_dia:.dia=.png)
 
 srcpath = code/led-blink-delay.c   \
 	  code/led-blink-wq.c      \
+	  code/led-blink-wq-param.c      \
 	  code/key-scan.c
 
 sources = $(join $(srcpath:%.c=$(basename %)/), $(patsubst %, %,$(notdir $(srcpath))))

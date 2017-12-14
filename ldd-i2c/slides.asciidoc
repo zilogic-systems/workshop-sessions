@@ -70,24 +70,15 @@ image::figures/i2c-linux.png[width="640",align="center"]
 
 === I2C Controller/Adapter
 
-  * The I2C Controller itself, is handled by an I2C Bus Controller
+  * The I2C controller itself, is handled by an I2C bus controller
     driver.
 
   * Once the I2C Controller driver is available, the I2C peripherals
     can be accessed using the I2C APIs available in the Linux kernel.
 
-  * Linux refers the I2C controller as I2C bus adapter, and it is
+  * Linux refers the I2C bus controller as I2C bus adapter, and it is
     represented by an instance of `struct i2c_adapter`.
 
-=== Viewing Adapters
-
-  * Each I2C bus in the system is identified by a unique no. The I2C
-    Controllers and their unique no. can be obtained from sysfs 
-
-[source,sh]
-----
-ls /sys/class/i2c-dev/
-----
 
 === Getting I2C Adapter
 
@@ -231,44 +222,9 @@ include::code/lcd/lcd.exit[]
     link:{include:code/lcd/lcd.full.datauri}["lcd.c",filename="lcd.c"], and
     add support for clear support.
 
-== Debugging I2C
-
-=== I2C Dev Interface
-
-  * In Linux, I2C Bus can be accessed using a dev interface,
-    `/dev/i2c-<bus no.>`.
-
-  * `i2ctools` package provides commands to test I2C.
-
-  * `i2cdetect` provides the list of device addresses, connected in
-    the bus.
-
-=== Ftrace
-
-[source,sh]
-----
-$ echo 1 >/sys/kernel/debug/tracing/events/i2c/enable
-----
-
-[source,sh]
-----
-echo adapter_nr==1 >/sys/kernel/debug/tracing/events/i2c/filter
-----
-
-[source,sh]
-----
-$ cat /sys/kernel/debug/tracing/trace > out.txt
-----
-
-== Exercises
-
 === 4-way Key Datasheet
 
-* Develop a code which reads the i2c-key device's status and data
-  register, then prints the key pressed.
-
 image::figures/4-way-key-datasheet.png[align="center",width="720"]
-
 
 === Code - Ikey Headers
 
@@ -292,9 +248,8 @@ include::code/ikey/ikey.exit[]
 
 === Tryout
 
- * Modify the Key code
-    link:{include:code/ikey/ikey.full.datauri}["key.c",filename="key.c"], and
-    add support for glowing LED on key press
+ * Build and test the i2c key code
+    link:{include:code/ikey/ikey.full.datauri}["ikey.c",filename="ikey.c"].
 
 == Model for Busses
 
@@ -312,3 +267,54 @@ include::code/ikey/ikey.exit[]
 === USB Model
 
 image::figures/usb-linux.png[width="580",align="center"]
+
+== Explore It Yourself
+
+=== Viewing Adapters in Sysfs
+
+  * Each I2C bus in the system is identified by a unique no. The I2C
+    Controllers and their unique no. can be obtained from sysfs 
+
+[source,sh]
+----
+ls /sys/class/i2c-dev/
+----
+
+=== Debugging I2C Using I2C Tools
+
+  * `i2ctools` package provides commands to test I2C.
+
+  * `i2cdetect` provides the list of device addresses, connected in
+    the bus.
+
+[source,sh]
+----
+$ i2cdetect -y -l
+$ i2cdetect -y 0
+----
+
+=== Debugging Using Ftrace
+
+[source,sh]
+----
+$ echo 1 >/sys/kernel/debug/tracing/events/i2c/enable
+----
+
+[source,sh]
+----
+echo adapter_nr==0 >/sys/kernel/debug/tracing/events/i2c/filter
+----
+
+[source,sh]
+----
+$ cat /sys/kernel/debug/tracing/trace > out.txt
+----
+
+== Exercises
+
+=== Tryout
+
+ * Modify the Key code
+    link:{include:code/ikey/ikey.full.datauri}["ikey.c",filename="ikey.c"], and
+    add support for glowing LED on key press
+
