@@ -4,6 +4,8 @@
 
  * Need to speed up build using apt cache.
 
+ * Add minicom default configuration file.
+
 == Known Issues
 
  * Vagrant adds the default shared folder mapping, but fails to mount
