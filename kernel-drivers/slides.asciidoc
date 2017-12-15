@@ -93,7 +93,7 @@ image::figures/device-file-driver.png[align="center"]
 === Try Out
 
   * Try writing to the UART LCD display
-  * The device file is `/dev/ttyLPx`
+  * The device file is `/dev/ttyLP1`
 
 === Minor No.
 
@@ -130,7 +130,7 @@ void serial_putc(int dev, char c)
 === Try Out
 
   * Create a device node with your name, but the major and minor
-    number of `/dev/ttyLPx`
+    number of `/dev/ttyLP1`
 
   * Use the `mknod` command
 +
