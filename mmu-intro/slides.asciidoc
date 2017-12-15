@@ -1,0 +1,256 @@
+= Demystifying the MMU
+Zilogic Systems
+
+== Introduction
+
+=== Hardware Evolution
+
+  * Computer Generations
+    - Mainframes
+    - Desktops
+    - Mobile
+
+  * Operating Systems
+    - Single Tasking
+    - Multi-tasking
+
+=== Goals of Multi-tasking OS
+
+  * An application developer should not have to worry about, what
+    other programs are running in the system.
+
+  * The application developer has to assume that the computer is
+    completely available to the application program.
+
+=== Virtual Computers
+
+image::figures/multi-task.png[width="50%",align="center"]
+
+=== Basic Blocks
+
+image::figures/computer-blocks.png[width="75%",align="center"]
+
+=== Terminology: Process
+
+  * Program: Set of instructions to perform a task
+
+  * What is a *process*?
+
+=== Terminology: Process
+
+  * Program: Set of instructions to perform a task
+
+  * What is a *process*?
++
+------
+Process = Program + Run-time State
+------
++
+  * Run-time State
+    . Global Data
+    . Registers
+    . Stack
+
+== Perils of Sharing
+
+=== Problems
+
+  * The Problem of Protection
+  * The Problem of Fragmentation
+  * Support for Paging and Relocation
+
+=== The Problem of Protection
+
+image::figures/protection-1.png[width="35%",align="center"]
+
+=== The Problem of Protection
+
+image::figures/protection-2.png[width="65%",align="center"]
+
+=== The Problem of Protection
+
+image::figures/protection-3.png[width="65%",align="center"]
+
+=== The Problem of Fragmentation
+
+image::figures/fragmentation-123.png[align="center"]
+
+=== The Problem of Fragmentation
+
+image::figures/fragmentation-4.png[width="20%",align="center"]
+
+=== The Problem of Fragmentation
+
+image::figures/fragmentation-5.png[width="50%",align="center"]
+
+=== Support for Swapping and Relocation
+
+image::figures/swap-1.png[width="25%",align="center"]
+
+=== Support for Swapping and Relocation
+
+image::figures/swap-2.png[align="center"]
+
+=== Support for Swapping and Relocation
+
+image::figures/swap-3.png[width="40%",align="center"]
+
+=== Support for Swapping and Relocation
+
+image::figures/swap-4.png[width="40%",align="center"]
+
+=== Support for Swapping and Relocation
+
+image::figures/swap-5.png[width="40%",align="center"]
+
+=== Sharing is Non-Trivial
+
+  * Sharing of memory at first seems to be simple
+
+  * But brings along with it a host of issues
+
+  * Additional support from hardware is required
+
+  * MMU: Hardware block was added
+
+== Digression: POTS
+
+=== POTS
+
+image::figures/pphone.png[width="10%",align="center"]
+
+=== Emergency Numbers
+
+image::figures/diff-exchange.png[width="45%",align="center"]
+
+=== Key Points to Note
+
+  * Virtual phone numbers are always converted to physical phone
+    numbers by the exchange using a mapping table
+
+  * When the user moves from one city to another
+    - Gets connected to a different exchange
+    - Has a different mapping table
+    - Maps the same virtual phone numbers, to a different set of
+      physical phone numbers
+
+== MMU
+
+=== Hardware
+
+image::figures/cpu-no-mmu.png[width="50%",align="center"]
+
+=== Hardware
+
+image::figures/cpu-mmu.png[align="center"]
+
+=== VA to PA
+
+image::figures/va-pa.png[width="35%",align="center"]
+
+[role="two-column"]
+=== Virtual Pages
+
+[role="left"]
+image::figures/vpages.png[align="center"]
+
+[role="right"]
+  * Divide addresses into 4K chunks
+    - Pages
+  * Each page is give an unique number
+  * Example for 32 bit system
+
+=== Physical Pages
+
+image::figures/ppages.png[align="center"]
+
+=== Pages and Page Tables
+
+image::figures/vp-pp.png[align="center"]
+
+  * Translation is specified on page-to-page basis
+  * Virtual address `0x0000_0000` mapped to Phyiscal address `0x0000_1000`
+
+=== Translation
+
+[options="header"]
+|======
+| Virtual Address | Virtual Page | Physical Address	| Physical Page
+| `0x0000_0000`   | VP `0`  	 | `0x0000_1000` 	| PP `1`
+| `0x0000_0001`   | VP `0` 	 | `0x0000_1001` 	| PP `1`
+| `0x0000_2000`   | VP `2` 	 | `0x0000_0000` 	| PP `0`
+| `0x0000_2001`   | VP `2` 	 | `0x0000_0001` 	| PP `0`
+|======
+
+== Using the MMU
+
+=== Program Exec
+
+image::figures/os-program-exec-1.png[width="70%",align="center"]
+
+=== Program Exec
+
+image::figures/os-program-exec-2.png[width="70%",align="center"]
+
+=== Recall POTS Analogy
+
+  * Moving from one city to another city
+  * Dialing the same emergency number
+    - Emergency number is the same
+    - But mapping has changed
+    - User ends up calling a different physical phone number
+
+=== Unmapped Pages
+
+image::figures/page-fault.png[width="50%",align="center"]
+
+== Issues Revisited
+
+=== Protection
+
+image::figures/protection-solved.png[width="40%",align="center"]
+
+=== Fragmentation
+
+image::figures/fragmentation-solved.png[width="75%",align="center"]
+
+=== Fragmentation: Array Example
+
+image::figures/fragmentation-solved-array.png[width="75%",align="center"]
+
+=== Relocation
+
+image::figures/relocation-solved-1.png[width="75%",align="center"]
+
+=== Relocation
+
+image::figures/relocation-solved-2.png[width="75%",align="center"]
+
+=== MMU: Reality Check
+
+  * No. of page table entries is large
+  * On a 32-bit system, 10,48,576 entries are required
+  * Not feasible to store all page table entries within MMU
+
+=== Translation Look-Aside Buffer (TLB)
+
+  * MMU has space for small no. of page table entries
+    - 256, 512 or 1024
+
+  * Complete page table is in RAM
+    - Data structure optimized for space and lookup
+
+  * Access a Virtual Address
+    . TLB is checked for mapping entry
+    . If not present, mapping for the page is loaded from RAM
+    . Translation performed and access is completed
+
+== Conclusion
+
+=== Summary
+
+  * Highlight the problems leading to the inclusion of the MMU
+
+  * Explain how the OS uses it to overcome them
+
+  * Explain the functionality of the MMU through models of increasing complexity
