@@ -1,0 +1,111 @@
+= Filesystem Internals
+Zilogic Systems
+
+== Need for a Filesystem
+
+=== Without Filesystems
+
+image::figures/no-fs-1.png[width="50%",align="center"]
+
+=== Without Filesystems
+
+image::figures/no-fs-2.png[width="50%",align="center"]
+
+=== Without Filesystems
+
+image::figures/no-fs-3.png[width="50%",align="center"]
+
+=== Problems
+    
+  * User has to remember the sectors that store the contents of a file.
+
+  * The user also has to keep track of which sectors are free.
+
+  * Managing files becomes tedious.
+
+=== Solution
+
+image::figures/fat.png[width="50%",align="center"]
+
+== Unix Filesystems
+
+=== Inode Table
+
+image::figures/inode-table-1.png[width="50%",align="center"]
+
+=== Directories
+
+image::figures/inode-table-2.png[width="50%",align="center"]
+
+=== Directories
+
+image::figures/inode-table-3.png[width="50%",align="center"]
+
+=== Directory Walk
+
+image::figures/inode-table-3-2.png[width="50%",align="center"]
+
+=== Directory Walk
+
+image::figures/inode-table-3-3.png[width="50%",align="center"]
+
+=== Directory Walk
+
+image::figures/inode-table-3-4.png[width="50%",align="center"]
+
+=== Directory Walk
+
+image::figures/inode-table-3-5.png[width="50%",align="center"]
+
+=== Directory Walk
+
+image::figures/inode-table-3-6.png[width="50%",align="center"]
+
+=== Directories
+
+image::figures/inode-table-4.png[width="50%",align="center"]
+
+=== Link Count
+
+image::figures/inode-table-5.png[width="55%",align="center"]
+
+== Dealing with Open Files
+
+=== Global File Table
+
+image::figures/fd-file-table-0.png[width="45%",align="center"]
+
+=== Global File Table
+
+image::figures/fd-file-table.png[width="45%",align="center"]
+
+=== Forking
+
+image::figures/fork.png[width="45%",align="center"]
+
+== Kernel Representation
+
+=== Filesystem
+
+[source,c]
+------
+#include <linux/fs.h>
+
+struct inode;
+------
+
+[source,c]
+------
+#include <linux/dcache.h>
+
+struct dentry;
+------
+
+=== Global File Table
+
+[source,c]
+------
+#include <linux/fs.h>
+
+struct file;
+------
