@@ -92,9 +92,8 @@ image::figures/device-file-driver.png[align="center"]
 
 === Try Out
 
-  * Try writing to the LCD display. The device file is `/dev/tty0`.
-
-  * Try reading from the Keypad. The device file is `/dev/i2c-key`.
+  * Try writing to the UART LCD display
+  * The device file is `/dev/ttyLPx`
 
 === Minor No.
 
@@ -127,3 +126,16 @@ void serial_putc(int dev, char c)
   * Major no. identifies the driver
 
   * Minor no. is used by the driver to identify the device
+
+=== Try Out
+
+  * Create a device node with your name, but the major and minor
+    number of `/dev/ttyLPx`
+
+  * Use the `mknod` command
++
+------
+mknod <device-file> c <major> <minor>
+------
++
+  * Check if the driver can be accessed using the device file
