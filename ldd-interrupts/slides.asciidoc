@@ -299,7 +299,14 @@ void * dev;
   * Perform device specific action
   * Return `IRQ_HANDLED`
 
-=== FIXME: Shared Interrupts
+=== Shared Interrupts
+
+  * `IRQF_SHARED` flag should be used in `request_irq()`
+
+  * Multiple interrupt handlers can be registered
+
+  * Kernel invokes all registered interrupt handlers, when and
+    interrupt occurs
 
 == I2C Key Driver
 
