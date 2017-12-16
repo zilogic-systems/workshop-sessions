@@ -268,7 +268,7 @@ include::code/y/y/exit[]
 === Try Out
 
   * Get the `y` driver module:
-    link:{include:code/y.tar.gz.datauri}["y.tar.gz",filename="y.tar.gz"]
+    link:{include:cdist/y.tar.gz.datauri}["y.tar.gz",filename="y.tar.gz"]
 
   * Compile the `y` module, and load the module
 
