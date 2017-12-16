@@ -460,14 +460,21 @@ kfifo_reset(fifo)
 
 == I2C LCD Driver
 
+=== Requirements
+
+  * Writing to the LCD device, should cause the data to be displayed
+    on the display
+
 === Try Out
 
-  * Requirement
-    - Writing to the LCD device, should cause the data to be displayed
-      on the display
-
-  * Get the `lcd` skeleton module:
+  * Get the `lcd` module:
     link:{include:code/lcd.tar.gz.datauri}["lcd.tar.gz",filename="lcd.tar.gz"]
+
+  * Walk through the code
+
+  * Compile, load the `lcd` module, and create device node
+
+  * Write to `/dev/lcd` device file
 
 == Questions
 
