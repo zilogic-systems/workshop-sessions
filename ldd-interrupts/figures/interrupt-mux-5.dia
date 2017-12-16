@@ -252,44 +252,7 @@
         <dia:boolean val="true"/>
       </dia:attribute>
     </dia:object>
-    <dia:object type="Standard - Text" version="1" id="O7">
-      <dia:attribute name="obj_pos">
-        <dia:point val="21.5,18"/>
-      </dia:attribute>
-      <dia:attribute name="obj_bb">
-        <dia:rectangle val="13.6,17.0116;29.423,18.9884"/>
-      </dia:attribute>
-      <dia:attribute name="text">
-        <dia:composite type="text">
-          <dia:attribute name="string">
-            <dia:string>#Interrupt handler clears interrupt in PIC.
-Interrupt handler returns. #</dia:string>
-          </dia:attribute>
-          <dia:attribute name="font">
-            <dia:font family="sans" style="0" name="Helvetica"/>
-          </dia:attribute>
-          <dia:attribute name="height">
-            <dia:real val="0.98777773976325989"/>
-          </dia:attribute>
-          <dia:attribute name="pos">
-            <dia:point val="21.5,17.7671"/>
-          </dia:attribute>
-          <dia:attribute name="color">
-            <dia:color val="#000000"/>
-          </dia:attribute>
-          <dia:attribute name="alignment">
-            <dia:enum val="1"/>
-          </dia:attribute>
-        </dia:composite>
-      </dia:attribute>
-      <dia:attribute name="valign">
-        <dia:enum val="2"/>
-      </dia:attribute>
-      <dia:connections>
-        <dia:connection handle="0" to="O6" connection="8"/>
-      </dia:connections>
-    </dia:object>
-    <dia:object type="Standard - Box" version="0" id="O8">
+    <dia:object type="Standard - Box" version="0" id="O7">
       <dia:attribute name="obj_pos">
         <dia:point val="29,9"/>
       </dia:attribute>
@@ -309,7 +272,7 @@ Interrupt handler returns. #</dia:string>
         <dia:boolean val="true"/>
       </dia:attribute>
     </dia:object>
-    <dia:object type="Standard - Text" version="1" id="O9">
+    <dia:object type="Standard - Text" version="1" id="O8">
       <dia:attribute name="obj_pos">
         <dia:point val="32,11.5"/>
       </dia:attribute>
@@ -342,10 +305,10 @@ Interrupt handler returns. #</dia:string>
         <dia:enum val="2"/>
       </dia:attribute>
       <dia:connections>
-        <dia:connection handle="0" to="O8" connection="8"/>
+        <dia:connection handle="0" to="O7" connection="8"/>
       </dia:connections>
     </dia:object>
-    <dia:object type="Standard - Box" version="0" id="O10">
+    <dia:object type="Standard - Box" version="0" id="O9">
       <dia:attribute name="obj_pos">
         <dia:point val="18,2"/>
       </dia:attribute>
@@ -365,7 +328,7 @@ Interrupt handler returns. #</dia:string>
         <dia:boolean val="true"/>
       </dia:attribute>
     </dia:object>
-    <dia:object type="Standard - Line" version="0" id="O11">
+    <dia:object type="Standard - Line" version="0" id="O10">
       <dia:attribute name="obj_pos">
         <dia:point val="18,3"/>
       </dia:attribute>
@@ -389,7 +352,7 @@ Interrupt handler returns. #</dia:string>
         <dia:real val="0.5"/>
       </dia:attribute>
     </dia:object>
-    <dia:object type="Standard - Text" version="1" id="O12">
+    <dia:object type="Standard - Text" version="1" id="O11">
       <dia:attribute name="obj_pos">
         <dia:point val="23.5,3"/>
       </dia:attribute>
@@ -422,12 +385,12 @@ Interrupt handler returns. #</dia:string>
         <dia:enum val="2"/>
       </dia:attribute>
     </dia:object>
-    <dia:object type="Standard - Text" version="1" id="O13">
+    <dia:object type="Standard - Text" version="1" id="O12">
       <dia:attribute name="obj_pos">
         <dia:point val="23.5,5"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="21.5925,4.5055;23.523,5.4945"/>
+        <dia:rectangle val="21.5925,4.54;23.5,5.46"/>
       </dia:attribute>
       <dia:attribute name="text">
         <dia:composite type="text">
@@ -441,7 +404,7 @@ Interrupt handler returns. #</dia:string>
             <dia:real val="0.98777773976325989"/>
           </dia:attribute>
           <dia:attribute name="pos">
-            <dia:point val="23.5,5.261"/>
+            <dia:point val="23.5,5.2725"/>
           </dia:attribute>
           <dia:attribute name="color">
             <dia:color val="#000000"/>
@@ -455,12 +418,12 @@ Interrupt handler returns. #</dia:string>
         <dia:enum val="2"/>
       </dia:attribute>
     </dia:object>
-    <dia:object type="Standard - Text" version="1" id="O14">
+    <dia:object type="Standard - Text" version="1" id="O13">
       <dia:attribute name="obj_pos">
         <dia:point val="23.5,7"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="21.5925,6.5055;23.523,7.4945"/>
+        <dia:rectangle val="21.5925,6.54;23.5,7.46"/>
       </dia:attribute>
       <dia:attribute name="text">
         <dia:composite type="text">
@@ -474,7 +437,7 @@ Interrupt handler returns. #</dia:string>
             <dia:real val="0.98777773976325989"/>
           </dia:attribute>
           <dia:attribute name="pos">
-            <dia:point val="23.5,7.261"/>
+            <dia:point val="23.5,7.2725"/>
           </dia:attribute>
           <dia:attribute name="color">
             <dia:color val="#000000"/>
@@ -488,7 +451,7 @@ Interrupt handler returns. #</dia:string>
         <dia:enum val="2"/>
       </dia:attribute>
     </dia:object>
-    <dia:object type="Standard - ZigZagLine" version="1" id="O15">
+    <dia:object type="Standard - ZigZagLine" version="1" id="O14">
       <dia:attribute name="obj_pos">
         <dia:point val="29,10"/>
       </dia:attribute>
@@ -521,12 +484,12 @@ Interrupt handler returns. #</dia:string>
         <dia:real val="0.5"/>
       </dia:attribute>
     </dia:object>
-    <dia:object type="Standard - Text" version="1" id="O16">
+    <dia:object type="Standard - Text" version="1" id="O15">
       <dia:attribute name="obj_pos">
         <dia:point val="23.5,9"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="21.5925,8.5055;23.523,9.4945"/>
+        <dia:rectangle val="21.5925,8.54;23.5,9.46"/>
       </dia:attribute>
       <dia:attribute name="text">
         <dia:composite type="text">
@@ -540,7 +503,7 @@ Interrupt handler returns. #</dia:string>
             <dia:real val="0.98777773976325989"/>
           </dia:attribute>
           <dia:attribute name="pos">
-            <dia:point val="23.5,9.261"/>
+            <dia:point val="23.5,9.2725"/>
           </dia:attribute>
           <dia:attribute name="color">
             <dia:color val="#000000"/>
@@ -554,12 +517,12 @@ Interrupt handler returns. #</dia:string>
         <dia:enum val="2"/>
       </dia:attribute>
     </dia:object>
-    <dia:object type="Standard - Text" version="1" id="O17">
+    <dia:object type="Standard - Text" version="1" id="O16">
       <dia:attribute name="obj_pos">
         <dia:point val="21,6"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="19.8687,5.5055;22.1542,6.4945"/>
+        <dia:rectangle val="19.8687,5.54;22.1312,6.46"/>
       </dia:attribute>
       <dia:attribute name="text">
         <dia:composite type="text">
@@ -573,7 +536,7 @@ Interrupt handler returns. #</dia:string>
             <dia:real val="0.98777773976325989"/>
           </dia:attribute>
           <dia:attribute name="pos">
-            <dia:point val="21,6.261"/>
+            <dia:point val="21,6.2725"/>
           </dia:attribute>
           <dia:attribute name="color">
             <dia:color val="#000000"/>
@@ -587,8 +550,42 @@ Interrupt handler returns. #</dia:string>
         <dia:enum val="2"/>
       </dia:attribute>
       <dia:connections>
-        <dia:connection handle="0" to="O10" connection="8"/>
+        <dia:connection handle="0" to="O9" connection="8"/>
       </dia:connections>
+    </dia:object>
+    <dia:object type="Standard - Text" version="1" id="O17">
+      <dia:attribute name="obj_pos">
+        <dia:point val="21,18"/>
+      </dia:attribute>
+      <dia:attribute name="obj_bb">
+        <dia:rectangle val="11.095,17.0116;30.928,18.9884"/>
+      </dia:attribute>
+      <dia:attribute name="text">
+        <dia:composite type="text">
+          <dia:attribute name="string">
+            <dia:string>#Interrupt handling for mouse device is completed.
+Interrupt is cleared in mouse device. #</dia:string>
+          </dia:attribute>
+          <dia:attribute name="font">
+            <dia:font family="sans" style="0" name="Helvetica"/>
+          </dia:attribute>
+          <dia:attribute name="height">
+            <dia:real val="0.98777773976325989"/>
+          </dia:attribute>
+          <dia:attribute name="pos">
+            <dia:point val="21,17.7671"/>
+          </dia:attribute>
+          <dia:attribute name="color">
+            <dia:color val="#000000"/>
+          </dia:attribute>
+          <dia:attribute name="alignment">
+            <dia:enum val="1"/>
+          </dia:attribute>
+        </dia:composite>
+      </dia:attribute>
+      <dia:attribute name="valign">
+        <dia:enum val="2"/>
+      </dia:attribute>
     </dia:object>
   </dia:layer>
 </dia:diagram>

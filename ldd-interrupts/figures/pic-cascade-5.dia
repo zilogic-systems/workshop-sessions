@@ -269,9 +269,6 @@
       <dia:attribute name="numcp">
         <dia:int val="1"/>
       </dia:attribute>
-      <dia:attribute name="line_color">
-        <dia:color val="#ff5151"/>
-      </dia:attribute>
       <dia:attribute name="end_arrow">
         <dia:enum val="3"/>
       </dia:attribute>
@@ -966,6 +963,9 @@
       </dia:attribute>
       <dia:attribute name="autorouting">
         <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="line_color">
+        <dia:color val="#ff5151"/>
       </dia:attribute>
       <dia:attribute name="end_arrow">
         <dia:enum val="3"/>

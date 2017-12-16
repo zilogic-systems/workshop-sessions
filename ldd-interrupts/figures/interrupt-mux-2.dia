@@ -257,7 +257,7 @@
         <dia:point val="21.5,18"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="13.9987,16.5177;29.0242,19.4823"/>
+        <dia:rectangle val="13.9987,16.5522;29.0012,19.4478"/>
       </dia:attribute>
       <dia:attribute name="text">
         <dia:composite type="text">
@@ -273,7 +273,7 @@ PIC generates interrupt to the CPU. #</dia:string>
             <dia:real val="0.98777773976325989"/>
           </dia:attribute>
           <dia:attribute name="pos">
-            <dia:point val="21.5,17.2732"/>
+            <dia:point val="21.5,17.2847"/>
           </dia:attribute>
           <dia:attribute name="color">
             <dia:color val="#000000"/>
@@ -431,7 +431,7 @@ PIC generates interrupt to the CPU. #</dia:string>
         <dia:point val="23.5,5"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="21.5925,4.5055;23.523,5.4945"/>
+        <dia:rectangle val="21.5925,4.54;23.5,5.46"/>
       </dia:attribute>
       <dia:attribute name="text">
         <dia:composite type="text">
@@ -445,7 +445,7 @@ PIC generates interrupt to the CPU. #</dia:string>
             <dia:real val="0.98777773976325989"/>
           </dia:attribute>
           <dia:attribute name="pos">
-            <dia:point val="23.5,5.261"/>
+            <dia:point val="23.5,5.2725"/>
           </dia:attribute>
           <dia:attribute name="color">
             <dia:color val="#000000"/>
@@ -464,7 +464,7 @@ PIC generates interrupt to the CPU. #</dia:string>
         <dia:point val="23.5,7"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="21.5925,6.5055;23.523,7.4945"/>
+        <dia:rectangle val="21.5925,6.54;23.5,7.46"/>
       </dia:attribute>
       <dia:attribute name="text">
         <dia:composite type="text">
@@ -478,7 +478,7 @@ PIC generates interrupt to the CPU. #</dia:string>
             <dia:real val="0.98777773976325989"/>
           </dia:attribute>
           <dia:attribute name="pos">
-            <dia:point val="23.5,7.261"/>
+            <dia:point val="23.5,7.2725"/>
           </dia:attribute>
           <dia:attribute name="color">
             <dia:color val="#000000"/>
@@ -533,7 +533,7 @@ PIC generates interrupt to the CPU. #</dia:string>
         <dia:point val="23.5,9"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="21.5925,8.5055;23.523,9.4945"/>
+        <dia:rectangle val="21.5925,8.54;23.5,9.46"/>
       </dia:attribute>
       <dia:attribute name="text">
         <dia:composite type="text">
@@ -547,7 +547,7 @@ PIC generates interrupt to the CPU. #</dia:string>
             <dia:real val="0.98777773976325989"/>
           </dia:attribute>
           <dia:attribute name="pos">
-            <dia:point val="23.5,9.261"/>
+            <dia:point val="23.5,9.2725"/>
           </dia:attribute>
           <dia:attribute name="color">
             <dia:color val="#000000"/>
@@ -566,7 +566,7 @@ PIC generates interrupt to the CPU. #</dia:string>
         <dia:point val="21,6"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="19.8687,5.5055;22.1542,6.4945"/>
+        <dia:rectangle val="19.8687,5.54;22.1312,6.46"/>
       </dia:attribute>
       <dia:attribute name="text">
         <dia:composite type="text">
@@ -580,7 +580,7 @@ PIC generates interrupt to the CPU. #</dia:string>
             <dia:real val="0.98777773976325989"/>
           </dia:attribute>
           <dia:attribute name="pos">
-            <dia:point val="21,6.261"/>
+            <dia:point val="21,6.2725"/>
           </dia:attribute>
           <dia:attribute name="color">
             <dia:color val="#000000"/>
