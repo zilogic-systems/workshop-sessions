@@ -1,0 +1,5 @@
+= Bus Model
+Zilogic Systems
+:kp:
+
+include::slides-common.asciidoc[]

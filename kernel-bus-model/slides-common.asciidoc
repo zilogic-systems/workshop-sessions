@@ -1,5 +1,3 @@
-= Bus Model
-Zilogic Systems
 
 == Hotplug
 
@@ -113,16 +111,18 @@ image::figures/bus-model-7.png[align="center"]
 
 === I2C Driver Skeleton
 
-Download link:{include:code/i2c-my/my.c.datauri}["skel.c",filename="skel.c"]
-
 [source,c]
 ------
-include::code/i2c-my/my.c[]
+include::code/skel-driver/skel-driver.c[]
 ------
 
+ifdef::kp[]
 === Try Out
 
   * `rmmod` the `i2c_key` module
+
+  * Get the module
+    link:{include:code/skel-driver.tar.gz.datauri}["skel-driver.tar.gz",filename="skel-driver.tar.gz"]
 
   * Modify the skeleton code so that the `probe()` callback is called
     for the I2C device `zkey`
@@ -131,12 +131,91 @@ include::code/i2c-my/my.c[]
     module is loaded
 
   * Check `sysfs` to see if the driver is bound to the device
+endif::kp[]
+
+ifdef::ldd[]
+=== Adding Devices Manually
+
+  * Devices can also be added / removed manually through the `sysfs`
+
+  * Controller device node
++
+------
+/sys/bus/i2c/devices/i2c-0
+------
++
+  * Devices can be added by writing to `new_device`
++
+------
+echo zkey 0x20 > /sys/bus/i2c/devices/i2c-0/new_device
+------
+
+=== Removing Devices Manually
+
+  * Devices can be removed by writing to `delete_device`
++
+------
+echo 0x20 > /sys/bus/i2c/devices/i2c-0/delete_device
+------
+
+=== Try Out
+
+  * Check the currently available devices
++
+------
+ls /sys/bus/i2c/devices
+------
++
+  * Add an I2C device to the system using `sysfs`
++
+------
+echo "zkey 0x20" > /sys/bus/i2c/devices/i2c-0/new-device
+------
++
+  * Check the curently available devices again
+
+=== Try Out
+
+  * Get the module
+    link:{include:code/skel-driver.tar.gz.datauri}["skel-driver.tar.gz",filename="skel-driver.tar.gz"]
+
+  * Modify the skeleton code so that the `probe()` callback is called
+    for the I2C device `zkey`
++
+------
+static const struct i2c_device_id skel_id[] = {
+	{ "skel-dev-name-1", 0 },
+	{ "skel-dev-name-2", 0 },
+	{ }
+};
+------
++
+------
+static const struct i2c_device_id skel_id[] = {
+	{ "zkey", 0 },
+	{ }
+};
+------
+
+=== Try Out
+
+  * Build the module, and load the module
+
+  * Check if the `probe()` is invoked when the module is loaded
+
+  * Check `sysfs` to see if the driver is bound to the device
++
+------
+ls /sys/bus/i2c/drivers/skel-driver
+------
+
+endif::ldd[]
 
 == Module Autoload
 
 === Autoloading
 
-  * Driver tells us how a driver starts handling a device, if the
+  * Bus model tells us how a driver starts handling a device, if the
     driver is already loaded
 
   * If the driver is not already loaded, it should be loaded first
@@ -152,10 +231,10 @@ include::code/i2c-my/my.c[]
     - `modprobe` should be invoked to load the required modules
 
   * Requirements
-    - Device hotplug should be notified to user space
-    - Userspace should be able to identify the driver for the device
+    . Device hotplug should be notified to user space
+    . Userspace should be able to identify the driver for the device
 
-=== Device Hotplug Notification
+=== Requirement 1: Device Hotplug Notification
 
   * Device hotplug is notified to user space, through netlink socket
 
@@ -173,6 +252,7 @@ bus:vendor-id-product-id
 ------
 i2c:zkey
 pci:v00000010d00000020
+usb:v1044p8005
 ------
 
 === Module Loading by Alias
@@ -182,39 +262,40 @@ pci:v00000010d00000020
   * Aliases for a module can be obtained using `modinfo`
 
   * Module can be loaded by its filename or by its alias AKA modalias
+
+=== Device Name as Alias
+
+  * Specify the device name as alias of module
+
+  * Module can be loaded either by module name or device it supports
 +
 ------
-modprobe i2c_key
-modprobe i2c:zkey
+modprobe usb:v1044p8005
 ------
 
-=== Module's Alias Can Have Wild Cards
+=== Module Alias Can Have Wild Cards
 
-  * If modules alias is `pci:v00000010d*`
+  * If modules alias is `usb:v1044p*`
 
-  * Matches devices with vendord ID 0x10 and any device ID
+  * Matches devices with vendord ID 0x1044 and any product ID
 
   * Module can be loaded with any of the following names
-    - `pci:v00000010d00000020`
-    - `pci:v00000010d00000030`
+    - `modprobe usb:v1044p0001`
+    - `modprobe usb:v1044p0002`
 
-=== Device to Driver Mapping
+=== Requirement 2: Device to Driver Mapping
 
-  * Modules alias AKA modalias provides device to driver mapping
+  * Module alias is picked from the modules
 
-  * The device information sent over netlink is infact the modalias
-    string of the device
+  * Collected to a single file `modules.alias`
 
-  * `modprobe` should be invoked with the modalias string of the
-    inserted device
-
-  * Matching driver will be loaded into the kernel, and the bus model
-    takes over
+  * Provides the reuqired device to driver mapping
 
 === UDev, Completes the Puzzle
 
-image::figures/autoload.png[align="center"]
+image::figures/autoload.png[align="center",width="50%"]
 
+ifdef::kp[]
 === Try Out
 
   * Try loading `8139cp` PCI driver with the filename first, in the
@@ -225,6 +306,33 @@ image::figures/autoload.png[align="center"]
   * Find out the modalias names for the PCI driver
 
   * Try loading the driver with the alias names
+endif::kp[]
+
+ifdef::ldd[]
+=== Try Out
+
+  * On the development system, get the modinfo for `zd1201`
++
+-----
+/sbin/modinfo ~/linux-4.4.39/drivers/net/wireless/zd1201.ko
+-----
+
+=== Try Out
+
+  * On the target board, check the `modules.alias` file
++
+-----
+cat /lib/modules/4.4.39/module.alias | grep zd1201
+-----
++
+  * On the target board, load the driver with the device name
++
+-----
+modprobe usb:v1044p8005d00dc00dsc00dp00ic00isc00ip00in00
+-----
++
+  * Check if `zd1201` is loaded using `lsmod`
+endif::ldd[]
   
 === Module Device Table
 
@@ -244,6 +352,6 @@ MODULE_DEVICE_TABLE(i2c, my_id)
 === Try Out
 
   * Add a few more device names to id list of our I2C driver
-  * Build and check if they appear in the `modinfo` output
+  * Check if they appear in the `modinfo` output
   * Remove the `MODULE_DEVICE_TABLE()` macro invocation build and
     check `modinfo` output
