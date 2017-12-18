@@ -238,7 +238,7 @@ image::figures/context2.png[width=700,align="center"]
   * For example the processor cannot execute instructions that modify
     the page tables, in user mode.
 
-  * The kernel code executes in superuser mode, and user code executes
+  * The kernel code executes in supervisor mode, and user code executes
     in user mode.
 
 === Address Space Privileges
@@ -257,6 +257,14 @@ image::figures/context2.png[width=700,align="center"]
 
   * The pages corresponding to kernel code and data are indicated as
     supervisor pages.
+
+=== MMU for User Space
+
+image::figures/userpage.png[align="center"]
+
+=== MMU for Kernel Space
+
+image::figures/kernelpage.png[align="center"]
 
 == Privilege Escalation in Detail
 
@@ -305,15 +313,18 @@ image::figures/trap.png[align="center"]
   * The processor switches to supervisor, and starts executing the
     trap handler. The trap handler is part of the kernel code.
 
-  * The trap handler uses the system call no. to index into system
-    call table, and then branches to the specified system call.
+  * Kernel has a system call table within it.
+
+  * The trap handler uses the 
+    - system call no. to index into system call table, 
+    - then branches to the specified system call.
  
   * returns through the same path.
 
 === Controlled Privilege Escalation
 
   * Userspace can run only kernel space functions, which are exposed
-    as system calls.
+    as `system calls`.
 
   * Thus we are able to achieve controlled access to the system calls,
     through the privilege modes and the trap mechanism.
@@ -321,9 +332,9 @@ image::figures/trap.png[align="center"]
 === Syscall Sequence
 image::figures/sc-sequence.png[align="center"]
 
-== Debugging Syscalls
+== Explore It Yourself
 
-=== Strace
+=== Strace to Debug Syscalls
 
   * `strace` - traces system calls and signals of a process.
 
