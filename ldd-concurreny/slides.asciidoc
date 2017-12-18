@@ -7,13 +7,10 @@
  * Two or more instance of a same method executed on same time
    constitutes to concurrency.
 
- * A method is suspended in-between and 
+ * A method is suspended in-between by pre-emption and 
     - another instance of the same is invoked,
     - if they could run without descrepancy, 
     - its also concurrency.
-
- * methods of program executed in any order, doesn't affect the final
-   result, then they can support concurrency.
 
 === Sources of Concurrency
 
@@ -34,11 +31,11 @@
 
 === SMP vs UP
 
-* UP - Uni Processor
-  - only single core, scope for concurrency is just preemption and
+* *UP - Uni Processor*
+  - only single core, scope for concurrency is just pre-emption and
     interrupts
 
-* SMP - Symmetric Multiprocessor
+* *SMP - Symmetric Multiprocessor*
   - A system with multiple CPUs of same architecture
   - Single kernel spans across the CPUs 
   - same code can run simultaneously on two cores.
@@ -48,7 +45,8 @@
 * A kernel driver code or function can run simultaneously on two
   different cores.
 
-* Which may be potentially a problem if it is not taken care properly.
+* Which may be potentially a problem, if it is not taken care
+  properly.
 
 === Types of Concurrency
 
@@ -58,14 +56,9 @@
  * Concurrency due to interleaving of execution is called
    `pseudo-concurrency`.
 
-  * Concurrency due to sleeping, pre-emption and interrupts comes
-    under pseudo-concurrency.
+  * Concurrency due to *sleeping*, *pre-emption* and *interrupts*
+    comes under pseudo-concurrency.
 
-=== Solving Concurrency Issues
-
-  * May need to disable pre-emption
-
-  * May need to disable interrupts
 
 == Descrepancies of Concurrency
 
@@ -122,6 +115,16 @@ writeback i (8)
 
 == Synchronization
 
+=== Solving Concurrency Issues
+
+  * Write callbacks as re-entrant codes
+
+  * at instances, may need to disable pre-emption
+
+  * at instances, may need to disable interrupts
+
+  * by mutual exclusion
+
 === Mutual Exclusion
 
 * When one thread is accessing a shared data, other thread has to be
@@ -135,12 +138,12 @@ writeback i (8)
 
 === Lock Scenarios
 
-* Short term locks
+* *Short term locks*
   - execution time is less between acquiring and releasing a lock
 
-  - can be a busyloop lock, since lock-in period is less.
+  - can be a busyloop lock, since lock-in or waiting period is less.
 
-* Long term locks
+* *Long term locks*
   - execution or waiting period is long.
 
   - should be using an yielding lock, as CPU can be given to other
@@ -247,12 +250,13 @@ include::code/ikey-mutex/ikey-mutex.read[]
 
   * Spinlocks are busy looping locks
 
-  * When lock is available, disables process pre-emption in single
-    core processor, and sets a lock flag.
+  * When lock is available, `disables process pre-emption` in
+    uni-processor systems, and sets a lock flag.
 
-  * When lock is not available runs a tight loop checking the flag.
+  * When lock is not available, runs a `tight loop checking` the flag.
 
-  * Can be used to protect a shared data between process contexts.
+  * Can be used to protect a shared data between process contexts, if
+    lock-in period is less.
 
   * A variant of spin lock can also disable interrupts before
     acquiring the lock.
@@ -301,6 +305,7 @@ void spin_unlock(spinlock_t *lock);
 ------
 
 === Spinlocks with Interrupts
+
   * Acquiring the lock and disabling interrupts.
 
 ------
