@@ -8,16 +8,17 @@ from __future__ import print_function
 from collections import namedtuple
 from enum import Enum
 
-import sys
-import time
+try:
+    import Tkinter as tk
+except ImportError:
+    import tkinter as tk
+
 import json
-import pygame
+import sys
 
-
-class LevelInvalidError(Exception):
-    """Indicates a parse error in level data."""
-    pass
-
+Tile = namedtuple("Tile", "wall worker dock box")
+Dir = Enum('Dir', 'UP DN LT RT')
+Key = Enum('Key', 'UP DOWN LEFT RIGHT QUIT SKIP')
 
 class World:
     """Represents the positions of worker, walls, boxes and docks.
@@ -38,9 +39,8 @@ class World:
     def _parse(self, level_info):
         """Parses the level and initialize initial level state.
 
-        Raises LevelInvalidError if parsing level fails.
+        Raises ValueError if parsing level fails.
         """
-
         for i, line in enumerate(level_info):
             for j, tile in enumerate(line):
                 pos = (j, i)
@@ -62,19 +62,19 @@ class World:
                     self.wall_pos.append(pos)
                 if tile not in ('@', '+', '$', '*', '.', '#', ' ', '\n'):
                     msg = "character not recognized {0}".format(tile)
-                    raise LevelInvalidError(msg)
+                    raise ValueError(msg)
 
         if len(self.worker_pos) != 1:
-            raise LevelInvalidError("worker not found")
+            raise ValueError("worker not found")
 
         if len(self.dock_pos) != len(self.box_pos):
-            raise LevelInvalidError("boxes and docks count mismatch")
+            raise ValueError("boxes and docks count mismatch")
 
         if len(self.box_pos) == 0:
-            raise LevelInvalidError("boxes not found")
+            raise ValueError("boxes not found")
 
         self.nrows = len(level_info)
-        self.ncols = max(len(l) for l in level_info) - 1
+        self.ncols = max(len(l) for l in level_info)
 
     def get(self, pos):
         """Returns the tile information at specified position."""
@@ -94,7 +94,7 @@ class World:
 
 
 class GameEngine:
-    """Rules engine, decides what is possible with the world.
+    """Rules engine, decides what is possible within the world.
 
     Rules:
       * Worker cannot move into a wall
@@ -103,7 +103,8 @@ class GameEngine:
     Also provides method to check if player has won.
     """
 
-    def move(self, direction, world):
+    @staticmethod
+    def move(direction, world):
         """Move player in a specified direction."""
         x, y = world.worker_pos[0]
 
@@ -116,7 +117,7 @@ class GameEngine:
         elif direction == Dir.RT:
             next_pos = (x + 1, y)
             push_pos = (x + 2, y)
-        elif direction == Dir.LT:
+        else: # if direction == Dir.LT:
             next_pos = (x - 1, y)
             push_pos = (x - 2, y)
 
@@ -134,136 +135,138 @@ class GameEngine:
 
         world.move_worker(next_pos)
 
-    def is_game_over(self, world):
+    @staticmethod
+    def is_game_over(world):
         """Returns True if all boxes are in docks, False otherwise."""
-
-        for dock in world.dock_pos:
-            tile = world.get(dock)
-            if not tile.box:
+        for box in world.box_pos:
+            if box not in world.dock_pos:
                 return False
         return True
 
 
 class GameView:
-    """Interacts with user processing inputs and displaying the world."""
+    """Interacts with user getting inputs and displaying the world."""
+    TILE_SIZE = 32
 
-    def __init__(self):
-        self._tile_size = 32
-        self._screen = None
-        self._width = None
-        self._height = None
+    def __init__(self, game):
+        self._root = tk.Tk()
+        self._root.title("Sokoban!")
+        self._canvas = tk.Canvas(self._root)
+        self._canvas.pack()
+
+        tile_names = (
+            ("wall", Tile(wall=True, worker=False, dock=False, box=False)),
+            ("floor", Tile(wall=False, worker=False, dock=False, box=False)),
+            ("dock", Tile(dock=True, wall=False, worker=False, box=False)),
+            ("box", Tile(box=True, wall=False, worker=False, dock=False)),
+            ("worker", Tile(worker=True, wall=False, dock=False, box=False)),
+            ("box-docked", Tile(box=True, dock=True, wall=False, worker=False)),
+            ("worker-docked", Tile(worker=True, dock=True, wall=False, box=False))
+        )
+
         self._images = {}
-        self._key_map = {
-            pygame.K_UP: Key.UP,
-            pygame.K_LEFT: Key.LEFT,
-            pygame.K_RIGHT: Key.RIGHT,
-            pygame.K_DOWN: Key.DOWN,
-            pygame.K_q: Key.QUIT,
+        for name, tile in tile_names:
+            self._images[tile] = tk.PhotoImage(file="tiles/{}.ppm".format(name))
+
+        self._game = game
+        self._root.bind("<KeyPress>", self._on_key_press)
+
+    def _on_key_press(self, event):
+        """Maps the key pressed, and invokes key handler callback."""
+        key_map = {
+            "Up": Key.UP,
+            "Left": Key.LEFT,
+            "Right": Key.RIGHT,
+            "Down": Key.DOWN,
+            "q": Key.QUIT,
+            "s": Key.SKIP,
         }
+        try:
+            self._game.handle_key(key_map[event.keysym])
+        except KeyError:
+            pass
 
-        pygame.init()
-        pygame.display.set_caption("Sokoban!")
-        for name, tile in tiles.items():
-            self._images[tile] = self._load_tile(name)
+    def run(self):
+        """Runs the main event loop."""
+        self._root.mainloop()
 
-    def set_size(self, ncols, nrows):
-        """Sets the screen dimensions."""
-        self._width = ncols * self._tile_size
-        self._height = nrows * self._tile_size
-        self._screen = pygame.display.set_mode((self._width, self._height))
+    def quit(self):
+        """Quit the main event loop."""
+        self._root.quit()
 
-    def show(self, world):
-        """Displays the tiles in the world."""
-        self._screen.fill((0, 0, 0))
+    def setup_world(self, world):
+        """Sets the size of the game window."""
+        width = world.ncols * GameView.TILE_SIZE
+        height = world.nrows * GameView.TILE_SIZE
+        self._canvas.config(width=width, height=height)
 
+    def show_world(self, world):
+        """Updates the tiles on the game window."""
+        self._canvas.delete("all")
         for y in range(world.nrows):
             for x in range(world.ncols):
                 tile = world.get((x, y))
-                sx = x * self._tile_size
-                sy = y * self._tile_size
+                sx = x * GameView.TILE_SIZE
+                sy = y * GameView.TILE_SIZE
                 img = self._images[tile]
-                self._screen.blit(img, (sx, sy))
+                self._canvas.create_image(sx, sy, image=img, tag="all", anchor=tk.NW)
 
-        pygame.display.flip()
+class Sokoban:
+    """Game director, ties up engine, world and view."""
 
-    def wait_key(self):
-        """Waits and returns the key read from the user."""
-        while True:
-            event = pygame.event.wait()
-            if event.type == pygame.QUIT:
-                return Key.QUIT
-            elif event.type == pygame.KEYDOWN:
-                try:
-                    return self._key_map[event.key]
-                except KeyError:
-                    return None
+    def __init__(self, levels):
+        self._levels = levels
+        self._current = 0
+        self._engine = GameEngine()
+        self._view = GameView(self)
 
-    def _load_tile(self, name):
-        """Loads and returns the tile bitmap files."""
-        return pygame.image.load("tiles/{0}.bmp".format(name))
+        self._world = World(self._levels[self._current])
+        self._view.setup_world(self._world)
+        self._view.show_world(self._world)
+        self._view.run()
 
+    def _goto_next(self):
+        """Increments level and update world."""
+        self._current = (self._current + 1) % len(self._levels)
+        self._world = World(self._levels[self._current])
+        self._view.setup_world(self._world)
+        self._view.show_world(self._world)
 
-Tile = namedtuple("tile", "wall worker dock box")
-Dir = Enum('Dir', 'UP DN LT RT')
-Key = Enum('Key', 'UP DOWN LEFT RIGHT QUIT')
-tiles = {
-    "wall": Tile(wall=True, worker=False, dock=False, box=False),
-    "floor": Tile(wall=False, worker=False, dock=False, box=False),
-    "dock": Tile(dock=True, wall=False, worker=False, box=False),
-    "box": Tile(box=True, wall=False, worker=False, dock=False),
-    "worker": Tile(worker=True, wall=False, dock=False, box=False),
-    "box-docked": Tile(box=True, dock=True, wall=False, worker=False),
-    "worker-docked": Tile(worker=True, dock=True, wall=False, box=False)
-}
+    def _move(self, direction):
+        """Make move and update in view."""
+        self._engine.move(direction, self._world)
+        self._view.show_world(self._world)
 
+    def handle_key(self, key):
+        """Processes a key event.
 
-def play(engine, view, world):
-    """Runs the game loop.
+          * Invoke engine to update the world
+          * Invoke view to display the world
+          * Check game over and move to next level
+        """
+        if key == Key.QUIT:
+            self._view.quit()
+        elif key == Key.UP:
+            self._move(Dir.UP)
+        elif key == Key.RIGHT:
+            self._move(Dir.RT)
+        elif key == Key.LEFT:
+            self._move(Dir.LT)
+        elif key == Key.DOWN:
+            self._move(Dir.DN)
+        elif key == Key.SKIP:
+            self._goto_next()
 
-    while not game over:
-        get user input
-        feed to game engine, which updates world
-        update view with new world state
-    """
-    
-    view.set_size(world.ncols, world.nrows)
-    view.show(world)
-    while not engine.is_game_over(world):
-        inp = view.wait_key()
-        if inp == Key.UP:
-            engine.move(Dir.UP, world)
-        elif inp == Key.DOWN:
-            engine.move(Dir.DN, world)
-        elif inp == Key.LEFT:
-            engine.move(Dir.LT, world)
-        elif inp == Key.RIGHT:
-            engine.move(Dir.RT, world)
-        elif inp == Key.QUIT:
-            sys.exit(0)
-
-        view.show(world)
-    time.sleep(1)
+        if self._engine.is_game_over(self._world):
+            self._goto_next()
 
 
-def main():
-    """Sets up and invokes game loop."""
-
-    if len(sys.argv) != 2:
-        print("Usage: sokoban <level>", file=sys.stderr)
-        sys.exit(1)
-
-    levels = json.load(open("levels.json"))
-    nlevel = int(sys.argv[1])
-    if nlevel >= len(levels):
-        print("sokoban: invalid level", file=sys.stderr)
-        sys.exit(1)
-        
-    view = GameView()
-    engine = GameEngine()
-    world = World(levels[nlevel])
-
-    play(engine, view, world)
-
+def load_levels():
+    try:
+        return json.load(open("levels.json"))
+    except (OSError, IOError, ValueError):
+        print("sokoban: loading levels failed!", file=sys.stderr)
+        exit(1)
 
 if __name__ == "__main__":
-    main()
+    Sokoban(load_levels())
