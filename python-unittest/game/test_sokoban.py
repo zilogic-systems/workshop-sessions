@@ -431,38 +431,38 @@ class TestSokoban(TestCase):
         self.assertEqual(mock_view.setup_world.call_count, 2)
 
 
+class TerminateLoop(Exception):
+    pass
+
+
 class TestGameView(TestCase):
     """Test cases for the GameView class."""
 
-    def make_tk_mocks(self):
-        mock_tk = Mock()
-        mock_root = mock_tk.Tk()
-        mock_canvas = mock_tk.Canvas()
-        mock_tk.PhotoImage.side_effect = ["#", " ", ".", "$", "@", "*", "+"]
+    def make_pygame_mock(self):
+        mock_pygame = Mock()
 
-        patcher = patch("sokoban.tk", mock_tk)
+        patcher = patch("sokoban.pygame", mock_pygame)
         patcher.start()
         self.addCleanup(patcher.stop)
 
-        return (mock_tk, mock_root, mock_canvas)
+        return mock_pygame
 
-    def test_run(self):
-        _, mock_root, _ = self.make_tk_mocks()
-        mock_game = Mock()
-        view = GameView(mock_game)
+    def make_screen_mock(self, mock_pygame):
+        mock_screen = Mock()
+        mock_pygame.display.set_mode.return_value = mock_screen
+        return mock_screen
 
-        view.run()
-
-        self.assertTrue(mock_root.mainloop.called)
+    def make_image_load_mock(self, mock_pygame):
+        mock_pygame.image.load.side_effect = ["#", " ", ".", "$", "@", "*", "+"]
 
     def test_quit(self):
-        _, mock_root, _ = self.make_tk_mocks()
+        mock_pygame = self.make_pygame_mock()
         mock_game = Mock()
         view = GameView(mock_game)
 
         view.quit()
 
-        self.assertTrue(mock_root.quit.called)
+        self.assertTrue(mock_pygame.quit.called)
 
     @staticmethod
     def make_world_mock(nrows, ncols, tile=None):
@@ -475,49 +475,56 @@ class TestGameView(TestCase):
         return mock_world
 
     def test_setup_world(self):
-        _, _, mock_canvas = self.make_tk_mocks()
+        mock_pygame = self.make_pygame_mock()
         mock_world = self.make_world_mock(1, 1)
         mock_game = Mock()
         view = GameView(mock_game)
 
         view.setup_world(mock_world)
 
-        mock_canvas.config.assert_called_with(width=32, height=32)
+        mock_pygame.display.set_mode.assert_called_with((32, 32))
 
     def test_show_world(self):
-        _, _, mock_canvas = self.make_tk_mocks()
+        mock_pygame = self.make_pygame_mock()
+        mock_screen = self.make_screen_mock(mock_pygame)
+        self.make_image_load_mock(mock_pygame)
         mock_world = self.make_world_mock(1, 1)
         mock_game = Mock()
         view = GameView(mock_game)
+        view.load_images()
+        view.setup_world(mock_world)
 
         view.show_world(mock_world)
 
-        mock_canvas.create_image.assert_called_with(0, 0, image=" ", tag="all",
-                                                    anchor=mock.ANY)
+        mock_screen.blit.assert_called_with(" ", (0, 0))
 
     def test_on_key_press(self):
-        _, mock_root, _ = self.make_tk_mocks()
+        mock_pygame = self.make_pygame_mock()
+        mock_pygame.event.wait.side_effect = [
+            Mock(type=mock_pygame.KEYDOWN, key=mock_pygame.K_UP),
+            TerminateLoop
+        ]
         mock_game = Mock()
-        GameView(mock_game)
+        view = GameView(mock_game)
 
-        bind_args, _ = mock_root.bind.call_args_list[0]
-        _, callback = bind_args
-        event = Mock(keysym="Up")
-        callback(event)
+        with self.assertRaises(TerminateLoop):
+            view.run()
 
         mock_game.handle_key.assert_called_with(Key.UP)
 
     def test_on_key_press_invalid(self):
-        mock_tk, mock_root, _ = self.make_tk_mocks()
+        mock_pygame = self.make_pygame_mock()
+        mock_pygame.event.wait.side_effect = [
+            Mock(type=mock_pygame.KEYDOWN, key=mock_pygame.K_z),
+            TerminateLoop
+        ]
         mock_game = Mock()
-        GameView(mock_game)
+        view = GameView(mock_game)
 
-        bind_args, _ = mock_root.bind.call_args_list[0]
-        _, callback = bind_args
-        event = Mock(keysym="XXX")
-        callback(event)
-
-        self.assertEqual(mock_game.handle_key.called, 0)
+        with self.assertRaises(TerminateLoop):
+            view.run()
+        
+        self.assertFalse(mock_game.handle_key.called)
 
 
 class TestLoadLevels(TestCase):
