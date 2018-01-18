@@ -81,13 +81,12 @@ static ssize_t ikey_read(struct file *file, char __user * buf,
 {
 	int i;
 	int ret;
-	int lk_sts = 0;
 
 	ret = wait_event_interruptible(ikey_wq, !kfifo_is_empty(&ikey_fifo));
 	if (ret != 0)
 		return -ERESTARTSYS;
 
-	lk_sts = mutex_lock_interruptible(&kf_lock);
+	mutex_lock(&kf_lock);
 	for (i = 0; i < count; i++) {
 		char ikey;
 		if (kfifo_get(&ikey_fifo, &ikey) == 0)
