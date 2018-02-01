@@ -28,6 +28,8 @@ After installation you can navigate to each session and then build the slides
 #### Example to build slides
 
 ```
+$ git clone https://github.com/zilogic-systems/workshop-sessions.git
+$ cd workshop-sessions
 $ cd kernel-boot
 $ make
 $ firefox slides.html
