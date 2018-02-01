@@ -18,6 +18,21 @@ by Zilogic.
   * [Git Remotes](git-remotes)
   * Advanced Git Features
 
+## To Build the slides
+
+ * Install asciidoc 
+ * Install build-essential
+
+After installation you can navigate to each session and then build the slides
+
+### Example to build slides
+
+```
+$ cd kernel-boot
+$ make
+$ firefox slides.html
+
+```
 ## Dive Into Yocto, Workshop: Sessions
 
   * [Autotools](autotools)
