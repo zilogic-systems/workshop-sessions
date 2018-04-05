@@ -4,6 +4,8 @@
 #include <linux/module.h>
 #include <linux/i2c.h>
 
+#define DATA_REG_ADDR 0x0
+
 static struct i2c_client * client;
 
 static void display_msg(void)
@@ -13,7 +15,7 @@ static void display_msg(void)
 	char *msg = "Hello World";
 
 	for (i = 0; i < strlen(msg); i++) {
-		buf[0] = 0x0;
+		buf[0] = DATA_REG_ADDR;
 		buf[1] = msg[i];
 		ret = i2c_master_send(client, buf, sizeof(buf));
 		if (ret != sizeof(buf))
