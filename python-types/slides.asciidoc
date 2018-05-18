@@ -1,0 +1,589 @@
+= Python Types
+Zilogic Systems
+
+== Introduction
+
+=== Overview
+
+  * Methods
+  * Lists
+  * Strings and Integers
+  * Tuples
+  * Dictionaries
+  * Iterators
+  * Operators
+
+== Methods
+
+=== Standard Operations on List
+
+[source,python]
+------
+>>> l = ["a", "b", "c"]
+>>> l[1]                 # Accessing an Item
+"b"
+-------
+
+[source,python]
+-------
+>>> l += ["d", "e"]       # Extending a List
+>>> l
+["a", "b", "c", "d", "e"]
+------
+
+=== Operator
+
+  * Concise way to specify an operation to be performed
+
+    - `[]` specifies a element needs to be accessed
+    - `+=` specifies the lists needs to be exteneded
+
+  * Shortcomings
+    - Beyond a point, we run out of characters to represent operations
+    - Unnatural, when multiple values are involved
+
+  * Additional operations can be specified using 'methods'
+
+=== Methods vs Operators
+
+  * Values are also known as objects in Python
+  * Method invocation syntax
++
+[source,python]
+------
+object.method(arg1, arg2, ...)
+------
++
+  * If `add` operation were a method
++
+[source,python]
+-----
+>>> a = 1
+>>> b = 2
+>>> c = a.add(b)
+-----
+
+=== Methods
+
+  * All values of a type, have certain associated methods
+  * Methods are additional operations associated with a value
+  * Some methods, just use value
+  * Some methods, modify the value
++
+[source,python]
+-----
+>>> l = ["a", "b", "c"]
+>>> l.index("b")
+1
+>>> l.reverse()
+>>> l
+["c", "b", "a"]
+------
+
+== Strings and Integers
+
+=== Strings
+
+  * `split([sep])` - split string using a delimiter
++
+[source,python]
+------
+include::code/strlist/split[]
+------
++
+  * `join(list)` - join strings in the list using the string as separator
++
+[source,python]
+------
+include::code/strlist/join[]
+------
+
+=== Integers
+
+  * `int(str, [base])` - constructors an integer object
+  * `base`, if not specified is assumed to be 10
++
+[source,python]
+-----
+include::code/strint/to-int[]
+-----
+
+=== Integers to Strings
+
+  * Simple format conversion
++
+[source,python]
+-----
+include::code/strint/format[]
+-----
+
+=== Integers to Strings (Contd.)
+
+  * Padding and Alignment
++
+[source,python]
+-----
+include::code/strint/pad-align[]
+-----
+
+=== Integers to Strings (Contd.)
+
+  * Fill
++
+[source,python]
+-----
+include::code/strint/fill[]
+-----
+
+== Lists
+
+=== Lists Methods
+
+  * `append(item)` - adds items to the list
+  * `pop([index])` - removes item at a position from the list
+  * `insert(index, item)` - inserts an item into the list
+
+=== Using List as Stack
+
+[source,python]
+------
+include::code/stack/grow[]
+------
+
+=== Using List as Stack (Contd.)
+
+[source,python]
+------
+include::code/stack/shrink[]
+------
+
+=== Mutable vs Immutable
+
+  * Lists are mutable
+  * Strings are immutable
++
+[source,python]
+------
+>>> l = [1, 2, 3]
+>>> l[0] = 4
+...
+>>> s = "123"
+>>> s[0] = 4
+...
+------
+
+=== Object IDs
+
+  * Each object has a unique id
++
+[source,python]
+------
+>>> l = [1, 2, 3]
+>>> id(l)
+...
+>>> i = 10
+>>> id(i)
+...
+>>>> s = "Hello"
+>>> id(s)
+...
+------
+
+=== Aliasing
+
+  * Both `a` and `b` are referring to the same list
+  * Two names to the same object, 'aliases'
+  * If `b` is modified `a` is also modified
++
+[source,python]
+------
+>>> a = [1, 2, 3]
+>>> b = a
+>>> id(a)
+...
+>>> id(b)
+...
+>>> b[0] = 5
+>>> a
+...
+------
+
+=== Aliasing (Contd.)
+
+  * Can trip users new to the language
+
+  * Certain operations are in-place, certain other return a new list
++
+[source,python]
+------
+>>> l = [1, 2, 3]
+>>> l.append(4)
+>>> id(l)
+...
+>>> l2 = l + [4]
+>>> id(l2)
+...
+------
+
+=== List Pitfall
+
+[source,python]
+------
+def add1(l, v):
+    l.append(v)
+
+def add2(l, v):
+    l = l + [v]
+------
+
+=== Try Out
+
+  * Create a matrix, using nested lists
++
+[source,python]
+------
+m = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+------
++
+  * Use `m[i]` to get an element from outer list
+  * Use `m[i][j]` to get an element from an inner list
+  * Create a zero filled 3x3 matrix, as shown below
+  * Modify element `m[0][0]`, what happens to the matrix?
++
+[source,python]
+------
+m = [[0, 0, 0]] * 3
+------
+
+=== Methods Return Values
+
+  * Methods of lists, perform in-place operation, and return `None`
+  * Methods of strings, return a modified copy of the string
++
+[source,python]
+------
+>>> s = "ABCD"
+>>> s.lower()
+...
+>>> s
+...
+>>> l = [4, 2, 3]
+>>> l.sort()
+>>> l
+...
+------
+
+== Tuples
+
+=== Introduction
+
+  * Lists are like arrays in C
+    - Used to group similar types of data
+    
+  * Tuples are like structs in C
+    - Used to group similar / different types, but related data
+    - Example: Student Record, Coordinate, etc.
+
+  * Tuples are immutable
+
+=== Literals
+
+  * Tuples literals, are comma separated values
+  * For clarity, they can be surrounded by parenthesis
++
+[source,python]
+------
+>>> a = 1, 2, 3
+>>> a
+...
+>>> a = (1, 2, 3)
+>>> a
+...
+------
+
+=== Literals (Contd.)
+
+  * Single element tuple literal: `(100,)`
+
+  * The extra comma is required, to distinguish it from an expression
+  
+  * Empty tuple literal: `()`
+
+=== Operations
+
+  * Most operators that work on list, work on tuple as well
+
+    - Indexing (Read-only)
+    - Concatenation
+    - Repetition
+    - Slicing
+    - Comparison
+
+=== Tuple Assignment
+
+  * Tuple Packing
++
+[source,python]
+------
+>>> t = 1, 2
+>>> t
+...
+------
++
+  * Tuple Unpacking
++
+[source,python]
+------
+>>> a, b = t
+>>> a
+...
+>>> b
+...
+------
+
+=== Tuple Assignment (Contd.)
+
+  * Tuple Packing and Unpacking
++
+[source,python]
+------
+>>> a, b = 10, 20
+>>> a
+...
+>>> b
+...
+------
+
+=== Try Out
+
+  * Write a function that returns the area and perimeter of a
+    rectangle, as tuple, given the length and breadth
+
+  * Use tuple unpacking to store the result in two separate variables
++
+------
+a, p = calc(length, breadth)
+------
+
+== Dictionaries
+
+=== Introduction
+
+  * Stores a mapping from keys to values
+  * Values can be of any type
+  * Keys can be of certain limited types: integers, strings, tuples
+    containing integers and strings
+
+=== Literals
+
+[source,python]
+------
+numbers = {
+      "zero": 0,
+      "one": 1,
+      "two": 2,
+      "three": 3
+}
+------
+
+=== Access
+
+  * Can be accessed through the index operator
++
+[source,python]
+------
+>>> numbers["two"]
+...
+>>> numbers["four"] = 4
+>>> numbers
+...
+------
+
+=== Ordering
+
+  * The order of items, may not be order in which it was created
+
+  * Dictionaries are unordered
+
+=== Methods
+
+  * `keys()`, returns a sequence of keys from the dictionary
+
+  * `value()`, returns a sequence of values from the dictionary
+
+=== Try Out
+
+  * Create the following dictionary
++
+[source,python]
+------
+capital = {"Andhra Pradesh": "Hyderabad", "Arunachal Pradesh": "Itanagar",
+"Assam": "Dispur", "Bihar": "Patna", "Goa": "Panaji", "Gujarat":
+"Gandhinagar", "Haryana": "Chandigarh", "Himachal Pradesh": "Shimla",
+"Jammu & Kashmir": "Srinagar", "Karnataka": "Bangalooru", "Kerala":
+"Thiruvananthapuram", "Madhya Pradesh": "Bhopal", "Maharashtra":
+"Mumbai", "Manipur": "Imphal", "Meghalaya": "Shillong", "Mizoram":
+"Aizawl", "Nagaland": "Kohima", "Orissa": "Bhubaneswar", "Punjab":
+"Chandigarh", "Rajasthan": "Jaipur", "Sikkim": "Gangtok",
+"Tripura": "Agartala", "Uttar Pradesh": "Lucknow",
+"West Bengal": "Kolkata", "Chhattisgarh": "Raipur", "Uttarakhand":
+"Dehradun", "Jharkhand": "Ranchi", "Telangana": "Hyderabad"}
+------
+
+=== Try Out
+
+  * Retreive the capital of `"Goa"` and `"Andhra Pradesh"`.
+  * Change the capital of `"Andhra Pradesh"` to `"Amaravati"`
+  * Retreive the capital of `"Andhra Pradesh"`
+  * Add the state `"Tamil Nadu"` to the dictionary
+
+== Iterators
+
+=== Iterator
+
+  * `for` statement can be used iterate over any collection: lists,
+    strings, tuples
+
+  * `iter()` function, returns an iterator of an collection
+
+  * iterator points to a element within an interable
+
+  * `next()` function, called on the iterator, moves to the next
+    element in the collection, and returns it
+
+=== How `for` Works
+
+  * At the beginning of the `for` loop, `for` invokes `iter()` to get
+    an iterator
+
+  * Each time the loop body is executed, `next()` called to get the
+    next element
+
+  * The element is assigned to the loop variable
+
+  * Looping continues, till `next()` causes the `StopIteration` error.
+
+=== Iterable
+
+  * An object is iterable, if iterator can be obtained through
+    `iter()`
+
+  * lists, strings, tuples are iterable
+
+=== Dictionary Iterator
+
+  * Dictionary is also iterable
+
+  * Iterator returns the keys of the dictionary
+
+  * Default iterator for dict
+
+  * `values()` can be used to iterate over values instead of keys
+
+  * `items()` can be used to iterate over `(key, value)` tuples
+
+=== Builtins Accepting Iterables
+
+  * `max()`
+  * `min()`
+  * `any()`
+  * `all()`
+  * `sum()`
+  * `sorted()`
+
+=== Lambdas
+
+  * Lambdas are anyonymous functions
+
+  * Accepts arguments and returns the result of evaluation of an expression
++
+-----
+>>> twice = lambda x: x * 2
+>>> twice(4)
+...
+>>> l = [('a', 10), ('c', 8), ('b', 5), ('d', 3)]
+>>> l.sort()
+>>> l
+...
+>>> l = [('a', 10), ('c', 8), ('b', 5), ('d', 3)]
+>>> l.sort(key=lamba x: x[1])
+>>> l
+...
+-----
+
+== More Operators
+
+=== `len()` operator
+
+  * `len()` returns the no. of elements in a collection
+
+  * String - no. of characters
+
+  * Dictionary / Tuple / List - no. of items
+
+=== `in` operator
+
+  * `in` operator check if an item is present in a collection
+
+  * String - checks if string is a substring of another string
+
+  * Tuple / List - checks if an item is present in the the list
+
+  * Dictionary - check is a key is present in the dictionary
+
+== Dictionary Revisited
+
+=== Example: Collection of Counters
+
+[source,python]
+------
+def histogram(s):
+    d = {}
+    for c in s:
+        if c not in d:
+            d[c] = 1
+        else:
+            d[c] += 1
+    return d
+------
+
+=== Example: Collection of Counters (Contd.)
+
+[source,python]
+------
+>>> h = histogram('brontosaurus')
+>>> h
+...
+------
+
+=== Try Out
+
+  * Write a function to print the histogram
+
+=== Try Out: Sort Histogram on Key
+
+  * The `sorted()` built-in when applied to a dictionary, returns list
+    of keys in sorted fashion
+
+=== Try Out: Sorting Histogram on Value
+
+  * Convert dictionary into list of tuples `[(key, value), ...]`,
+    using `items()` methods
+
+  * Sort the items based on the value, using `sorted()`, specify a
+    lambda as the sort key, to sort on second item in the tuple
+
+  * Loop throught the sorted items, and print them
+
+== Review
+
+=== Type Hierarchy
+
+  * Sequence Types
+    - Immutable Sequences
+      ** Strings
+      ** Tuples
+    - Mutable Sequence
+      ** Lists
+  * Mapping Types
+    - Dictionaries
