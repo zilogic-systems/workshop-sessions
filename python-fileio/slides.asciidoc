@@ -8,7 +8,7 @@ Zilogic Systems
 
   * Working with Binary Data
 
-  * Wokring with Text Files
+  * Working with Text Files
 
 === Binary vs Text
 
@@ -17,13 +17,6 @@ Zilogic Systems
   * Human beings are supposed to work with text files
 
   * Examples?
-
-=== Resource: Tamil Font
-
-  * Some slides use a Tamil text, and requires a Unicode Tamil Font
-
-  * Download and Install link:{include:noto-sans-ta.zip.datauri}["Noto
-    Sans Tamil Font",filename="noto-sans-ta.zip"]
 
 == Dealing with Binary Data
 
@@ -93,7 +86,7 @@ b'\x01\x00\00\x00\x02'
 import struct
 
 fp = open("myfile.dat", "wb")
-bytes = struct.pack(">BHL", 1, 2, 3)
+bytes = struct.pack("BHL", 1, 2, 3)
 fp.write(bytes)
 fp.close()
 ------
@@ -120,7 +113,7 @@ import struct
 
 fp = open("myfile.dat", "rb")
 bytes = fp.read(7)
-print(struct.unpack(">BHL", bytes))
+print(struct.unpack("BHL", bytes))
 fp.close()
 ------
 
@@ -129,7 +122,51 @@ fp.close()
 
    * If not specified, reads all the bytes
 
+=== Reading from C
+
+[source,c]
+------
+#include <error.h>
+#include <errno.h>
+#include <stdio.h>
+
+struct data {
+	unsigned char a;
+	unsigned short b;
+	unsigned long c;
+};
+
+int main()
+{
+	int ret;
+	struct data d;
+	FILE *fp = fopen("myfile.dat", "rb");
+	if (fp == NULL) {
+		error(1, errno, "error opening file myfile.dat");
+	}
+
+	ret = fread(&d, sizeof(d), 1, fp);
+	if (ret != 1) {
+		error(1, errno, "error reading file myfile.dat");
+	}
+
+	printf("%d\n", d.a);
+	printf("%d\n", d.b);
+	printf("%d\n", d.c);
+
+	fclose(fp);
+	return 0;
+}
+------
+
 == Dealing with Text
+
+=== Resource: Tamil Font
+
+  * Some slides use Tamil text, and requires a Unicode Tamil Font
+
+  * Download and Install link:{include:noto-sans-ta.zip.datauri}["Noto
+    Sans Tamil Font",filename="noto-sans-ta.zip"]
 
 === How Text is Represented
 
@@ -144,7 +181,6 @@ fp.close()
     - Assign a code to each character to be represented
 
     - Specify a method store the code, as bytes
-
 
 === ASCII Encoding
 
