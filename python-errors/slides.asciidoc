@@ -1,0 +1,138 @@
+= Python Errors
+Zilogic Systems
+
+== Introduction
+
+=== Overview
+
+  * Types of Errors
+  * Handling Errors
+  * Raising Errors
+
+== Types of Errors
+
+=== Representation
+
+  * Errors are represented by instances of error classes
+
+  * Contain additional information about the error, usually in the
+    form of an error message / error code
+
+=== ValueError
+
+  * Built-in function or operation receives an invalid argument
++
+[source,python]
+------
+>>> int("abcd")
+...
+------
+
+=== IndexError
+
+  * Raised when indexing a sequence, and the index is out-of-range
++
+[source,python]
+------
+>>> l = ["a", "b", "c"]
+>>> l[4]
+...
+------
+
+=== KeyError
+
+  * Raised when a key is not found in a mapping type
++
+[source,python]
+------
+>>> d = {"a": 1, "b": 2, "c": 3}
+>>> d["a"]
+...
+------
+
+=== More Errors
+
+  * `AttributeError`
+  * `ImportError`
+  * `KeyboardInterrupt`
+  * `MemoryError`
+  * `NameError`
+  * `SyntaxError`
+  * `TypeError`
+  * `ZeroDivisionError`
+  * `OSError`
+
+== Handling Errors
+
+=== Exception Handling
+
+  * `try` block, attempts to execute statements
+
+  * If error occurs, matching except block is executed
+
+[source,python]
+------
+while True:
+    try:
+        n = input("Please enter an integer: ")
+        n = int(n)
+        break
+    except ValueError:
+        print("Not a valid integer!")
+------
+
+=== Multiple Exceptions
+
+[source,python]
+------
+integers = []
+try:
+    fp = open('integers.txt')
+    for line in fp:
+        integers.append(int(line))
+except IOError as e:
+    print("error opening file integers.txt: {}".format(e))
+except ValueError:
+    print("invalid integer")
+------
+
+=== Raising Errors
+
+  * `raise` statement can be used to raise errors
+
+  * Used within functions to indicate the occurrence of error to the
+    caller
++
+[source,python]
+------
+def myfunc():
+    raise ValueError("invalid value '2' for argument")
+
+try:
+    myfunc()
+except ValueError as e:
+    print("error executing myfunc: {}".format(e))
+------
+
+=== Cleanup Actions
+
+[source,python]
+------
+def copy(src, dst):
+    fp1 = None
+    fp2 = None
+    try:
+        fp1 = open(src, "rb")
+        fp2 = open(dst, "wb")
+
+        fp2.write(fp1.read())
+
+    finally:
+        if fp1 is not None:
+            print("fp1 closed")
+            fp1.close()
+
+        if fp2 is not None:
+            print("fp2 closed")
+            fp2.close()
+------
