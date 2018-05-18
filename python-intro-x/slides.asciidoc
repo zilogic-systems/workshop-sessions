@@ -372,7 +372,7 @@ image::levels/level-end-11.png[]
 === Try Out: Algorithm
 
   * count = 0
-  * while not left_is_clear()
+  * while not right_is_clear()
     - move
     - count = count + 1
   * repeat count times
