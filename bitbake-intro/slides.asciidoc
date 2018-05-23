@@ -97,7 +97,7 @@ include::code/simple/bbsetup.sh[]
     - `conf/bitbake.conf`
     - `classes/base.bbclass`
 
-  * `bread.bb` is a recipe contains build instructions
+  * `bread.bb` is a recipe that contains build instructions
 
   * Contents of `conf/bitbake.conf` will be discussed later-on
 
@@ -163,7 +163,7 @@ include::code/simple/run-get.sh[]
 
 === Invoking BitBake (2)
 
-  * Commands run with `tmp` folder as current working directory
+  * Commands are run with `tmp` folder as current working directory
 
   * Run the `do_cook` task
 
