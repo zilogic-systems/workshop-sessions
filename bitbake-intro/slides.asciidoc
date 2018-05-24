@@ -251,6 +251,27 @@ var[flag] = "value"
   * `deptask` is a flag, the specifies that a particular task of
     recipes specified in `DEPENDS` should be executed first
 
+[role="two-column"]
+=== Interal Storage
+
+[role="left"]
+image::figures/varflags.png[align="center",width="75%"]
+
+[role="right"]
+   * A variable is internal represented as a hash map
+
+   * Maps keys to value
++
+-------
+myvar = "yocto"
+myvar[x] = "bit"
+myvar[y] = "bake"
+-------
++
+   * Special key `_content` contains the variables value
+
+   * Additional flags / attributes
+
 == Configuration
 
 === BitBake Configuration
