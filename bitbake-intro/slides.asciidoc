@@ -350,3 +350,20 @@ do_cook() {
         echo "${PN}: ready" >> sandwich.txt
 }
 ------
+
+== Backup Slides
+
+=== Re-run on Task Change
+
+  * Stamp filename, should include the hash of the task and
+    dependencies
+
+  * Dependencies
+    - variable values
+    - dependent task hashes
+
+  * Add to `conf/bitbake.conf`.
++
+------
+BB_SIGNATURE_HANDLER ?= "basichash"
+------
