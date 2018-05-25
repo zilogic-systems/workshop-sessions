@@ -78,6 +78,85 @@ Zilogic Systems <training@zilogic.com>
  * We can find the details on build steps involved in building the
    package in file _log.task_order_
 
+== Distribution
+
+=== Customization on Distribution Level
+
+ * If we want to different package management to be chosen, different
+   init system to be chosen. These are defined to be the policy of the
+   distribution.
+
+ * For ex. Below command would configure yocto to build debian
+   packages.
+
+----
+PACKAGE_CLASSES = "package_deb"
+DISTRO_FEATURES_append = " sysvinit"
+VIRTUAL-RUNTIME_init_manager = "sysvinit"
+VIRTUAL-RUNTIME_dev_manager = "udev" 
+----
+
+=== Creating Our Own Distribution
+
+ * By yocto convention, we may need to create a _distribution_ which has
+   information about the policies to be adhered whiling building the
+   individual components.
+
+  * Distro configurations are more about how the packages are
+    configured and built, rather than what packages are built.
+
+  * Some of the distro configurations chooses how the system and
+    packages has to be started in boot (sysv init or systemd)
+
+  * Whether QT like UI components has to be compiled with X11 support
+    or directfb support.
+
+  * Certain distro features can depend on HW related
+    features.
+
+=== Creating Our Own Distribution
+
+  * We can create a new distribution called zebian in our meta-zepto-fs
+    layer
+
+  * Inside the meta-zepto-fs/conf create a directory distro and file
+    zebian.conf inside it. Write below given distro descriptions to
+    it.
+
+[source,shell]
+------
+$ vim meta-zepto-fs/conf/distro/zebian.conf
+
+
+DISTRO = "zebian"
+DISTRO_VERSION = "1.0"
+PACKAGE_CLASSES = "package_deb"
+------
+
+=== Adding Our Distro to local.conf
+
+ * Since we don't have big policies thought out for our new
+   distribution, we can just choose a packaging method for our distro.
+
+ * Can edit the conf/local.conf to build our new distro as shown below
+
+[source,shell]
+------
+$ vim conf/local.conf
+
+
+MACHINE = "qemuarm"
+DISTRO = "zebian"
+CONF_VERSION = "1"
+------
+
+ * Build the core-image-tiny image and it would get built on
+   `tmp-glibc`
+
+ * Test the new distro on the target.
+
+== Machine
+
 === Need for Machine Configuration
 
   * _Machine_ is the target board for which the image is built.

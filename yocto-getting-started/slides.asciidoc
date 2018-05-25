@@ -52,8 +52,8 @@ $ source oe-init-build-env
 
 === Setting Up Yocto (2)
 
- * The script creates and switches to a directory build, in which the
-   further builds would happen
+ * The script creates and switches to a build directory, in which the
+   further builds would be performed.
 
  * To start building, We should provide the target board (machine) for
    which the kernel and rootfs has to be built by Poky.
@@ -133,7 +133,7 @@ $ bitbake core-image-minimal
 ------
 
  * Built kernel and rootfs images would be available in
-   build/tmp/deploy/images/${MACHINE} directory.
+   `build/tmp/deploy/images/${MACHINE}` directory.
 
  * Along with the images you may also find manifest files describing
    the packages available in rootfs.
@@ -160,8 +160,8 @@ $ cat tmp/deploy/images/qemuarm/core-image-minimal-qemuarm.manifest
 
 === Booting Image with QEMU
 
- * Copy the zImage to shared folder /media/sf_share and
-   core-image-minimal-qemuarm.ext4 as disk.img in /media/sf_shared
+ * Copy the zImage to shared folder $SHARED and
+   core-image-minimal-qemuarm.ext4 as disk.img in $SHARED
 
  * Now we can boot our new images using qemu arm as shown
 
@@ -213,14 +213,11 @@ $ vim pn-buildlist
 $ bitbake -s | grep bash
 ------
 
-* We can enable building bash by adding below line to local.conf
+* We can enable building a package by adding below line to local.conf
 
 ------
-IMAGE_INSTALL += bash
+IMAGE_INSTALL += <package>
 ------
-
-* Build the new rootfs image using core-image-minimal again and check
-  whether the bash is built.
 
 === Need for Layer
 
@@ -228,4 +225,4 @@ IMAGE_INSTALL += bash
   me maintained, shared or version controlled.
 
 * Better practise is to maintain all our permanent changes in separate
-  layer, which can be maintained in versioning system.
+  layer, which can be maintained in version control system.

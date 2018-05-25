@@ -67,6 +67,8 @@ image::figures/yocto-project-transp.png[style="left",align="center"]
    for different providers separately.
 
  * Required layers can be pulled into build system, when required.
+
+ * Application developer's centric tools and worlflow.
  
 === Yocto Over Pre-built Distros
 
@@ -146,7 +148,7 @@ image::figures/Poky-Logo.jpg[style="left",align="center"]
  * Openembedded Classic is a massive project which has thousands of
    recipes and hundreds of target boards.
 
- * Which has become a much bloated and hard to maintain software.
+ * Which has become a much bloated and hard to maintain.
 
  * Yocto and Openembedded share bitbake and a specific metadata(set of
    recipes) called openembedded-core.
@@ -166,6 +168,21 @@ image::figures/Poky-Logo.jpg[style="left",align="center"]
 
 image::figures/oe-repo-cropped.png[style="left",align="center"]
 image::figures/poky-repo-cropped.png[style="right",align="center"]
+
+=== Yocto Releases
+
+* Yocto get released twice in a year.
+
+|====
+| *Name*| *Version*
+|Sumo   | 2.5 (Yet to be released)
+|Rocko  | 2.4
+|Pyro   | 2.3
+|Morty  | 2.2
+|krogoth| 2.1
+|Jethro | 2.0
+|Fido   | 1.8
+|==== 
 
 == Yocto Architecture
 
@@ -259,11 +276,11 @@ class. Checks the build outputs for
 * The target specific packages available in package feed, can be
   installed into the rootfs.
 
-* The packages need to be installed into rootfs and type of rootfs can
-  be controlled through image specific variables.
+* Type of rootfs can be controlled be through image specific
+  variables.
 
 * The image specific manifest files are created for further analysis.
 
-* The package feeds can be exposed as a repo through web server, so
-  the packages in the target system can be updated at run-time.
+* The package feeds can also be exposed as a repo through web server,
+  so the packages in the target system can be updated at run-time.
 
