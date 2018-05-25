@@ -166,6 +166,13 @@ BBLAYERS = "            \
 
 === Make the Burger
 
+  * Summary
+
+    - Created `meta-burger`
+    - Added a layer config: `meta-burger/conf/layer.conf`
+    - Added recipe in `meta-burger/burger.bb`
+    - Added layer to `conf/bblayers.conf`
+
   * Try building burger using the new layer
 
 == Customization using Layers
