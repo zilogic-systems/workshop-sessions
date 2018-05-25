@@ -1,0 +1,452 @@
+= Yocto For Application Development Support
+
+== Using SDK
+
+=== SDK / ADT for Developers 
+
+* Yocto SDK has toolchain and the dependency libraries which can be
+  used by application developers to build their applications.
+
+* Yocto also provides an plugin called ADT, which allows to developers
+  to use the yocto toolchain in eclipse IDE.
+
+* SDK provides also tools using which developers can test, debug and
+  introspect the application.
+
+* SDK removes dependency of developers knowing the Yocto build system.
+
+
+=== Building SDK
+
+* SDK can be built with below command 
+
+[source,shell]
+----
+bitbake -c populate_sdk core_image_tiny
+----
+
+* Debugging and testing tools can be enabled by adding below in
+  conf/local.conf
+
+[source,shell]
+----
+EXTRA_IMAGE_FEATURES = "tools-debug tools-profile tools-testapps debug-tweaks"
+----
+
+* Built SDK would be found in `tmp/deploy/sdk` as a shell script which
+  on invocation installs the SDK in your system.
+
+=== Using SDK
+
+* The toolchains in the SDK can be added to path by sourcing below file.
+
+[source,shell]
+----
+source environment-setup-armv5e-poky-linux-gnueabi
+----
+
+* Then the applications can be cross compiled using this toolchain.
+
+----
+$ arm-poky-linux-gnueabi-gcc
+----
+
+=== Development to Integration Workflow
+
+* If the developer had his code developed, built with SDK and tested
+  in the target board.
+
+* Next is to get integrated into the rootfs for next release adding it
+  to Yocto build system.
+
+== Adding Packages to Yocto Build System
+
+=== Building Custom Package
+
+* Custom packages can be added to Yocto build system, by developing a
+  bitbake recipe for the source code developed.
+
+* The bitbake recipe can be added to Yocto build system and can be
+  built as a whole.
+
+* But it is know fact that Yocto is a beast which going take up more
+  RAM, CPU, storage and network bandwidth.
+
+* Do reduce the Yocto build overhead, we can use the build
+  sstate-cache, which would be available from the Yocto's previous
+  build.
+
+
+=== Build Types
+
+ * We can build packages which are compliant to 
+   - autotools 
+   - cmake 
+   by inheritting the autotools or cmake classes in the recipe as we did
+   for bash in zepto.
+
+ * We can build packages with make only type by writing a recipe
+   invoking oe_make
+
+ * We can build packages with fewer source files by placing the source
+   inside the layer itself.
+
+=== Layers for Convenience 
+
+* A separate layer can be created with the recipes and configurations
+  for custom software components.
+
+* This simplifies the maintenance of your own recipes.
+
+* These layer can be added to the yocto build.
+
+ * We can run the below command to create a layer called meta-app
+   in the build folder
+
+[source,shell]
+------
+$ yocto-layer create ../app
+------
+
+=== Recipes for In-layer Sources
+
+ * We can build a package by placing the source of package along the
+   recipe.
+
+ * We can create a helloworld packages by creating a folder in our
+   meta layer.
+
+[source,shell]
+-----
+$ cd meta-app/
+$ mkdir -p recipes-core/helloworld
+$ mkdir -p recipes-core/heloworld/files 
+-----
+
+=== Recipes for In-layer Sources Contd.
+
+ * Create a 'C' file helloworld.c inside the `files` folder.
+
+[source,shell]
+-----
+$ cd helloworld/files
+$ vim helloworld.c
+-----
+
+[source,c]
+-----
+#include <stdio.h>
+
+int main()
+{
+        printf("Hello World\n");
+}
+
+-----
+
+=== Recipes for In-layer Sources Contd.
+
+
+ * Create a helloworld.bb recipe file inside `helloworld` folder.
+
+[source,shell]
+-----
+$ vim helloworld.bb
+-----
+
+[source,shell]
+-----
+PN="helloworld"
+SRC_URI="file://helloworld.c"
+-----
+
+ * Fetcher can look for source files in the `files` folder residing in
+   the same heirarchy of `bb` file.
+
+ * Specify the source file name using `file` protocol through `SRC_URI`,
+
+=== Recipes for In-layer Sources Contd.
+
+   where the fetcher can fetch the file, from files folder to the
+   `WORKDIR`.
+
+ * The location of the source file has to be specified to the build
+   stage, by explcitily pointing the `S` variable to the `WORKDIR`
+   where the file was downloaded.
+
+[source,shell]
+-----
+S = "${WORKDIR}"
+-----
+
+=== Recipes for In-layer Sources Contd.
+
+ * We can specify our custom compilation commands and install commands
+   through compile and install tasks.
+
+[source,shell]
+-----
+do_compile() {
+        ${CC} helloworld.c -o helloworld
+}
+
+do_install() {
+        install -d ${D}${bindir}
+        install -m 0755 helloworld ${D}${bindir}
+}
+-----
+
+=== Root Hierarchy
+
+ * Install task needs to copy the built files into, `${D}` directory
+   which is rootfs base.
+
+ * It has unix file hierarchical directories like /usr/bin, /usr/lib..
+
+ * Yocto defines variables for `/usr/bin`,  `/usr/lib`, `etc` paths in variables
+   `${bindir}`, `${libdir}`, `${sysconfdir}` etc.
+
+ * Necessary folder can be created inside `${D}` using `install -d`
+   command.
+
+=== Recipes for In-layer Sources Contd.
+
+ * By default yocto expects license for every package for it's QA
+   proccess.
+
+ * We can specify the license through `LICENSE` variable and md5
+   checksum for the license file through `LIC_FILES_CHKSUM` variable.
+
+ * Yocto has license files and its's checksum in its source itself,
+   which can be referred, as in below example.
+
+[source,shell]
+-----
+LICENSE = "MIT"
+LIC_FILES_CHKSUM =
+"file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
+-----
+
+=== Recipes for In-layer Sources Contd.
+
+[source,shell]
+-----
+PN="helloworld"
+
+LICENSE = "MIT"
+LIC_FILES_CHKSUM =
+"file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
+
+SRC_URI="file://helloworld.c"
+
+S = "${WORKDIR}"
+
+do_compile() {
+        ${CC} helloworld.c -o helloworld
+}
+
+do_install() {
+        install -d ${D}${bindir}
+        install -m 0755 helloworld ${D}${bindir}
+}
+-----
+
+=== Creating custom image
+
+[source,shell]
+------
+$ mkdir -p recipes-core/images/
+------
+
+Create a file core-image-tiny.bbappend and include the list of packages
+
+[source,shell]
+------
+$ vim recipes-core/images/core-image-tiny.bbappend
+IMAGE_INSTALL += " helloworld"
+inherit core-image
+------
+
+=== Build with New Layer
+
+ * The meta-zepto-fs layer has to be added to the yocto build as
+
+[source,shell]
+------
+$ cd ../build
+$ bitbake-layers add-layer ../meta-app
+------
+
+ * Build the image with hello world 
+
+[source,shell]
+-----
+$ bitbake core-image-tiny
+-----
+
+== Make Based App
+
+=== Folders for Recipe
+
+* Create folder structure for the main application as shown below.
+
+[source,shell]
+------
+cd meta-app
+mkdir -p recipes-core/mainapp
+mkdir -p recipes-core/mainapp/files
+------
+
+=== App Code
+
+* Download the application code from
+  link:{include:code/app.c.datauri}["app.c",filename="app.c"] and copy
+  to recipe as shown below.
+
+[source,shell]
+-----
+cp ~/Downloads/app.c recipes-core/mainapp/files
+-----
+
+=== Add Makefile
+
+[source,shell]
+----
+vim recipes-core/mainapp/files/Makefile
+----
+
+[source,shell]
+------
+compile:
+	${CC} app.c -lncurses -lpanel -o mainapp
+install:
+	install -d ${DESTDIR}/usr/bin
+	install -m 0755 mainapp ${DESTDIR}/usr/bin
+------
+
+=== Add Recipe
+
+[source,shell]
+-----
+vim recipes-core/mainapp/mainapp.bb
+-----
+
+[source,shell]
+-----
+PN = "mainapp"
+LICENSE = "MIT"
+LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
+SRC_URI = "file://app.c \
+	   file://Makefile"
+S = "${WORKDIR}"
+DEPENDS = "ncurses"
+do_configure[noexec] = "1"
+do_clean[noexec] = "1"
+do_compile() {
+	     oe_runmake compile 
+}
+do_install() {
+	     oe_runmake  install DESTDIR=${D}
+}
+---- 
+
+=== Adding Mainapp to Image
+
+[source,shell]
+-----
+vim recipes-core/images/core-image-tiny.bbappend
+-----
+
+[source,shell]
+-----
+IMAGE_INSTALL += " mainapp"
+inherit core-image
+----
+
+=== Supporting Package Source in External Directory
+
+ * If the source exists in a home folder or in anyother folder in a
+   local system, they can be built with externalsrc class definitions.
+
+ * recipes need to inherit the externalsrc class and need to provide
+   the path of the source as shown below, instead of SRC_URI
+ 
+[source,shell]
+-----
+inherit externalsrc
+EXTERNALSRC = " path "
+EXTERNALSRC_BUILD = " path "
+-----
+
+
+
+=== Create External Source
+
+* Create externhello directory in home directory
+
+[source,shell]
+-----
+$mkdir ~/externhello
+$vim ~/externhello/hello.c
+-----
+
+[source,c]
+-----
+#include <stdio.h>
+
+int main(void)
+{
+	printf("Have a nice day!");
+	return 0;
+}
+-----
+
+=== Recipe for External Source
+
+Create a recipe for external source in meta-app
+
+[source,shell]
+-----
+$ cd meta-app
+$ mkdir -p recipes-core/externhello
+$ vim recipes-core/externhello/externhello.bb
+-----
+
+[source,shell]
+-----
+PN="externhello"
+
+LICENSE = "MIT"
+LIC_FILES_CHKSUM =
+"file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
+
+inherit externalsrc
+EXTERNALSRC = "/home/vagrant/externhello"
+EXTERNALSRC_BUILD = "/home/vagrant/externhello"
+
+S = "${WORKDIR}"
+
+do_compile() {
+        ${CC} hello.c -o externhello
+}
+
+do_install() {
+        install -d ${D}${bindir}
+        install -m 0755 externhello ${D}${bindir}
+}
+-----
+
+=== Adding External Source Package into Image
+
+[source,shell]
+-----
+cd meta-app/recipes-core/images
+vim core-image-minimal.bbappend
+-----
+
+[source,shell]
+-----
+IMAGE_INSTALL += " externhello"
+inherit core-image
+-----
+
