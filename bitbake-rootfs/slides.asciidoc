@@ -95,8 +95,11 @@ Zilogic Systems
 
   * Setup bitbake first
   * Setup `BBPATH`
-  * Add a recipe for libncurses
+  * Add a recipe for ncurses
+    - `http://ftp.gnu.org/gnu/ncurses/ncurses-5.9.tar.gz`
   * Add a recipe for less
+    - `http://www.greenwoodsoftware.com/less/less-458.tar.gz`
+  * Specify less depends on ncurses
 
 == Zepto V4
 
@@ -104,5 +107,4 @@ Zilogic Systems
 
   * Support creation of images
   * Separate recipe to copy libraries from toolchain directory
-
 

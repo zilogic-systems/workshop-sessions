@@ -15,21 +15,21 @@ Zilogic Systems
 
 === Use Case: Recipe Collection
 
-  * Layer provids a way of distributing a collection of recipes
+  * Layer provides a way of distributing a collection of recipes
 
   * Collection of recipes providing a feature, like GTK+ GUI, can be
     distributed as a layer
 
 === Use Case: BSP Support
 
-  * Layer provies a way of adding support for a particular hardware
+  * Layer provides a way of adding support for a particular hardware
 
   * Recipes and configuration, to enable support for various
     hardware peripherals
 
 === Use Case: Customization
 
-  * Important since, may layers are distributed by other vendors
+  * Important since, many layers are distributed by other vendors
 
   * Hard to convince a vendor to include a change, might not be
     applicable to all users
@@ -52,21 +52,41 @@ Zilogic Systems
 
 image::figures/layer-dir-tree.png[align="center"]
 
+=== Locating Layers
+
+  * `conf/bblayers.conf`
+    - specifies the list of layers to be processed
+
+  * `BBLAYERS` Variable
+    - specifies the layers
+
+=== Locating Configs, Classes and Recipes
+
+  * `conf/layer.conf` - one per layer
+    - adds config. and class files to the search path
+    - adds recipes to the search path
+
+  * `BBPATH`
+    - specifies config and class search path
+    - used by `include` and `inherit` directives
+
+  * `BBFILES` - specifies location of recipes
+
 [role="two-column"]
 === Layer Config. Processing
 
 [role="left"]
-image::figures/layerconf.png[align="center"]
+image::figures/layerconf.png[align="center",width="40%"]
 
 [role="right"]
   * If `BBPATH` is not set, BitBake looks for `conf/bblayers.conf`, in
     the current directory
 
-  * The file sets up `BBLAYERS` to specify a list of layer directories
+  * Sets up `BBLAYERS` - list of layer directories
 
-  * For each layer in `BBLAYERS`, the `conf/layer.conf` is read
+  * For each layer, `conf/layer.conf` is read
 
-  * `conf/layer.conf` file sets up `BBPATH` and `BBFILES`
+  * Sets up `BBPATH` and `BBFILES`
 
   * `bitbake.conf` is searched in `BBPATH`, and read
 
@@ -90,7 +110,7 @@ $ unset BBPATH
 
 === Adding a Burger Layer
 
-  * Create new layer for burger calld `meta-burger`
+  * Create new layer for burger called `meta-burger`
 +
 ------
 cd ~/yp/lunch
@@ -146,13 +166,32 @@ BBLAYERS = "            \
 
 === Make the Burger
 
+  * Summary
+
+    - Created `meta-burger`
+    - Added a layer config: `meta-burger/conf/layer.conf`
+    - Added recipe in `meta-burger/burger.bb`
+    - Added layer to `conf/bblayers.conf`
+
   * Try building burger using the new layer
 
 == Customization using Layers
 
+=== Append Files
+
+  * Layers can have regular recipes: `.bb`
+
+    - Specifies how to build something
+
+  * Layers can have append files: `.bbappend`
+
+    - Processed after a recipe with same name
+    - Can be used to add to / modify the recipe
+    - Need not be in the same layer as the recipe
+
 === Using Append Files
 
-  * Modify omlete to have less pepper
+  * Modify omelet to have less pepper
 
   * Add a file called `omelet.bbappend` in `meta-burger`
 +
@@ -164,3 +203,15 @@ do_get() {
 ------
 +
   * Delete `tmp`, and rebuild burger now
+
+=== Use Case
+
+  * Append files can be used to maintain customizations to recipes
+
+  * Independent of the original recipe
+
+  * Necessary because, not all changes to third-party recipes can be
+    upstreamed
+
+  * Project specific customization can be maintained in a separate
+    layer

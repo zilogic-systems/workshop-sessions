@@ -69,9 +69,20 @@ image::figures/kernel-boot.png[align="center"]
 
   * Boot arguments to the kernel can be specified
 
+=== Shared Folder
+
+  * Target emulation is done outside VirtualBox, on the host
+
+  * Shared folder
+    - Transfer kernel and disk images, out of VirtualBox
+    - Used to test against the target, emulated by Qemu
+
+  * Set the environment variable `SHARED` to point to the shared
+    folder
+
 === Invoking Qemu
 
-Create a file in `~/shared` called `run-qemu.sh`.
+Create a file in `$SHARED` called `run-qemu.sh`.
 
 [source,shell]
 ------
@@ -83,7 +94,7 @@ include::cmd/boot-prebuilt.sh[]
 
 === Invoking Qemu (Contd.)
 
-Create a file in `~/shared` called `run-qemu.sh`.
+Create a file in `$SHARED` called `run-qemu.sh`.
 
 [source,shell]
 ------
@@ -104,12 +115,7 @@ include::cmd/boot-prebuilt.sh[]
 include::cmd/copy-prebuilt.sh[]
 ------
 +
-  * In the host, invoke Qemu
-+
-[source,shell]
-------
-include::cmd/run-qemu.sh[]
-------
+  * In the host, invoke Qemu using `run-qemu.sh`
 
 == Minimal Filesystem V0
 
@@ -196,12 +202,6 @@ include::cmd/create-hello-rootfs.sh[]
 === Boot the Kernel with Hello 
 
   * Boot the kernel with new disk image.
-+
-[source,shell]
-------
-include::cmd/boot-hello-rootfs.sh[]
-------
-+
   * Kernel after boot up checks for `/sbin/init`.
   * If not found it tries to execute `/bin/sh`
 
@@ -315,12 +315,7 @@ include::cmd/create-bash-rootfs.sh[]
 === Boot the Kernel Image
 
   * Boot the kernel with new disk image.
-+
-[source,shell]
-------
-include::cmd/boot-bash-rootfs.sh[]
-------
-+
+
   * Basic navigation command works, but `ls` doesn't.
 
   * Use `echo *` instead!

@@ -97,7 +97,7 @@ include::code/simple/bbsetup.sh[]
     - `conf/bitbake.conf`
     - `classes/base.bbclass`
 
-  * `bread.bb` is a recipe contains build instructions
+  * `bread.bb` is a recipe that contains build instructions
 
   * Contents of `conf/bitbake.conf` will be discussed later-on
 
@@ -163,7 +163,7 @@ include::code/simple/run-get.sh[]
 
 === Invoking BitBake (2)
 
-  * Commands run with `tmp` folder as current working directory
+  * Commands are run with `tmp` folder as current working directory
 
   * Run the `do_cook` task
 
@@ -251,6 +251,27 @@ var[flag] = "value"
   * `deptask` is a flag, the specifies that a particular task of
     recipes specified in `DEPENDS` should be executed first
 
+[role="two-column"]
+=== Interal Storage
+
+[role="left"]
+image::figures/varflags.png[align="center",width="75%"]
+
+[role="right"]
+   * A variable is internal represented as a hash map
+
+   * Maps keys to value
++
+-------
+myvar = "yocto"
+myvar[x] = "bit"
+myvar[y] = "bake"
+-------
++
+   * Special key `_content` contains the variables value
+
+   * Additional flags / attributes
+
 == Configuration
 
 === BitBake Configuration
@@ -328,4 +349,23 @@ do_cook() {
         sleep 2
         echo "${PN}: ready" >> sandwich.txt
 }
+------
+
+== Questions
+
+== Backup Slides
+
+=== Re-run on Task Change
+
+  * Stamp filename, should include the hash of the task and
+    dependencies
+
+  * Dependencies
+    - variable values
+    - dependent task hashes
+
+  * Add to `conf/bitbake.conf`.
++
+------
+BB_SIGNATURE_HANDLER ?= "basichash"
 ------

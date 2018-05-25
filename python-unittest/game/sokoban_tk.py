@@ -10,7 +10,7 @@ from enum import Enum
 
 import json
 import sys
-import pygame
+import tkinter as tk
 
 Tile = namedtuple("Tile", "wall worker dock box")
 Dir = Enum('Dir', 'UP DN LT RT')
@@ -147,14 +147,14 @@ class GameView:
 
     def __init__(self, game):
         self._game = game
-        self._screen = None
+        self._window = tk.Tk()
+        self._window.title("Sokoban!")
+        self._canvas = tk.Canvas(self._window)
+        self._canvas.pack()
+        self._window.bind("<KeyPress>", self._on_key_press)
         self._images = {}
-        self._done = False
-        pygame.init()
-        pygame.display.set_caption("Sokoban!")
 
     def load_images(self):
-        """Loads tile images from file."""
         tile_names = (
             ("wall", Tile(wall=True, worker=False, dock=False, box=False)),
             ("floor", Tile(wall=False, worker=False, dock=False, box=False)),
@@ -165,53 +165,46 @@ class GameView:
             ("worker-docked", Tile(worker=True, dock=True, wall=False, box=False))
         )
 
-        self._images = {}
         for name, tile in tile_names:
-            self._images[tile] = pygame.image.load("tiles/{0}.ppm".format(name))
+            self._images[tile] = tk.PhotoImage(file="tiles/{}.ppm".format(name))
 
     def setup_world(self, world):
         """Sets the size of the game window."""
         width = world.ncols * GameView.TILE_SIZE
         height = world.nrows * GameView.TILE_SIZE
-        self._screen = pygame.display.set_mode((width, height))
+        self._canvas.config(width=width, height=height)
 
     def show_world(self, world):
         """Updates the tiles on the game window."""
-        self._screen.fill((0, 0, 0))
+        self._canvas.delete("all")
         for y in range(world.nrows):
             for x in range(world.ncols):
                 tile = world.get((x, y))
                 sx = x * GameView.TILE_SIZE
                 sy = y * GameView.TILE_SIZE
                 img = self._images[tile]
-                self._screen.blit(img, (sx, sy))
-        pygame.display.flip()
+                self._canvas.create_image(sx, sy, image=img, tag="all", anchor=tk.NW)
 
     def quit(self):
-        """Exits from main loop."""
-        pygame.quit()
-        self._done = True
+        self._window.quit()
 
     def run(self):
-        """Runs the main event loop."""
-        key_map = {
-            pygame.K_UP: Key.UP,
-            pygame.K_LEFT: Key.LEFT,
-            pygame.K_RIGHT: Key.RIGHT,
-            pygame.K_DOWN: Key.DOWN,
-            pygame.K_q: Key.QUIT,
-            pygame.K_s: Key.SKIP,
-        }
+        self._window.mainloop()
 
-        while not self._done:
-            event = pygame.event.wait()
-            if event.type == pygame.QUIT:
-                self._game.handle_key(Key.QUIT)
-            elif event.type == pygame.KEYDOWN:
-                try:
-                    self._game.handle_key(key_map[event.key])
-                except KeyError:
-                    pass
+    def _on_key_press(self, event):
+        """Maps the key pressed, and invokes key handler callback."""
+        key_map = {
+            "Up": Key.UP,
+            "Left": Key.LEFT,
+            "Right": Key.RIGHT,
+            "Down": Key.DOWN,
+            "q": Key.QUIT,
+            "s": Key.SKIP,
+        }
+        try:
+            self._game.handle_key(key_map[event.keysym])
+        except KeyError:
+            pass
 
 
 class Sokoban:

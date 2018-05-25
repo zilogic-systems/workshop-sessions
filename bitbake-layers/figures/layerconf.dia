@@ -87,7 +87,7 @@
         <dia:real val="0.5"/>
       </dia:attribute>
       <dia:connections>
-        <dia:connection handle="0" to="O8" connection="13"/>
+        <dia:connection handle="0" to="O6" connection="13"/>
       </dia:connections>
     </dia:object>
     <dia:object type="Standard - Line" version="0" id="O1">
@@ -95,7 +95,7 @@
         <dia:point val="23.954,14"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="23.6583,13.949;24.32,16.4384"/>
+        <dia:rectangle val="23.6583,13.949;24.32,16.4385"/>
       </dia:attribute>
       <dia:attribute name="conn_endpoints">
         <dia:point val="23.954,14"/>
@@ -114,8 +114,8 @@
         <dia:real val="0.5"/>
       </dia:attribute>
       <dia:connections>
-        <dia:connection handle="0" to="O9" connection="13"/>
-        <dia:connection handle="1" to="O11" connection="0"/>
+        <dia:connection handle="0" to="O7" connection="13"/>
+        <dia:connection handle="1" to="O9" connection="0"/>
       </dia:connections>
     </dia:object>
     <dia:object type="Standard - Line" version="0" id="O2">
@@ -142,7 +142,7 @@
         <dia:real val="0.5"/>
       </dia:attribute>
       <dia:connections>
-        <dia:connection handle="0" to="O11" connection="8"/>
+        <dia:connection handle="0" to="O9" connection="8"/>
       </dia:connections>
     </dia:object>
     <dia:object type="Standard - ZigZagLine" version="1" id="O3">
@@ -178,7 +178,7 @@
         <dia:real val="0.5"/>
       </dia:attribute>
       <dia:connections>
-        <dia:connection handle="0" to="O11" connection="4"/>
+        <dia:connection handle="0" to="O9" connection="4"/>
       </dia:connections>
     </dia:object>
     <dia:object type="Standard - Line" version="0" id="O4">
@@ -210,7 +210,7 @@
         <dia:point val="23.954,26"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="23.6566,25.9489;24.3182,28.1118"/>
+        <dia:rectangle val="23.6565,25.9489;24.3182,28.1118"/>
       </dia:attribute>
       <dia:attribute name="conn_endpoints">
         <dia:point val="23.954,26"/>
@@ -229,59 +229,10 @@
         <dia:real val="0.5"/>
       </dia:attribute>
       <dia:connections>
-        <dia:connection handle="0" to="O10" connection="13"/>
+        <dia:connection handle="0" to="O8" connection="13"/>
       </dia:connections>
     </dia:object>
-    <dia:object type="Standard - Line" version="0" id="O6">
-      <dia:attribute name="obj_pos">
-        <dia:point val="33,3"/>
-      </dia:attribute>
-      <dia:attribute name="obj_bb">
-        <dia:rectangle val="32.95,2.95;33.05,30.05"/>
-      </dia:attribute>
-      <dia:attribute name="conn_endpoints">
-        <dia:point val="33,3"/>
-        <dia:point val="33,30"/>
-      </dia:attribute>
-      <dia:attribute name="numcp">
-        <dia:int val="1"/>
-      </dia:attribute>
-    </dia:object>
-    <dia:object type="Standard - Text" version="1" id="O7">
-      <dia:attribute name="obj_pos">
-        <dia:point val="35,6"/>
-      </dia:attribute>
-      <dia:attribute name="obj_bb">
-        <dia:rectangle val="35,5.2675;48.3,7.17528"/>
-      </dia:attribute>
-      <dia:attribute name="text">
-        <dia:composite type="text">
-          <dia:attribute name="string">
-            <dia:string>#Specifies
-BBLAYERS: Location of layers#</dia:string>
-          </dia:attribute>
-          <dia:attribute name="font">
-            <dia:font family="monospace" style="0" name="Courier"/>
-          </dia:attribute>
-          <dia:attribute name="height">
-            <dia:real val="0.98777773976325989"/>
-          </dia:attribute>
-          <dia:attribute name="pos">
-            <dia:point val="35,6"/>
-          </dia:attribute>
-          <dia:attribute name="color">
-            <dia:color val="#000000"/>
-          </dia:attribute>
-          <dia:attribute name="alignment">
-            <dia:enum val="0"/>
-          </dia:attribute>
-        </dia:composite>
-      </dia:attribute>
-      <dia:attribute name="valign">
-        <dia:enum val="3"/>
-      </dia:attribute>
-    </dia:object>
-    <dia:object type="Flowchart - Parallelogram" version="0" id="O8">
+    <dia:object type="Flowchart - Parallelogram" version="0" id="O6">
       <dia:attribute name="obj_pos">
         <dia:point val="20,5"/>
       </dia:attribute>
@@ -332,7 +283,7 @@ BBLAYERS: Location of layers#</dia:string>
         </dia:composite>
       </dia:attribute>
     </dia:object>
-    <dia:object type="Flowchart - Parallelogram" version="0" id="O9">
+    <dia:object type="Flowchart - Parallelogram" version="0" id="O7">
       <dia:attribute name="obj_pos">
         <dia:point val="20,11"/>
       </dia:attribute>
@@ -383,7 +334,7 @@ BBLAYERS: Location of layers#</dia:string>
         </dia:composite>
       </dia:attribute>
     </dia:object>
-    <dia:object type="Flowchart - Parallelogram" version="0" id="O10">
+    <dia:object type="Flowchart - Parallelogram" version="0" id="O8">
       <dia:attribute name="obj_pos">
         <dia:point val="20,23"/>
       </dia:attribute>
@@ -434,12 +385,12 @@ BBLAYERS: Location of layers#</dia:string>
         </dia:composite>
       </dia:attribute>
     </dia:object>
-    <dia:object type="Flowchart - Diamond" version="0" id="O11">
+    <dia:object type="Flowchart - Diamond" version="0" id="O9">
       <dia:attribute name="obj_pos">
         <dia:point val="19.99,16.3267"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="19.94,16.2767;28.06,21.7233"/>
+        <dia:rectangle val="19.94,16.2767;28.06,21.7234"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
         <dia:point val="19.99,16.3267"/>
@@ -473,7 +424,7 @@ read?#</dia:string>
             <dia:real val="0.98777773976325989"/>
           </dia:attribute>
           <dia:attribute name="pos">
-            <dia:point val="24,18.2508"/>
+            <dia:point val="24,18.2509"/>
           </dia:attribute>
           <dia:attribute name="color">
             <dia:color val="#000000"/>
@@ -482,86 +433,6 @@ read?#</dia:string>
             <dia:enum val="1"/>
           </dia:attribute>
         </dia:composite>
-      </dia:attribute>
-    </dia:object>
-    <dia:object type="Standard - Text" version="1" id="O12">
-      <dia:attribute name="obj_pos">
-        <dia:point val="35,11"/>
-      </dia:attribute>
-      <dia:attribute name="obj_bb">
-        <dia:rectangle val="35,10.2445;52.598,16.1724"/>
-      </dia:attribute>
-      <dia:attribute name="text">
-        <dia:composite type="text">
-          <dia:attribute name="string">
-            <dia:string>#Specifies
-BBFILES: Location of recipes
-BBPATH: Location of bitbake.conf 
-        and location of conf files
-        and class files for 'include'
-        and 'require' directives#</dia:string>
-          </dia:attribute>
-          <dia:attribute name="font">
-            <dia:font family="monospace" style="0" name="Courier"/>
-          </dia:attribute>
-          <dia:attribute name="height">
-            <dia:real val="0.98777773976325989"/>
-          </dia:attribute>
-          <dia:attribute name="pos">
-            <dia:point val="35,11"/>
-          </dia:attribute>
-          <dia:attribute name="color">
-            <dia:color val="#000000"/>
-          </dia:attribute>
-          <dia:attribute name="alignment">
-            <dia:enum val="0"/>
-          </dia:attribute>
-        </dia:composite>
-      </dia:attribute>
-      <dia:attribute name="valign">
-        <dia:enum val="3"/>
-      </dia:attribute>
-    </dia:object>
-    <dia:object type="Standard - Text" version="1" id="O13">
-      <dia:attribute name="obj_pos">
-        <dia:point val="35,22"/>
-      </dia:attribute>
-      <dia:attribute name="obj_bb">
-        <dia:rectangle val="35,21.2675;53.525,31.0775"/>
-      </dia:attribute>
-      <dia:attribute name="text">
-        <dia:composite type="text">
-          <dia:attribute name="string">
-            <dia:string>#In Yocto, bitbake.conf pulls in
-other config files
-
-include conf/local.conf
-include conf/build/${BUILD_SYS}.conf
-include conf/target/${TARGET_SYS}.conf
-include conf/machine/${MACHINE}.conf
-include conf/machine/${SDKMACHINE}.conf
-include conf/distro/${DISTRO}.conf
-#</dia:string>
-          </dia:attribute>
-          <dia:attribute name="font">
-            <dia:font family="monospace" style="0" name="Courier"/>
-          </dia:attribute>
-          <dia:attribute name="height">
-            <dia:real val="0.98777773976325989"/>
-          </dia:attribute>
-          <dia:attribute name="pos">
-            <dia:point val="35,22"/>
-          </dia:attribute>
-          <dia:attribute name="color">
-            <dia:color val="#000000"/>
-          </dia:attribute>
-          <dia:attribute name="alignment">
-            <dia:enum val="0"/>
-          </dia:attribute>
-        </dia:composite>
-      </dia:attribute>
-      <dia:attribute name="valign">
-        <dia:enum val="3"/>
       </dia:attribute>
     </dia:object>
   </dia:layer>

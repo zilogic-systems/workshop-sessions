@@ -1,11 +1,23 @@
 = Python, Introduction
 Zilogic Systems
 
+== Introduction
+
+=== Overview
+
+  * Programming Fundamentals
+  * Variables, Expressions and Statements
+  * Functions
+  * Conditionals
+  * Lists and Iteration
+
 == Programming Fundamentals
 
 === Program
 
-  * Sequence of instructions given to a computer to perform a task
+  * Sequence of instructions to perform a task
+
+  * Exact instructions depend on the programming language
 
   * Instructions
     - input
@@ -24,13 +36,15 @@ Zilogic Systems
 
 === Python
 
-  * Python - high level language
-
   * Computers understand low level language -- machine language
+
+  * Python - high level language
 
   * Advantages
     - Easier to write and maintain programs
     - Are not restricted to a single machine
+
+  * Examples of other high level languages?
 
 === Compiler vs Interpreter
 
@@ -40,9 +54,26 @@ Zilogic Systems
 
 image::figures/compiler-interpreter.png[width="50%",align="center"]
 
+=== Python 2 vs Python 3
+
+  * Minor differences between the two versions
+
+  * Workshop will cover Python 3
+
+  * Python interpreter can be started by invoking `python`
++
+------
+Python 3.4.2 (default, Oct  8 2014, 10:45:20) 
+[GCC 4.9.1] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>>
+------
+
 === Python Interpreter
 
-  * Interactive mode
+  * When invoked, enters interactive mode
+
+  * Statements: instructions that Python can execute
 
   * Prompt: interpreter is ready to accept instructions
 +
@@ -52,8 +83,8 @@ image::figures/compiler-interpreter.png[width="50%",align="center"]
 2
 -----
 +
-  * Operators: addition, multiplication, subtraction, division,
-    exponentiation
+  * Operators Examples:
+    - addition, multiplication, subtraction, division, exponentiation
 
 === Values and Types
 
@@ -61,36 +92,47 @@ image::figures/compiler-interpreter.png[width="50%",align="center"]
 
   * Examples: `2`, `"Hello"`
 
-  * Values can be classified based on their behaviour: class / types
+  * Values can be classified based on their behaviour: types
 
   * Integer type: `2`, `5`, `10`
 
   * String type: `"Hello"`, `"Hello World!"`
 
+  * Strings are enclosed in single or double quotes
+
 === Determining type
+
+  * The `type()` built-in function, returns the type of the argument
 
 [source,python]
 ------
 >>> type(2)
 <class 'int'>
->>> type("Hello")
+>>> type("2")
 <class 'str'>
+>>> type(2.0)
+<class 'float'>
 ------
 
 === Types: `int` vs `str`
 
 [source,python]
 ------
->>> 12 + 12
-24
->>> "12" + "12"
-'1212'
+>>> 12 / 2
+6
+>>> "12" / "2"
+...
+TypeError: unsupported operand types for /: 'str' and 'str'
+>>> 12 + 2
+14
+>>> "12" + "2"
+'122'
 ------
 
 === Printing Hello World
 
   * Python interpreter can be made to print `Hello, World!` using the
-    following instruction
+    following statement
 
 [source,python]
 -------
@@ -98,17 +140,17 @@ image::figures/compiler-interpreter.png[width="50%",align="center"]
 Hello, World!
 -------
 
-  * `print`, prints the value specified within parenthesis
+  * `print()` function prints the argument passed to it
 
-  * More details will be provided shortly
+== Variables, Expressions and Statements
 
-== Expressions and Statements
+=== Assignment Statements
 
-=== Variables
+  * Assign values to variables
 
   * Variable is a name that points to a value
 
-  * Creating a variable: assignment statement
+  * If variable does not exist, it is created
 +
 [source,python]
 ------
@@ -130,8 +172,6 @@ Hello, World!
   * There aren't two copies of 'Hello World'
 
   * A single copy with two pointers to it
-
-FIXME: Image Here
 
 === Variable Names
 
@@ -166,10 +206,11 @@ SyntaxError: invalid syntax
 
   * Highlighted in the code editors, so need not be memorized!
 
-=== Expression
+=== Expressions Statements
 
-  * Expressions are used to determine a value from other variables and
-    values
+  * Expressions are a combination of variables, values and operators
+
+  * Expressions by themselves can be statements: expression statement
 
   * A value by itself is a valid expression
 
@@ -184,34 +225,6 @@ SyntaxError: invalid syntax
 >>> n + 25
 42
 -----
-
-=== Statements
-
-  * Statements are instructions to the interpreter
-
-  * Assignment statement, instructs the interpreter to assign a value
-    to a variable
-+
-[source,python]
------
->>> n = 17
------
-+
-  * Expressions can be part of statements
-+
-[source,python]
-------
->>> n = n + 1
-------
-
-=== Statements (Contd.)
-
-  * Expressions by themselves can be statements: expression statement
-+
-[source,python]
-------
->>> n + 25
-------
 +
   * Result of expression statement is printed on the screen, by the
     interpreter
@@ -321,6 +334,23 @@ percentage = (minute * 100) / 60
 percentage = (minute * 100) / 60     # percentage of an hour
 ------
 
+=== Try Out
+
+  * Write an expression to compute the factorial of 6
+
+  * The interpreter automatically creates the variable `_` and assigns
+    it the value of the last expression statement, in interactive mode
+
+  * Use this facility to compute the factorial of 6
+
+  * What happens when you try to compute 2 ** 200?
+
+=== Try Out
+
+  * How is it that Python is able to evaluate 2 ** 200?
+
+  * What is the largest number Python can represent?
+
 == Functions
 
 === Introduction
@@ -330,6 +360,8 @@ percentage = (minute * 100) / 60     # percentage of an hour
   * Name is assigned to the sequence of statements
 
   * Function can be invoked by its name
+
+  * The statements are executed and a value / result is returned
 
 === Defining a Function
 
@@ -367,6 +399,9 @@ def print_message():
   * Functions returns the value `None` by default
 
   * `None` is similar to `NULL` in C or `null` in Java
+
+  * It is of a separate type, that does not support (almost) any
+    operation
 
 === Defining Functions in Interactive Mode
 
@@ -479,10 +514,10 @@ True
 [source,python]
 ------
 if x > 0:
-    printf('x is positive')
+    print('x is positive')
 ------
 
-  * If condition evaluates to `True`, body is executed
+  * If statement, condition evaluates to `True`, body is executed
 
   * Body is indented by one level, just like function definitions
 
@@ -516,9 +551,9 @@ else:
 
   * There is no statement similar to switch to Python
 
-== List and Iteration
+== Lists and Iteration
 
-=== List
+=== Lists
 
   * List is the equivalent of arrays in C
 +
@@ -620,6 +655,13 @@ while True:
 print(sum)
 ------
 
+=== Try Out
+
+  * Define a function computes the factorial of a given number
+
+  * Hint: The `range()` can accept two arguments, `start` and
+    `end`. And produces number in the range `[start,end)`
+
 == Misc. Bits
 
 === Global vs Local Variables
@@ -629,7 +671,7 @@ print(sum)
   * Variables created outside function are global variables
 
   * If variable created within a function needs to be global, use the
-    `global` keyword
+    `global` statement
 +
 [source,python]
 ------
@@ -697,3 +739,32 @@ image::figures/slice.png[align="center",width="60%"]
 ...
 >>> set_color(color=1, x=2, y=3)
 ------
+
+== Review
+
+=== Statements
+
+  * Assignment Statement
+  * Expression Statement
+  * `def` Statement
+  * `return` Statement
+  * `if` Statement
+  * `for` Statement
+  * `while` Statement
+  * `global` Statement
+
+=== Data Types
+
+  * `int`
+  * `str`
+  * `bool`
+  * `NoneType`
+  * `list`
+
+=== Built-in Functions
+
+  * `type()`
+  * `print()`
+  * `range()`
+  * `input()`
+  * `int()`

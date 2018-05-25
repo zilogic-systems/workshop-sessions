@@ -2,9 +2,11 @@
 
 set -e -x -u
 
+SHARED=~/yp/shared
+
+cd $SHARED
 cat <<EOF > run-qemu.sh
 ### START: boot-prebuilt.sh
-cd ~/shared
 qemu-system-arm -M versatilepb \
                 -hda disk.img  \
 		-kernel zImage \
@@ -13,12 +15,12 @@ qemu-system-arm -M versatilepb \
 EOF
 
 ### START: copy-prebuilt.sh
-cp ~/yp/pre-built/zImage /media/sf_shared
-cp ~/yp/pre-build/disk.img /media/sf_shared
+cp ~/yp/pre-built/zImage $SHARED
+cp ~/yp/pre-built/disk.img $SHARED
 ### END: copy-prebuilt.sh
 
 ### START: run-qemu.sh
-cd ~/shared
+cd $SHARED
 bash run-qemu.sh
 ### END: run-qemu.sh
 
@@ -57,7 +59,7 @@ genext2fs -b 131072 -d $ROOTFS $DISKIMG
 ### END: create-hello-rootfs.sh
 
 ### START: boot-hello-rootfs.sh
-cd ~/shared
+cd $SHARED
 bash run-qemu.sh
 ### END: boot-hello-rootfs.sh
 
@@ -118,7 +120,7 @@ genext2fs -b 131072 -d $ROOTFS $DISKIMG
 ### END: create-bash-rootfs.sh
 
 ### START: boot-bash-rootfs.sh
-cd ~/shared
+cd $SHARED
 bash run-qemu.sh
 ### END: boot-bash-rootfs.sh
 
@@ -139,7 +141,7 @@ make install DESTDIR=$ROOTFS
 genext2fs -b 131072 -d $ROOTFS $DISKIMG
 ### END: create-ls-rootfs.sh
 
-cd ~/shared
+cd $SHARED
 bash run-qemu.sh
 
 ### START: check-ls-deps.sh

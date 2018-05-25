@@ -1,0 +1,2 @@
+  * Fix UART device file name
+  * Need to make this common for both ldd and kernel-porting

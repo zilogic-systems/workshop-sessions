@@ -110,7 +110,8 @@ include::code/iexamples/import-from[]
 
 === Try Out
 
-TBD
+  * Try importing `is_palindrome()` and try using it without the
+    module prefix
 
 === Standard Library
 
@@ -151,4 +152,6 @@ include::code/iexamples/package[]
 
 === Try Out
 
-TBD
+  * Create the package as indicated in the previous slide
+
+  * Try importing and using the functions in `utils.lang`

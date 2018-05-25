@@ -22,11 +22,15 @@ Zilogic Systems
   * Contains the first user space application, usually `init`
   * And all its dependencies
 
-== Autotool Intro
+== Autotools Intro
 
 === Autotools
 
-  * Most free software use the GNU Autotools for configuration and build.
+  * Many free software packages are written in C
+
+  * Distributed as source and needs to be built
+
+  * Use GNU Autotools for configuration and build
 
   * Configuration is primarily used for
 
@@ -37,7 +41,7 @@ Zilogic Systems
 
 === Unix Variants
 
-  * Unix-like operation systems
+  * Unix-like operating systems
     - Linux
     - Solaris
     - FreeBSD
@@ -61,7 +65,7 @@ Zilogic Systems
 
   * Local implementation of functions not available.
 
-  * Fallback implementation for unsupported features.
+  * Fallback implementation for unsupported OS features.
 
   * Choose specific feature provided by the OS.
 
