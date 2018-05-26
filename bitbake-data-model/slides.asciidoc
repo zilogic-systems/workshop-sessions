@@ -6,12 +6,12 @@ Zilogic Systems <training@zilogic.com>
 
 === Recipe Data
 
-When recipes are read the all variables and task definitions are
-stored in a hash map
+When recipes are read all variables and task definitions are stored in
+a hash map
 
 [cols="25%m,75%m",options="header"]
 |======
-| Key		| Value
+| Name		| Value
 | PN		| bread
 | do_get
 | echo $\{PN}: wheat > bread.txt +
@@ -25,6 +25,42 @@ stored in a hash map
   echo $\{PN}: ready >> bread.txt +
 |======
 
+=== Recipe Data (Contd.)
+
+  * Variable defintions and function definitions have different syntax
+
+  * But internally they stored in the same way
+
+  * The hash map is called the *Data Store*
+
+=== Recipe Data with Flags
+
+[cols="25%m,25%m,50%m",options="header"]
+|======
+| Name		2+| Value
+| PN		| _content	| sandwich
+| DEPENDS	| _content	| bread omelet
+.2+| do_get	| deptask	| do_cook
+| _content
+| echo $\{PN}: wheat > bread.txt +
+  echo $\{PN}: salt  >> bread.txt +
+  echo $\{PN}: sugar >> bread.txt +
+  echo $\{PN}: water >> bread.txt +
+  sleep 1
+|======
+
+=== Recipe Data with Flags (Contd.)
+
+  * Each entry in the data store is itself a hash map
+
+  * The hash map maps flag names to values
+
+  * The special flag name `_content` is the 'value of the variable'
+
+  * Data Store
+    - A hash map that maps names to values
+    - The values are in-turn hash maps that maps flag names to values
+
 === Recipe Processing
 
 image::figures/datastore-no-finalize.png[align="center"]
@@ -35,7 +71,7 @@ image::figures/conf-parsing.png[width="25%",align="center"]
 
 === Recipe Parsing
 
-image::figures/recipe-parsing.png[width="25%",align="center"]
+image::figures/recipe-parsing.png[width="22%",align="center"]
 
 === Pro Tip
 
@@ -48,30 +84,15 @@ image::figures/recipe-parsing.png[width="25%",align="center"]
 
 == Improved Model
 
-=== Data Store with Flags
-
-------
-do_get[deptask] = do_cook
-------
-
-[cols="25%m,25%m,50%m",options="header"]
-|======
-| Key		| Flag		| Value
-| PN		| _data		| sandwich
-.2+| do_get	| deptask	| do_cook
-| _data
-| echo $\{PN}: wheat > bread.txt +
-  echo $\{PN}: salt  >> bread.txt +
-  echo $\{PN}: sugar >> bread.txt +
-  echo $\{PN}: water >> bread.txt +
-  sleep 1
-|======
-
 === Recipe Processing with Finalize
 
 image::figures/datastore.png[align="center"]
 
 == Assignment Operators
+
+=== Per Recipe Data Store
+
+image::figures/per-recipe-data-store.png[width="60%",align="center"]
 
 === Default Value
 
@@ -84,6 +105,19 @@ On Assignment:
 ------
 if a is not defined:
     a = b
+------
+
+=== Default Value: Example
+
+[source,python]
+------
+a = "hello"
+
+a ?= "world"
+b ?= "world"
+
+# ${a} == "hello"
+# ${b} == "world"
 ------
 
 === Weak Default Value
@@ -105,6 +139,38 @@ if a is not defined:
    a = a[_weakdefault]
 ------
 
+=== Weak Default Value: Example
+
+[source,python]
+------
+# Conf
+a ?= "world"
+b ?= "world"
+
+# Recipe
+a ?= "hello"
+
+# ${a} == "world"
+# ${b} == "world"
+------
+
+=== Weak Default Value: Example (Contd.)
+
+[source,python]
+------
+# Conf
+a ??= "world"
+b ??= "world"
+
+# Recipe
+a ?= "hello"
+
+# After Finalize
+#
+# ${a} == "hello"
+# ${b} == "world"
+------
+
 === Appending
 
 ------
@@ -115,6 +181,15 @@ On Assignment:
 
 ------
 a = a + " " + b
+------
+
+Example:
+
+[source,python]
+------
+msg = "hello"
+msg += "world"
+# ${msg} == "hello world"
 ------
 
 === Prepending
@@ -129,6 +204,15 @@ On Assignment:
 a = b + " " + a
 ------
 
+Example:
+
+[source,python]
+------
+msg = "world"
+msg =+ "hello"
+# ${msg} == "hello world"
+------
+
 === Appending without Spaces
 
 ------
@@ -141,6 +225,15 @@ On Assignment:
 a = a + b
 ------
 
+Example:
+
+[source,python]
+------
+bb = "bit"
+bb .= "bake"
+# ${bb} == "bitbake"
+------
+
 === Prepending without Spaces
 
 ------
@@ -151,6 +244,15 @@ On Assignment:
 
 ------
 a = b + a
+------
+
+Example:
+
+[source,python]
+------
+bb = "bake"
+bb =. "bit"
+# ${bb} == "bitbake"
 ------
 
 === Appending after Finalize
@@ -174,6 +276,47 @@ for append in a[_append_list]:
 
 No spaces are added, if required should be provided a part of the
 value
+
+=== Example
+
+[source,python]
+------
+# Conf
+os += "freebsd"
+
+# Recipe
+os ?= "windows linux macosx"
+
+# ${os} == "freebsd"
+------
+
+=== Example (Contd.)
+
+[source,python]
+------
+# Conf
+os += "freebsd"
+
+# Recipe
+os = "windows linux macosx"
+
+# ${os} == "windows linux macosx"
+------
+
+=== Example (Contd.)
+
+[source,python]
+------
+# Conf
+os_append = " freebsd"
+
+# Recipe
+os ?= "windows linux macosx"
+
+# After Finalize
+#
+# ${os} == "windows linux macosx freebsd"
+------
 
 === Immediate Assignment
 
