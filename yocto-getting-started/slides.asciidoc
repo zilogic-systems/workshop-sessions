@@ -79,7 +79,7 @@ $ export MACHINE=qemuarm
 
  * And also the Poky accepts only limited configurations through
    environment variables.
-
+//////
  * The list of whitelisted variables, that can be passed to bitbake
    recipes, can be obtained from below command.
 
@@ -87,7 +87,7 @@ $ export MACHINE=qemuarm
 ----
 $ echo $BB_ENV_EXTRAWHITE
 ----
-
+/////////
  * To manage this, Poky provides a mechanism of passing configurations
    through file.
 
@@ -199,18 +199,18 @@ $ bitbake -g core-image-minimal
 $ vim pn-buildlist
 ------
 
-* From this list we can find that, bash is not built by
+* From this list we can find that, what is not built by
   core-image-minimal recipe.
 
 === Adding Package to a Build
 
 
-* We can find the package name and version of the bash using
+* We can find the package name and version of the using
   --show-version option of bitbake as
 
 [source,shell]
 ------
-$ bitbake -s | grep bash
+$ bitbake -s | grep <package>
 ------
 
 * We can enable building a package by adding below line to local.conf

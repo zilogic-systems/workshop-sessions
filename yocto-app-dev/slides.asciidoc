@@ -15,7 +15,6 @@
 
 * SDK removes dependency of developers knowing the Yocto build system.
 
-
 === Building SDK
 
 * SDK can be built with below command 
@@ -76,8 +75,17 @@ $ arm-poky-linux-gnueabi-gcc
   sstate-cache, which would be available from the Yocto's previous
   build.
 
+=== SDK Release
 
-=== Build Types
+* The Yocto build team can deliver below to the application developers
+  - SDK
+  - Poky build system
+  - sstate-cache
+
+* The application developers can easily integrate and test their
+  layers with Yocto.
+
+=== Application Build Types
 
  * We can build packages which are compliant to 
    - autotools 
@@ -86,10 +94,10 @@ $ arm-poky-linux-gnueabi-gcc
    for bash in zepto.
 
  * We can build packages with make only type by writing a recipe
-   invoking oe_make
+   invoking `oe_make`
 
- * We can build packages with fewer source files by placing the source
-   inside the layer itself.
+ * We can build packages with fewer source files even without Makefile
+   by placing the source inside the layer itself.
 
 === Layers for Convenience 
 
@@ -101,11 +109,11 @@ $ arm-poky-linux-gnueabi-gcc
 * These layer can be added to the yocto build.
 
  * We can run the below command to create a layer called meta-app
-   in the build folder
+   in the poky folder
 
 [source,shell]
 ------
-$ yocto-layer create ../app
+$ yocto-layer create app
 ------
 
 === Recipes for In-layer Sources

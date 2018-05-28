@@ -34,9 +34,9 @@ image::figures/oe-logo.png[style="left",align="center"]
  * Poky & Angstrom are two embedded distribution which were built
    using open-embedded build system.
 
- * Poky was a build system used OpenedHand Project, After Intel taking
-   over the OpenedHand project, Poky was adopted by Linux Foundation
-   for its Yocto Project.
+ * Poky was a build system used by OpenedHand Project, After Intel
+   taking over the OpenedHand project, Poky was adopted by Linux
+   Foundation for its Yocto Project.
 
  * Yocto's goal was to provide complete development and test
    environment to the embedded Linux developers and vendor neutral
@@ -59,16 +59,16 @@ image::figures/yocto-project-transp.png[style="left",align="center"]
 
 === Yocto's Unique Features
 
- * Supports sufficient infrastructure to perform post build analysis
-   on the build artifacts, for their size, dependency, quality and
-   licenses.
-
  * Supports segregating and maintaining build recipes in atomic layers
    for different providers separately.
 
  * Required layers can be pulled into build system, when required.
 
- * Application developer's centric tools and worlflow.
+ * Supports sufficient infrastructure to perform post build analysis
+   on the build artifacts, for their size, dependency, quality and
+   licenses.
+
+ * Application developer's centric tools and workflow.
  
 === Yocto Over Pre-built Distros
 
@@ -85,7 +85,6 @@ image::figures/yocto-project-transp.png[style="left",align="center"]
 
   * Supports handling open source and proprietary licensed software
     build.
-
 
 [style="two-column"]
 === Yocto Over Buildroot
@@ -122,7 +121,7 @@ Yocto develops several projects to improve build infrastructure
 
  * Yocto project components are maintained in git repo
    https://git.yoctoproject.org/
-
+///////
 [style="two-column"]
 === Poky
 
@@ -168,6 +167,7 @@ image::figures/Poky-Logo.jpg[style="left",align="center"]
 
 image::figures/oe-repo-cropped.png[style="left",align="center"]
 image::figures/poky-repo-cropped.png[style="right",align="center"]
+////////
 
 === Yocto Releases
 
