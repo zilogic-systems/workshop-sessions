@@ -5,7 +5,7 @@ before_install:
 
 install:
 	sudo apt-get install -y --no-install-recommends $(packages)
-	sudo pip install zdrive-push
+	sudo -H pip install zdrive-push
 
 script:
 	make
