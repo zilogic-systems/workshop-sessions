@@ -1,0 +1,302 @@
+= Subversion, Getting Started
+Zilogic Systems
+
+== Subversion
+
+=== Purpose
+
+  * Record Keeping
+    - Provides access to a previous release.
+    - Easy to identify why a change was made.
+    - Undo changes made to the software.
+  * Collaboration
+    - lock-modify-unlock
+    - copy-modify-merge
+
+=== Concepts
+
+  * Repository
+    - central data store, of current and previous versions
+
+  * Working Copy
+    - copy of repo's contents on your local system, tracked by subversion
+
+  * Check out
+    - getting a working copy from a repo
+
+=== Concepts (Contd.)
+
+  * Commit
+    - publishing changes made in working copy to the repo
+
+  * Revision
+    - state of the tree, created when the repo accepts a commit
+
+  * Update
+    - getting new modifications published to the repo by others
+
+=== SVN Commands
+
+General Format
+
+------
+svn command [options] [args]
+------
+
+  * command specifies the operation to be performed
+  * options modifies the operation in minor ways
+  * args are arguments to the command
+
+=== Accessing a Repository
+
+  * Various protocols can be used to access the repository
+    - HTTP/HTTPS
+    - SSH
+    - Local File
+    - SVN custom protocol
+  * The repository is referred to using a URL.
+  * A repo can contain multiple projects each in a separate directory.
+
+=== Accessing a Repository (Contd.)
+
+image::figures/url.png[]
+
+=== Checking Out
+
+  * Checking out a working copy of sandbox
++
+------
+$ svn co file:///home/vijaykumar/svn/book book
+A    book/chapter-1.txt
+A    book/chapter-2.txt
+A    book/chapter-3.txt
+Checked out revision 1.
+------
++
+  * Sub-command is `co` 
+  * First argument - URL, the directory in the repo to checkout
+  * Second argument - the local directory to checkout into
+  * Working copy contains additional files used internally by svn
+
+=== Checking Out (Contd.)
+
+  * Each directory has a administrative directory `.svn` 
++
+------
+$ ls -a
+[.]   [..]  chapter-1.txt  chapter-2.txt  chapter-3.txt  [.svn]
+------
+
+=== Committing
+
+  * Committing local changes to repository
++
+-----
+$ svn commit -m "msg"
+Sending        chapter-1.txt
+Sending        chapter-2.txt
+Transmitting file data ..
+Committed revision 2.
+-----
++
+  * `msg` is a log message associated with the change 
+
+=== Try Out
+
+  * Check out book project from your repo
+  * Add the author in `chapter-1.txt` and `chapter-2.txt`
+  * Commit the changes made, with a meaningful log message
+
+[role="two-column"]
+=== Revisions
+
+[role="left"]
+  * Changes in multiple files can be published in a single commit
+  * New state of the repo is created when a commit is made
+  * Each state is given a unique integer, one greater than previous revision
+
+[role="right"]
+image::figures/revs.png[]
+
+=== File States
+
+  * For each file, the revision checked out is recorded in admin area
+
+  * Based on the above info, a file's state can be determined
+    - Unchanged and current
+    - Locally changed and current
+    - Unchanged and out-of-date
+    - Locally changed and out-of-date
+
+  * `svn status` can be used to identify the state of a file
+
+=== What's going on?
+
+  * What files have been locally modified.
++
+------
+$ svn status
+M      chapter-2.txt
+M      chapter-3.txt
+------
++
+   * Difference between working copy and checked out version
++
+------
+$ svn diff
+------
+
+=== Try Out
+
+  * The chapters 1 and 2 have "freedom" spelled incorrectly as "fredom"
+  * Fix these spelling errors.
+  * Check the status of the files.
+  * Do a diff to verify the changes.
+  * Commit the changes.
+
+=== Other's Changes
+
+  * What files have changes published by others.
++
+------
+$ svn status -u
+       *        2   chapter-2.txt
+       *        1   chapter-3.txt
+Status against revision:      3
+------
++
+  * Receiving changes published by others
++
+------
+$ svn update
+U    chapter-1.txt
+G    chapter-2.txt
+C    chapter-3.txt
+Updated to revision 6.
+------
++
+  * Changes made by others are merged into working copy.
+
+  * If the same line is modified in two different ways "conflict"
+    occurs.
+
+------
+<<<<<<< .mine
+  Your changes.
+=======
+  New changes that came from repo.
+>>>>>>> .r(latest repo revision)
+------
++
+  * Keep the required change remove markers and the other change.
++
+------
+$ svn resolved file
+------
+
+=== Try Out
+
+  * There is a word missing in chapter 3, line 8.
+  * Make yet another checkout B of the book.
+  * Goto checkout B, in chapter 3, line 8, replace ??? with 1984
+  * Commit the change
+  * Go back to checkout A of the book
+  * Check to see if there are updates in repo
+  * Do an update and get the changes
+
+=== Try Out (Contd.)
+
+  * There is a word "neighbour" missing in chapter 1, line 23
+  * Goto checkout B, in chapter 1, line 32, replace ??? with "neighbour"
+  * Commit your change
+  * Goto checkout A, and replace ??? with "neighbor", the American spelling
+  * The change cannot be committed, since it is not the latest revision of the file
+  * Do an update, it will result in a conflict.
+  * Resolve the conflict and commit.
+
+=== Who did what?
+
+  * To view the change history.
++
+-------
+$ svn log
+--
+r3 | vijaykumar | 2008-12-18 14:01:45 +0530 | 1 line
+
+Ran through spell checker and fixed spelling mistakes.
+--
+r2 | vijaykumar | 2008-12-18 13:34:38 +0530 | 1 line
+
+Added author to chapter-1 and chapter-2.
+--
+r1 | vijaykumar | 2008-12-18 13:15:25 +0530 | 1 line
+
+Importing initial version of book.
+--
+-------
+
+=== Who did what? (Contd.)
+
+  * To get the difference between two revisions.
++
+------
+$ svn diff -r old:new
+------
+
+=== Try Out
+
+  * Find out the modifications made in chapter 1.
+
+  * Find out the differences from revision 1 to current revision of
+    chapter 3.
+
+=== Tree Modifications
+
+  * To add a file or directory
++
+------
+$ svn add file
+------
++
+  * To remove a file or directory
++
+------
+$ svn remove file
+------
++
+  * To rename a file or directory
++
+------
+$ svn mv oldfile newfile
+------
+
+=== Try Out
+
+  * Create a new file called `chapter-4.txt`
+  * Add the file to the repo
+  * Chapter 3 should really have been chapter 5
+  * Rename `chapter-3.txt` to `chapter-5.txt`
+
+=== Mixed Revisions
+
+  * Working copy can contain files from different revisions
+  * After a commit the repo's state changes and new revision is assigned
+  * Revision is updated in admin area only for files part of the commit
+  * Revision for other files -- updated only after an `svn update` 
+  * Can cause minor inconveniences.
+  * Example: `svn log` might show an older history, if directory revision is old
+
+=== Going Back in Time
+
+  * To get an older revision of the repo
++
+------
+$ svn update -r 4 
+------
+
+=== Try Out
+
+  * Go back to revision 1 of the repository.
+  
+  * Verify it, by checking the author name in `chapter-1.txt` and
+    `chapter-2.txt`
