@@ -6,6 +6,8 @@ git-sessions =			\
 
 git-resources =	git-resources
 
+svn-sessions = subversion
+
 python-sessions = 		\
 	python-intro		\
 	python-intro-x		\
@@ -61,7 +63,7 @@ eldi-sessions = 		\
 	uspace-gpio		\
 	uspace-pwm
 
-sessions = $(git-sessions) $(git-resources) $(yocto-sessions) $(kp-sessions) $(eldi-sessions)
+sessions = $(svn-sessions) $(git-sessions) $(git-resources) $(yocto-sessions) $(kp-sessions) $(eldi-sessions) 
 
 all:
 	for dir in $(sessions); do make -C $$dir; done
@@ -74,6 +76,7 @@ install:
 	cd build; tar --gzip -c --transform "s|^|yocto-slides/|" -f yocto-slides.tar.gz $(yocto-sessions)
 	cd build; tar --gzip -c --transform "s|^|git-slides/|" -f git-slides.tar.gz $(git-sessions)
 	cd build; tar --gzip -c --transform "s|^|eldi-slides/|" -f eldi-slides.tar.gz $(eldi-sessions)
+	cd build; tar --gzip -c --transform "s|^|svn-slides/|" -f svn-slides.tar.gz $(svn-sessions)
 
 clean:
 	for dir in $(sessions); do make -C $$dir clean; done
