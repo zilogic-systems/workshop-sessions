@@ -87,6 +87,30 @@ $ ls -a
 [.]   [..]  chapter-1.txt  chapter-2.txt  chapter-3.txt  [.svn]
 ------
 
+=== Try Out
+
+  * Download the sandbox repository from
+    link:{include:svn.tar.gz.datauri}["svn.tar.gz",filename="svn.tar.gz"]
+
+  * Extract it using the following command
++
+------
+$ tar -x -f svn.tar.gz
+------
++
+  * Note down the path at which it has been extracted
+
+=== Try Out
+
+  * Check out from the repository
++
+------
+$ svn co file:///REPOPATH/book book
+------
++
+  * Replace `/REPOPATH` with the path at which the `svn`
+    folder has been extracted
+
 === Committing
 
   * Committing local changes to repository
