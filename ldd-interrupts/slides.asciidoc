@@ -381,23 +381,14 @@ include::code/ikey/ikey/handler[]
 
 === Try Out
 
-  * Get the `key` module:
-    link:{include:cdist/key.tar.gz.datauri}["key.tar.gz",filename="key.tar.gz"]
+  * Get the `ikey` module:
+    link:{include:cdist/ikey.tar.gz.datauri}["ikey.tar.gz",filename="ikey.tar.gz"]
 
   * Load the module, and create device nodes
 
   * Read from `/dev/key` using `cat`
 
   * What happens when no data is available
-
-=== Try Out
-
-  * Modify the program to use `wait_event` instead of
-    `wait_event_interruptible`
-
-  * Read from `/dev/key` using `cat`
-
-  * Try terminating `cat` using `Ctrl-C`
 
 == Execution Contexts
 
