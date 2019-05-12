@@ -1,4 +1,4 @@
-= Building and Using packages
+= Building and Using Packages
 Zilogic Systems <training@zilogic.com>
 
 == Advantage of Managed Rootfs
