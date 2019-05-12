@@ -1,7 +1,7 @@
 = Device Interfacing
 Zilogic Systems
 :data-uri:
-:kernel-porting:
+:arm:
 
 == Microprocessors
 
@@ -19,7 +19,7 @@ image::figures/model3.png[width="60%",align="center"]
 
 === RAM
 
-image::figures/ram.png[width="30%",align="center"]
+image::figures/ram.png[width="25%",align="center"]
 
 === Instruction
 
@@ -33,7 +33,7 @@ image::figures/8-bit-cpu.png[width="20%",align="center"]
 
 === RAM Interfacing
 
-image::figures/single-ram.png[width="70%",align="center"]
+image::figures/single-ram.png[width="50%",align="center"]
 
 === Multiple RAM Chips
 
@@ -52,6 +52,10 @@ image::figures/chip-select.png[width="40%",align="center"]
 
 image::figures/two-ram.png[width="50%",align="center"]
 
+=== System Bus
+
+image::figures/system-bus.png[width="40%",align="center"]
+
 == Device Interfacing
 
 === Seven Segment Display
@@ -64,11 +68,42 @@ image::figures/7-segment-data.png[width="70%",align="center"]
 
 === Replace RAM with Display
 
-image::figures/two-ram.png[width="60%",align="center"]
+image::figures/ram-ram.png[width="70%",align="center"]
 
 === Memory Mapped IO
 
-image::figures/ram-display.png[width="60%",align="center"]
+image::figures/ram-display.png[width="70%",align="center"]
+
+=== Accessing Device from a C Program
+
+[source,c]
+------
+unsigned char *p;
+
+p = 0x10;   /* point it to device register */
+*p = 5;   /* write to the device register */
+------
+
+=== Example: Display Controller
+
+image::figures/display-controller.png[width="70%",align="center"]
+
+Each pixel on the screen is controlled by 3 memory locations,
+corresponding to R, G and B.
+
+[role="two-column"]
+=== Example: Serial Controller
+
+[role="left"]
+image::figures/serial-controller.png[align="center"]
+
+[role="right"]
+  * Data written to the TX register, is transmitted out
+
+  * Data received, is available from the RX register
+
+  * Data rate, and other comm. parameters can be specified through the
+    CTL register
 
 === Memory Access Optmization
 
@@ -100,13 +135,10 @@ a = 5;
 
   * Can be disabled using the `volatile` keyword
 
-[role="two-column"]
 === Interrupts
 
-[role="left"]
-image::figures/interrupt.png[]
+image::figures/interrupt.png[width="50%",align="center"]
 
-[role="right"]
   * Devices are slaves on the bus, cannot initiate a transaction
   
   * To notify the processor of data availability raises an 'interrupt'
@@ -117,7 +149,7 @@ image::figures/interrupt.png[]
 
 === Interrupt Controller
 
-image::figures/interrupt-controller.png[align="center"]
+image::figures/interrupt-controller.png[align="center",width="60%"]
 
   * Interrupt Controller has multiple interrupt request lines
 
@@ -235,6 +267,19 @@ run-qemu
 ------
 
 endif::kernel-porting[]
+
+[role="two-column"]
+=== ARM SoC
+
+[role="left"]
+image::figures/arm-soc.png[align="center"]
+
+[role="right"]
+   * To access a device that is not memory mapped, the corresponding
+     controller is required
+
+   * System-on-Chips have many controllers on a single chip, to
+     interface with various kinds of devices
 
 === RTC Registers
 
