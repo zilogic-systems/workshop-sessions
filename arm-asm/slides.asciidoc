@@ -19,7 +19,7 @@ label:    instruction         @ comment
 
   * The label is a convenient way to refer to the location of the instruction in memory
 
-  * The label can be used where ever an address can appear
+  * The label can be used wherever an address can appear
 
   * For example as an operand of the branch instruction
   
