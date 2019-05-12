@@ -620,7 +620,7 @@
         <dia:point val="14.5,8.5"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="14.5,7.88638;15.5961,8.68725"/>
+        <dia:rectangle val="14.5,7.905;15.5775,8.65"/>
       </dia:attribute>
       <dia:attribute name="text">
         <dia:composite type="text">
@@ -650,14 +650,14 @@
     </dia:object>
     <dia:object type="Standard - ZigZagLine" version="1" id="O23">
       <dia:attribute name="obj_pos">
-        <dia:point val="16,-1"/>
+        <dia:point val="22,-1"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="15.9293,-1.05;17.45,8.45"/>
+        <dia:rectangle val="17.35,-1.05;22.0707,8.45"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
-        <dia:point val="16,-1"/>
-        <dia:point val="16,-1"/>
+        <dia:point val="22,-1"/>
+        <dia:point val="22,-1"/>
         <dia:point val="17.4,-1"/>
         <dia:point val="17.4,8.4"/>
       </dia:attribute>
