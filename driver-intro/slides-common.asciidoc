@@ -1,0 +1,365 @@
+== What is a Driver?
+
+=== Keyboard Driver
+
+image::figures/driver-api-1.png[width="100%"]
+
+=== Keyboard Driver
+
+image::figures/driver-api-2.png[width="100%"]
+
+=== Hardware Abstraction
+
+  * OS objective: Hide the differences in the hardware from the
+    applications
+
+  * Each device has a software called a driver, that knows about the
+    details of the device hardware
+
+  * These drivers provide a consistent interface towards the
+    application
+
+=== Hardware Abstraction in Linux
+
+  * Similarity between accessing I/O devices and acessing files
+
+  * Data from I/O devices can be treated as a stream of bytes, just
+    like files.
+
+  * In Unix, everything is a file!
+
+=== Device Files
+
+  * Files can be broadly classified as plain files, directories and
+    special or device file
+    
+  * Physical devices are accessed through device files
+
+  * Device files are located in `/dev`
+
+=== Example Device Files
+
+------
+/dev/hda, /dev/hdb - IDE Hardisk, CDROM
+/dev/sda, /dev/sdb - SCSCI or SATA Hardisk
+/dev/fd0	   - Floppy Drive
+/dev/audio         - Sound Card
+/dev/input/mice    - Mouse
+/dev/mem	   - RAM
+------
+
+=== Working with Device Files
+
+  * Reading and writing to the device files, will result in reading
+    and writing to the devices
++
+------
+# cat /dev/input/mice
+------
++
+  * Moving the mouse, causes wierd characters getting
+    dumped on the screen
+
+  * Correlation between the mouse movements and the data from the
+    device file
+
+=== Mouse Event Format
+
+  * For each mouse event 3 bytes are produced.
+
+  * First byte contains bits to indicate which of the 3 mouse buttons
+    was pressed.
++
+------
+Bit 0 - Left Button
+Bit 1 - Right Button 
+Bit 2 - Middle Button
+------
+
+ifdef::eldi[]
+
+=== Python Code
+
+[source,python]
+------
+include::code/mouse.py[]
+------
+
+endif::eldi[]
+
+ifdef::ldd[]
+
+=== Code
+
+[source,python]
+------
+include::code/mouse.c[]
+------
+
+endif::ldd[]
+
+=== How Device Files Work
+
+  * How does the operating system know that mouse events should be
+    reported when `/dev/input/mice` is read?
+
+  * `ls` on device files and ordinary files.
++
+------
+[~]$ ls -alh /dev/input/mice /dev/audio 
+crw-rw---- 1 root audio 14,  4 2007-08-21 10:02 /dev/audio
+crw-rw---- 1 root root  13, 63 2007-08-21 10:01 /dev/input/mice
+
+[~]$ ls -alh *.pdf
+-rw-r--r-- 1 vijay vijay  323K 2007-07-28 21:40 lcd-datasheet.pdf
+-rw-r--r-- 1 vijay vijay 1023K 2007-08-19 18:05 radmind-solaris.pdf
+-rw-r--r-- 1 vijay vijay  3.2M 2007-08-11 09:40 thinkpad.pdf
+------
+
+=== Kernel Driver Model
+
+image::figures/device-file-driver-1.png[align="center"]
+
+=== Kernel Driver Model
+
+image::figures/device-file-driver-2.png[align="center"]
+
+=== Kernel Driver Model
+
+image::figures/device-file-driver-3.png[align="center"]
+
+=== Kernel Driver Model
+
+image::figures/device-file-driver.png[align="center"]
+
+== More fun with device files
+
+=== Accessing the Audio Device
+
+  * Device file: `/dev/audio`
+  * Format: 1-channel, 8-bit, mu-law, sampling rate of 8kHz
++
+------
+[~]$ cat mysound.au > /dev/audio
+------
++
+  * Creating the file from `.mp3` file
+------
+[~]$ sox ~/song.mp3 -b 8 -e mu-law -c 1 -r 8000 song.au
+------
+   * `-b 8` specifies 8-bit, `-u` specifies mu-law, `-c` specifies mono
+     (single-channel), `-r 8000` specifies 8kHz sampling rate.
+
+=== Accessing the Hard Disk
+
+   * Hard disk is usually accessed through the file system
+
+   * Raw access the hard disk through the device files `/dev/hda`, `/dev/hdb`, etc
+
+   * Sectors in the hard disk appear to be layed out sequentially when
+     accessed through `/dev/hda`
+
+=== Printing the Partition Table
+
+  * Each sector is of 512 bytes.
+
+  * The first sector of the hard disk is called the MBR.
+ 
+  * The MBR contains a part of the boot loader, and the partition table.
+
+  * The first 446 bytes contains the boot loader code.
+
+  * The next 64 bytes contains the partition table.
+
+  * The last 2 bytes contain magic nos. `55`, `AA`.
+
+=== Printing the Partition Table (Contd.)
+  
+  * The partition table has four records, each of size 16 bytes.
+
+  * Each record has the following format.
+
+image::figures/part-table.png[align="center"]
+
+=== Code
+
+ifdef::eldi[]
+
+[source,python]
+------
+include::code/part.py[]
+------
+
+endif::eldi[]
+
+ifdef::ldd[]
+
+[source,python]
+------
+include::code/part.c[]
+------
+
+endif::ldd[]
+
+
+== Controlling Devices
+
+=== Introduction
+
+  * Reading and writing to device files translate really well to
+    device I/O
+
+  * Limits to the abstraction
+
+  * Not possible to model all device operations as reading and writing
+    to files
+
+  * Example: Control and configuration of the device
+
+=== IOCTL
+
+  * Linux has a separate system call called `ioctl()` to deal with
+    this.
++
+------
+ioctl(fd, request, [arg])
+------
+
+=== CDROM Tray Eject
+
+  * Device File: `/dev/sr0`
+  * Header file: `linux/cdrom.h`
+  * IOCTL: `CDROMEJECT`
+
+ifdef::eldi[]
+
+=== Code
+
+[source,python]
+------
+include::code/eject.py[]
+------
+
+  * If `O_NONBLOCK` is not specified then opening the device file will
+    fail, if there is no CD-ROM in the drive
+
+  * Programmatic closing of the CD-ROM drive, using `CDROMCLOSETRAY`
+
+endif::eldi[]
+
+ifdef::ldd[]
+
+=== Code
+
+[source,python]
+------
+include::code/myeject.c[]
+------
+
+=== Code (Contd.)
+
+  * If `O_NONBLOCK` is not specified then opening the device file will
+    fail, if there is no CD-ROM in the drive
+
+  * Programmatic closing of the CD-ROM drive, using `CDROMCLOSETRAY`
+
+endif::ldd[]
+
+=== Reading RTC
+
+  * RTC (Real Time Clock) maintains the system time, even when the
+    system is powered down
+
+  * The RTC is backed up by a battery, and when the system powers up
+    it reads the current time from the RTC
+
+  * Date/time is read from the RTC using ioctls
+
+=== Reading RTC (Contd.)
+
+  * Device file: `/dev/rtc0`
+  * Header file: `linux/rtc.h`
+  * IOCTL: `RTC_RD_TIME`
+  * Argument is a buffer where driver fills in the current time
+
+ifdef::eldi[]
+
+=== Code
+
+[source,python]
+------
+include::code/rtc.py[]
+------
+
+endif::eldi[]
+
+ifdef::ldd[]
+
+=== Code
+
+[source,python]
+------
+include::code/rtc.c[]
+------
+
+endif::ldd[]
+
+=== Volume Control
+
+  * Device file: `/dev/mixer`
+  * Header file: `linux/soundcard.h`.
+  * IOCTL: `SOUND_MIXER_READ_VOLUME`, `SOUND_MIXER_WRITE_VOLUME`
+  * Argument is a buffer containing an integer
+    - byte 0 represents the left volume
+    - byte 1 represents the right volume
+
+ifdef::eldi[]
+
+=== Code
+
+[source,python]
+------
+include::code/volume.py[]
+------
+
+endif::eldi[]
+
+ifdef::ldd[]
+
+=== Code
+
+[source,python]
+------
+include::code/volume.c[]
+------
+
+endif::ldd[]
+
+ifdef::eldi[]
+
+== Resource
+
+=== File: `ioctl.py`
+
+[source,python]
+------
+include::code/ioctl.py[]
+------
+
+=== File: `ioctl_util.py`
+
+[source,python]
+------
+include::code/ioctl_util.py[]
+------
+
+endif::eldi[]
+
+=== Further Reading
+
+ * Linux: Rute User's Tutorial and Exposition: Device Files
+   http://rus-linux.net/MyLDP/BOOKS/rute/node21.html
+
+ * Linux Kernel Hackers' Guide: Device Drivers -
+   http://www.tldp.org/LDP/khg/HyperNews/get/devices/devices.html
+
