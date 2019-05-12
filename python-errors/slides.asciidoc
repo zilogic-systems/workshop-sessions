@@ -13,7 +13,7 @@ Zilogic Systems
 
 === Representation
 
-  * Errors are represented by instances of error classes
+  * Errors are represented by error objects
 
   * Contain additional information about the error, usually in the
     form of an error message / error code
