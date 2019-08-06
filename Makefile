@@ -63,7 +63,7 @@ eldi-sessions = 		\
 	uspace-gpio		\
 	uspace-pwm
 
-sessions = $(svn-sessions) $(git-sessions) $(git-resources) $(yocto-sessions) $(kp-sessions) $(eldi-sessions) 
+sessions = $(svn-sessions) $(git-sessions) $(git-resources) $(yocto-sessions) $(kp-sessions) $(eldi-sessions) $(python-sessions)
 
 all:
 	for dir in $(sessions); do make -C $$dir; done
@@ -77,6 +77,7 @@ install:
 	cd build; tar --gzip -c --transform "s|^|git-slides/|" -f git-slides.tar.gz $(git-sessions)
 	cd build; tar --gzip -c --transform "s|^|eldi-slides/|" -f eldi-slides.tar.gz $(eldi-sessions)
 	cd build; tar --gzip -c --transform "s|^|svn-slides/|" -f svn-slides.tar.gz $(svn-sessions)
+	cd build; tar --gzip -c --transform "s|^|python-slides/|" -f python-slides.tar.gz $(python-sessions)
 
 clean:
 	for dir in $(sessions); do make -C $$dir clean; done
