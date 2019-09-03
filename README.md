@@ -20,7 +20,8 @@ by Zilogic.
 
 ## To build the slides
 
- * Install asciidoc 
+ * Install asciidoc
+ * Install dia
  * Install build-essential
 
 After installation you can navigate to each session and then build the slides
