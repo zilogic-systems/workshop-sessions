@@ -1,0 +1,206 @@
+= Zero Copy Transfers
+Zilogic Systems
+
+== Introduction
+
+=== Overview
+
+  * Process to Process
+    - Message Queues
+    - Shared Memory
+
+  * DMA
+
+  * Device to Process
+    - read / write System Call
+    - mmap
+
+== Process to Process
+
+=== Message Queues
+
+image::figures/mq.png[width="40%",align="center"]
+
+=== Message Queue API
+
+  * `mq_open()`
+  * `mq_send()`
+  * `mq_receive()`
+  * `mq_close()`
+
+=== Example with Message Queue
+
+  * Player
+    - Reads frames from a files
+    - Write them to the Message Queue
+
+  * Viewer
+    - Reads frames from a Message Queue
+    - Display it on a screen
+
+=== Example with Message Queue
+
+image::figures/mq-copy.png[width="80%",align="center"]
+
+=== Multiple Copies
+
+image::figures/mq-copy-issue.png[width="80%",align="center"]
+
+Can be checked with strace.
+------
+strace -tt -e mq_timedsend ./player
+------
+
+=== Avoiding Copies
+
+  * Both player and viewer can use a shared memory location
+
+  * Player loads the frame into the shared memory
+
+  * Viewer display the frame from the shared memory
+
+=== Using Shared Memory
+
+image::figures/mq-shm.png[width="50%",align="center"]
+
+=== Using Shared Memory
+
+image::figures/mq-shm.png[width="50%",align="center"]
+
+  * But what happens if the player modifies the frame while the viewer
+    is displaying the frame?
+
+=== Buffer Ownership Transfer
+
+image::figures/mq-copy-zero-1.png[width="70%",align="center"]
+
+=== Buffer Ownership Transfer
+
+image::figures/mq-copy-zero-1b.png[width="70%",align="center"]
+
+=== Buffer Ownership Transfer
+
+image::figures/mq-copy-zero-2.png[width="70%",align="center"]
+
+=== Buffer Ownership Transfer
+
+image::figures/mq-copy-zero-2b.png[width="70%",align="center"]
+
+=== Buffer Ownership Transfer
+
+image::figures/mq-copy-zero-3.png[width="70%",align="center"]
+
+=== Buffer Ownership Transfer
+
+image::figures/mq-copy-zero-3b.png[width="70%",align="center"]
+
+=== Buffer Ownership Transfer
+
+image::figures/mq-copy-zero-4.png[width="70%",align="center"]
+
+=== Visualizing Using Trace
+
+------
+strace -tt -e mq_timedsend,mq_timedreceive ./player
+------
+
+== DMA
+
+=== System Bus
+
+image::figures/system-bus.png[width="40%",align="center"]
+
+=== Multiple CPU
+
+image::figures/multi-master.png[width="40%",align="center"]
+
+=== DMA Controller
+
+image::figures/dma.png[width="40%",align="center"]
+
+=== DMA Controller
+
+image::figures/dma-1.png[width="40%",align="center"]
+
+=== DMA Controller
+
+image::figures/dma-2.png[width="40%",align="center"]
+
+=== Bus Master Device
+
+image::figures/bus-master-device.png[width="40%",align="center"]
+
+=== Bus Master Device
+
+image::figures/bus-master-device-1.png[width="40%",align="center"]
+
+== Device to Process
+
+=== Read / Write System Call
+
+image::figures/device-copy.png[width="80%",align="center"]
+
+=== MMAP Based Zero Copy
+
+  * Driver allocates DMA buffers
+
+  * Driver exposes the DMA buffers, through `mmap()` syscall
+
+  * User space application maps the buffers into its address space
+
+  * Buffer ownership is managed using ioctls
+    - `QBUF`
+    - `DQBUF`
+
+  * Similar to the Message Queue example seen earlier
+
+=== MMAP Based Zero Copy
+
+image::figures/device-zero-copy.png[width="80%",align="center"]
+
+=== Testing with `vivid`
+
+  * vivid - Virtual Video Driver
+  * Provides a generated frames - color bars with changing timestamp
+  * Supports both read / write API and mmap
+  * To load the driver
++
+------
+# modprobe vivid
+------
++
+  * By default provides two virtual devices
+  * Can be viewed using any webcam application
+
+=== Example Capture Program
+
+  * Reads the video devices and store the frames in files
+  * By default uses mmap, can be changed read / write API
+  * Observe `read()` sytem call
++
+------
+strace -tt -e read ./capture -r
+------
++
+  * Observe `ioctl()` sytem call
++
+------
+strace -tt -e read,ioctl ./capture
+------
+
+=== Detailed Syscall Sequence for Capture
+
+  * `ioctl(REQBUFS)` is used specify the no. of buffers required
+
+  * `ioctl(QUERYBUF)` is used to get the base and size of each buffer
+
+  * `mmap()` is used to map the buffer into the process address space
+
+  * Process queues all buffers to the device using `ioctl(QBUF)`
+
+  * Loop
+    - Process waits for data using `select()`
+    - `ioctl(DQBUF)`
+    - `ioctl(QBUF)`
+
+
