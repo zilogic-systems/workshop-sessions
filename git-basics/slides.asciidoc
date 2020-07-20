@@ -111,11 +111,9 @@ $ git commit -a -m "Some Change"
 ------
 
 
-=== Try Out
+=== Try Out - 1
 
-  * Extract `book.tar.gz`
-  * The tar ball contains a project to develop a book
-  * The project is tracked using Git
+  * The `book` project is tracked using Git
   * The `chapter-3.txt` has an author line, which is missing in
     `chapter-1.txt` and `chapter-2.txt`
   * Fix the author line and commit the changes
@@ -141,7 +139,7 @@ $ git diff HEAD
 ------
 
 
-=== Try Out
+=== Try Out - 2
 
   * The `chapter-1.txt` and `chapter-2.txt` have the word "freedom"
     spelled incorrectly as "fredom"
@@ -190,9 +188,13 @@ $ git checkout master
   * But files cannot be changed and committed, a branch needs to be
     created
 
+=== Try Out - 3
+
+  * List out the previous commits using the `git log` command.
+
+  * Checkout the first commit, using the `git checkout <commit>`.
 
 == Branching Basics
-
 
 [role="two-column"]
 === Branching
@@ -229,7 +231,7 @@ $ git checkout my-old-branch
 ------
 
 [style="two-column"]
-=== Try Out
+=== Try Out - 4
 
 ------
 $ git checkout -b year-fix
@@ -272,7 +274,7 @@ $ git merge my-new-branch
 ------
 
 [style="two-column"]
-=== Try Out
+=== Try Out - 5
 
 image::figures/branch-2.png[style="right",align="center"]
 
