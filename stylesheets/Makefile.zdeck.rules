@@ -1,0 +1,3 @@
+install:
+	mkdir $(TOPDIR)/build/$(notdir $(shell pwd))
+	cp slides.html $(TOPDIR)/build/$(notdir $(shell pwd))
