@@ -1,4 +1,4 @@
-packages = python-pip asciidoc dia inkscape source-highlight
+packages = python-pip asciidoc dia inkscape source-highlight zdeck
 
 before_install:
 	sudo apt-get update
