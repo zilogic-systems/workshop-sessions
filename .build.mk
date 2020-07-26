@@ -1,6 +1,7 @@
 packages = python-pip asciidoc dia inkscape source-highlight zdeck
 
 before_install:
+	sudo echo $(ZILOGIC_APT_REPO) | sudo tee /etc/apt/sources.list.d/zilogic.list
 	sudo apt-get update
 
 install:
