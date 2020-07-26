@@ -1,11 +1,8 @@
+exercises = ex1 ex2 ex3 ex4 ex5 ex6 ex7 ex8 ex9
+
+reset:
+	for ex in $(exercises); do make -C $${ex} reset; done
+
 clean:
-	make -C ex1 clean
-	make -C ex2 clean
-	make -C ex3 clean
-	make -C ex4 clean
-	make -C ex5 clean
-	make -C ex6 clean
-	make -C ex7 clean
-	make -C ex8 clean
-	make -C ex9 clean
+	for ex in $(exercises); do make -C $${ex} clean; done
 	find . -name "*~" -delete
