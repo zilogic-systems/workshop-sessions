@@ -45,7 +45,7 @@ proj/
 |
 + file.txt
 ------
- 
+
 [role="right"]
   * When a new version is added the file will have the suffix `.v4`
   * `master` holds the name of the latest revision
@@ -129,7 +129,7 @@ Add support for storing order of commits.
   * Regular files stored in the repo are called "blob"s
 
   * Objects representing commits are stored in the repo: commit object
-  
+
   * Each commit object gets its own SHA1
 
   * Contains the following information
@@ -218,7 +218,7 @@ proj/
 Add support for tracking multiple branches.
 
 [role="two-column"]
-=== Storing Branches 
+=== Storing Branches
 
 [role="left"]
 ------
@@ -562,7 +562,7 @@ git reset chapter-2.txt
 ------
 git reset --patch chapter-2.txt
 ------
-    
+
 === Three Diff Types
 
 image::figures/diff.png[align="center"]
@@ -601,4 +601,3 @@ Which of the following statements are true?
   * [C] Per branch file contains SHA1 of the latest commit in the branch
   * [D] Two files that have the same content are only represented once
     in the object database
-  
