@@ -362,6 +362,42 @@ image::figures/duplicate-files.png[align="center"]
 
 image::figures/duplicate-files-across-commits.png[align="center",width="50%"]
 
+=== Quiz
+
+Which of the following objects are stored in the object database?
+
+  * [A] Blobs
+  * [B] Tree Objects
+  * [C] Commit Objects
+  * [D] Branch Objects
+
+=== Quiz
+
+Which of the following are True?
+
+  * [A] Each object in the object database is identified by SHA1 of
+    its contents.
+  * [B] Commit objects have a reference to their previous commit
+  * [C] Commit objects have a reference to a tree object,
+    corresponding to the top most directory in the project.
+  * [D] Tree object have references to files / directories present
+    with the the corresponding directory
+
+=== Quiz
+
+Which of the following are True?
+
+  * [A] If the contents of the file are the same, it is stored only
+    once in the object database.
+
+  * [B] The probability of the two different files having the same
+    SHA1 is very very low.
+
+  * [C] The HEAD file points to the latest commit.
+
+  * [D] On commit, the branch file is updated to point to newly
+    created commit.
+
 == Exploring a Git Repo
 
 === Demo: Initial Contents
@@ -398,8 +434,11 @@ $ git add world.txt
 $ git commit -a -m "Added world.txt."
 ------
 +
-  * Verify that there is only one object for in the object database,
-    for both the `hello.txt` and `world.txt`
+  * How many objects are there in the object database?
+    - [A] 3
+    - [B] 4
+    - [C] 5
+    - [D] 6
 
 === Demo: Branches
 
@@ -579,25 +618,21 @@ image::figures/diff.png[align="center"]
 
   * Commit the staged changes
 
-== Questions
+=== Quiz
 
-== Review
+Find the odd one out.
 
-=== Question
+  * [A] cache
+  * [B] staging
+  * [C] index
+  * [D] stash
 
-Which of the following objects are stored in the object database?
+=== Quiz
 
-  * [A] Blobs
-  * [B] Tree Objects
-  * [C] Commit Objects
-  * [D] Branch Objects
+True or False:
 
-=== Question
+  * [A] `(git diff --cached) + (git diff) == (git diff HEAD)`
+  * [B] `(git stage) == (git add)`
+  * [C] `(git commit -a) == (git add + git commit)`
+  * [D] `(git reset) == (git checkout)`
 
-Which of the following statements are true?
-
-  * [A] SHA1 of two files will never be the same
-  * [B] Merge commits can have more than one parent
-  * [C] Per branch file contains SHA1 of the latest commit in the branch
-  * [D] Two files that have the same content are only represented once
-    in the object database
