@@ -79,10 +79,7 @@ $ sha1sum test.txt
 c54c65218154f15c32ca252946786e0ad09aa99b  test.txt
 ------
 
-[role="tip"]
-=== //
-
-SHA1 Collision: http://stackoverflow.com/q/1867191
+== Tip: SHA1 Collision: http://stackoverflow.com/q/1867191
 
 === Using SHA1
 
@@ -123,8 +120,7 @@ image::figures/no-commit-objects.png[align="center",width="40%"]
 
 == Ordered Single File Model
 
-[role="tip"]
-=== //
+=== Requirement
 
 Add support for storing order of commits.
 
@@ -174,8 +170,7 @@ proj/
 
 == Detached Head Model
 
-[role="tip"]
-=== //
+=== Requirement
 
 Add support for tracking current checkout revision.
 
@@ -218,8 +213,7 @@ proj/
 
 == Multi-Branch Model
 
-[role="tip"]
-=== //
+=== Requirement
 
 Add support for tracking multiple branches.
 
@@ -279,8 +273,7 @@ proj/
 
 == Merge Commit Model
 
-[role="tip"]
-=== //
+=== Requirement
 
 Add support for tracking branch merges.
 
@@ -302,8 +295,7 @@ image::figures/merge-commit.png[align="center"]
 
 == Multi-File Model
 
-[role="tip"]
-=== //
+=== Requirement
 
 Add support for handling multiple files.
 
@@ -473,16 +465,9 @@ $ git checkout -b my-branch
   * You do not want to commit the paragraph that you added to Chapter
     2, but you want commit the spelling fixes
 
-[role="tip"]
-=== //
+== Tip: This situation is what we call the "Tangled Working Copy Problem."
 
-This situation is what we call the "Tangled Working Copy Problem."
-
-
-[role="tip"]
-=== //
-
-Blog Article: http://2ndscale.com/rtomayko/2008/the-thing-about-git
+== Tip: Blog Article: http://2ndscale.com/rtomayko/2008/the-thing-about-git
 
 === Staging
 
@@ -582,15 +567,9 @@ git reset --patch chapter-2.txt
 
 image::figures/diff.png[align="center"]
 
-[role="tip"]
-=== //
+== Tip: `git add` == `git stage`
 
-`git add` == `git stage`
-
-[role="tip"]
-=== //
-
-staging == index == cache
+== Tip: staging == index == cache
 
 === Try Out
 
