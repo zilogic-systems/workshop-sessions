@@ -18,6 +18,9 @@ tryout.tar.gz:
 	GIT_RES_DIR=../../git-resources make -C tryout reset
 	tar --gzip -c -f tryout.tar.gz tryout/ex*
 
+install-extra:
+	cp tryout.tar.gz $(TOPDIR)/build/git-internals
+
 clean:
 	rm -f $(images_png)
 	rm -f slides.html
