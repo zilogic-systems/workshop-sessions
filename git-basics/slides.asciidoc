@@ -10,9 +10,9 @@ Zilogic Systems <training@zilogic.com>
     - [A] Never used it.
     - [B] Used it, but never got to understand the commands.
     - [C] Tried understanding Git, but never understood much of it.
-    - [D] It has been easy learning Git, so far.
+    - [D] Learning Git, it has been easy, so far.
 
-=== Overivew
+=== Overview
 
   * Introduction to Version Control
   * Introduction to Git
