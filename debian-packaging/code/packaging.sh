@@ -19,9 +19,9 @@ popd
 
 
 pushd ~/yp/packaging
-fpm -f -s dir -t deb -n "hello" -v 1.0.0 \
+fpm -s dir -t deb -n "hello" -v 1.0.0 \
     -a all -C ~/yp/packaging/build/hello \
-    --description "Simple Hello World package."
+    --description "Simple Hello World package." .
 popd
 
 #
@@ -37,24 +37,26 @@ EOF
 popd
 
 pushd ~/yp/packaging
-fpm -f -s dir -t deb -n "hello" -v 1.1.0 \
+fpm -s dir -t deb -n "hello" -v 1.1.0 \
     -a all -C ~/yp/packaging/build/hello \
-    --description "Simple Hello World package."
+    --description "Simple Hello World package." .
 popd
 
 #
 # abc def
 #
 
-pushd ~/yp/packaging
-fpm -f -s dir -t deb -n "abc" -v 1.0.0 \
-    -a all --inputs /dev/null          \
-    --depends def                      \
-    --description "Package for understanding deps."
+mkdir -p ~/yp/packaging/build/dummy
 
-fpm -f -s dir -t deb -n "def" -v 1.0.0 \
-    -a all --inputs /dev/null          \
-    --description "Package for understanding deps."
+pushd ~/yp/packaging
+fpm -s dir -t deb -n "abc" -v 1.0.0 \
+    -a all -C ~/yp/packaging/build/dummy \
+    --depends def                      \
+    --description "Package for understanding deps." .
+
+fpm -s dir -t deb -n "def" -v 1.0.0 \
+    -a all -C ~/yp/packaging/build/dummy \
+    --description "Package for understanding deps." .
 popd
 
 #
@@ -80,10 +82,10 @@ pushd ~/yp/repos/mypkgs
 
 for i in $(seq 1 5)
 do
-    fpm -f -s dir -t deb -n "mypkg$i" -v 1.0.0 \
-	-a all --inputs /dev/null              \
+    fpm -s dir -t deb -n "mypkg$i" -v 1.0.0 \
+	-a all -C ~/yp/packaging/build/dummy \
 	--depends def                          \
-	--description "Package $i for understanding repos."
+	--description "Package $i for understanding repos." .
 done
 
 popd

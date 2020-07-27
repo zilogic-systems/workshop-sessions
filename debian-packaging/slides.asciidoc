@@ -202,7 +202,7 @@ $ mkdir myrepo2
 
 === Creating Repositories (Contd.)
 
-  * Create a repository configuration file `conf/distributions`
+  * Create a repository configuration file ` conf/distributions`
 +
 ------
 Codename: wheezy

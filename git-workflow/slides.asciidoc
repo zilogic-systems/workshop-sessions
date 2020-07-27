@@ -432,7 +432,7 @@ Which of the following statements are true?
 
   * [A] Use merge for unpublished branches, and rebase for published
     branches
-  
+
   * [B] In Git, commits once made, cannot be changed
 
   * [C] Centalized workflow, is used by large teams of untrusted
