@@ -71,7 +71,7 @@ $ git checkout master
 $ git merge bug-fix
 ------
 
-=== Try Out
+=== Try Out - 1
 
   * Extract a fresh copy of `book.tar.gz`
 
@@ -81,7 +81,7 @@ $ git merge bug-fix
 
   * View the status of the branches using `git branch -v`
 
-=== Try Out (Contd.)
+=== Try Out - 1 (Contd.)
 
   * Try merging changes from `master` branch
 
@@ -125,7 +125,7 @@ $ git merge bug-fix
   * To resolve conflict keep the required change, remove conflict
     markers, and do a `git add`, and then `git commit`.
 
-=== Try Out: Merge Conflicts
+=== Try Out - 2: Merge Conflicts
 
   * Extract a fresh copy of `book.tar.gz`
 
@@ -142,6 +142,33 @@ $ git merge bug-fix
   * Merge changes from `year-fix`
 
   * Resolve the conflict and commit
+
+=== Quiz
+
+Which of the following are true?
+
+  * [A] Fast Forward merge does not make any changes in the repo.
+
+  * [B] Up-to-date merge updates the branch file in the repo.
+
+  * [C] True merge does not change any files in the repo.
+
+  * [D] A merge conflict, needs to be resolved manually.
+
+=== Quiz
+
+==== Left
+
+image::figures/git-merge-2.png[width="50%",align="center"]
+
+==== Right
+
+  * Merging `bug-fix` from master, represents
+
+    - [A] True Merge
+    - [B] Fast Forward Merge
+    - [C] Up-to-date Merge
+    - [D] None of the above
 
 == Remote Repositories
 
@@ -237,7 +264,7 @@ $ git log
 $ git branch
 ------
 
-=== Try Out
+=== Try Out - 3
 
   * Create three folders `public`, `userA`, `userB`
   * Changed directory to `public` and extract `book.git.tar.gz`
@@ -250,7 +277,7 @@ $ git branch
 + userB/
 ------
 
-=== Try Out
+=== Try Out - 3
 
   * Change directory to `userA` and clone the book repository present
     in `public`
@@ -306,7 +333,7 @@ image::figures/push-1.png[]
 
 image::figures/push-2.png[]
 
-=== Try Out
+=== Try Out - 4
 
   * Fix the spelling of the word `freedom` in `chapter-1.txt` and
     `chapter-2.txt`, and commit
@@ -389,7 +416,7 @@ $ git checkout master
 $ git merge origin/master
 ------
 
-=== Try Out
+=== Try Out - 5
 
   * Change back to `userA` book repository
 
@@ -427,26 +454,7 @@ $ git fetch <remote-name>
 $ git remote -vv
 ------
 
-== Questions
-
-== Review
-
-[role="two-column"]
-=== Question
-
-[role="left"]
-image::figures/git-merge-2.png[width="50%",align="center"]
-
-[role="right"]
-  * Merging `bug-fix` from master, represents
-
-    - [A] True Merge
-    - [B] Fast Forward Merge
-    - [C] Up-to-date Merge
-    - [D] None of the above
-
-[role="two-column"]
-=== Question
+=== Quiz
 
 Which of the following statements are true?
 
@@ -454,3 +462,5 @@ Which of the following statements are true?
   * [B] Commits cannot be made on remote tracking branches
   * [C] Fetch updates only remote tracking branches
   * [D] Merge conflicts are resolved automatically by Git
+
+=== Questions
