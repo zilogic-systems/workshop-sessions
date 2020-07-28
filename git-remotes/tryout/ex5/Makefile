@@ -11,6 +11,8 @@ reset: clean
 	git clone $(git_url) userA/book
 	sed -i 's/fredom/freedom/' userA/book/chapter-1.txt
 	sed -i 's/fredom/freedom/' userA/book/chapter-2.txt
+	cd userA/book; git config user.name "User"
+	cd userA/book; git config user.email user@example.com
 	git -C userA/book commit -a -m "Fixed spelling freedom"
 	git -C userA/book push origin master:master
 	git clone $(git_url) userB/book
