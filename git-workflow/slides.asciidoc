@@ -28,15 +28,13 @@ Zilogic Systems <training@zilogic.com>
 
 === Demo
 
-  * Extract a fresh copy of `book.tar.gz`
   * Fix the spelling of freedom in `chapter-1.txt`
   * Make a commit
   * Fix the spelling of freedom in `chapter-2.txt`
   * Update the previous commit with the new changes
 
-=== Try Out
+=== Try Out - 1
 
-  * Extract a fresh copy of `book.tar.gz`
   * Fix the spelling of freedom in `chapter-1.txt`
   * Make a commit
   * Fix the spelling of freedom in `chapter-2.txt`
@@ -92,8 +90,6 @@ git rebase master
 
 === Demo
 
-  * Extract a fresh copy of `book.tar.gz`
-
   * `chapter-3.txt` has an year missing, in line 8
 
   * Create a bug-fix branch called `year-fix`
@@ -120,9 +116,7 @@ git rebase master
 git rebase master
 ------
 
-=== Try Out
-
-  * Extract a fresh copy of `book.tar.gz`
+=== Try Out - 2
 
   * `chapter-3.txt` has an year missing, in line 8
 
@@ -132,7 +126,7 @@ git rebase master
 
   * Commit the changes
 
-=== Try Out (Contd.)
+=== Try Out - 2 (Contd.)
 
   * Switch to `master` branch
 
@@ -140,7 +134,7 @@ git rebase master
 
   * Commit the change
 
-=== Try Out (Contd.)
+=== Try Out - 2 (Contd.)
 
   * Switch to `year-fix` branch
 
