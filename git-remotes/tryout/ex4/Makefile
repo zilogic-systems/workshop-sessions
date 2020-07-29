@@ -30,7 +30,7 @@ test:
 	@sed -i 's/fredom/freedom/' userA/book/chapter-2.txt
 	@git -C userA/book commit -a -m "Fixed spelling freedom"
 	@git -C userA/book push origin master:master
-	@git clone $(GIT_PATH) userB/book
+	@git clone $(git_url) userB/book
 
 clean:
 	rm -fr public userA userB

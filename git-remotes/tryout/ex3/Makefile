@@ -1,4 +1,5 @@
-GIT_PATH := file://./public/book.git
+currdir = $(dir $(realpath $(firstword $(MAKEFILE_LIST))))
+git_url = file://$(currdir)/public/book.git
 
 check: start git-clone
 	@echo "All Checks Passed!"
@@ -18,7 +19,7 @@ git-clone:
 	@echo "OK"
 
 test:
-	@git clone $(GIT_PATH) userA/book
+	@git clone $(git_url) userA/book
 
 clean:
 	rm -fr public userA userB
