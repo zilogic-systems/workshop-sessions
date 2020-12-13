@@ -1,0 +1,827 @@
+= Tracing in Linux
+Zilogic Systems <training@zilogic.com>
+
+== Introduction
+
+=== Quick Poll
+
+  * Let's start with a quick poll.
+
+  * Can you name some tracing tools that you have come across before?
+
+=== Overview
+
+  * Introduction to Tracing
+  * Introduction to uftrace
+  * Case Studies
+    - nmap Example
+    - QT QML Example
+
+== Introduction to Tracing
+
+=== Purpose of Tracing
+
+  * The basic idea behind tracing is to understand the flow of
+    execution in a program.
+
+  * This can usually be acheived by implementing proper logging in the
+    application.
+
+  * But there are scenarios where logging does not work
+    - Application does not implement proper logging
+    - Application implements logging, but the particular code is in a
+      logging shadow zone
+
+  * In such cases, tracing is brute force alternative.
+
+  * It also serves as a valuable tool for understanding and analyzing
+    the flow in a complex codebase.
+
+=== Tracing Tools
+
+  * Tracing is generally done at the function call boundaries.
+
+    - `strace` traces system call invocations.
+
+    - `ltrace` traces library call invocations.
+
+    - `ftrace` traces function execution within the kernel.
+
+    - `uftrace` can trace regular functions, library functions, system
+      calls and kernel code.
+
+=== Quick Detour
+
+  * nm: displays the list of symbols in a executable.
+
+    - T: Symbol is in the text section
+    - D: Symbol is in the initialized data section
+    - B: Symbol is in the uninitialized data section
+    - U: Undefined Symbol
+
+  * Lower case - local symbol, Upper case - global symbol
+
+== Building a Tiny Tracer
+
+=== Two Techniques
+
+  * Library Preloading
+  * Code Instrumentation
+
+=== Library Preloading
+
+  * It is possible to provide custom implementations of library
+    functions using a technique called LD Preloading.
+
+  * Many profiling and tracing tools use this technique to provide for
+    example, a custom implementation of malloc() to the application.
+
+=== Overriding `fopen()`
+
+[source,c]
+------
+include::code/test.c[]
+------
+
+  * Compile Using
+
+------
+gcc prog.c -o prog
+------
+
+=== Custom `fopen()`
+
+[source,c]
+------
+include::code/myfopen.c[]
+------
+
+  * Compile Using
+
+------
+gcc -Wall -fPIC -shared -o myfopen.so myfopen.c
+------
+
+=== Replacing `fopen()`
+
+------
+LD_PRELOAD=./myfopen.so ./test
+------
+
+  * The `LD_PRELOAD` environment variable causes the library to be
+    loaded before the standard library is loaded.
+
+  * The version of `fopen()` with `myfopen.so` is used, instead of the
+    standard `fopen()`.
+
+=== Code Instrumentation
+
+[source,c]
+------
+include::code/sleeptest.c[]
+------
+
+------
+gcc -o sleeptest sleeptest.c
+nm
+------
+
+=== Compile Code with Instrumentation
+
+------
+gcc -pg -o sleeptest sleeptest.c
+nm
+------
+
+  * The `-pg` option, adds a `mcount()` invocation at the beginning of
+    every function.
+
+  * The `mcount()` is a hook, that Profiling tools like prof can
+    implement to determine if a function was called and how much time
+    was spent within a function, etc.
+
+=== Implementing a Function Tracer
+
+  * A custom `mcount()` can be implemented and provided to an
+    instrumented binary using LD preloading.
+
+  * We have a custom `mcount` implementation that prints a `.` when it
+    is invoked.
+
+------
+LD_PRELOAD=./libprof.so ./sleeptest
+------
+
+=== Try Out
+
+  * Try tracing the fibonacci program.
+
+  * Compile the program with code instrumentation.
+
+  * Run the program with LD_PRELOAD.
+
+=== Quiz
+
+Answer True of False:
+
+  1. LD_PRELOAD is an environment variable.
+
+  2. The `-pg` flag is used for instrumenting the code with mcount()
+     invocation.
+
+  3. User functions in a program can be overriden using LD preloading.
+
+  4. The system call no. for write 
+
+== Introduction to uftrace
+
+=== Introduction
+
+  * Developed by Namhyung Kim.
+
+  * GitHub: https://github.com/namhyung/uftrace
+
+  * Works for C, C++ and Rust
+
+  * Inspired the ftrace framework of the Linux Kernel
+
+=== User Function Tracing
+
+==== Left
+
+[source,c]
+------
+/* gcc source.c */
+
+void bar() {
+
+}
+
+void foo() {
+  bar();
+}
+
+int main() {
+  foo();
+  bar();
+}
+------
+
+==== Right
+
+[source,asm]
+------
+<bar>:
+
+  ret
+
+
+<foo>:
+
+  call <bar>
+  ret
+
+
+<main>:
+
+  call <foo>
+  call <bar>
+  ret
+------
+
+=== User Function Tracing
+
+==== Left
+
+[source,c]
+------
+/* gcc -pg source.c */
+
+void bar() {
+
+}
+
+void foo() {
+  bar();
+}
+
+int main() {
+  foo();
+  bar();
+}
+------
+
+==== Right
+
+[source,asm]
+------
+<bar>:
+  call <mcount@plt>
+  ret
+
+
+<foo>:
+  call <mcount@plt>
+  call <bar>
+  ret
+
+
+<main>:
+  call <mcount@plt>
+  call <foo>
+  call <bar>
+  ret
+------
+
+=== User Function Tracing
+
+==== Right
+
+[source,c]
+------
+/* gcc `-finstrument-functions` source.c */
+
+void bar() {
+
+}
+
+void foo() {
+  bar();
+}
+
+int main() {
+  foo();
+  bar();
+}
+------
+
+==== Left
+
+[source,asm]
+------
+<bar>:
+  call <__cyg_profile_func_enter@plt>
+  call <__cyg_profile_func_exit@plt>
+  ret
+
+<foo>:
+  call <__cyg_profile_func_enter@plt>
+  call <bar>
+  call <__cyg_profile_func_exit@plt>
+  ret
+
+<main>:
+  call <__cyg_profile_func_enter@plt>
+  call <foo>
+  call <bar>
+  call <__cyg_profile_func_exit@plt>
+  ret
+------
+
+=== Try Out
+
+-------
+gcc -pg foobar.c -o foobar
+uftrace record ./foobar
+uftrace replay
+-------
+
+Try the above by compiling foobar without the `-pg` option.
+
+=== Try Out
+
+-------
+gcc -pg foobar.c -o foobar
+uftrace live ./foobar
+-------
+
+  * live = record + replay
+
+=== Library Function Tracing
+
+[source,c]
+------
+include::code/lfoobar.c[]
+------
+
+=== Try Out
+
+  * No special option needs to be passed to uftrace to support library
+    function tracing.
+
+------
+gcc -pg lfoobar.c -o lfoobar
+uftrace live ./lfoobar
+------
+
+  * To avoid tracing library functions
+
+------
+uftrace live --no-libcall ./lfoobar
+------
+
+=== PLT Hooking
+
+image::figures/figure1.png[]
+
+=== PLT Hooking
+
+image::figures/figure2.png[]
+
+=== PLT Hooking
+
+image::figures/figure3.png[]
+
+=== PLT Hooking
+
+image::figures/figure4.png[]
+
+=== C++ new and delete
+
+[source,cpp]
+------
+include::code/new-delete.cpp[]
+------
+
+=== Try Out
+
+------
+g++ -pg new-delete.cpp -o new-delete
+uftrace live ./new-delete
+------
+
+=== Try Out
+
+  * Nested Library Calls: Application invokes a library, which in-turn
+    invokes another library
+
+  * new and delete internally invoke `malloc` and `free`.
+
+------
+uftrace live --nest-libcall ./new-delete
+------
+
+=== Kernel Function Tracing
+
+  * Kernel function tracing is based on the ftrace framework.
+
+  * `CONFIG_DNYAMIC_FTRACE` if enabled, will allow tracing to be
+    enabled on request, with zero overhead at other times.
+
+  * `-k` option to trace kernel functions as well.
+
+------
+include::code/hello.c[]
+------
+
+=== Demo
+
+  * Tracing kernel functions requires root access to the system.
+
+------
+gcc -pg hello.c hello
+uftrace live ./hello
+sudo uftrace live -k ./hello
+------
+
+  * Tracing by specfying depth.
+
+------
+sudo uftrace -K 2 hello
+------
+
+== Function Information
+
+=== Display Function Arguments
+
+  * Specify the arguments using the `-A` option.
+
+------
+uftrace live -A sleep@arg1 ./sleeptest
+------
+
+=== Try Out
+
+  * Display the arguments passed to main
+
+------
+uftrace live -A main@arg1,arg2 ./hello world
+------
+
+=== Display Function Return Value
+
+  * Specify the arguments using the `-A` option.
+
+------
+uftrace live -A sleep@arg1 -R sleep@retval ./sleeptest
+------
+
+=== Argument Type Specification
+
+  * `puts` accepts a string, which is passed as pointer to puts
+
+------
+uftrace live -A puts@arg1 ./hello
+------
+
+  * If the argument type is indicated as string, uftrace can obtain
+    the string and display it.
+
+------
+uftrace live -A puts@arg1/s ./hello
+------
+
+=== Try Out
+
+  * Print the argument passed to `puts` as a string.
+
+------
+uftrace live -A puts@arg1/s ./hello
+------
+
+=== Auto Function Type
+
+  * If debug info is available, uftrace can automatically detect the
+    argument types and return values.
+
+  * To add debug info use `-g` option during compilation.
+
+  * To automatically detection function type using `-a` option to
+    uftrace.
+
+=== Try Out
+
+  * Command sequence to automatically identify function type.
+
+------
+gcc -pg -g hello.c -o hello
+uftrace live -a ./hello
+------
+
+=== Full Dynamic Tracing
+
+  * Without the support from the compiler, uftrace can patch calls to
+    mcount within existing binary.
+
+  * This is done through binary inspection and modification, of
+    function code.s
+
+  * Useful when we need to run uftrace on pre-built code.
+
+  * To patch a specific function `-P` option can be used.
+
+-----
+gcc foobar.c -o foobar
+uftrace live -P bar -P main foobar
+-----
+
+=== Full Dynamic Tracing
+
+  * Instead of specifying the functions one by one, we can specify a
+    regex pattern to match mulitple funtions.
+
+  * The `.` regex pattern matches all functions, and all the functions
+    are patched.
+
+-----
+gcc foobar.c -o foobar
+uftrace live -P . foobar
+-----
+
+=== Try Out
+
+  * Compile foobar without instrumentation and use dynamic tracing, to
+    trace the functions within foobar.
+
+=== Reports
+
+  * Trace Statistics
+  * Trace Dump
+  * Call Graph
+
+=== Trace Statistics
+
+  * `uftrace report` can be used to get summary and statistics of the
+    trace data.
+
+  * Indicates the following:
+    - Total Time: amount of time spent within the function
+    - Self Time: the time taken by the fuction alone
+    - Calls: the no. of times the function was invoked
+
+  * The `-s` option can be used to sort according to particular field:
+    total, self, call, func
+
+--------
+uftrace record sleeptest
+uftrace report
+--------
+
+=== Try Out
+
+  * Run `uftrace` on `fibonacci` program, and generate an `uftrace
+    report`
+
+  * Change the argument to the program, and observe the difference in
+    the call out and the total time.
+
+=== Trace Dump
+
+  * `uftrace dump` can be used to convert the data to a format that
+    can be used by external tools.
+
+  * Chrome browser has a built-in trace data visualization. This was
+    primarity developed for analyzing Chrome browser operation and for
+    profiling Javascripts.
+
+  * This interface in Chrome can be used for visualization trace data
+    recorded by uftrace.
+
+  * `--chrome` option will dump it in JSON format that can be consumed
+    by the Chrome browser.
+
+=== Demo
+
+  * The following command sequence generates trace data, that can be
+    visualized using Chrome.
+
+------
+uftrace record ./fibonacci 3
+uftrace dump --chrome > trace.json
+------
+
+=== Call Graph
+
+  * The `uftrace graph` can be used to display the call graph of the
+    program execution.
+
+  * The call graph call also be viewed interactively using `uftrace
+    tui`.
+
+------
+uftrace graph
+------
+
+  * To view the task execution use `--task` option.
+
+=== Try Out
+
+  * Generate the task graph for gcc execution.
+
+-----
+uftrace record -P . gcc hello.c
+uftrace tui
+-----
+
+=== Quiz
+
+Answer True or False
+
+  1. uftrace traces kernel functions using PLT Hooking
+
+  2. uftrace can automatically determine function arguments if the
+     program is compiled with -pg option.
+
+  3. uftrace can automatically patch functions in programs that are
+     not compiled with instrumentation.
+
+  4. `chrome://tracing` is for troubleshooting performance issues
+     within the Chrome browser.
+
+== nmap Example
+
+=== Poll
+
+The following screenshot shows nmap inaction. Guess Which movie is
+this screenshot from?
+
+image::screenshot/reload_nmap_c.jpg[align="center"]
+
+=== Introduction
+
+  * nmap - Network exploration tool and security / port scanner
+
+  * It can detect which ports are open in a given server.
+
+  * Example:
++
+------
+nmap nmap.org
+------
+
+=== Tracing and Analyzing nmap Execution
+
+  * Objective - Determine the order in which nmap scans ports on a
+    server.
+
+  * Building nmap with instrumentation.
+
+  * Capturing trace data.
+
+  * De-ciphering trace data, to understand nmap execution.
+
+  * Filter the data to show the exact scan order.
+
+== QT QML
+
+=== Poll
+
+  * What is QT?
+
+  * What is QT QML?
+
+  * What is V8?
+
+=== Introduction
+
+  * QT QML has a built-in V4 Javascript engine
+
+  * A bug in Javascript engine on QT's bug tracker:
+    https://bugreports.qt.io/browse/QTBUG-56830
+
+  * Code example:
++
+------
+console.log('"240000000000" == "3776798720"', "240000000000" == "3776798720");
+console.log('"240000000000" === "3776798720"', "240000000000" === "3776798720");
+------
++
+  * Output:
++
+------
+qml: "240000000000" == "3776798720" true
+qml: "240000000000" === "3776798720" true
+------
+
+=== Debugging the Code
+
+  * The bug was eventually fixed by "Giuseppe D'Angelo"
+
+  * He wrote a commentary on how he fixed the issue in his company's
+    blog: https://www.kdab.com/fixing-bugs-via-lateral-thinking/
+
+=== Test Case in C++
+
+[source,cpp]
+------
+     QJSEngine engine;
+     QJSValue value("foo");
+
+     QJSValue obj = engine.newObject();
+     obj.setProperty("240000000000", value);
+
+     QJSValueIterator it(obj);
+     while (it.hasNext()) {
+         it.next();
+         qDebug() << it.name() << it.value().toString();
+     }
+
+# Prints "3776798720" "foo"
+------
+
+=== Using a Debugger
+
+  * Issues with using the debugger approach:
+    - In his own words: "there's a lot of dark magic in there to give
+      JavaScript semantics to values, and keep them allocated in
+      efficient ways"
+
+    - Could not print local variables because they were getting
+      reinterpret_cast() across different internal datatypes.
+
+  * Solution: Use tracing and identify the diverging code paths
+
+=== Comparison of Trace Data
+
+image::screenshot/comparison1.png[]
+
+=== Comparison of Trace Data
+
+image::screenshot/comparison2.png[]
+
+=== Point of Divergence
+
+  * He was able to identify the point of divergence, and further
+    narrow it down to an incorrect integer overflow check in the code.
++
+[source,cpp]
+------
+     ScopedString s(scope, engine->newString(name));
+     uint idx = s->asArrayIndex();
+     if (idx < UINT_MAX) {
+         setProperty(idx, value);
+         return;
+     }
+     s->makeIdentifier(scope.engine);
+     QV4::ScopedValue v(scope, QJSValuePrivate::convertedToValue(engine, value));
+     o->put(s, v);
+------
++
+  * Fix: https://codereview.qt-project.org/175782
+
+== Thank You
+
+=== Credits
+
+  * Examples are based on https://uftrace.github.io/slide/[uftrace
+    tutorial slides]
+
+  * nmap example is based on
+    https://static.sched.com/hosted_files/osseu17/52/Good_bye_printf_hands_on_tutorial_uftrace_function_graph_tracer_C_C%2B%2B.pdf["Goodbye!
+    printf()" hands-on tutorial], OSS Europe 2017
+
+  * Blog article on the QT QML Issue:
+    https://www.kdab.com/fixing-bugs-via-lateral-thinking/
+
+  * PLT Hooking images from https://github.com/kubo/plthook
+
+== Backup
+
+=== Filters
+
+  * `-D <depth>` Limit function nesting depth
+
+  * `-F <func>` Limit functions to be traced. Can be used more than
+    once.
+
+  * `-N <func>` Omit functions to be traced. Can be used more than
+    once.
+
+  * `-t <time>` Limit functions based on execution time. If execution
+    is lesser, it is omitted.
+
+=== Try Out
+
+  * Limit nesting depth to 2
+
+------
+gcc -pg foobar.c foobar
+uftrace live -D 2 ./foobar
+------
+
+=== Try Out
+
+  * Limit functions to `foo`
+
+------
+gcc -pg foobar.c foobar
+uftrace live -F foo ./foobar
+------
+
+=== Try Out
+
+  * Omit `bar` from the trace.
+
+------
+gcc -pg foobar.c foobar
+uftrace live -N bar ./foobar
+------
+
+=== Try Out
+
+  * Omit functions that take less than 1us to execute.
+
+------
+uftrace live -t 1us ./sleeptest
+------
+
