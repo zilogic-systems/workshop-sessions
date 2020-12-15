@@ -48,7 +48,7 @@ linux-tracing-resources:
 	echo 'all: hello' >> linux-tracing/b7/Makefile
 	mkdir -p linux-tracing/b8
 	cp code/hello.c linux-tracing/b8
-	echo 'CFLAGS = "-g -pg"' > linux-tracing/b8/Makefile
+	echo 'CFLAGS = -g -pg' > linux-tracing/b8/Makefile
 	echo 'all: hello' >> linux-tracing/b8/Makefile
 	mkdir -p linux-tracing/b9
 	cp code/foobar.c linux-tracing/b9
