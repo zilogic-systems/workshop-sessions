@@ -43,9 +43,9 @@ linux-tracing-resources:
 	echo 'CFLAGS = "-pg"' > linux-tracing/b6/Makefile
 	echo 'all: sleeptest' >> linux-tracing/b6/Makefile
 	mkdir -p linux-tracing/b7
-	cp code/sleeptest.c linux-tracing/b7
+	cp code/hello.c linux-tracing/b7
 	echo 'CFLAGS = "-pg"' > linux-tracing/b7/Makefile
-	echo 'all: sleeptest' >> linux-tracing/b7/Makefile
+	echo 'all: hello' >> linux-tracing/b7/Makefile
 	mkdir -p linux-tracing/b8
 	cp code/hello.c linux-tracing/b8
 	echo 'CFLAGS = "-g -pg"' > linux-tracing/b8/Makefile
