@@ -1,0 +1,4 @@
+qemu-user-static
+qemu-user-binfmt
+jarwrapper
+gcc-arm-linux-gnueabi

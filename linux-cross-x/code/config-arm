@@ -1,0 +1,14 @@
+hostname=arm
+cross_prefix=arm-linux-gnueabi-
+dl_dir=/tmp/dl
+busybox_version=1.25.0
+build_threads=4
+console_dev=ttyS0
+console_baud=115200
+build_dir=build-${hostname}
+img_filename=$PWD/${hostname}-ramdisk.img
+
+function before_pack() {
+    # Any commands to execute before packing up
+    return
+}

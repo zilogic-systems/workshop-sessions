@@ -1,0 +1,283 @@
+= Cross Execution in Linux
+Zilogic Systems <training@zilogic.com>
+
+== Introduction
+
+=== Think Out of the Box!
+
+  * Resources within the target is limited, hard to run and debug
+    programs.
+
+  * Number of target boards is also generally limited, compared to the
+    no. of developers, leading to wait times for testing on target.
+
+  * What if we can use and test the application, within the target
+    filesystem, on the host?
+
+  * Objective of this session is to show the tools and techniques
+    available for doing this.
+
+=== Quick Poll
+
+  * What are the various ways through which you can create a Root
+    Filesystem?
+
+=== Quick Poll
+
+  * What are the various ways through which you can create a Root
+    Filesystem?
+
+  * Answers:
+    - Buildroot
+    - Yocto
+    - Openwrt
+    - Debian Bootstrap
+
+=== Root Directory
+
+  * Root directory is the top level directory in the filesystem.
+
+  * Represented by "/" in Linux.
+
+  * Contains the top level directories in a filesystem
+    - usr
+    - bin
+    - etc
+    - tmp
+    - proc
+
+=== Root Filesystem
+
+  * Filesystem is a hierarchy of files and folders.
+
+  * Filesystem that contains the system root directory is called the
+    root filesystem.
+
+  * It is the first filesystem that gets mounted when the system is
+    booted-up.
+
+  * The storage device that contains the root filesystem is called
+    root device.
+
+  * The root device is specified as a boot argument to the kernel.
+
+=== Create a Simple Root FS using BusyBox
+
+  * Busybox can be used to create a simple filesystem.
+
+  * This is similar to filesystems created by Yocto or Buildroot, but
+    really, really tiny.
+
+  * It is also the fastest way to get a working root filesystem,
+    complete with shell, text editors, networking utils, filesystem
+    utils, etc.
+
+=== Try Out (A1)
+
+  * Create a simple rootfs using Busybox.
+
+------
+cd tiny-rootfs
+./mkrootfs.sh config-x86
+ls build-x86/rootfs
+------
+
+== Chroot
+
+=== Introduction
+
+  * Chroot is a mechanism available in Unix systems, that allows the
+    root directory of a process be replaced with another directory.
+
+  * We can set the root directory of a process to `/opt/root`.
+
+  * And when the process tries to access `/bin/sh`, the kernel will
+    access `/opt/root/bin/sh`.
+
+=== Why Chroot?
+
+  * Chroots were originally used for creating isolated environments
+    within which servers can execute.
+
+  * Idea is if the server is compromised, the access is restricted
+    only to the restricted chroot environment.
+
+  * It can also be used for testing, debugging and working with root
+    filesystems.
+
+=== Invocation
+
+------
+chroot <new-root-dir> <program>
+------
+
+  * `new-root-dir` is the directory to be treated as root.
+
+  * `program` is the program to be executed within the chroot.
+
+=== Try Out (A2)
+
+  * Use the rootfs created using chroot.
++
+------
+sudo chroot build-x86/rootfs /bin/sh
+------
+
+== Cross Execution
+
+=== Quiz
+
+  * What does the following script do?
++
+------
+#!/bin/cat
+
+hello world
+goodbye world
+------
+
+=== Quiz
+
+  * What does the following script do?
++
+------
+#!/bin/rm
+
+hello world
+goodbye world
+------
+
+=== binfmt_misc
+
+  * binfmt_misc is the binary equivalent of the Sha-Bang sequence.
+
+  * When we try to execute a binary file, the kernel will check if it
+    is a supported executable format.
+
+  * If not, it will check for register handler for the binary file,
+    and then will invoke the corresponding interpreter to execute it.
+
+=== Try Out (A3)
+
+  * Executing a Java JAR requires the Java VM to be invoked.
+
+------
+java -jar helloworld.jar
+------
+
+  * If binfmt_misc handler is registered, the JAR file can be made
+    executable and executed as follows.
+
+------
+chmod +x helloworld.jar
+./helloworld.jar
+------
+
+=== Qemu User Mode Emulation
+
+  * Qemu has a CPU emulator, that can emulate instruction set from
+    various different architectures.
+
+  * It provides a mechanism through which non-native binaries can be
+    executed, in a host.
+
+  * This mechanism within Qemu, is called User Mode Emulation.
+
+=== Try Out (A4)
+
+  * Compile the hello world program for ARM.
++
+------
+arm-linux-gnueabi-gcc -static helloworld.c -o helloworld
+file helloworld
+------
++
+  * Run it with Qemu
++
+------
+qemu-arm-static ./helloworld
+------
++
+  * Qemu is registered as interpreter for ARM binaries!
++
+------
+./helloworld
+------
+
+=== Chroot + Qemu
+
+  * Chroot and Qemu User Mode Emulation can be combined to
+    cross-execute and test programs in a root filesystem.
+
+  * Create ARM Root filesystem
++
+------
+cd tiny-rootfs
+./mkrootfs.sh config-arm
+ls build-arm/rootfs
+file build-arm/rootfs/bin/busybox
+------
+
+=== Chroot + Qemu
+
+  * Qemu should be available within the rootfs
++
+------
+cp /usr/bin/qemu-arm-static build-arm/rootfs/usr/bin/
+------
++
+  * Chroot to `build-arm/rootfs`
++
+------
+chroot build-arm/rootfs
+------
+
+=== Try Out (A5)
+
+  * Chroot into a Root FS, built for ARM.
+
+------
+file build-arm/rootfs/bin/busybox
+chroot build-arm/rootfs
+------
+
+== Final Notes
+
+=== Alternatives to Chroot
+
+  * fakechroot
+    - Use LD Preloading to acheive Chroot like functionality
+    - Does not require root access
+
+  * proot
+    - Uses syscall tracing to acheive Chroot like functionlity
+    - Does not require root access
+
+=== Conclusion
+
+  * It is possible to run program compiled for the target on the host,
+    thanks to the emulation tools available in Linux.
+
+  * There are and will be limitations to what can be done within the
+    emulation.
+
+  * But this opens up possibilities with respect to testing and
+    debugging target applications, that can be carefully evaluated and
+    incorporated in the developer workflow.
+
+=== Quiz
+
+Answer True or False
+
+  * Busybox provides tiny versions of commands and utiltiies, required
+    for a Linux system.
+
+  * chroot changes the root directory of all programs running in the
+    system.
+
+  * binfmt_misc is the binary equivalent of sha-bang sequence.
+
+  * A process running within chroot, can access files outside the
+    chroot environment.
+
+== Thank You!
