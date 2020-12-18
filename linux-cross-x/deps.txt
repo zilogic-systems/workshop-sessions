@@ -1,4 +1,6 @@
 qemu-user-static
-qemu-user-binfmt
 jarwrapper
 gcc-arm-linux-gnueabi
+genext2fs
+default-jdk-headless
+

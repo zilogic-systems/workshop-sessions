@@ -1,6 +1,6 @@
 hostname=arm
 cross_prefix=arm-linux-gnueabi-
-dl_dir=/tmp/dl
+dl_dir=~/tmp/dl
 busybox_version=1.25.0
 build_threads=4
 console_dev=ttyS0
