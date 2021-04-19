@@ -10,6 +10,9 @@ by Zilogic.
   * ARM Bare Metal Programming, Workshop. For details see
     http://www.zilogic.com/arm-linker-script-training.html
   * Kernel Porting Workshop. For details see http://www.zilogic.com/linux-kernel-porting-training.html
+  * Device Interfacing Workshop.
+  * Device Driver Workshop.
+  * Python Programming Workshop.
 
 ## Git Basics Workshop: Sessions
 
