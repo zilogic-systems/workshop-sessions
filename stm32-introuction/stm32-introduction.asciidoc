@@ -1,0 +1,343 @@
+= STM32 Introduction
+
+=== We will be discussing...
+
+* ARM Architecture
+* STM32 Controllers
+* Toolchain
+* STM32 CubeMX
+* Programming Tools
+* Debugging Tools
+
+== ARM Architecture
+
+=== Introduction
+
+* Instruction sets and architecture developed by ARM Holdings.
+* ARM licenses the intellectual property, but doesn't manufacture devices.
+* Currently ARM is the most widely used instruction set architecture in terms of quantity.
+
+=== Cortex processors
+
+[frame="all",grid="all",options="header",cols="30,70"]
+|====
+| Processor Family  | Details
+| *Cortex-A*	    | Application
+| *Cortex-R*	    | Real Time
+| *Cortex-M*	    | Embedded
+|====
+
+=== Cortex-M Registers
+
+image::figures/cortex_regs.png[align="center", width="40%"]
+
+source: STMicroelectronics
+
+=== Cortex-M Registers (Contd...)
+
+* R0-R12 : General-purpose registers, and can be used as operands for ARM instructions.
+* R13 is the Stack Pointer (SP) register, which stores the address of the last program request in a stack.
+* R14 is the Link register, which holds the address to return to when a function call completes.
+* R15 is the Program counter, that contains the address (location) of the instruction being
+executed at the current time.
+
+=== Bus Architecture - AMBA
+
+* The ARM Advanced Microcontroller Bus Architecture (AMBA) is an open-standard, on-chip interconnect specification for the connection and management of functional blocks in system-on-a-chip (SoC) designs.
+* Today, AMBA is widely used on a range of ASIC and SoC parts including applications processors used in modern portable mobile devices like smartphones.
+* AMBA (1996) Introduced APB Bus
+* AMBA 2 (1999) Introduced AHB Bus
+* AMBA 3 (2003) Introduced AXI Bus
+
+=== Bus Architecture (Contd...)
+
+*Advanced eXtensible Interface (AXI)*
+
+* AXI, the third generation of AMBA interface defined in the AMBA 3 specification, is targeted at high performance, high clock frequency system designs.
+
+*Advanced High performance Bus (AHB)*
+
+* Introduced in AMBA 2
+* Support large bus-widths (64/128/256/512/1024 bit).
+
+*Advanced Peripheral Bus (APB)*
+
+* APB is designed for low bandwidth control accesses, for example register interfaces on system peripherals.
+
+=== Bus Architecture (Contd...)
+
+==== Right
+image::figures/pic_block_dia.png[align="center",width="60%"]
+
+==== Left
+image::figures/stm32f7_bus_matrix.png[align="center",width="80%"]
+
+=== Memory map
+
+image::figures/memory_map.png[align="center",width="40%"]
+
+source: STMicroelectronics
+
+=== Interrupts and Exceptions handling
+
+* In the ARM architecture, interrupts are one type of exception.
+* Interrupts are usually generated from on-chip peripherals or external inputs, and in some cases they can be triggered by software.
+* Exceptions are, instead, related to software execution, and the CPU itself can be a source of exceptions.
+
+=== Interrupts
+
+image::figures/interrupt.png[align="center",width="50%"]
+
+=== SysTick
+
+* SysTick performs Timer/Counter operation in all ARM
+* 24-bit down counter decrements at bus clock frequency
+* It is used to generate periodic interrupts to scheduled tasks.
+* Programmers can define the update frequency of SysTick timer by setting its registers.
+* SysTick timer is also used by the STM32 HAL to generate precise delays
+
+== STM32 Controllers
+
+=== Introduction
+
+* STM32 is a family of 32-bit microcontroller IC's from STMicroelectronics
+* They are grouped into related series based on ARM Processor core
+
+=== A General understanding of STM32 Family...
+
+image::figures/stm32_series.png[align="centre",width="40%"]
+
+source: STMicroelectronics
+
+=== Decoding details from controller name
+
+------
+STM32[aa][bb][c][d]
+------
+------
+aa : Family category
+bb : Subtype, differs in equipment of peripherals. Depends on certain family
+c  : Package pin count
+d  : Flash memory size
+------
+
+=== Family Grouping
+
+==== Right
+
+image::figures/stm32_decode_family.png[align="centre",width="90%"]
+
+==== Left
+
+image::figures/pin_flash.png[align="centre",width="50%"]
+
+== Toolchain
+
+=== Toolchain allows us to,
+
+* Write down program and navigate through files and inspection of variables
+* To compile program using cross platform compiler
+* To flash and debug program into target board
+
+=== A toolchain contains
+
+* IDE with text editor and navigator
+* Cross compiler to compile code for arm cortex-M platform
+* Debugger to debug step by step program
+
+=== Some common toolchains
+
+* IAR for cortext-M
+* Keil
+* System Workbench for STM32 (SW4STM32)
+
+=== STM32 System Workbench
+
+* Toolchain based on Eclipse IDE and GCC compiler
+* Supported on Linux, Windows and MacOS
+* Almost all tools pre-installed
+
+=== Toolchain installation
+
+* Eclipse Installation
+
+https://www.eclipse.org/downloads/packages/release/oxygen/3a/eclipse-ide-cc-developers
+
+* Eclipse Plug-Ins Installation
+
+** C/C++ Development Tools SDK (Eclipse CDT)
+** GNU MCU plug-ins for Eclipse
+
+=== Toolchain installation (Contd...)
+
+* GCC ARM Embedded Installation
+
+https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads
+
+* Build Tools Installation
+
+https://github.com/xpack-dev-tools/windows-build-tools-xpack/releases
+
+=== Toolchain installation (Contd...)
+
+* OpenOCD Installation
+
+https://github.com/ilg-archived/openocd/releases
+
+* ST Tools and Drivers Installation
+
+** STM32CubeMX
+** STM32CubeProgrammer
+
+=== STM32 CubeIDE
+
+STM32CubeIDE is an advanced C/C++ development platform with following capabilities:
+
+* Peripheral configuration (Integrated CubeMX)
+* Code generation, compilation, and debug features.
+* Support for ST-LINK (STMicroelectronics) and J-Link (SEGGER) debug probes
+* Import project from Atollic TrueSTUDIO and AC6 System Workbench for STM32 (SW4STM32)
+* Multi-OS support: Windows, Linux, and macOS, 64-bit versions only.
+
+=== STM32 CubeIDE Installation
+
+Installation file for cubeIDE can be downloaded from:
+
+https://www.st.com/en/development-tools/stm32cubeide.html
+
+=== STM32CubeMX
+
+image::figures/cubemx.jpg[align="center",width="30%"]
+
+=== What is cubeMX?
+
+* Graphical tool for 32-bit ARM Cortex STM32 microcontrollers.
+* Easy microcontroller selection covering whole STM32 portfolio.
+* Board selection from a list of STMicroelectronics boards.
+* Easy microcontroller configuration (pins, clock tree, peripherals, middleware) and
+generation of the corresponding initialization C code.
+* Generation of IDE ready projects, almost all toolchain supported.
+
+=== CubeMX Code Generation Flow
+
+image::figures/cubeMX_generation_flow.png[align="center",width="50%"]
+
+source: STMicroelectronics
+
+=== Installation - Prerequisites
+
+System Requirements:
+------
+* Windows XP: 32-bit (x86)
+* Windows 7: 32-bit (x86), 64-bit (x64)
+* Windows 8: 32-bit (x86), 64-bit (x64)
+* Linux : 32-bit (x86) and 64-bit (x64) (tested on RedHat, Ubuntu and Fedora)
+* MacOS: 64-bit (x64)
+------
+
+Memory requirement:
+------
+* Recommended minimum RAM: 2 Gbytes.
+------
+
+=== Installation - Prerequisites (Contd...)
+
+Software pre-requisites:
+------
+* Java Run Time Environment for 1.7.0_45
+------
+If Java is not installed on your computer or if you have an old version, STM32CubeMX
+installer will open the Java download web page and stop.
+
+=== Installation process
+
+* Download STM32CubeMX installation package from www.st.com/stm32cubemx.
+* Extract (unzip) stm32cubemx.zip whole package into the same directory.
+* For windows, Double click the SetupSTM32CubeMX-VERSION.exe file to launch the installation
+wizard.
+* For linux, Double click (or launch from the console window) on the SetupSTM32CubeMX-
+VERSION.linux file.
+
+=== Launch CubeMX
+
+On Windows:
+------
+* select STM32CubeMX from Program Files > ST Microelectronics > STM32CubeMX.
+* Double-click STM32CubeMX icon on your desktop.
+------
+
+On Linux:
+------
+* Launch the STM32CubeMX executable from STM32CubeMX installation directory.
+------
+
+== Programming Tools
+
+=== STM32 Cube programmer
+
+image::figures/programmer.png[align="center",width="60%"]
+
+=== Features
+
+* Erases, programs, views and verifies the content of the device Flash memory
+* Supports Motorola S19, Intel HEX, ELF, and binary formats
+* Supports debug and bootloader interfaces - JTAG/SWD, UART, USB DFU, I2C, SPI,
+  and CAN bootloader interfaces
+* Supports the programming and configuring of option bytes
+* ST-LINK firmware update
+* Multi-OS support: Windows, Linux, macOS
+
+=== Installation
+
+Installation file can be downloaded from:
+------
+https://www.st.com/en/development-tools/stm32cubeprog.html
+------
+
+=== What you will see on the main page
+
+* Memory and File edition
+* Erasing and Programming
+* Option bytes
+* MCU Core
+* External Loaders
+* ST-Link configuration
+
+
+=== Cube programmer interface
+
+image::figures/cubeprogrammer-main-page.png[align="center",width="70%"]
+
+== Debugging Tools
+
+=== ST-Link V2
+
+image::figures/stlink_conn.png[align="center",width="20%"]
+
+=== Features
+
+* In-circuit debugger and programmer for the STM8 and STM32 microcontroller families.
+* SWIM Connection for STM8 devices
+* JTAG/SWD Connection for STM32 devices
+* Direct firmware update support (DFU)
+* Provision of status LED blinking during the communication with the PC
+
+=== STM8 Connection
+
+==== Right
+
+image::figures/swim_connector.png[align="center",width="30%"]
+
+==== Left
+
+image::figures/swim_table.png[align="center",width="100%"]
+
+=== STM32 Connection
+
+==== Right
+
+image::figures/jtag_connector.png[align="center",width="40%"]
+
+==== Left
+
+image::figures/jtag_table.png[align="center",width="100%"]
