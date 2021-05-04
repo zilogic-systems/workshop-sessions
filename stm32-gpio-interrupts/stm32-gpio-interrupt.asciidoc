@@ -1,0 +1,271 @@
+= Cube HAL - GPIO & Interrupts
+Zilogic Systems
+
+=== We will be discussing...
+
+* GPIO
+** GPIO Configuration
+** GPIO Driving
+* STM32 Interrupts
+** Enabling / Disabling
+** Lifecycle
+* Demo Project
+
+== GPIO
+
+=== GPIO Introduction
+
+* General purpose Input Output
+* Each GPIO pins grouped into different Ports
+* Speed selection of individual GPIO possible
+
+=== GPIO General Outlook
+
+image::figures/gpio-format.png[align="center", width="60%"]
+
+=== GPIO Functional details
+
+* Each port can be configured in:
+** Input floating
+** Input pull-up
+** Input pull-down
+** Analog
+** Output open drain with pull up or down
+** Output push pull
+** Alternate function
+
+=== HAL GPIO Configuration
+
+Structure in HAL Layer holding GPIO Init Details
+------
+typedef struct
+{
+	uint32_t Pin;
+	uint32_t Mode;
+	uint32_t Pull;
+	uint32_t Speed;
+	uint32_t Alternate;
+}GPIO_InitTypeDef;
+------
+
+=== HAL GPIO Configuration (contd...)
+
+* *Pin* : Pin number inside a port
+* *Mode* : it is the operating mode of the pin.
+[frame="all",grid="all",options="header",cols="30,70"]
+|====
+| MACRO in HAL  		    | Details
+| *GPIO_MODE_INPUT*	    	    | Input Floating Mode
+| *GPIO_MODE_OUTPUT_PP*	    	    | Output Push Pull Mode
+| *GPIO_MODE_OUTPUT_OD*	    	    | Output Open Drain Mode
+| *GPIO_MODE_AF_PP*	    	    | Alternate Function Push Pull Mode
+| *GPIO_MODE_AF_OD*	    	    | Alternate Function Open Drain Mode
+| *GPIO_MODE_ANALOG*	    	    | Analog Mode
+| *GPIO_MODE_IT_RISING*	    	    | External Interrupt Mode with Rising edge trigger detection
+| *GPIO_MODE_IT_FALLING*	    | External Interrupt Mode with Falling edge trigger detection
+| *GPIO_MODE_IT_RISING_FALLING*	    | External Interrupt Mode with Rising/Falling edge trigger detection
+| *GPIO_MODE_EVT_RISING*	    | External Event Mode with Rising edge trigger detection
+| *GPIO_MODE_EVT_FALLING*	    | External Event Mode with Falling edge trigger detection
+| *GPIO_MODE_EVT_RISING_FALLING*    | External Event Mode with Rising/Falling edge trigger detection
+|====
+
+=== HAL GPIO Configuration (contd...)
+
+* *Pull* : specifies the Pull-up or Pull-Down activation for the selected pins
+[frame="all",grid="all",options="header",cols="30,70"]
+|====
+| MACRO in HAL  		| Details
+| *GPIO_NOPULL*	    	    	| No Pull-up or Pull-down activation
+| *GPIO_PULLUP*	    		| Pull-up activation
+| *GPIO_PULLDOWN*	    	| Pull-down activation
+|====
+
+=== HAL GPIO Configuration (contd...)
+
+* *Speed* : Defines the pin speed
+------  		
+GPIO_SPEED_LOW   
+GPIO_SPEED_MEDIUM	    	
+GPIO_SPEED_FAST
+GPIO_SPEED_HIGH	    	
+------
+
+* *Alternate* : specifies which peripheral to associate to the pin.
+
+=== HAL GPIO Configuration (contd...)
+
+Structure in HAL Layer holding GPIO Port Register Details
+------
+typedef struct
+{
+  __IO uint32_t MODER;
+  __IO uint32_t OTYPER;
+  __IO uint32_t OSPEEDR;
+  __IO uint32_t PUPDR;
+  __IO uint32_t IDR;
+  __IO uint32_t ODR;
+  __IO uint32_t BSRR;
+  __IO uint32_t LCKR;
+  __IO uint32_t AFR[2];
+} GPIO_TypeDef;
+------
+
+=== HAL GPIO Configuration (contd...)
+
+* *GPIOx_MODER* : GPIO port mode register
+* *GPIOx_OTYPER* : GPIO port output type register
+* *GPIOx_OSPEEDR* : GPIO port output speed register
+* *GPIOx_PUPDR* : GPIO port pull up/pull down register
+* *GPIOx_IDR* : GPIO port input data register
+* *GPIOx_ODR* : GPIO port output data register
+* *GPIOx_BSRR* : GPIO port bit set/reset register
+* *GPIOx_LCKR* : GPIO port configuration lock register
+* *GPIOx_AFRL* : GPIO alternate function low register
+* *GPIOx_AFRH* : GPIO alternate function high register
+
+=== Driving GPIO
+
+*Init GPIO*
+------
+void HAL_GPIO_Init(GPIO_TypeDef  *GPIOx, GPIO_InitTypeDef *GPIO_Init)
+------
+
+*Deinit GPIO*
+------
+void HAL_GPIO_DeInit(GPIO_TypeDef* GPIOx, uint32_t GPIO_Pin)
+------
+
+=== Driving GPIO (contd...)
+
+*Read GPIO*
+------
+GPIO_PinState HAL_GPIO_ReadPin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin)
+------
+
+*Write GPIO*
+------
+void HAL_GPIO_WritePin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, GPIO_PinState PinState)
+------
+
+*Toggle GPIO*
+------
+void HAL_GPIO_TogglePin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin)
+------
+
+== Interrupts
+
+=== Introduction
+
+* Asynchronous event that causes current code execution halt on a priority basis
+* More important the interrupt is, the higher its priority
+* Can originate both by the hardware and the software
+* Interrupts originate by the hardware, exceptions by the software
+* Nested Vectored Interrupt Controller (NVIC) is the unit inside Cortex-M dedicated for exception management
+
+=== NVIC Controller
+
+image::figures/nvic_controller.png[align="center", width="70%"] 
+source: STMicroelectronics
+
+=== NVIC Controller (contd...)
+
+* Dedicated unit for exception handling
+* Peripherals can be external to Core (internal to MCU) or External to MCU.
+* External Interrupt/Event Controller (EXTI), is responsible of the interconnection between the external I/O signals and the NVIC controller
+* System exceptions : exceptions originate inside the CPU core
+* Hardware exceptions : exceptions coming from external peripherals, also called Interrupt Requests (IRQ).
+
+=== NVIC Controller (contd...)
+
+* All exceptions handled using ISR's written on high level code.
+* All routines should be located on Vector tables.
+* Each controller will have their own vector table implementation
+
+=== STM32 Vector table
+
+image::figures/nvic_table.png[align="center", width="50%"]
+
+=== STM32 Vector table (contd...)
+
+* *Reset*
+** Raised just after CPU Reset
+** Reset handler is the real entry point to code
+
+* *NMI*
+** Special exception, having highest priority after the Reset
+** Linked to Clock Security System
+** CSS detects issues in HSE
+
+=== STM32 Vector table (contd...)
+
+* *Hard Fault*
+** Generic fault exception
+** Can act as collector of all types of exception
+
+* *Memory Management Fault*
+** Occurs when code access illegal memory location
+
+=== STM32 Vector table (contd...)
+
+* *Bus Fault*
+** When AHB interface receives an error response from slave
+** Called prefetch abort if on instruction fetch
+** Called data abort if on data access
+
+* *Usage Fault*
+** Caused by illegal instruction, alignment problem, or attempt to access a non-existent co-processor
+
+=== STM32 Vector table (contd...)
+
+* *SVCCall*
+** Raised as an indication to supervisor call (SVC)
+** Used by real time system
+
+* *Debug Monitor*
+** Raised when a software debug event occurs while the processor core is in Monitor Debug-Mode
+** Used as exception for debug events like breakpoints and watchpoints on software debug
+
+=== STM32 Vector table (contd...)
+
+* *PendSV*
+** Another exception related to RTOS
+
+* *SysTick*
+** Exception usually related to RTOS activities
+** Timebase for  RTOS task schedulings
+
+=== NVIC HAL API
+
+*Enable Interrupt*
+----
+void HAL_NVIC_EnableIRQ(IRQn_Type IRQn);
+----
+
+*Disable Interrupt*
+----
+void HAL_NVIC_DisableIRQ(IRQn_Type IRQn);
+----
+
+*Set priority*
+----
+void HAL_NVIC_SetPriority(IRQn_Type IRQn, uint32_t PreemptPriority,
+     				    uint32_t SubPriority);
+----
+
+== Projects
+
+=== Demo 1 : Blink LED
+
+Blink the on-board LED connected to STM32F746 Discovery board using HAL GPIO Toggle API.
+
+Hint: On-board LED connected to GPIO *PI1*
+
+=== Demo 2 : LED Control using push button
+
+Control on-board LED connected to STM32F746 Discovery board using push button.
+
+Hint: Push button connected to GPIO *PI11*
+
+=== Demo 3 : LED Control using External Interrupt
+
+Enable external interrupt on push button pin and control LED.
