@@ -1,0 +1,137 @@
+= Cube HAL - Timer & UART
+Zilogic Systems
+
+=== We will be discussing...
+
+* Timers
+** Introduction
+** Polling & Interrupt Mode
+* UART
+** Polling Mode
+** Interrupt Mode
+* Demo Project
+
+== Timer
+
+=== Introduction
+
+* Free running counter
+* Counting speed controlled by frequency
+* 16 bit or 32 bit timers
+* Timeout detected by counter overflow
+
+=== Types of Timers
+
+[frame="all",grid="all",options="header",cols="30,70"]
+|====
+| Type		    | Timers
+| Basic		    | TIM6, TIM7
+| Advanced    	    | TIM1, TIM8
+| General purpose   | TIM3, TIM4 (16 Bit)
+| General purpose   | TIM2, TIM5 (32 Bit)
+| Low power   	    | LPTIM1
+|====
+
+=== Basic Timers
+
+* 16 Bit auto-reload counter
+* Programmable prescalar
+* Can be used for time base generation or in DAC
+* Interrupt generation on the update event
+
+=== Low Power Timers
+
+* 16 bit timers useful for ultimate power consumption reduction
+* Can run in all modes except on standby mode
+* Ability to wakeup system from low power mode
+* Wide range of selectable clock sources
+
+=== General Purpose Timers
+
+* Contains 16 bit auto reload counter driven by programmable prescalar
+* Operation is completely independent and doesn't share any resources
+* Interrupt generation capability
+
+== Functional decription
+
+=== Time base generation
+
+Time base unit contains:
+
+* Counter Value
+* Prescaler Value
+* Auto-Reload Value
+
+=== Timer in Interrupt mode
+
+* Provide period and prescalar value based on required timeout
+* Enable timer using *HAL_TIM_Base_Start_IT()* API
+* Implement *HAL_TIM_PeriodElapsedCallback()* or IRQ Handler for timeout detection.
+
+=== Timer in polling mode
+
+* Provide period and prescalar value based on required timeout
+* Enable timer using *HAL_TIM_Base_Start()* API
+* Verify current counter value is equal or greater than the given value
+* *__HAL_TIM_GET_COUNTER()* can be used for checking counter value
+
+== UART
+
+=== Introduction
+
+* Universal Asynchronous Reciever/Transmitter
+* Full-duplex asynchronous communications
+* Programmable baud rate
+* Programmable data word length
+
+=== HAL UART Module
+
+* UART Init
+
+------
+HAL_StatusTypeDef HAL_UART_Init(UART_HandleTypeDef *huart)
+------
+
+* UART Deinit
+
+------
+HAL_StatusTypeDef HAL_UART_DeInit(UART_HandleTypeDef *huart)
+------
+
+=== HAL UART Module (contd...)
+
+* Transmission
+
+------
+HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, uint8_t *pData,
+		  				 uint16_t Size, uint32_t Timeout)
+------
+
+* Reception
+
+------
+HAL_StatusTypeDef HAL_UART_Receive(UART_HandleTypeDef *huart, uint8_t *pData,
+		  				 uint16_t Size, uint32_t Timeout)
+------
+
+== Projects
+
+=== Demo 1 - Timer in interrupt mode
+
+Create a timer circuit in interrupt mode which will trigger at every 5 second using
+TIM6 module
+
+=== Demo 2 - Timer in polling mode
+
+Create a timer circuit in polling mode which will trigger at every 5 second using
+TIM6 module
+
+=== Demo 3 - UART Loopback
+
+*USART6 Tx* pin connected to *PC6* on Microcontroller
+
+*USART6 Rx* pin connected to *PC7* on Microcontroller
+
+*USART6 Tx* connected to *D1* on board pin header
+
+*USART6 Rx* connected to *D0* on board pin header
