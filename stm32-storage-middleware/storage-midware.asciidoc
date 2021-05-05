@@ -1,0 +1,155 @@
+= Storage Middlewares
+Zilogic Systems
+
+=== We will be discussing...
+
+* SD Card
+* SD Card protocol
+* FATFs Overview
+* FATFs architecture
+* FATFs API
+* Project
+
+== SD Card
+
+=== SD Operation modes
+
+* Secure Digital Input Output
+* 1 Bit mode operation:
+** One data transfer line
+** Additional lines for command and clock
+* 4 Bit mode operation:
+** Four data transfer lines
+** Additional lines for clock and command
+
+=== Connection with the host
+
+image::figures/sdio.png[align="center",width="40%"]
+
+=== SDMMC
+
+* Secure Digital/ MultiMediaCard interface
+* Interface betweenSD/SDIO/MMC cards and the AHB bus
+* Max 24MBps speed capability
+
+=== SDMMC Controller
+
+* SD/MMC bus master that provides all SD/SDIO and MMC functions needed to interface with cards.
+* Consist of SDMMC Adapter and an APB interface
+* The SDMMC adapter provides functions such as clock generation, command and data transfer
+* APB interface manages the control and status registers, FIFO buffers as well as DMA.
+
+=== SDMMC Controllers (contd...)
+
+image::figures/sdmmc-apb.png[align="center",width="30%"]
+source: STMicroelectronics
+
+== FAT Filesystem
+
+=== Introduction
+
+* FAT : File Allocation Table
+* It is a way of organising files in a storage device
+* Used to facilitate access to files and directories
+* Ideal for removable Flash media
+
+=== FatFs
+
+* FatFs is a generic FAT/exFAT filesystem module for small embedded systems
+* The FatFs module is written in compliance with ANSI C
+* FatFs is completely separated from the disk I/O layer (platform independent)
+
+=== FatFs (contd...)
+
+image::figures/fatfs_app_flow.png[align="center",width="20%"]
+
+=== FatFs API
+
+* File Access API
+
+[frame="all",grid="all",options="header",cols="30,70"]
+|====
+| API			| Details
+| *f_open()*	    | Open/Create file
+| *f_close()*	    | Close file
+| *f_read()*	    | Read data from file
+| *f_write()*	    | Write data to file
+| *f_lseek()* 	    | Move read/write pointer
+| *f_gets()* 	    | Read a string
+| *f_puts()* 	    | Write a string
+|====
+
+=== FatFs API (contd...)
+
+* Directory Access API
+
+[frame="all",grid="all",options="header",cols="30,70"]
+|====
+| API			| Details
+| *f_opendir()* 	| Open a directory
+| *f_closedir()* 	| Close an open directory
+| *f_readdir()* 	| Read a directory item
+| *f_findfirst()* 	| Open a directory and read the first item matched
+| *f_findnext()* 	| Read a next item matched
+|====
+
+=== FatFs API (contd...)
+
+* File and Directory Management API
+
+[frame="all",grid="all",options="header",cols="30,70"]
+|====
+| API			| Details
+| *f_stat()* 		| Check existance of a file or sub-directory
+| *f_unlink()* 		| Remove a file or sub-directory
+| *f_rename()* 		| Rename/Move a file or sub-directory
+| *f_chmod()* 		| Change attribute of a file or sub-directory
+| *f_mkdir()* 		| Create a sub-directory
+| *f_chdir()* 		| Change current directory
+|====
+
+=== FatFs API (contd...)
+
+* Volume Management and System Configuration API
+
+[frame="all",grid="all",options="header",cols="30,70"]
+|====
+| API			| Details
+| *f_mount()* 		| Register/Unregister the work area of the volume
+| *f_mkfs()* 		| Create an FAT volume on the logical drive
+| *f_fdisk()* 		| Create partitions on the physical drive
+| *f_getfree()* 	| Get free space on the volume
+| *f_getlabel()* 	| Get volume label
+| *f_setlabel()*	| Set volume label
+| *f_setcp()*		| Set active code page
+|====
+
+=== FatsFs MAI
+
+* Storage Device Controls API
+
+[frame="all",grid="all",options="header",cols="30,70"]
+|====
+| API			| Details
+| *disk_status()*	| Get device status
+| *disk_initialize()*	| Initialize device
+| *disk_read()*		| Read data
+| *disk_write()*	| Write data
+| *disk_ioctl()*	| Control device dependent functions
+|====
+
+=== FatsFs MAI (contd...)
+
+* Real Time Clock API
+
+[frame="all",grid="all",options="header",cols="30,70"]
+|====
+| API			| Details
+| *get_fattime()*	| Get current time
+|====
+
+== Project
+
+=== Demo Project
+
+Write to SD-Card using FatFs Middleware
