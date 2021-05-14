@@ -1,0 +1,432 @@
+= Functional Programming with Python
+Zilogic Systems <training@zilogic.com>
+
+== Prelude
+
+=== Overview
+
+  * Functional Programming
+  * `lambda`
+  * `map()`, `filter()`, `reduce()`
+  * Alternatives: List Comprehension
+
+== Functional Programming
+
+=== What is Functional Programming?
+
+  * As described by https://stackoverflow.com/a/13600858[Omnimike on
+    StackOverflow]
+
+    - Functional programming focuses on expressions
+    - Procedural programming focuses on statements
+
+  * Procedural programs work by performing a sequence of state
+    modifying operations, using statements.
+
+  * Functional programs work by performing transformations on the
+    data, to obtain the result.
+
+  * Example: Multiply all even numbers in an array by 10, and add them
+    all, storing the result in variable `result`.
+
+=== Using Procedural Program
+
+[source,python]
+------
+numList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+result = 0
+
+for i in numList:
+  if i % 2 == 0:
+    result += i * 10
+------
+
+=== Using Functional Program
+
+[source,python]
+------
+numList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+result = reduce(lambda a, b: a + b,
+                map(lambda x: x * 10,
+                    filter(lambda n: n % 2 == 0,
+                           numList)))
+------
+
+=== Which is Better?
+
+  * They are two different ways of thinking about the same problem.
+
+  * In some scenarios, functional programs have an advantage, since
+    the lend well to parallelism.
+
+  * But procedural programs are more easier to reason about.
+
+  * Python provides both the approaches, but is essentially a
+    procedural programming language, with functional programming
+    features.
+
+=== Building Blocks of Functional Programming
+
+  * Ability to pass around functions.
+
+  * Ability to define functions in-line: `lambda`
+
+  * Built-in helpers to assist in functional programming: `map()`,
+    `reduce()`, `filter()`
+
+== Inline Functions with `lambda`
+
+=== Introduction
+
+  * The `def` keyword in Python can be used for creating functions.
+
+  * But these functions are created in their own statement.
+
+  * But what if we need to create a function, right when we are
+    invoking another function.
+
+  * `lambda` keyword can do that for you.
++
+------
+lambda <params>: <expression>
+------
+
+=== Example
+
+  * Define a lambda and store in a variable, and invoke it.
++
+[source,python]
+------
+add = lambda a, b: a + b
+add(1, 2)
+------
++
+  * This is equivalent to
++
+[source,python]
+------
+def add(a, b):
+    return a + b
+------
+
+=== Use-case
+
+  * Previous example was provided to show the equivalence between
+    functions and lambdas.
+
+  * A better use-case for lambda would be
++
+[source,python]
+------
+l = ["orange", "Watermelon", "apple", "fig"]
+sorted(l)
+
+
+l = ["orange", "Watermelon", "apple", "fig"]
+sorted(l, key=lambda x: x.upper())
+------
+
+=== Limitations
+
+  * Lambda's can only contain expressions to be evaluated and returned
+    to the caller.
+
+  * Statements are not allowed within lambdas.
+
+  * Lambda definitions like other expressions can span multiple lines
+    using brackets.
+
+== Functional Programming with Python
+
+=== Iterables vs Iterator
+
+  * iterable
+    - An object that can be provided to a `for` loop.
+    - An object that we can loop over or iterate over.
+    - An object that we can obtain an iterator from, using `iter()`
+    - strings, lists, dictionaries
+
+  * iterator
+    - An object that is pointing an element in a sequence
+    - We can obtain the current element and move the iterator to the
+      next element, using `next()`
+
+=== Iterables vs Iterator (Contd.)
+
+  * Iterables generally can be thought of having a collection of
+    elements, but not necessarily.
+
+  * Iterators are also iterables because they can also be looped
+    over. Invoking `iter()` on an iterator returns itself.
+
+image::figures/iter.png[width="20%",align="center"]
+
+=== `map()` - Transform each Element
+
+  * Applies a function to each element in an iterable.
+
+  * Returns an iterator.
++
+------
+map(func, iterable...)
+------
++
+  * Example
++
+[source,python]
+------
+l = ["orange", "watermelon", "apple", "fig"]
+map(lambda x: x.upper(), l)
+------
+
+=== `map()` - Transform each Element (Contd.)
+
+  * Example with more than one iterable
++
+[source,python]
+------
+i = [0, 1, 2, 3]
+l = ["orange", "watermelon", "apple", "fig"]
+map(lambda x, y: "{}. {}".format(x, y), i, l)
+------
++
+  * The `map()` will be performed for the length of the shortest
+    iterable.
+
+=== `filter()` - Select Elements
+
+  * Returns an iterator that will produce only elements that return
+    `True` when passed to the function.
++
+------
+filter(func, iterable)
+------
++
+  * Get all elements that have "g" in them.
++
+[source,python]
+------
+l = ["orange", "watermelon", "apple", "fig"]
+filter(lambda x: x.find("g") != -1, l)
+------
+
+=== `reduce()` - Reduce iterable to a Single Value
+
+  * reduce() has the following definition.
++
+[source,python]
+------
+def reduce(func, x, initial):
+    result = initial
+    for i in x:
+        result = func(result, i)
+    return result
+------
++
+  * The result of `reduce()` is a single value than iterable, as in
+    the previous cases.
+
+=== Visual Representation
+
+image::figures/reduce.png[width="30%",align="center"]
+
+=== Using `reduce()`
+
+  * `reduce()` is available from `functools` module
++
+[source,python]
+------
+l = [1, 2, 3]
+reduce(lambda a, b: a + b, l, 0)
+
+l = ["orange", "watermelon", "apple", "fig"]
+reduce(lambda a, b: a + b, l, "")
+
+# A more useful example
+reduce(lambda a, b: a + ", " + b, l, "")
+------
+
+=== Initial Argument
+
+  * The 3rd argument, initial is optional in `reduce()`.
+
+  * If the argument is not specified, reduce first operates over,
+    first and second element of the list.
++
+[source,python]
+------
+l = [1, 2, 3]
+reduce(lambda a, b: a + b, l)
+------
+
+== Alternatives: List Comprehension
+
+=== Creating a List
+
+  * Start with an empty list.
+
+  * Populate the list in a for loop.
++
+[source,python]
+-------
+squares = []
+for i in range(10):
+   squares.append(i * i)
+-------
+
+=== List Comprehension
+
+  * List can also be created using the following List Comprehension
+    syntax.
+
+  * The below two are functionally equivalent.
++
+[source,python]
+------
+l = [<expression> for <var> in <iterable>]
+
+l = []
+for <var> in <iterable>:
+    l.append(<expression>)
+------
++
+  * Example:
++
+[source,python]
+------
+squares = [i ** i for i in range(10)]
+------
+
+=== Map Equivalence
+
+  * In this form, list comprehension pretty much can do what `map()`
+    does.
++
+[source,python]
+------
+l = ["orange", "watermelon", "apple", "fig"]
+ul = map(lambda x: x.upper(), l)
+
+l = ["orange", "watermelon", "apple", "fig"]
+ul = [x.upper() for x in l]
+------
+
+=== Filtering
+
+  * List comprehensions can also skip elements using conditions.
++
+[source,python]
+------
+l = [<expression> for <var> in <iterable> if <cond>]
+
+l = []
+for <var> in <iterable>:
+    if <cond>:
+        l.append(<expression>)
+------
++
+  * In this form it can perform both mapping and filtering.
+
+=== Filter Equivalence
+
+  * The below example shows how list comprehension can be used in
+    place of `filter()`.
+
+[source,python]
+------
+l = ["orange", "watermelon", "apple", "fig"]
+lg = filter(lambda x: x.find("g") != -1, l)
+
+l = ["orange", "watermelon", "apple", "fig"]
+lg = [x for x in l if x.find("g") != -1]
+------
+
+=== Generator Comprehension
+
+  * What if the list we are going to create is large.
+
+  * And we do not want to populate the list all at once.
++
+[source,python]
+------
+gsquares = (i * i for i in range(10))
+next(gsquares)
+------
++
+  * The lazy evaluation, also allows us to provide a never ending
+    sequence of elements.
++
+[source,python]
+------
+from itertools import count
+gsquares = (i * i for i in count())
+next(gsquares)
+------
+
+=== Generators
+
+  * Generator expression results in generator objects.
+
+  * Generator objects are a type of iterators.
+
+image::figures/generator.png[width="30%",align="center"]
+
+=== Set and Dictionary Comprehension
+
+  * Set Comprehension
++
+[source,python]
+------
+quote = "Believe you can and you are halfway there."
+alpha = {i.lower() for i in quote if i.isalpha()}
+
+# Syntactic sugar for:
+alpha = set(i.lower() for i in quote if i.isalpha())
+------
+
+  * Dictionary Comprehension
++
+[source,python]
+------
+squares = {i: i * i for i in range(10)}
+
+# Syntactic sugar for:
+squares = dict((i, i * i) for i in range(10))
+------
+
+== Closing Notes
+
+=== Key Takeaways
+
+  * Python has functional programming constructs, that aids in
+    representing logic, that naturally lends to functional
+    programming.
+
+  * These are achieved through `lambda`, `filter()`, `map()`,
+    `reduce()`.
+
+  * Beyond that Python itself does not parallelize execution, to speed
+    up the code.
+
+  * List and generator comprehensions are more Pythonic ways of
+    achieving the same.
+
+=== Further Reading and References
+
+  * https://en.wikipedia.org/wiki/Functional_programming[Functional
+    Programming] on Wikipedia
+
+  * https://zetcode.com/python/lambda/Python lambda functions] on
+    ZetCode
+
+  * https://realpython.com/python-functional-programming/[Functional
+    Programming in Python: When and How to Use It]
+
+  * https://realpython.com/list-comprehension-python/[When to Use a
+    List Comprehension in Python]
+
+  * https://stackoverflow.com/q/2776829[Difference between Python's
+    Generators and Iterators]
+
