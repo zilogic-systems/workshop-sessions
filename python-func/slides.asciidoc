@@ -418,7 +418,7 @@ squares = dict((i, i * i) for i in range(10))
   * https://en.wikipedia.org/wiki/Functional_programming[Functional
     Programming] on Wikipedia
 
-  * https://zetcode.com/python/lambda/Python lambda functions] on
+  * https://zetcode.com/python/lambda/[Python lambda functions] on
     ZetCode
 
   * https://realpython.com/python-functional-programming/[Functional
