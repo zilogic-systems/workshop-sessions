@@ -132,7 +132,7 @@ errors.
 
 ------
 #include <string.h>
-#incldue <stdlib.h>
+#include <stdlib.h>
 
 int main()
 {
@@ -206,7 +206,7 @@ tar -x -f ~/yp/dl/bash-4.3.tar.gz
 
 === Try Out
 
-  * Configure bash with history disabled 
+  * Configure bash with history disabled
 +
 ------
 ./configure --enable-history=no
