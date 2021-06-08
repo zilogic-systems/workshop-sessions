@@ -60,7 +60,7 @@ image::figures/kernel-boot.png[align="center"]
 
 [role="right"]
   * Bootloader -- loads Operating System kernel from disk to memory,
-    and transfers control it
+    and transfers control to it
 
   * Qemu has a built-in bootloader
 
@@ -199,7 +199,7 @@ include::cmd/create-hello-rootfs.sh[]
 
   * `-d` specifies the directory containing the rootfs
 
-=== Boot the Kernel with Hello 
+=== Boot the Kernel with Hello
 
   * Boot the kernel with new disk image.
   * Kernel after boot up checks for `/sbin/init`.
@@ -360,7 +360,7 @@ Oops! What did we miss?
 
 === Determine the Dependencies
 
-  * Determine the dependencies a copy them to the root filesystem
+  * Determine the dependencies and copy them to the root filesystem
 +
 [source,shell]
 ------

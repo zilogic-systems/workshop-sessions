@@ -263,7 +263,7 @@ cd ~/yp/manual/less-458
             --host=arm-linux-gnueabi \
             --build=i686-pc-linux-gnu     \
             LDFLAGS="-L $ROOTFS/usr/lib"  \
-            CPPFLAGS="-I $ROOTFS/usr/inxclude"
+            CPPFLAGS="-I $ROOTFS/usr/include"
 make
 make install DESTDIR=$ROOTFS
 ### END: build-less.sh
