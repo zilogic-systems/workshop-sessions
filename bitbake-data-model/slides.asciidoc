@@ -29,7 +29,7 @@ a hash map
 
   * Variable defintions and function definitions have different syntax
 
-  * But internally they stored in the same way
+  * But internally they are stored in the same way
 
   * The hash map is called the *Data Store*
 
@@ -264,7 +264,7 @@ a_append = b
 On Assignment:
 
 ------
-Add b to a[_append_list] 
+Add b to a[_append_list]
 ------
 
 On Finalize:
@@ -330,4 +330,3 @@ On Assignment:
 ------
 a = "Hello BitBake"
 ------
-
