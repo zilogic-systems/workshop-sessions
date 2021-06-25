@@ -48,7 +48,7 @@ include::code/Makefile.bash[]
 
   * Make, tracks *only* the timestamps
 
-  * Also changes to build variables are not tracked. 
+  * Also changes to build variables are not tracked.
 
 === BitBake
 
@@ -252,7 +252,7 @@ var[flag] = "value"
     recipes specified in `DEPENDS` should be executed first
 
 [role="two-column"]
-=== Interal Storage
+=== Internal Storage
 
 [role="left"]
 image::figures/varflags.png[align="center",width="75%"]
