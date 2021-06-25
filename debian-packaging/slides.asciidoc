@@ -141,7 +141,7 @@ image::figures/repo-structure.png[align="center"]
 
 === Repo Commands
 
-Command are available for the following operations
+Commands are available for the following operations
 
   * Adding a repostiory
 
@@ -169,7 +169,7 @@ $ sudo add-apt-repository  "deb file://$PWD wheezy main"
 
 === Using the Repo
 
-  * Fetch packages list and meta information 
+  * Fetch packages list and meta information
   * Used later on for locating package dependencies
   * Also used for searching packages matching a keyword
 +
@@ -187,7 +187,7 @@ $ sudo apt-get install mypkg1
 === Creating Repositories
 
   * Custom repositories can be created from a set of packages
-  * `mypkgs` contains the packages 
+  * `mypkgs` contains the packages
 +
 ------
 $ cd ~/yp/repos/
