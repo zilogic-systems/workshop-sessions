@@ -1,0 +1,175 @@
+{
+  "Application": {
+    "Screens": [
+      {
+        "Components": [
+          {
+            "Type": "Box",
+            "Color": {
+              "Red": 227,
+              "Green": 11,
+              "Blue": 11
+            },
+            "Alpha": 255,
+            "Name": "box1",
+            "X": 0,
+            "Y": 0,
+            "Width": 480,
+            "Height": 272,
+            "Visible": true,
+            "LockPosition": false,
+            "Draggable": false,
+            "Clickable": false,
+            "Fadeable": false,
+            "Moveable": false
+          },
+          {
+            "Type": "Button",
+            "Pressed": "__designer\\Blue_Buttons_Round_Edge_small_pressed.png",
+            "Released": "__designer\\Blue_Buttons_Round_Edge_small.png",
+            "Alpha": 255,
+            "Style": "Style4",
+            "Name": "button1",
+            "X": 310,
+            "Y": 212,
+            "Width": 170,
+            "Height": 60,
+            "Visible": true,
+            "LockPosition": false,
+            "Draggable": false,
+            "Clickable": false,
+            "Fadeable": false,
+            "Moveable": false
+          }
+        ],
+        "Interactions": [
+          {
+            "InteractionName": "Interaction1",
+            "HasCompletedTrigger": false,
+            "Trigger": {
+              "Type": "TriggerClicked",
+              "TriggerComponent": "button1"
+            },
+            "Action": {
+              "Type": "ActionGotoScreen",
+              "ScreenTransitionType": "ScreenTransitionSlide",
+              "ScreenTransitionDirection": "East",
+              "ActionComponent": "Screen2"
+            }
+          }
+        ],
+        "Name": "screen1",
+        "OverrideDefaultBufferSize": false,
+        "CanvasBufferSize": 0
+      },
+      {
+        "Components": [
+          {
+            "Type": "Box",
+            "Color": {
+              "Red": 33,
+              "Green": 245,
+              "Blue": 18
+            },
+            "Alpha": 255,
+            "Name": "box1",
+            "X": 0,
+            "Y": 0,
+            "Width": 480,
+            "Height": 272,
+            "Visible": true,
+            "LockPosition": false,
+            "Draggable": false,
+            "Clickable": false,
+            "Fadeable": false,
+            "Moveable": false
+          },
+          {
+            "Type": "Button",
+            "Pressed": "__designer\\Blue_Buttons_Round_Edge_small_pressed.png",
+            "Released": "__designer\\Blue_Buttons_Round_Edge_small.png",
+            "Alpha": 255,
+            "Style": "Style4",
+            "Name": "button1",
+            "X": 0,
+            "Y": 212,
+            "Width": 170,
+            "Height": 60,
+            "Visible": true,
+            "LockPosition": false,
+            "Draggable": false,
+            "Clickable": false,
+            "Fadeable": false,
+            "Moveable": false
+          }
+        ],
+        "Interactions": [
+          {
+            "InteractionName": "Interaction1",
+            "HasCompletedTrigger": false,
+            "Trigger": {
+              "Type": "TriggerClicked",
+              "TriggerComponent": "button1"
+            },
+            "Action": {
+              "Type": "ActionGotoScreen",
+              "ScreenTransitionType": "ScreenTransitionSlide",
+              "ScreenTransitionDirection": "West",
+              "ActionComponent": "screen1"
+            }
+          }
+        ],
+        "Name": "Screen2",
+        "OverrideDefaultBufferSize": false,
+        "CanvasBufferSize": 0
+      }
+    ],
+    "CustomContainerDefinitions": [],
+    "Name": "touchgfx-demo",
+    "Resolution": {
+      "Width": 480,
+      "Height": 272
+    },
+    "SelectedColorDepth": 16,
+    "StartupScreenName": "screen1",
+    "SelectedStartupLanguage": "GB",
+    "Skin": "Blue",
+    "TouchGfxPath": "../Middlewares/ST/touchgfx",
+    "UIPath": ".",
+    "AvailableColorDepths": [
+      16
+    ],
+    "AvailableLCDs": {
+      "16": "LCD16bpp"
+    },
+    "AvailableSections": [
+      "ExtFlashSection",
+      "IntFlashSection"
+    ],
+    "AvailableResolutions": [
+      {
+        "Width": 480,
+        "Height": 272
+      }
+    ],
+    "PhysicalButtons": [],
+    "FrameworkFeatures": {
+      "LCD16bpp": {
+        "Id": "LCD16bpp",
+        "IsEnabled": true
+      }
+    },
+    "GenerateAssetsCommand": "make -f simulator/gcc/Makefile assets -j8",
+    "PostGenerateCommand": "touchgfx update_project --project-file=simulator/msvs/Application.vcxproj",
+    "PostGenerateTargetCommand": "touchgfx update_project --project-file=../touchgfx-demo.ioc --platform=m7",
+    "CompileSimulatorCommand": "make -f simulator/gcc/Makefile -j8",
+    "RunSimulatorCommand": "build\\bin\\simulator.exe",
+    "LandscapeSkinX": 0,
+    "LandscapeSkinY": 0,
+    "PortraitSkinX": 0,
+    "PortraitSkinY": 0,
+    "DisplayOrientation": "Landscape",
+    "Family": "STM32F7"
+  },
+  "Version": "4.16.1"
+}

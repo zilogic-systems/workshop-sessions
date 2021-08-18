@@ -79,4 +79,4 @@ image::figures/class_hierarchy.png[align="center",width="50%"]
 
 === Simple display button with UART Feedback
 
-Create a simple 480 x 272 size display (which will be compatible for STM32F746 Display) with a button which will give UART response if pressed.
+Create a simple 480 x 272 size display (which will be compatible for STM32F746 Display) with interactive button screen transition.
