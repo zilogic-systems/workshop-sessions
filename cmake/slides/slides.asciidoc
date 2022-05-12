@@ -1,0 +1,39 @@
+= CMake
+Zilogic Systems
+:data-uri:
+
+== CMake
+
+=== Introduction
+
+ * `CMake` is a Build management tool.
+ * `CMake` generates a build system for a project.
+ * Not an alternative to `make`.
+ * Rather `CMake` auto-generates `Makefiles` and does more than `make`.
+
+
+=== Why `CMake`?
+
+ * Required for Projects that needs to be supported in multiple platforms.
+ * `make` build is specific to Unix/Linux.
+ * Windows/Mac uses differnt build tools like Xcode, Eclipse, Visual Studio, etc
+ * Detects compile-time and run-time dependencies for the project
+
+=== `CMake`
+
+ * `CMakeLists.txt` is given as input to `cmake` tool.
+ * `cmake` parses the file that helps it
+    . Analyze the source files and their relationships
+    . Understand the compile-time and run-time dependencies
+    . Generate the required Build system for the project
+
+=== `CMakeLists.txt` Syntax
+
+ * Consists of a list of commands
+ * Similar to function calls
+
+--------------
+message("Hello World")
+--------------
+
+== Examples
