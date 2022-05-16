@@ -9,4 +9,4 @@ add_subdirectory(mathlib)
 # add the executable
 add_executable(calc main.c)
 
-target_link_libraries(calc PUBLIC mathlib)
+target_link_libraries(calc mathlib)
