@@ -10,7 +10,9 @@ Zilogic Systems
  * `CMake` generates a build system for a project.
  * Not an alternative to `make`.
  * Rather `CMake` auto-generates `Makefiles` and does more than `make`.
-
+ * In 1999, developed as part of Insight Toolkit(ITK) funded by the
+   U.S National Library of Medicine.
+ * `C` stands for `Cross-platform` as it supports cross-platform build.
 
 === Why `CMake`?
 
@@ -18,6 +20,7 @@ Zilogic Systems
  * `make` build is specific to Unix/Linux.
  * Windows/Mac uses differnt build tools like Xcode, Eclipse, Visual Studio, etc
  * Detects compile-time and run-time dependencies for the project
+
 
 === `CMake`
 
@@ -33,7 +36,34 @@ Zilogic Systems
  * Similar to function calls
 
 --------------
+cmake_minimum_required(VERSION 3.10)
+
+# set the project name
+project(HelloWorld)
+
 message("Hello World")
 --------------
+
+=== Generating Project Build files
+
+ * Syntax:
+--------------
+$ cmake <path to directory containing CMakeLists.txt>
+--------------
+
+ * From the top directory of the project, execute:
+--------------
+$ cmake ./
+--------------
+
+=== Out-of-tree Builds
+
+ * For out-of-tree builds, execute `cmake` from a custom build folder:
+--------------
+$ cd build
+$ cmake ../
+--------------
+
+ * Out-of-tree builds helps us easily clean-up the project
 
 == Examples

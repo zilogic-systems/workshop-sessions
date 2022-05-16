@@ -1,4 +1,4 @@
-TOPDIR = ../../workshop-sessions
+TOPDIR = ../../../workshop-sessions
 
 EXPORT_WIDTH  = 1024
 

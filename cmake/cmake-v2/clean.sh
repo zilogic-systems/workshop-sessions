@@ -1,6 +1,6 @@
 #!/bin/sh
 
-rm -f app
+rm -f app calc 
 rm -f Makefile
 rm -f CMakeCache.txt
 rm -rf CMakeFiles
