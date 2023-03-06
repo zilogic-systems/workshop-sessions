@@ -6,6 +6,7 @@ code-base to learn the art of unit testing.
 
 from __future__ import print_function
 from collections import namedtuple
+from builtins import open as xopen
 from enum import Enum
 
 import json
@@ -145,8 +146,7 @@ class GameView:
     """Interacts with user getting inputs and displaying the world."""
     TILE_SIZE = 32
 
-    def __init__(self, game):
-        self._game = game
+    def __init__(self):
         self._screen = None
         self._images = {}
         self._done = False
@@ -192,8 +192,7 @@ class GameView:
         pygame.quit()
         self._done = True
 
-    def run(self):
-        """Runs the main event loop."""
+    def run_once(self, event_handler):
         key_map = {
             pygame.K_UP: Key.UP,
             pygame.K_LEFT: Key.LEFT,
@@ -202,16 +201,19 @@ class GameView:
             pygame.K_q: Key.QUIT,
             pygame.K_s: Key.SKIP,
         }
+        event = pygame.event.wait()
+        if event.type == pygame.QUIT:
+            event_handler.handle_key(Key.QUIT)
+        elif event.type == pygame.KEYDOWN:
+            try:
+                event_handler.handle_key(key_map[event.key])
+            except KeyError:
+                pass
 
+    def run(self, event_handler):
+        """Runs the main event loop."""
         while not self._done:
-            event = pygame.event.wait()
-            if event.type == pygame.QUIT:
-                self._game.handle_key(Key.QUIT)
-            elif event.type == pygame.KEYDOWN:
-                try:
-                    self._game.handle_key(key_map[event.key])
-                except KeyError:
-                    pass
+            self.run_once(event_handler)
 
 
 class Sokoban:
@@ -221,13 +223,13 @@ class Sokoban:
         self._levels = levels
         self._current = 0
         self._engine = GameEngine()
-        self._view = GameView(self)
+        self._view = GameView()
         self._view.load_images()
 
         self._world = World(self._levels[self._current])
         self._view.setup_world(self._world)
         self._view.show_world(self._world)
-        self._view.run()
+        self._view.run(self)
 
     def _goto_next(self):
         """Increments level and update world."""
@@ -264,11 +266,10 @@ class Sokoban:
         if self._engine.is_game_over(self._world):
             self._goto_next()
 
-
 def load_levels():
     """Returns levels loaded from a JSON file."""
     try:
-        return json.load(open("levels.json"))
+        return json.load(xopen("levels.json"))
     except (OSError, IOError, ValueError):
         print("sokoban: loading levels failed!", file=sys.stderr)
         exit(1)

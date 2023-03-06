@@ -145,14 +145,13 @@ class GameView:
     """Interacts with user getting inputs and displaying the world."""
     TILE_SIZE = 32
 
-    def __init__(self, game):
-        self._game = game
+    def __init__(self):
         self._window = tk.Tk()
         self._window.title("Sokoban!")
         self._canvas = tk.Canvas(self._window)
         self._canvas.pack()
-        self._window.bind("<KeyPress>", self._on_key_press)
         self._images = {}
+        self._event_handler = None
 
     def load_images(self):
         tile_names = (
@@ -188,7 +187,9 @@ class GameView:
     def quit(self):
         self._window.quit()
 
-    def run(self):
+    def run(self, event_handler):
+        self._event_handler = event_handler
+        self._window.bind("<KeyPress>", self._on_key_press)
         self._window.mainloop()
 
     def _on_key_press(self, event):
@@ -202,7 +203,7 @@ class GameView:
             "s": Key.SKIP,
         }
         try:
-            self._game.handle_key(key_map[event.keysym])
+            self._event_handler.handle_key(key_map[event.keysym])
         except KeyError:
             pass
 
@@ -214,13 +215,13 @@ class Sokoban:
         self._levels = levels
         self._current = 0
         self._engine = GameEngine()
-        self._view = GameView(self)
+        self._view = GameView()
         self._view.load_images()
 
         self._world = World(self._levels[self._current])
         self._view.setup_world(self._world)
         self._view.show_world(self._world)
-        self._view.run()
+        self._view.run(self)
 
     def _goto_next(self):
         """Increments level and update world."""

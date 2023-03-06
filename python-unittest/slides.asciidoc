@@ -193,15 +193,14 @@ image::figures/sokoban.png[align="center"]
 ------
 $ unzip game.zip
 $ cd game
-$ python -m sokoban.main
+$ python3 sokoban.py
 ------
 +
-  * Arrow keys to move, `S` to skip to next level, `BACKSPACE` to
-    undo, `R` to reset
+  * Arrow keys to move, `S` to skip to next level
 
 === Unit Testing Frameworks
 
-  * Unit testing frameworks provide then necessary infrastructure to
+  * Unit testing frameworks provide the necessary infrastructure to
 
     - Write test cases
     - Run the test cases
@@ -235,7 +234,7 @@ image::figures/sokoban-level-example.png[]
 
   * Go to the top level folder (the one that contains the `README` file)
 
-  * Create `test_model.py`, with the code from previous slide
+  * Create `test_sokoban.py`, with the code from previous slide
 
   * Execute and verify the output
 
@@ -248,17 +247,16 @@ include::code/test_model_v2.py[]
 
 === Try Out
 
-  * Update `test_model.py` with the code from the previous slide
+  * Update `test_sokoban.py` with the code from the previous slide
 
-  * Invoke `python -m unittest discover`
+  * Invoke `py.test`
     - Discovers all files starting with `test_`
-    - Looks for classes derived from `unittest.TestCase`
-    - Executes the tests in the class
+    - Looks for functions with `test_`
+    - Executes the test
     - Records and prints the results
 
-  * Change the assertion of `ncols` to `self.assertEqual(world.ncols,
-    8)` causing it to fail, and observe the output of `python -m
-    unittest discover`
+  * Change the assertion of `ncols` to `assert world.ncols == 8`
+    causing it to fail, and observe the output of `py.test`
 
 === One Logical Concept Per Test
 
@@ -298,7 +296,7 @@ include::code/test_model_v4/tests.py[]
 
 === Assert Raises Exception
 
-  * A `LevelInvalidError` is thrown
+  * A `ValueError` is thrown
     - When an invalid character is present
     - Or when the worker is missing
     - Or when the number of boxes and docks do not match
@@ -306,13 +304,13 @@ include::code/test_model_v4/tests.py[]
 
 === Assert Raises Exception (Contd.)
 
-  * `assertRaises` can be used to verify that an exception was raised
+  * `pytest.raises` can be used to verify that an exception was raised
 +
 ------
-assertRaises(exception, func, *args)
+pytest.raises(exception, func, *args)
 ------
 +
-  * Verify that `LevelInvalidError` is raised when an invalid
+  * Verify that `ValueError` is raised when an invalid
     character is present
 +
 [source,python]
@@ -322,15 +320,17 @@ include::code/test_model_v5/test1.py[]
 
 === Assert Raises with Regex Match
 
-  * `assertRaisesRegexp` in addition can verify that string
-    representation of raised exception matches a regex
+  * `ExceptionInfo` object is returned from `pytest.raises()`
+  * Contains information about the raised exception
+  * `ExceptionInfo.match` can verify that string representation of raised
+    exception matches a regex
 +
 ------
-assertRaisesRegexp(exception, regex, func, *args)
+ExceptionInfo.match(regex)
 ------
-+
-  * Test case modified to use `assertRaisesRegexp()`
-+
+
+=== Assert Raises with Regex Match (Contd.)
+
 [source,python]
 ------
 include::code/test_model_v5/test2.py[]
@@ -338,7 +338,7 @@ include::code/test_model_v5/test2.py[]
 
 === Assert Raises with Regex Match (Contd.)
 
-  * Verify that `LevelInvalidError` is raised when no worker is
+  * Verify that `ValueError` is raised when no worker is
     present
 +
 [source,python]
@@ -346,34 +346,43 @@ include::code/test_model_v5/test2.py[]
 include::code/test_model_v5/test3.py[]
 ------
 
-
 === Try Out
+
+  * Add test cases from the previous slides and verify that they work
+    as expected
+
+  * Ensure that you are importing `pytest`, for the above test cases
 
   * Try adding a test case to verify that an exception is raised, when
     there is mismatch in the no. of boxes and docks
+
+=== Test Case for Boxes != Docs
+
+[source,python]
+------
+def test_boxes_docks_not_equal():
+    level = [
+        "#########",
+        "#.$$ @  #",
+        "#########",
+    ]
+    excinfo = pytest.raises(ValueError, World, level)
+    assert excinfo.match("mismatch")
+------
 
 == Short Detour: Game Objects
 
 === Overview
 
-  * Model
-    - GameState
-    - World
-
-  * Controller
-    - GameEngine
-    - GameController
-
-  * View
-    - GameView
-    - PyGameGL
+  * Model: World
+  * Controller: GameEngine
+  * View: GameView
 
 === World Object
 
   * `get(pos)`
     - Query tile at the specified `(x, y)` position
-    - Returns one of `Tile.WALL`, `Tile.FLOOR`, `Tile.DOCK`,
-      `Tile.BOX`, `Tile.WORKER`, `Tile.BOX_DOCKED`
+    - Returns a `Tile`, with boolean attributes: `wall`, `worker`, `dock`, `box`
     
   * `move_worker(to_pos)`
     - Move worker to the specified position
@@ -381,58 +390,22 @@ include::code/test_model_v5/test3.py[]
   * `push_box(from_pos, to_pos)`
     - Move a box from one position to another
 
-[role="two-column"]
-=== GameState Object
-
-[role="left"]
-image::figures/game-state.png[align="center"]
-
-[role="right"]
-  * The current state in a level is represented by `GameState`
-
-  * `GameState` has two attributes
-    - `world`
-    - `history`
-
-  * `world` is a `World` object that represents the position of the
-    tiles
-
-  * `history` is a stack that stores previous `world` states
-
-[role="two-column"]
-=== GameState Object
-
-[role="left"]
-image::figures/game-state.png[align="center"]
-
-[role="right"]
-  * When user moves the worker, a 'copy' of `world` is stored in
-    `history` and `world` is modified
-
-  * The `history` stack is used for getting previous `World` objects,
-    for implementing undos and reset
-
 === GameEngine Object
 
-  * Implements user actions within a level like, move, undo and reset
+  * Rules engines, decides what is possible and what is not within a
+    world
 
-  * `move(dir, state)`
+  * `move(dir, world)`
 
     - Validates and moves the worker in the specified direction, by
       updating the `World` object
 
     - Validates and pushes the box, if present
 
-  * `undo(state)`
+  * `is_game_over(world)`
 
-    - Pops previous `World` state from history and sets as current
-      state
-
-  * `reset(state)`
-
-    - Pops all previous `World` states from history and goes to the
-      initial state
-
+    - Checks if the game is over
+    - All boxes are in docks
 
 == Mocking
 
@@ -459,7 +432,7 @@ image::figures/game-state.png[align="center"]
 +
 [source,python]
 ------
->>> from mock import Mock
+>>> from unittest.mock import Mock
 >>> m = Mock(a=1, b=2)
 >>> m.a
 1
@@ -574,22 +547,6 @@ ValueError: test error
 
   * Helper methods to assert calls were made on the Mock object
 
-  * `assert_called_once_with()`, checks if *only one call* was made
-    with given arguments
-+
-[source,python]
-------
->>> mfunc = Mock(return_value=None)
->>> mfunc(1, 2)
->>> mfunc.assert_called_once_with(1, 2)
->>> mfunc(2, 3)
->>> mfunc.assert_called_once_with(1, 2)
-...
-AssertionError
--------
-
-=== Asserting on Calls (Contd.)
-
   * `assert_called_with()`, checks if the *last call* was made with
     given arguments
 +
@@ -618,29 +575,6 @@ AssertionError
 >>> mfunc.assert_any_call(2, 3)
 ------
 
-=== Asserting on Calls (Contd.)
-
-  * `assert_has_calls()`, checks if a list of calls were made
-  * A call is specified using a `call()` object
-
-[source,python]
-------
->>> from mock import call
->>> mfunc = Mock(return_value=None)
->>> mfunc(1, 2)
->>> mfunc(2, 3)
->>> mfunc(4, 5)
->>> mfunc.assert_has_calls([call(1, 2), call(2, 3)])
->>> mfunc.assert_has_calls([call(2, 3), call(1, 2)])
-...
-AssertionError
->>> mfunc.assert_has_calls([call(2, 3), call(1, 2)], any_order=True)
-------
-
-=== Spec-ing
-
-FIXME
-
 [role="two-column"]
 === Testing GameEngine
 
@@ -648,12 +582,11 @@ FIXME
 image::figures/game-engine.png[align="center"]
 
 [role="right"]
-  * `GameEngine` manipulates the `GameState` object
+  * `GameEngine` manipulates the `World` object
 
-  * Testing the `GameEngine` requires that we isolate it from
-    `GameState`
+  * Testing the `GameEngine` requires that we isolate it from `World`
 
-  * `GameState` is simulated using a Mock object
+  * `World` is simulated using a Mock object
 
   * Assertions on the Mock object will be used to verify the
     functionality of the `GameEngine`
@@ -662,71 +595,154 @@ image::figures/game-engine.png[align="center"]
 === Review of Object Methods
 
 [role="left"]
+[source,python]
 ------
 class GameEngine:
     def move():
         ...
 	
-    def undo():
-        ...
-	
-    def reset():
+    def is_game_over():
         ...
 ------
 
 [role="right"]
+[source,python]
 ------
-.
-
 class World:
     def move_worker():
         ...
 
     def push_box():
         ...
-
-
 ------
 
-[role="two-column"]
-=== First Test Case
+=== Test Case for `is_game_over()`
 
-[role="left"]
-image::figures/game-engine-test-1.png[width="50%",align="center"]
+  * `is_game_over()` checks if each box is in a dock position
 
-[role="right"]
-  * *Arrange*
-    - Worker is in position `(1, 1)`
-    - Two tiles to the right are floors
+  * Create a `Mock()` for the world, with attributes `box_pos` and `dock_pos`
 
-  * *Act*, User moves worker to the right
-
-  * *Assert*, Worker should be moved to `(2, 1)`
+  * Invoke `is_game_over()` with the mocked world
 
 === Test Case Implementation
 
 [source,python]
 ------
-include::code/test_controller_v1/test.py[]
+include::code/test_controller_v1.py[]
 ------
 
-[role="two-column"]
 === Try Out
 
-[role="left"]
-image::figures/game-engine-test-2.png[width="50%",align="center"]
+  * Update the test cases with the code from the previous slide.
 
-[role="right"]
-  * Write a test case to verify that the worker cannot move into
-    a wall
+  * Execute the test cases and verify that the tests pass.
 
-  * *Arrange*
-    - Worker is in position `(1, 1)`
-    - Two tiles to the right are walls
+  * Add a test case to verify that `is_game_over()` returns `False`
 
-  * *Act*, User moves worker to the right
+    - When the boxes or not in the docks
 
-  * *Assert*, Worker should not be moved
+=== Simplified `move()`
+
+[source,python]
+------
+    def move(direction, world):
+        x, y = world.worker_pos[0]
+
+        if direction == Dir.UP:
+            next_pos = (x, y - 1)
+        elif direction == Dir.DN:
+            next_pos = (x, y + 1)
+        elif direction == Dir.RT:
+            next_pos = (x + 1, y)
+        else:  # if direction == Dir.LT:
+            next_pos = (x - 1, y)
+
+        next_tile = world.get(next_pos)
+        if next_tile.wall:
+            return
+
+        world.move_worker(next_pos)
+------
+
+=== Testing `move()`
+
+image::figures/move-floor.png[width="20%"]
+
+[source,python]
+-----
+mock_world = Mock()
+mock_world.worker_pos = [(3, 1)]
+mock_world.get.return_value = Tile(wall=False,
+                                   dock=False,
+				   worker=False,
+				   box=False)
+engine = GameEngine()
+engine.move(Dir.RT, mock_world)
+
+mock_world.move_worker.assert_called_with((4, 1))
+-----
+
+=== Testing `move()` into Wall
+
+image::figures/move-wall.png[width="20%"]
+
+[source,python]
+-----
+mock_world = Mock()
+mock_world.worker_pos = [(3, 1)]
+mock_world.get.return_value = Tile(wall=True,
+                                   dock=False,
+				   worker=False,
+				   box=False)
+engine = GameEngine()
+engine.move(Dir.RT, mock_world)
+
+assert mock_world.move_worker.called == False
+-----
+
+=== Real `move()` Implementation
+
+  * Simplified move, only moves the worker
+
+  * The real `move()` needs to move the boxes as well
+
+    - If we move, *into* a box
+    - The *box* needs to be moved
+
+image::figures/move-box.png[width="20%",align="center"]
+
+=== Real `move()` Implementation
+
+  * But only if the box can be moved
+  * Box cannot be pushed into a wall
+
+image::figures/move-box-wall.png[width="20%",align="center"]
+
+=== Real `move()` Implementation
+
+  * But only if the box can be moved
+  * Box cannot be pushed into another box
+
+image::figures/move-box-box.png[width="20%",align="center"]
+
+=== Testing `move()` Box
+
+image::figures/move-box.png[width="20%",align="center"]
+
+[source,python]
+-----
+mock_world = Mock()
+mock_world.worker_pos = [(2, 1)]
+mock_world.get.side_effect = [
+	Tile(wall=False, dock=False, worker=False, box=True),
+	Tile(wall=False, dock=False, worker=False, box=False)
+]
+engine = GameEngine()
+engine.move(Dir.RT, mock_world)
+
+mock_world.push_box.assert_called_with((3, 1), (4, 1))
+mock_world.move_worker.assert_called_with(3, 1)
+-----
 
 == Patching
 
@@ -734,19 +750,24 @@ image::figures/game-engine-test-2.png[width="50%",align="center"]
 
   * View layer of Sokoban is written in Pygame
 
-  * `PyGameGL` object is where all access to Pygame is done
+  * `GameView` object is where all access to Pygame is done
 
-  * `PyGameGL` has a method `resize()` to set the display size
+  * `GameView` initializes Pygame and sets the window caption
 +
 [source,python]
 ------
-include::code/view/resize.py[]
+    def __init__(self):
+        self._screen = None
+        self._images = {}
+        self._done = False
+        pygame.init()
+        pygame.display.set_caption("Sokoban!")
 ------
 
 === Testing the View (Contd.)
 
   * Unit testing best practices suggest that the `pygame` should be
-    isolated, while testing `resize()`
+    isolated, while testing `GameView()`
 
   * `pygame` is not passed into the function as argument
 
@@ -762,11 +783,11 @@ include::code/view/resize.py[]
 +
 [source,python]
 ------
->>> import sokoban.view
->>> sokoban.view.pygame
+>>> import sokoban
+>>> sokoban.pygame
 <module ...>
 >>> mpygame = Mock()
->>> sokoban.view.pygame = mpygame
+>>> sokoban.pygame = mpygame
 ------
 +
   * With this patch in place, all the accesses to `pygame`, within the
@@ -778,18 +799,19 @@ include::code/view/resize.py[]
 +
 [source,python]
 ------
->>> gl = sokoban.view.PyGameGL()
->>> gl.resize(20, 30)
->>> mpygame.display.set_mode.call_args_list
-[call((20, 30))]
+>>> view = sokoban.GameView()
+>>> mpygame.init.called
+True
+>>> mpygame.display.set_caption.call_args_list
+[call("Sokoban!")]
 ------
 +
-  * This proves that the `set_mode()` was infact called on the Mock
+  * This proves that the `set_caption()` was infact called on the Mock
     object we patched into `pygame`
 
 === Managing the Patch
 
-  * A patch should be reverted when longer required
+  * A patch should be reverted when no longer required
 
   * Forgetting to revert the patch will affect the functionality of
     the patched code
@@ -812,13 +834,13 @@ include::code/view/resize.py[]
 
 [source,python]
 ------
->>> patcher = patch("sokoban.view.pygame")
+>>> patcher = patch("sokoban.pygame")
 >>> mpygame = patcher.start()
->>> import sokoban.view
->>> sokoban.view.pygame
+>>> import sokoban
+>>> sokoban.pygame
 <MagicMock ...>
 >>> patcher.stop()
->>> sokoban.view.pygame
+>>> sokoban.pygame
 <module ...>
 ------
 
@@ -829,21 +851,7 @@ include::code/view/resize.py[]
 [source,python]
 ------
 >>> mpygame = Mock()
->>> patcher = patch("sokoban.view.pygame", mpygame)
-------
-
-=== Patch as Decorator
-
-  * `patch()` can be used as a decorator on a function
-  * The patched Mock object is passed as argument to the function
-  * Patch is applied when the test function is called
-  * Patch is reverted when the test function returns
-+
-[source,python]
-------
-@patch("sokoban.view.pygame")
-def test_func(self, mpygame):
-    ...
+>>> patcher = patch("sokoban.pygame", mpygame)
 ------
 
 === Test Case Implementation
@@ -854,179 +862,160 @@ include::code/test_view_v1.py[]
 -------
 
 [role="two-column"]
-=== Testing Read Key
-
-[role="left"]
-[source,python]
-------
-include::code/view/key-map.py[]
-------
-
-[role="right"]
-  * `PyGameGL` uses a keymap to convert from `pygame`'s enumeration to
-    an internal key representation
-
-  * Rest of the code base remains, independent of `pygame`, and can be
-    easily ported to a different graphics layer
-
-=== Testing Read Key (Contd.)
-
-`read_key()` reads the key and converts to the internal key
-representation.
+=== Testing Load Levels
 
 [source,python]
 ------
-include::code/view/read-key.py[]
+def load_levels():
+    """Returns levels loaded from a JSON file."""
+    try:
+        return json.load(xopen("levels.json"))
+    except (OSError, IOError, ValueError):
+        print("sokoban: loading levels failed!", file=sys.stderr)
+        exit(1)
 ------
 
-=== Test Case Implementation
-
-Verify that `read_key()`, returns `Key.UNDO`, when the user presses
-the Backspace key.
+=== Testing Load Levels (Contd.)
 
 [source,python]
 ------
-include::code/test_view_v2/read-key-undo.py[]
+include::code/test_load_levels_v1.py[]
 ------
 
 === Try Out
 
-Write a test case to check that `read_key()` returns `Key.QUIT` when
-the event of type `pygame.QUIT` occurs.
+  * Update the test cases with the code from the previous slide
 
-=== Patching with Context Managers
+  * Execute the test cases and verify that the tests pass
+
+  * Add a test case to verify that 'SystemExit' exception is raised
+    when, a invalid JSON is passed
+
+=== Try Out (Contd.)
 
 [source,python]
 ------
-include::code/test_view_v2/read-key-undo-with.py[]
+include::code/test_load_levels_v2/invalid-json.py[]
+------
+
+=== Injecting Exceptions
+
+[source,python]
+------
+include::code/test_load_levels_v2/os-error.py[]
 ------
 
 == Fixtures
 
 === What is Fixture?
 
-=== Sharing Setup Code
+  * Integration Tests
+    - setup before the test
+    - cleanup after the test
+  * Example
+    - Populate database with a dataset
+    - Set of files on the filesystem
+  * Fixtures: setup / environment required to execute tests
 
-=== Releasing Resources
+=== Test Frameworks and Fixtures
 
-=== Using `addCleanup()`
+  * Test frameworks allows
+    - create fixtures
+    - re-use fixtures
+    - teardown fixtures
 
-=== Factory Approach
+=== Fixtures and Unit Testing
 
-=== Handling Multiple Patches
+  * Unit testing with mocks do not require fixtures
 
-[source,python]
-------
-@patch("module1.func1")
-@patch("module1.class2")
-@patch("module2.func3")
-def test_some_feature(mfunc1, mclass2, mfunc3):
-    .. .
-    ...
-------
+  * But, fixtures can be used for dealing with patching
 
-=== Handling Multiple Patches (Contd.)
+  * Issues in previous test cases with patching
 
-[source,python]
-------
-def test_some_feature():
-    with patch("module1.func1") as mfunc1:
-        with patch("module1.class2") as mclass2:
-            with patch("module2.func3") as mfunc3:
-                ...
-                ...
-------
+    - If test case fails, patch will not be reverted
 
-=== Handling Multiple Patches (Contd.)
+  * Patching can be handled correctly with fixtures
+
+=== Creating Fixtures
 
 [source,python]
 ------
-class MyTestCase(TestCase):
-    def setUp(self):
-        self.mfunc1_patcher = patch("module1.func1")
-        self.mfunc1 = self.mfunc1_patcher.start()
-        self.mclass2_patcher = patch("module1.class2")
-	self.mclass2 = self.mclass2_patcher.start()
-        self.mfunc3_patcher = patch("module2.func3")
-        self.mfunc3 = self.mfunc3_patcher.start()
-
-    def test_some_feature(self):
-        ...
-
-    def tearDown(self):
-        self.mfunc1_patcher.stop()
-        self.mclass2_patcher.stop()
-        self.mfunc3_patcher.stop()
+include::code/test_load_levels_v3/fixture.py[]
 ------
 
-=== Handling Multiple Patches (Contd.)
+=== Using Fixtures
 
 [source,python]
 ------
-class MyTestCase(TestCase):
-    def setUp(self):
-        patcher = patch("module1.func1")
-	self.addCleanup(patcher.stop)
-	self.mfunc1 = patcher.start()
-
-        patcher = patch("module1.class2")
-	self.addCleanup(patcher.stop)
-	self.mclass2 = patcher.start()
-
-        patcher = patch("module2.func3")
-        self.addCleanup(patcher.stop)
-	self.mfunc3 = patcher.start()
-
-    def test_some_feature(self):
-        ...
-------
-
-=== Handling Multiple Patches (Contd.)
-
-[source,python]
-------
-class MyTestCase(TestCase):
-    def patch(self, *args, **kwargs):
-        patcher = patch(*args, **kwargs)
-        self.addCleanup(patcher.stop)
-        return patcher.start()
-
-    def test_some_feature(self):
-        mfunc1 = self.patch("module1.func1")
-	mclass2 = self.patch("module1.class2")
-        mfunc3 = self.patch("module2.func3")
-	...
-------
-
-=== Patch Mixin
-
-[source,python]
-------
-include::code/test_view_v3/patch-mixin.py[]
-------
-
-=== Test Case with Patch Mixin
-
-[source,python]
-------
-class MyTestCase(PatchMixin, TestCase):
-    def test_some_feature(self):
-        mfunc1 = self.patch("module1.func1")
-	mclass2 = self.patch("module1.class2")
-        mfunc3 = self.patch("module2.func3")
-	...
-
-------
-
-=== Test Case with Patch Mixin
-
-[source,python]
-------
-include::code/test_view_v3/read-key-undo.py[]
+include::code/test_load_levels_v3/test-cases.py[]
 ------
 
 == Managing Test Cases
 
+=== Test Reports
+
+  * Generate reports in html format
+
+  * Plugin `pytest-html`, can be installed using `pip`
++
+------
+$ py.test --html=report.html
+------
+
+=== Test Coverage
+
+  * Identify portions that have not been tested
+
+  * Coverage tools track execution and records lines that have beeen
+    executed
+
+  * Plugin `pytest-cov`
++
+------
+$ py.test --cov=sokoban --cov-report html
+------
+
+=== CI Integration
+
+  * Execute test cases whenever code repository is updated
+
+  * Test reports can be published from the CI
+
+  * Test reports can be generated in JUnit XML format
++
+------
+$ py.test --junit-xml=report.xml
+------
+
 == Resources
 
-== Questions
+=== Documentation
+
+  * pytest Documentation
+    - https://docs.pytest.org/en/latest/
+  * mock / patch Documentation
+    - https://docs.python.org/3/library/unittest.mock.html
+  * Coverage Documentaton
+    - http://coverage.readthedocs.io/en/latest/
+  * Pygame Documentation
+    - https://www.pygame.org/docs/
+
+=== About the Trainer
+
+==== Left
+
+  * Vijay Kumar B. https://www.linkedin.com/in/bravegnu/[LinkedIn]
+  * Open Source and Free Software Enthusiast
+  * Specialize in
+    - Python
+    - Embedded Systems
+    - Linux
+
+==== Right
+
+  * Volunteer
+    - Chennaipy
+    - PyCon India
+    - PySangamam
+
+

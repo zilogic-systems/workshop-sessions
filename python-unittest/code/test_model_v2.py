@@ -1,5 +1,4 @@
-from sokoban.model import World
-from unittest import TestCase
+from sokoban import World
 
 SIMPLE_LEVEL = [
     "#########",
@@ -7,9 +6,8 @@ SIMPLE_LEVEL = [
     "#########",
 ]
 
-class WorldTestCase(TestCase):
-    def test_rect_world_dimensions(self):
-        world = World(SIMPLE_LEVEL)
+def test_rect_world_dimensions():
+    world = World(SIMPLE_LEVEL)
 
-        self.assertEqual(world.nrows, 3)
-        self.assertEqual(world.ncols, 9)
+    assert world.nrows == 3
+    assert world.ncols == 9
