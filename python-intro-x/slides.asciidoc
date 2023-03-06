@@ -1,6 +1,195 @@
-= Python Introduction: Exercises
+= Python Introduction
 Zilogic Systems
 :data-uri:
+
+== Introduction
+
+=== Overview
+
+  * Programming Fundamentals
+  * Variables, Expressions and Statements
+  * Functions
+  * Conditionals
+  * Lists and Iteration
+
+== Programming Fundamentals
+
+=== Program
+
+  * Sequence of instructions to perform a task
+
+  * Exact instructions depend on the machine
+
+  * Instructions
+    - input
+    - output
+    - math
+    - conditional execution
+    - repetition
+
+=== Programming
+
+  * Breaking down a complex task into subtasks
+
+  * Subtasks are further broken down
+
+  * Until they can be implemented by a instruction
+
+=== Python
+
+  * Computers understand low level language -- machine language
+
+  * Python - high level language
+
+  * Advantages
+    - Easier to write and maintain programs
+    - Are not restricted to a single machine
+
+  * Examples of other high level languages?
+
+=== Compiler vs Interpreter
+
+  * Programs in high level language needs additional processing
+
+  * Python programs are executed by an interpreter
+
+image::figures/compiler-interpreter.png[width="50%",align="center"]
+
+=== Python 2 vs Python 3
+
+  * Minor differences between the two versions
+
+  * Workshop will cover Python 3
+
+  * Python interpreter can be started by invoking `python`
++
+------
+Python 3.4.2 (default, Oct  8 2014, 10:45:20) 
+[GCC 4.9.1] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>>
+------
+
+=== Python Interpreter
+
+  * When invoked, enters interactive mode
+
+  * Statements: instructions that Python can execute
+
+  * Prompt: interpreter is ready to accept instructions
++
+[source,python]
+-----
+>>> 1 + 1
+2
+-----
++
+  * Operators Examples:
+    - addition, multiplication, subtraction, division, exponentiation
+
+=== Values and Types
+
+  * Value: data that programs work with
+
+  * Examples: `2`, `"Hello"`
+
+  * Data is associated with a type when represented in the program
+
+  * Integer type: `2`, `5`, `10`
+
+  * String type: `"Hello"`, `"Hello World!"`
+
+  * Strings are enclosed in single or double quotes
+
+=== Determining type
+
+  * The `type()` built-in function, returns the type of the argument
+
+[source,python]
+------
+>>> type(2)
+<class 'int'>
+>>> type("2")
+<class 'str'>
+>>> type(2.0)
+<class 'float'>
+------
+
+=== Types: `int` vs `str`
+
+[source,python]
+------
+>>> 12 / 2
+6
+>>> "12" / "2"
+...
+TypeError: unsupported operand types for /: 'str' and 'str'
+>>> 12 + 2
+14
+>>> "12" + "2"
+'122'
+------
+
+=== Printing Hello World
+
+  * A function is a mini-program that is given a name. The program can
+    be invoked using the function name followed by `()`
++
+[source,python]
+------
+>>> copyright()
+------
++
+  * Arguments can be passed to the function, by specifying them
+    between parenthesis
+
+  * `print()` function prints the argument passed to it
++
+[source,python]
+-------
+>>> print('Hello, World!')
+Hello, World!
+-------
+
+
+=== Comments
+
+  * Big and complicated programs can get difficult to read
+
+  * Comments: notes added to program to explain the code in natural
+    language
+
+  * Comments start with a `#`
+
+  * All characters after the `#` are ignored
+
+=== Script Mode
+
+  * Interactive mode: statements are read from user and executed
+
+  * Script mode: statements are read from a script file
+
+  * Python scripts have a `.py` suffix
+
+  * Bits of code can be tested in interactive mode, before it's used
+    in a script
+
+=== Script vs Interactive Mode
+
+  * Interactive mode: Interpreter prints the value of expressions
++
+[source,python]
+------
+>>> 26.2 * 1.61
+42.182
+------
++
+  * Script mode: Interpreter does not print the value of expression
++
+[source,python]
+------
+print(26.2 * 1.61)
+------
 
 == Introduction to Karel
 
@@ -11,13 +200,14 @@ Zilogic Systems
 
   * An environment similar to Karel will be used to introduce Python
 
-[role="two-column"]
 === Karel, the Robot
 
-[role="left"]
+==== Left
+
 image::levels/level-start-2.png[]
 
-[role="right"]
+==== Right
+
   * Karel, simulates a robot, inside a 2D world
 
   * Karel can move around the world
@@ -26,28 +216,29 @@ image::levels/level-start-2.png[]
 
   * The world can have beepers, devices that emit short sound signals
 
-[role="two-column"]
+
 === Karel, the Robot
 
-[role="left"]
+==== Left
+
 image::levels/level-start-2.png[]
 
-[role="right"]
+==== Right
+
   * Karel has sensors to detect walls and beepers
 
   * Karel can take beepers and store them in his bag
 
   * Karel can also drop beepers from his bag
 
-[role="two-column"]
 === Making Karel Move
 
-[role="left"]
 ==== Before
+
 image::levels/level-start-0.png[]
 
-[role="right"]
 ==== After
+
 image::levels/level-end-0.png[]
 
 === Code
@@ -89,14 +280,11 @@ python myprog.py
 +
  * Invokes the Python interpreter with the program file as argument
 
-[role="two-column"]
 === Making Karel Turn
 
-[role="left"]
 ==== Before
 image::levels/level-start-1.png[]
 
-[role="right"]
 ==== After
 image::levels/level-end-1.png[]
 
@@ -106,14 +294,11 @@ image::levels/level-end-1.png[]
 
   * Modify the code as required and execute it
 
-[role="two-column"]
 === Picking Beepers
 
-[role="left"]
 ==== Before
 image::levels/level-start-2.png[]
 
-[role="right"]
 ==== After
 image::levels/level-end-2.png[]
 
@@ -143,14 +328,11 @@ for i in range(7):
 stop()
 ------
 
-[role="two-column"]
 === Turn Right
 
-[role="left"]
 ==== Before
 image::levels/level-start-4.png[]
 
-[role="right"]
 ==== After
 image::levels/level-end-4.png[]
 
@@ -184,6 +366,257 @@ for i in range(7):
     pick_beeper()    # indented to same level
 ------
 
+== Variables, Expressions and Statements
+
+=== Assignment Statements
+
+  * Assign values to variables
+
+  * Variable is a name that points to a value
+
+  * If variable does not exist, it is created
++
+[source,python]
+------
+>>> message = 'And now for something completely different'
+>>> n = 17
+------
+
+=== Containing vs Pointing
+
+  * Variables can thought of as, pointers in C / C++
+
+  * They do not contain the value, rather they point to it
++
+------
+>>> num = 25000
+>>> hello = num
+------
++
+  * There aren't two copies of `25000`.
+
+  * A single copy with two pointers to it
+
+=== Variable Names
+
+  * Can contain alphabets, digits and underscore
+
+  * Should start with alphabet or underscore
+
+  * Underscore is used to separate words in the variable name:
+    `source_file`, `server_hostname`
+
+  * Invalid variable names result in syntax error
+
+=== Invalid Variable Names
+
+[source,python]
+------
+>>> 76trombones = 'big parade'
+SyntaxError: invalid syntax
+>>> more@ = 1000000
+SyntaxError: invalid syntax
+>>> class = 'Advanced Theoretical Zymurgy'
+SyntaxError: invalid syntax
+------
+
+=== Keywords and Variable Names
+
+  * Keywords: names reserved by the interpreter
+
+  * Mean something special to the interpreter
+
+  * Examples: `class`, `if`, `else`, `return`, etc.
+
+  * Highlighted in the code editors, so need not be memorized!
+
+=== Expressions Statements
+
+  * Expressions are a combination of variables, values and operators
+
+  * Expressions by themselves can be statements: expression statement
+
+  * A value by itself is a valid expression
+
+  * A variable by itself is also a valid expression
++
+[source,python]
+-----
+>>> 42
+42
+>>> n
+17
+>>> n + 25
+42
+-----
++
+  * Result of expression statement is printed on the screen, by the
+    interpreter
+
+=== Order of Operations
+
+==== Left
+
+[source,python]
+------
+>>> 1 + 2 ** 3
+9
+>>> 2 * 3 - 1
+5
+>>> 6 + 4 / 2
+8
+>>> 10 / 2 * 3
+15
+>>> 2 ** 3 ** 2
+512
+------
+
+==== Right
+
+  * BODMAS
+    - Brackets
+    - pOwer
+    - Division, Multiplication
+    - Addition, Subraction
+
+  * Operator with same precedence, evaluated from left to right
+
+  * Power, evaluated from right to left
+
+=== String Operations
+
+  * `+` operation between two strings: string concatentation
+
+  * `*` operation between a string and integer: repetition
++
+[source,python]
+------
+>>> first = 'throat'
+>>> second = 'warbler'
+>>> first + second
+'throatwarbler'
+>>> "Spam" * 3
+'SpamSpamSpam'
+------
+
+=== String Operations (Contd.)
+
+  * Representing repetition with `*` is a natural extension of
+    addition
+
+  * `4 * 3` => `4 + 4 + 4`
+
+  * `"Spam" * 3` => `"Spam" + "Spam" + "Spam"`
+
+=== Try Out
+
+  * Write an expression to compute the factorial of 6
+
+  * The interpreter automatically creates the variable `_` and assigns
+    it the value of the last expression statement, in interactive mode
+
+  * Use this facility to compute the factorial of 6
+
+  * What happens when you try to compute 2 ** 200?
+
+=== Try Out
+
+  * How is it that Python is able to evaluate 2 ** 200?
+
+  * What is the largest number Python can represent?
+
+== Conditionals
+
+=== Floor Division and Modulus
+
+  * `/` operator, divides two integers, returns a fractional number
+  
+  * `//` operator, divides two integers and truncates the result to an
+    integer, same as `/` is C
+
+  * `%` operator, returns the remainder of the division
++
+[source,python]
+-------
+>>> minutes = 105
+>>> minutes / 60
+1.75
+>>> minutes // 60
+1
+>>> minutes % 60
+45
+-------
+
+=== Relational Operators
+
+  * Same as relation operators in C
+
+  * Returns a boolean constant, `True` or `False`
++
+[source,python]
+-------
+>>> 5 == 5
+True
+>>> 5 == 6
+False
+>>> type(True)
+<class 'bool'>
+-------
+
+=== Logical Operator
+
+  * Logical operators: `and`, `or`, `not`
+  * Same as `&&`, `||`, `!` in C
++
+[source,python]
+------
+>>> num = 5
+>>> num > 0 and num < 10
+True
+------
+
+=== Conditional Execution
+
+[source,python]
+------
+if x > 0:
+    print('x is positive')
+------
+
+  * If statement, condition evaluates to `True`, body is executed
+
+  * Body is indented by one level, just like function definitions
+
+=== Conditional Execution (Contd.)
+
+[source,python]
+------
+if x % 2 == 0:
+    print("x is even")
+else:
+    print("x is odd")
+------
+
+  * `else` can be used to specify code to be executed, when condition
+    is `False`
+
+=== Chained Conditionals
+
+[source,python]
+------
+if x < y:
+    print("x is less than y")
+elif x > y:
+    print("x is greather than y")
+else:
+    print("x is equal to y")
+------
+
+  * If there are separate actions to be taken on multiple conditions
+    `if ... elif` ladder can be used
+
+  * There is no statement similar to switch to Python
+
 === Finding Beepers
 
 ==== Before
@@ -201,10 +634,8 @@ image::levels/level-end-6.png[]
   * Karel has sensors to identify if the current location has a beeper
 
   * `beeper()`
-    - returns `1` if beeper is present
-    - returns `0` if beeper is not present
-
-  * `if` statement can be used to execute code conditionally
+    - returns `True` if beeper is present
+    - returns `False` if beeper is not present
 
 === Algorithm
 
@@ -236,26 +667,231 @@ image::levels/level-end-7.png[]
   * Karel has a sensor to detect a wall
 
   * `front_is_clear()`
-    - returns `1` if there is no wall in the front
-    - returns `0` otherwise
+    - returns `True` if there is no wall in the front
+    - returns `False` otherwise
 
   * `left_is_clear()`, `right_is_clear()`
 
   * `break` statement can be used to break out of a loop
 
+=== Keyboard Input
+
+  * `input()`, gets a line of input from the user
+
+  * Accepts an optional prompt as argument
++
+[source,python]
+------
+>>> name = input("Your Name? ")
+Your Name? Guido Van Rossum
+>>> name
+'Guido Van Rossum'
+------
+
+=== Input a Number
+
+  * Use `int()` to convert a string to an integer
++
+[source,python]
+-------
+>>> num = input("Enter a number:")
+>>> num = int(num)
+-------
+
+=== More Iteration
+
+  * Python has `while` loop similar to C
++
+[source,python]
+------
+sum = 0
+while True:
+   num = int(input("Enter your input:"))
+   if num == 0:
+      break
+   sum = sum + num
+print(sum)
+------
+
 === Try Out: `while` Loop
 
-  * Repeat previous exercise using `while` statement
+  * Repeat previous "Stop Before Wall" exercise using `while`
+    statement
 
-[role="two-column"]
+=== Measure Distance
+
+Count the steps to the wall, and put beepers equal to the no. of
+steps.
+
+image:levels/level-start-10.png[] image:levels/level-end-10.png[]
+
+=== Try Out: Code
+
+[source,python]
+------
+start()
+
+count = 0
+while front_is_clear():
+    move()
+    count = count + 1
+
+for i in range(count):
+    put_beeper()
+
+turn_left()
+move()
+------
+
+=== Measure Wall Length
+
+Count the steps take to cross the wall, and put beepers equal to the
+no. of steps.
+
+image:levels/level-start-11.png[] image:levels/level-end-11.png[]
+
+=== Try Out: Algorithm
+
+  * count = 0
+  * while not right_is_clear()
+    - move
+    - count = count + 1
+  * repeat count times
+    - put beeper
+  * move
+
+=== With Conditional Expressions
+
+Pick only three beepers.
+
+image::levels/level-start-12.png[]
+image::levels/level-end-12.png[]
+
+=== Try Out: Algorithm
+
+  * count = 0
+  * repeat 7 times:
+    - move
+    - if beeper present and count < 3
+      ** pick beeper
+      ** count = count + 1
+
+== Functions
+
+=== Introduction
+
+  * Sequence of statements that perform a computation
+
+  * Name is assigned to the sequence of statements
+
+  * Function can be invoked by its name
+
+  * The statements are executed and a value / result is returned
+
+=== Defining a Function
+
+[source,python]
+------
+def print_message():
+    print("Hello World")
+    print("Goodbye World")
+------
+
+  * `def` keyword specifies the start of a function definition
+
+  * `print_message` specifies the name of the function
+
+=== Defining a Function (Contd.)
+
+[source,python]
+------
+def print_message():
+    print("Hello World")
+    print("Goodbye World")
+------
+
+  * Function definition has a header and a body
+
+  * Header is the first line, ends with a colon
+
+  * Body is indented, 4 spaces by convention
+
+=== Returning from a Function
+
+  * Function returns back to the caller when all statements are
+    executed
+
+  * Functions returns the value `None` by default
+
+  * `None` is similar to `NULL` in C or `null` in Java
+
+  * It is of a separate type, that does not support (almost) any
+    operation
+
+=== Defining Functions in Interactive Mode
+
+  * In interactive mode, after the header, the interpreter prints a
+    secondary prompt `...`
+
+  * The body can be typed in the secondary prompt
+
+  * An empty line terminates the body
++
+[source,python]
+------
+>>> def print_message():
+...    print("Hello World")
+...    print("Goodbye World")
+...
+------
+
+=== Function Parameters and Arguments
+
+[source,python]
+------
+def print_twice(msg):
+    print(msg)
+    print(msg)
+------
+
+  * `msg` is a function parameter
+
+  * When function is invoked it has to be passed one argument
+
+  * Arguments are assigned to the parameter variables
++
+[source,python]
+------
+>>> print_twice("Hello World!")
+Hello World!
+Hello World!
+------
+
+=== Local Variables
+
+  * Variables created within a function are local
+
+  * Parameters are also local variables
+
+=== Returning Values
+
+  * `return` statement can be used to return a value
++
+[source,python]
+------
+def find_rectangle_area(length, width):
+    area = length * width
+    return area
+------
+
 === Climb Up
 
-[role="left"]
 ==== Before
+
 image::levels/level-start-8.png[]
 
-[role="right"]
 ==== After
+
 image::levels/level-end-8.png[]
 
 === Demo
@@ -302,15 +938,14 @@ while find_gap():
 stop()
 ------
 
-[role="two-column"]
 === Climb Down
 
-[role="left"]
 ==== Before
+
 image::levels/level-start-9.png[]
 
-[role="right"]
 ==== After
+
 image::levels/level-end-9.png[]
 
 === Try Out
@@ -323,93 +958,13 @@ image::levels/level-end-9.png[]
 
   * Replace `left_is_clear()` with `right_is_clear()`
 
-[role="two-column"]
-=== Measure Distance
-
-Count the steps to the wall, and put beepers equal to the no. of
-steps.
-
-[role="left"]
-==== Before
-image::levels/level-start-10.png[]
-
-[role="right"]
-==== After
-image::levels/level-end-10.png[]
-
-=== Try Out: Code
-
-[source,python]
-------
-start()
-
-count = 0
-while front_is_clear():
-    move()
-    count = count + 1
-
-for i in range(count):
-    put_beeper()
-
-turn_left()
-move()
-------
-
-[role="two-column"]
-=== Measure Wall Length
-
-Count the steps take to cross the wall, and put beepers equal to the
-no. of steps.
-
-[role="left"]
-==== Before
-image::levels/level-start-11.png[]
-
-[role="right"]
-==== After
-image::levels/level-end-11.png[]
-
-=== Try Out: Algorithm
-
-  * count = 0
-  * while not right_is_clear()
-    - move
-    - count = count + 1
-  * repeat count times
-    - put beeper
-  * move
-
-[role="two-column"]
-=== Conditional Expressions
-
-Pick only three beepers.
-
-[role="left"]
-==== Before
-image::levels/level-start-12.png[]
-
-[role="right"]
-==== After
-image::levels/level-end-12.png[]
-
-=== Try Out: Algorithm
-
-  * count = 0
-  * repeat 7 times:
-    - move
-    - if beeper present and count < 3
-      ** pick beeper
-      ** count = count + 1
-
-[role="two-column"]
 === Drop Fibo
 
-[role="left"]
-==== Before
+Move till the end of the world, in each step drop beepers
+corresponding to the fibonacci number in the sequence.
+
 image::levels/level-start-13.png[]
 
-[role="right"]
-==== After
 image::levels/level-end-13.png[]
 
 === Try Out
@@ -420,15 +975,78 @@ image::levels/level-end-13.png[]
   * In each step, drop the beepers corresponding to the Fibonnaci
     number
 
-[role="two-column"]
+== Lists and Iteration
+
+=== Lists
+
+  * List is the equivalent of arrays in C
++
+[source,python]
+------
+>>> fibo = [1, 1, 2, 3, 5, 8, 12]
+>>> fibo[0]
+1
+>>> fibo[6]
+8
+>>> fibo[7] = 13
+>>> fibo
+[1, 1, 2, 3, 5, 8, 13]
+------
+
+=== Traversing a List
+
+[source,python]
+------
+>>> for n in fibo:
+...    print(n)
+...
+------
+
+  * Loop body is executed once for element in the list `fibo`
+
+  * `n` points to the current element, in the list
+
+=== Revisit: `for` with `range()` 
+
+[source,python]
+------
+>>> for i in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]:
+...    print(i)
+...
+>>> for i in range(10):
+...    print(i)
+...
+------
+
+  * Lists can be generated using `range()` function
+
+  * This can be use for emulating C-style `for` loops
+
+=== List Operations
+
+[source,python]
+------
+>>> a = [1, 2, 3]
+>>> b = [4, 5, 6]
+>>> a + b
+[1, 2, 3, 4, 5, 6]
+------
+
+[source,python]
+------
+>>> [0] * 4
+[0, 0, 0, 0]
+>>> [1, 2, 3] * 3
+[1, 2, 3, 1, 2, 3, 1, 2, 3]
+------
+
 === Drop Random
 
-[role="left"]
-==== Before
+Move till the end of the world, in each step drop beepers
+corresponding to the random sequence 1, 5, 3, 2, 4, 2.
+
 image::levels/level-start-14.png[]
 
-[role="right"]
-==== After
 image::levels/level-end-14.png[]
 
 === Try Out
@@ -438,15 +1056,13 @@ image::levels/level-end-14.png[]
   * In each step, drop the beepers corresponding to the element in the
     list
 
-[role="two-column"]
 === Reverse
 
-[role="left"]
-==== Before
+Reverse the count of the beepers from the beginning to the end of the
+world.
+
 image::levels/level-start-15.png[]
 
-[role="right"]
-==== After
 image::levels/level-end-15.png[]
 
 === Try Out
@@ -460,3 +1076,110 @@ count = [0] * 7
   * Each step pick all beepers, and store count in the list
   * Turn Around
   * Each step drop beepers corresponding to count in the list
+
+== Misc. Bits
+
+=== Global vs Local Variables
+
+  * Variables created within functions are local variables
+
+  * Variables created outside function are global variables
+
+  * If variable created within a function needs to be global, use the
+    `global` statement
++
+[source,python]
+------
+>>> def myfunc():
+...    global gtest
+...    gtest = 10
+...
+>>> myfunc()
+>>> print(gtest)
+------
+
+=== Slice Operator
+
+image::figures/slice.png[align="center",width="60%"]
+
+[source,python]
+------
+>>> str = "Hello World"
+>>> str[0:1]
+'H'
+>>> str[0:5]
+'Hello'
+>>> str[6:11]
+'World'
+------
+
+=== Slice Operator (Contd.)
+
+image::figures/slice.png[align="center",width="60%"]
+
+[source,python]
+------
+>>> str[:5]
+'Hello'
+>>> str[6:]
+'World'
+>>> str[-2:]
+'ld'
+------
+
+=== Default Arguments
+
+  * An argument to a function can be made optional by specifying a
+    default value
+
+[source,python]
+------
+>>> def hello(name="World"):
+...    print("Hello", name)
+...
+>>> hello()
+------
+
+=== Keyword Arguments
+
+  * Arguments can be specified in a function call, by their parameter
+    names
+
+[source,python]
+------
+>>> def set_color(x, y, color):
+...    print("x", x)
+...    print("y", y)
+...    print("color", color)
+...
+>>> set_color(color=1, x=2, y=3)
+------
+
+== Review
+
+=== Statements
+
+  * Assignment Statement
+  * Expression Statement
+  * `def` Statement
+  * `return` Statement
+  * `if` Statement
+  * `for` Statement
+  * `while` Statement
+  * `global` Statement
+
+=== Data Types
+
+  * `int`
+  * `str`
+  * `bool`
+  * `NoneType`
+  * `list`
+
+=== Built-in Functions
+
+  * `type()`
+  * `print()`
+  * `range()`
+  * `input()`
+  * `int()`
