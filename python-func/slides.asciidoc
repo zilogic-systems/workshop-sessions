@@ -430,3 +430,40 @@ squares = dict((i, i * i) for i in range(10))
   * https://stackoverflow.com/q/2776829[Difference between Python's
     Generators and Iterators]
 
+=== Quiz
+
+Answer True or False:
+
+  1. An iterable is an object that can be looped over.
+
+  2. An iterator can be looped over, only once.
+
+  3. Generator is a type of iterator.
+
+  4. Fuctional programs has a sequence of statements / instructions
+     that performs state modifying operations.
+
+  5. List Comprehension evaluates to a generator.
+
+  6. lambda functions can have one or more statements.
+
+  7. lambda definitions can appear within an expression.
+
+=== Try Out
+
+  * Given a list `a` of string extract only the first character from
+    the string to produce a list of characters.
+
+------
+a = ["orange", "watermelon", "apple", "fig"]
+------
+
+  * Given a list `a` of positive and negative values, write a list
+    comprehension expression to create produce a list of positive
+    values only.
+
+------
+a = [-4, 2, 0, -1, 12, -3]
+------
+
+
