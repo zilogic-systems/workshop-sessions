@@ -1,13 +1,136 @@
 = Python Errors
 Zilogic Systems
 
-== Introduction
+== Prelude
 
 === Overview
 
+  * Introduction
   * Types of Errors
   * Handling Errors
   * Raising Errors
+
+== Introduction
+
+=== Example of C Code
+
+[source,c]
+------
+#include <stdio.h>
+
+void read_line(char *filename, char *buf, size_t size)
+{
+    FILE *fp;
+    fp = fopen(filename, "r");
+    fgets(buf, size, fp);
+    fclose(fp);
+}
+
+int main(int argc, char *argv[])
+{
+    char buf[256];
+    if (argc != 2)
+        return 1;
+    read_line(argv[1], buf, sizeof(buf));
+    fputs(buf, stdout);
+}
+------
+
+=== Example of Python Code
+
+[source,python]
+------
+import sys
+
+def read_line(filename):
+    with open(filename) as fp:
+       return fp.readline()
+
+def main():
+    if len(sys.argv) != 2:
+       exit(1)
+    line = read_line(sys.argv[1])
+    print(line)
+
+main()
+------
+
+=== What is an Exception?
+
+  * There is a normal flow of execution in a program - things work as
+    expected.
+
+  * But then sometimes things do not work as expected - considered to
+    be an exceptional scenario.
+
+  * When we try to open a file, we normally expect the file to be
+    opened.
+
+  * But sometimes the file will fail to open due to permission not
+    being available - an exceptional scenario.
+
+=== What happens when Exception Occurs?
+
+  * A return statement returns back to the caller.
+
+  * In other words, returns one level, back up in the call stack.
+
+  * When we trigger an exception, a recursive return happens.
+
+  * If this is the call sequence: `func1 -> func2 -> func3`
+
+  * If `func3` triggers and exception. `func3` returns to `func2`
+
+  * `func2` returns to `func1`
+
+  * `func1` returns and the program terminates.
+
+=== Example
+
+[source,python]
+------
+def func3():
+    print("func3 entered")
+    int("abc")
+    print("func3 exited")
+
+def func2():
+    print("func2 entered")
+    func3()
+    print("func2 exited")
+
+def func1():
+    print("func1 entered")
+    func2()
+    print("func1 exited")
+
+func1()
+------
+
+=== Stopping the Recursive Return
+
+  * That is the default behaviour when an exception is triggered.
+
+  * But we can stop the recursive return, by catching the exception.
+
+  * When one of the function catches the exception, the recursive
+    return stops, and the exception can be handled.
+
+=== Why Recursive Return
+
+  * In languages like C, when an error occurs functions return with an
+    error code.
+
+  * Problems:
+
+    - If the error code is not checked by the caller, the error will
+      go unnoticed.
+
+    - Also the caller needs to propagate the error back to it's own
+      caller. And this involves writing error handling code at each
+      function call.
+
+    - Missing this out leads very hard to debug issues.
 
 == Types of Errors
 
@@ -64,12 +187,17 @@ Zilogic Systems
 
 == Handling Errors
 
-=== Exception Handling
+=== Catching Exception
+
+  * `try ... except` block can be used stop a recursive exception return
 
   * `try` block, attempts to execute statements
 
-  * If error occurs, matching except block is executed
+  * If error occurs, the `except` block is executed
 
+  * Exception is caught only if the exception specified in the except
+    block matches the type of the exception that has occurred.
++
 [source,python]
 ------
 while True:
@@ -83,6 +211,12 @@ while True:
 
 === Multiple Exceptions
 
+  * When the exception is caught we can get the exception object, to
+    retreive more information about the error.
+
+  * Multiple except blocks can be specified to catch different
+    exception types.
++
 [source,python]
 ------
 integers = []
@@ -116,6 +250,8 @@ except ValueError as e:
 
 === Cleanup Actions
 
+==== Left
+
 [source,python]
 ------
 def copy(src, dst):
@@ -136,3 +272,84 @@ def copy(src, dst):
             print("fp2 closed")
             fp2.close()
 ------
+
+==== Right
+
+  * While expecting exceptions we can also provide a cleanup action
+    that will be executed irrespective of whether the exception
+    occured.
+
+  * `finally` block can be used to specify a cleanup action.
+
+  * `else` block can be used to specify an action to be performed, if
+    no exception occurs.
+
+=== Try Out
+
+  * Write a function `int_or_zero()` that takes a string, and converts
+    it to an integer using `int()`.
+
+  * If an exception occurs, because it is not a valid integer, it
+    should return `0`, instead of raising an exception.
+
+=== Custom Exceptions
+
+  * Definiting a exception to represent your own errors.
++
+[source,python]
+------
+class TimeoutError(Exception):
+    pass
+
+e = TimeoutError("timedout waiting for response from server")
+print(e)
+------
++
+  * When instantiating your exception, you can pass a string message,
+    that would be provided when the exception is stringized.
+
+=== Adding More Information
+
+  * In case the exception object that you are creating, needs
+    additional information to be stored, then you can override the
+    `__init__()`, and store the additional parameters.
++
+[source,python]
+-----
+class MyError(Exception):
+    def __init__(self, code, msg):
+        super().__init__("[{}]: {}".format(code, msg))
+        self.code = code
+        self.msg = msg
+-----
+
+== Conclusion
+
+=== Further Reading
+
+  * https://realpython.com/python-exceptions/[Python Exceptions: An
+    Introduction]
+
+  * https://www.python-course.eu/exception_handling.php[Exception
+    Handling in Python]
+
+  * https://stackoverflow.com/a/1319675[StackOverflow: Proper way to
+    declare custom exceptions]
+
+=== About the Trainer
+
+==== Left
+
+  * Vijay Kumar B. https://www.linkedin.com/in/bravegnu/[LinkedIn]
+  * Open Source and Free Software Enthusiast
+  * Specialize in
+    - Python
+    - Embedded Systems
+    - Linux
+
+==== Right
+
+  * Volunteer
+    - Chennaipy
+    - PyCon India
+    - PySangamam
