@@ -23,6 +23,7 @@ test:
 clean:
 	rm -f $(images_png)
 	rm -f slides.html
+	rm -f advanced.html
 	find . -name "*~" -delete
 	find . -name "*.pyc" -delete
 	rm -fr code/__pycache__
