@@ -1,0 +1,919 @@
+= Advanced OOP in Python
+Timmins
+
+== Prelude
+
+=== Overview
+
+  * Inheritance
+  * Advanced Types
+    - Named Tuples
+    - Data classes
+    - Enum
+  * Python's OOP Model
+  * Interfaces
+  * Properties
+
+== Inheritance
+
+=== Introduction
+
+==== Left
+
+[source,python]
+------
+class A:
+   def hello(self):
+       print("Hello A!")
+
+class B(A):
+   def goodbye(self):
+       print("Goodbye B!")
+
+# The class definition of B above is
+# equivalent to the definition below.
+
+class B:
+   def hello(self):
+       print("Hello A!")
+
+   def goodbye(self):
+       print("Goodbye B!")
+------
+
+==== Right
+
+  * Inheritance can be used to extend the definition of a class, by
+    adding methods.
++
+[source,python]
+-------
+b = B()
+b.hello()
+b.goodbye()
+-------
+
+=== Inheritance (Contd.)
+
+  * Inheritance can also be used to override the definition of existing
+    methods.
+
+[source,python]
+------
+class A:
+   def hello(self):
+       print("Hello A!")
+
+class B(A):
+   def hello(self):
+       print("Hello B!")
+
+b = B()
+b.hello()
+------
+
+=== Inheritance (Contd.)
+
+  * Inheritance can also be used to extend the definition of existing
+    methods.
+
+[source,python]
+------
+class A:
+   def hello(self):
+       print("Hello A!")
+
+class B(A):
+   def hello(self):
+       super().hello()
+       print("Hello B!")
+
+b = B()
+b.hello()
+------
+
+=== List Based Set (Contd.)
+
+  * `ListBasedSet` a set implementation optimized for space.
+
+  * The set operations are defined by the base class `Set`.
+
+  * This is available from `collections.abc` module.
+
+  * There are extension points that are left out to be implemented by
+    the derived class.
++
+[source,python]
+------
+s1 = ListBasedSet('abcdef')
+s2 = ListBasedSet('defghi')
+print(s1 & s2)
+print(s1 | s2)
+print(s1 - s2)
+------
+
+=== List Based Set
+
+[source,python]
+------
+import collections.abc
+
+class ListBasedSet(collections.abc.Set):
+     def __init__(self, iterable):
+         self.elements = lst = []
+         for value in iterable:
+             if value not in lst:
+                 lst.append(value)
+     def __iter__(self):
+         return iter(self.elements)
+     def __contains__(self, value):
+         return value in self.elements
+     def __len__(self):
+         return len(self.elements)
+     def __repr__(self):
+         return "ListBasedSet({})".format(repr(self.elements))
+------
+
+=== Inheritance: The Good, Bad and Ugly
+
+  * Language provides a quick way to use inheritance.
+
+  * Most people start misusing and abusing inheritance.
+
+  * Many uses of inheritance makes code hard to read and maintain.
+
+  * A good understanding of design patterns is essential to properly
+    using inheritance.
+
+=== Example of Bad Inheritance Pattern
+
+==== Left
+
+[source,python]
+------
+class Label:
+    def __init__(self, x, y, text):
+        ...
+
+    def draw():
+        ...
+
+class Button(Label):
+    def __init__(self, x, y, text):
+        super().__init__(x, y, text)
+        # button specific init
+
+    def clicked(self):
+        ...
+------
+
+==== Right
+
+  * `Button` looks like a `Label`, with additional functionality.
+
+  * `Button` can re-use `draw()` available in the `Label` using
+    inheritance.
+
+  * What's wrong with this approach?
+
+  * `Label` is a class designed for its own purpose. It's behaviour
+    can change.
+
+  * But if it does it will inadvertantly affect `Button` as well.
+
+=== Better Approach
+
+==== Left
+
+[source,python]
+------
+class TextWiget:
+    def __init__(self, x, y, text):
+        ...
+
+    def draw():
+        ...
+
+class Label(TextWidget):
+    pass
+
+class Button(TextWidget):
+    def __init__(self, text):
+        super().__init__(text)
+        # button specific init
+
+    def clicked(self):
+        ...
+------
+
+==== Right
+
+  * The problem occurs because `Label` is "leaf" class. Something that
+    should not be inherited from.
+
+  * Move the code that needs to be shared to a non-leaf class,
+    `TextWidget`.
+
+  * `Button` and `Label` should inherit from `TextWidget`.
+
+  * If the definition of `Label` changes it will not affect `Button`.
+
+=== Bottom Line
+
+  * Inheritance is a very powerful tool.
+
+  * And wielding it effectively takes lot more effort and
+    understanding.
+
+  * An understanding of design patterns is essential. Read
+    https://python-patterns.guide/gang-of-four/composition-over-inheritance/[Python
+    Design Patterns: The Composition Over Inheritance Principle]
+
+== Advanced Types
+
+=== Named Tuples
+
+  * Tuples with bells and whistles
+
+  * Tuples are used generally used to combine together related data
+
+  * Drawbacks
+
+    - Tuples used to represent different data have the same type
+
+    - Elements can be accessed through indexing only
+
+=== Named Tuples
+
+  * Defining a named tuple
+
+[source,python]
+------
+from collections import namedtuple
+
+Point = namedtuple("Point", "x y")
+Rectangle = namedtuple("Rectangle", ["x", "y", "w", "h"])
+
+print(Rectangle)
+print(Point)
+------
+
+=== Instantiating and Field Access
+
+[source,python]
+-------
+p = Point(1, 2)
+r = Rectangle(x=10, y=20, w=40, h=50)
+
+print(p[0], p[1])
+print(p.x, p.y)
+print(r)
+------
+
+=== Dict Conversion and Modification
+
+[source,python]
+-------
+d = p._asdict()
+print(d["x"])
+print(d["y"])
+
+p2 = p._replace(x=10)
+print(p2)
+-------
+
+=== Try Out
+
+  * Create a `namedtuple` called `Circle`, with members `x`, `y` and
+    `radius`
+
+  * Instantiate the tuple
+
+  * Print the tuple, and fields
+
+  * Use tuple unpacking to extract each of the fields
+
+=== Limitation of Named Tuple
+
+  * Named tuples are immutable.
+
+  * The tuple cannot be modified after it has been crated.
+
+  * Modification requires creating a new tuple.
+
+=== Overcoming the Limitation
+
+==== Left
+
+[source,python]
+-------
+class Circle:
+    def __init__(self, x, y, radius):
+        self.x = x
+        self.y = y
+        self.radius = radius
+
+c1 = Circle(10, 20, 30)
+c2 = Circle(10, 20, 30)
+-------
+
+==== Right
+
+  * Problem 1: `print(c1)`
+
+  * Problem 2: `c1 == c2`
+
+=== Data Classes
+
+  * Mutable variant of Named Tuples
+
+  * It allows you to initialize attributes while constructing the
+    object:
++
+[source,python]
+-----
+from dataclasses import make_dataclass
+
+Point = make_dataclass("Point", ["x", "y"])
+-----
++
+  * It provides a readable `repr()`.
+
+=== Data Classes (Contd.)
+
+  * It is mutable.
++
+[source,python]
+------
+p1.x = 30
+p1
+------
++
+  * It overrides the default comparison. Instead of comparing by
+    `id()`, it compares attribute values instead.
++
+[source,python]
+------
+p2 = Point(x=30, y=20)
+p1 == p2
+------
+
+=== Try Out
+
+  * Create a data class called `Circle`, with members `x`, `y` and
+    `radius`
+
+  * Instantiate the class.
+
+  * Print the object and fields.
+
+=== Enumerations
+
+  * Everything is stored and processed in computers as numbers.
+
+  * But numbers when used within a program are ambiguous, as to what
+    they represent.
+
+  * Enumerations are used to give meaningful names to numbers.
++
+[source,python]
+------
+SUIT_CLUB = 0
+SUIT_DIAMOND = 1
+SUIT_HEART = 2
+SUIT_SPADE = 3
+
+Card = namedtuple("Card", ["suit", "rank"])
+card = Card(SUIT_DIAMOND, 1)
+------
+
+=== Issues
+
+  * They don't have a meaningful string representation.
++
+------
+print(card.suit)
+1
+------
++
+  * They enumerations do not belong a single type, rather they are of
+    integer type.
+
+  * Not possible to obtain the list of possible enumerations.
+
+  * Duplicates can go undetected.
+
+=== Language Support `enum`
+
+==== Left
+
+[source,python]
+------
+from enum import Enum
+
+class Suit(Enum):
+   CLUB = 0
+   DIAMOND = 1
+   HEART = 2
+   SPADE = 3
+------
+
+  * Representation
++
+[source,python]
+------
+suit = Suit.CLUB
+print(suit)
+------
+
+==== Right
+
+
+  * Suit enumerations are considered instance of `Suit` type.
++
+[source,python]
+------
+type(suit)
+------
++
+  * Human readable string type for printing: `suit.name`
+
+  * Numeric value: `suit.value`
+
+=== More Features
+
+  * Create an enum, programmatically from an integer.
++
+[source,python]
+-----
+suit = Suit(1)
+print(suit)
+-----
++
+  * Iteration over available enums.
++
+[source,python]
+------
+for s in Suit:
+    print(s)
+------
+
+=== Duplicate Detection
+
+[source,python]
+------
+from enum import Enum, unique
+
+@unique
+class Suit(Enum):
+   CLUB = 0
+   DIAMOND = 1
+   HEART = 2
+   SPADE = 2
+------
+
+=== Try Out
+
+  1. Create an enumeration of four seasons
+    - Spring
+    - Summer
+    - Autumn
+    - Winter
+
+  2. Print a list of seasons to the user.
+
+  3. Get the numeric input from the user to select a season.
+
+  4. Check if it the user has provided a valid input, and print the
+     name of the corresponding enum.
+
+== Python's OOP Model
+
+=== Instance Namespace: `__dict__`
+
+  * The `__dict__` attribute of an instance object, holds a dictionary
+    that maps attributes to their values.
+
+  * Adding a attribute to a object adds an item to this dictionary.
+
+  * When we get / set an attribute, Python uses the dictionary to
+    perform the operaiton.
+
+  * But the methods are not part of this dictionary.
+
+=== Class Namespace: `__dict__`
+
+  * The class object has a `__dict__` that holds the methods.
+
+  * When we access a member, Python first consults the `__dict__` in
+    the instance object, and then checks the `__dict__` in the class
+    object.
+
+  * Since all the instance objects share the methods, it is held the
+    class `__dict__`.
+
+=== Multiple Inheritance
+
+  * It is possible to create a class by inheriting from multiple
+    classes
+
+  * We get access to methods in both the classes.
++
+[source,python]
+-------
+class A:
+   def func_a(self):
+      print("func a")
+
+class B:
+   def func_b(self):
+      print("func b")
+
+class AB(A, B):
+   pass
+------
+
+=== Multiple Inheritance
+
+  * When the two classes that we are inheriting from provide methods
+    of the same name.
+
+  * Python has a method resolution order, available from the `__mro__`
+    class attribute.
++
+[source,python]
+-------
+class A:
+   def func(self):
+      print("func a")
+
+class B:
+   def func(self):
+      print("func b")
+
+class AB(A, B):
+   pass
+------
+
+== Need for Interfaces
+
+=== Type Interaction
+
+  * Python code uses the following techniques widely:
+
+    - Duck Typing
+    - Type Dispatch
+
+  * We will look into what these mean, and their limitations.
+
+=== Duck Typing with `json.load()`
+
+  * `json.load()` accepts a file-object.
++
+[source,python]
+------
+open("test.json", "w").write('[1, 2, 3]')
+
+import json
+json.load(open("test.json"))
+------
++
+  * But does it have to be a file-object? What does the documentation
+    of `json.load()` say?
++
+[source,python]
+------
+help(json.load)
+------
+
+=== Using a File-like Object
+
+[source,python]
+------
+class MemFile:
+   def read(self):
+       return '[1, 2, 3]'
+
+import json
+json.load(MemFile())
+------
+
+=== Problem with Duck Types
+
+  * Duck Typing is specified as part of the documentation.
+
+  * There is no language mechanism to specify which methods are to be
+    implemented.
+
+=== Type Dispatch with `yaml.load()`
+
+  * `yaml.load()` accepts a file object.
++
+[source,python]
+------
+open("test.yml", "w").write('[1, 2, 3]')
+
+import yaml
+yaml.load(open("test.yml"))
+------
++
+  * `yaml.load()` accepts a string object.
++
+[source,python]
+------
+yaml.load("[1, 2, 3]")
+------
+
+=== How Type Dispatch is Implemented?
+
+[source,python]
+------
+def load(stream):
+    if isinstance(stream, str):
+       ...
+    elif isinstance(stream, file):
+       ...
+    else:
+       raise TypeError("Should be string of file")
+------
+
+=== Support File-like Objects
+
+[source,python]
+------
+def load(stream):
+    if isinstance(stream, str):
+       ...
+    elif hasattr(stream, "read"):
+       ...
+    else:
+       raise TypeError("Should be string of file")
+------
+
+=== Lack of Formalism
+
+  * Here again we check if stream has a `read()` method.
+
+  * Lack of formalism - the methods are to be implemented for
+    file-like object?
+
+== Formalizing Interfaces
+
+=== Protocols
+
+  * File-like object: `read()`
+
+  * More Examples:
+    - Iterator-like object: `__next__()`
+    - Sequence-like object: `__getitem__()` and `__len__()`
+
+  * Protocol - a set of methods to be implemented to act like the
+    object.
+
+=== Abstract Base Classes
+
+  * Specifies the set of methods to be implemented by a class, to
+    confirm a specific protocol.
+
+  * A class inheriting from the abstract class "must" implement those
+    methods.
++
+[source,python]
+------
+from abc import ABC, abstractmethod
+
+class ReadOnlyFile(ABC):
+   @abstractmethod
+   def read(self):
+       pass
+------
+
+=== Implement the `ReadOnlyFile` Protocol
+
+[source,python]
+------
+class MemFile(ReadOnlyFile):
+   pass
+
+fp = MemFile()  # Will raise TypeError
+------
+
+[source,python]
+------
+class MemFile(ReadOnlyFile):
+   def read(self):
+       return "[1, 2, 3]"
+
+fp = MemFile()  # Will succeed
+------
+
+=== Try Out
+
+  * Create an abstract base class `Logger`, with an abstract method
+    `log(msg)`.
++
+------
+from abc import ABC, abstractmethod
+
+class Logger(ABC):
+    @abstractmethod
+    def log(self, msg):
+        pass
+------
++
+  * Create a console logger that will log to console by using the
+    `print()` function.
+
+  * Create a null logger that will discard all message.
+
+  * Try creating a instance of `Logger`.
+
+  * Create an instance of `ConsoleLogger` and log a message.
+
+  * Change it `ConsoleLogger` to `NullLogger` and check if the log
+    message is ignored.
+
+=== Using Abstrace Base Classes
+
+  * `json.load()` can specify that the passed object should implement
+    `ReadOnlyFile`.
+
+  * `yaml.load()` type dispatch can perform the following:
++
+[source,python]
+-------
+if isinstance(stream, str)
+    ...
+elif isintance(stream, ReadOnlyFile):
+    ...
+else
+    ...
+-------
+
+=== Limitation
+
+  * Third party library provides a file-like object.
++
+[source,python]
+------
+from aws.storage import RemoteFile
+
+fp = RemoteFile("5d41402abc4b2a76b9719d911017c592")
+yaml.load(fp)
+------
++
+  * Will raise `TypeError` since `RemoteFile` is not an instance of
+    `ReadOnlyFile`
+
+=== Solution
+
+  * Additional classes can be added to abstract base classes, to
+    indicate they also implement the interface.
++
+[source,python]
+------
+class RemoteFile:
+    pass
+
+fp = RemoteFile()
+isinstance(fp, ReadOnlyFile)
+
+ReadOnlyFile.register(RemoteFile)
+isinstance(fp, ReadOnlyFile)
+------
++
+  * `RemoteFile` is a virtual subclass of `ReadOnlyFile`.
+
+== Properties
+
+=== Controlled Access to Attributes
+
+  * When accessing an object, the programmer generally has
+    full access to the attributes for the object.
+
+  * Sometimes a controlled access to the attribute, is required.
+
+  * Properties allow controlled access to attributes.
+
+  * When a property is set, a setter function is invoked, to set the
+    attribute.
+
+  * When a property is read, a getter function is invoked, to read the
+    attribute.
+
+=== Point with Properties
+
+==== Left
+
+[source,python]
+------
+class Point:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def _set_x(self, x):
+        print("setting x to", x)
+        self._x = x
+
+    def _get_x(self):
+        return self._x
+
+    x = property(_get_x, _set_x)
+
+
+------
+
+==== Right
+
+  * A property is created by create a class level variable using the
+    `property()` builtin.
+
+  * To the `property()` builtin we pass the getter and setter
+    functions.
+
+  * When the property is accessed the getter and setter functions are
+    called?
+
+=== A Simple Use Case
+
+==== Left
+
+[source,python]
+------
+class Point:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def _set_x(self, x):
+        if x > 100:
+            self._x = 100
+        else:
+            self._x = x
+
+    def _get_x(self):
+        return self._x
+
+    x = property(_get_x, _set_x)
+------
+
+==== Right
+
+  * Using setters to limit the range of attribute `x`, in `Point`.
+
+  * If `x` is being set to a value greater than 100, we limit it to
+    100.
+
+== Conclusion
+
+=== Key Takeaways
+
+  * Inheritance provides one of re-using code.
+
+  * But brings along with its own pitfalls, be careful to read about
+    design patterns before using them in your code.
+
+  * Named Tuples, Data classes, Enum provide us with ways for
+    representing data.
+
+  * Duck Typing and Type Dispatch is prevalent in Python.
+
+  * But lack of formal mechanism, makes it confusing and error prone.
+
+  * ABC adds a formalism to specifying the interface.
+
+  * Properties allow controlled access to attributes.
+
+=== References & Further Reading
+
+    * https://python-patterns.guide/gang-of-four/composition-over-inheritance/[Python
+      Design Patterns: The Composition Over Inheritance Principle]
+
+    * https://realpython.com/python-interface/[Implementing an Interface
+      in Python @ RealPython]
+
+    * http://masnun.rocks/2017/04/15/interfaces-in-python-protocols-and-abcs/[Interfaces
+      in Python: Protocols and ABCs]
+
+    * https://stackoverflow.com/a/19328146[Why use Abstract Base Classes in Python?]
+
+    * https://www.python.org/dev/peps/pep-3119/[PEP 3119]
+
+=== About the Trainer
+
+==== Left
+
+  * Vijay Kumar B. https://www.linkedin.com/in/bravegnu/[LinkedIn]
+  * Open Source and Free Software Enthusiast
+  * Specialize in
+    - Python
+    - Embedded Systems
+    - Linux
+
+==== Right
+
+  * Volunteer
+    - Chennaipy
+    - PyCon India
+    - PySangamam

@@ -1,0 +1,882 @@
+= Classes and Objects
+Timmins
+:data-uri:
+
+== Prelude
+
+=== Overview
+
+  * Understanding Types
+  * User Defined Types
+  * Methods
+  * Private Members
+  * List / Dictionary Like Objects
+
+== Understanding Types
+
+=== Types Revisited
+
+  * Any data when represented in the program should be associated with
+    a type
+
+  * The type specifies what operations can be performed on the data
+
+  * The type also specifies the behaviour for those operations
+
+=== Example: Basic Data Types
+
+[source,python]
+------
+>>> 2 - 1
+...
+>>> "2" - "1"
+...
+>>> 1 + 2
+...
+>>> "1" + "2"
+...
+------
+
+=== Operations vs Method Calls
+
+  * How are operations implemented in Python?
+    - Operations internally translate to method calls
+
+  * Invoking the internal method.
++
+[source,python]
+------
+a = 10
+b = 20
+
+a.__add__(b)  # a + b
+a.__mul__(b)  # a * b
+a.__eq__(b)   # a == b
+------
+
+=== Generalizing Types for OOP
+
+  * The type specifies
+    - what operations can be performed on the data
+    - behaviour for those operations
+
+=== Generalizing Types for OOP
+
+  * The type specifies
+    - what [line-through]#operations# methods are available in an object
+    - behaviour for those [line-through]#operations# methods
+
+=== Example: Methods available
+
+  * Methods available in list and tuple
++
+[source,python]
+------
+>>> l = ["apple", "orange", "banana"]
+>>> l.index("banana")
+...
+>>> l.pop()
+...
+>>> t = ("apple", "orange", "banana")
+>>> t.index("banana")
+...
+>>> t.pop()
+...
+------
+
+=== Example: Behaviour of Methods
+
+  * Behaviour of methods in set and list
++
+[source,python]
+------
+>>> s = set("aeiou")
+>>> s.pop()
+...
+>>> l = list("aeiou")
+>>> l.pop()
+...
+------
+
+=== Querying Type of Object
+
+  * `type()`
+    - can be used to query the type of an object.
++
+[source,python]
+------
+type([1, 2, 3])
+------
++
+  * `dir()`
+    - Querying the methods and attributes of an object.
++
+[source,python]
+------
+dir("abc")
+------
+
+=== Try Out
+
+  * Define a function called `nonspecial()`, which accepts an object
+    as argument and returns a list of methods that do not start with
+    underscore.
+
+  * Try using list comprehension.
+
+== User Define Types
+
+=== User Defined Types
+
+  * A user defined type is used to represent data, by grouping data
+    represented using existing data types.
+
+  * Primarily done to keep related data together
+
+  * Specify methods available, and the behaviour for those methods
+
+  * Makes it convenient to work with data
+
+[role="two-column"]
+=== Point Object
+
+[role="left"]
+  * Representation of an XY coordinate:
+    - Two variables: `x` and `y`
+    - Tuple: `(x, y)`
+    - User Defined Type
+
+  * `Point` is a class object, that represents a user defined type.
+
+  * The class object can be used for creating objects.
+
+[role="right"]
+[source,python]
+------
+>>> class Point:
+...    pass
+>>> Point
+...
+------
+
+=== Point Object (Contd)
+
+  * The class object when invoked like a function creates an object of
+    that class
+
+  * The object is said to be an *instance* of the class
+
+[source,python]
+------
+>>> point = Point()
+>>> type(point)
+...
+>>> type("hello")
+...
+>>> type(1)
+...
+------
+
+=== Try Out
+
+  * Create a Point class, and create an instance of Point.
+
+  * List out the non-special members of the Point object.
+
+  * List out the non-special members of a list object.
+
+=== Attributes
+
+  * An instance can have a named values associated with it.
+
+  * These named values are called attributes.
+
+  * These attributes can be accessed using the dot-syntax, that is
+    similar to accessing names in a module.
+
+  * Assigning a value to the attribute causes the attribute to be
+    created.
+
+[source,python]
+------
+>>> point.x = 10
+>>> point.x
+...
+>>> point.y = 20
+>>> point.y
+...
+------
+
+=== Object Attributes
+
+==== Left
+
+image::figures/attributes.png[width="50%", align="center"]
+
+==== Right
+
+  * Model of an object and its attributes.
+
+  * point - object
+
+  * x - attribute
+
+  * y - attrbites
+
+=== Creating Mutliple Points
+
+  * When we instantiate the Point, separate memory space is allocated
+    for the new object.
+
+  * Where it can store its own attributes
++
+[source,python]
+------
+def make_point(x, y):
+    p = Point()
+    p.x = x
+    p.y = y
+    return p
+
+p1 = make_point(10, 20)
+p2 = make_point(20, 30)
+p3 = make_point(10, 30)
+------
+
+=== Demo
+
+  * Access the `x` and `y` attributes of each Point objecet.
+
+  * Get the location of each object in memory, using `id()`
+
+=== Try Out
+
+  * Create a class `Rect` to represent a rectangle
+
+  * Assign attributes x, y and width and height to represent the
+    rectangle
+
+  * Write a function `grow()` that increase the width and height of
+    the rectangle by `1`.
+
+[role="two-column"]
+=== Copy
+
+[role="left"]
+  * When an object is assigned to another variable, both variables are
+    pointing to the same copy of the object
+
+  * Modification through one variable will reflect in the other
+    variable - aliasing
+
+  * If a copy is required `copy` module can be used to copy the object.
+
+[role="right"]
+[source,python]
+-------
+class Rect:
+    pass
+
+import copy
+
+def grow(rect):
+    rect2 = copy.copy(rect)
+    rect2.width += 1
+    rect2.height += 1
+    return rect2
+------
+
+=== Copy (Contd.)
+
+[role="right"]
+[source,python]
+-------
+r1 = Rect()
+r1.x, r1.y = 0, 0
+r1.width, r1.height = 5, 10
+
+r2 = grow(r1)
+print(r1.width, r1.height)
+print(r2.width, r2.height)
+-------
+
+=== Deep Copying
+
+[source,python]
+-----
+class Circle:
+   pass
+
+c1 = Circle()
+
+c1.center = Point()
+c1.center.x = 0
+c1.center.y = 0
+c1.radius = 10
+------
+
+=== Deep Copying (Contd.)
+
+[source,python]
+-----
+import copy
+
+def move_circle(circle):
+    circle2 = copy.copy(circle)
+    circle2.center.x += 1
+    circle2.center.y += 1
+    return circle2
+
+c2 = move_circle(c1)
+
+print(c1.center.x, c1.center.y)
+print(c2.center.x, c2.center.y)
+------
+
+=== Shallow vs Deep Copy
+
+image::figures/copy1.png[align="center"]
+
+=== Shallow vs Deep Copy
+
+image::figures/copy2.png[align="center"]
+
+=== Shallow vs Deep Copy
+
+image::figures/copy3.png[align="center"]
+
+== Operations on Objects
+
+=== Date Example
+
+[source,python]
+-----
+class Date:
+    pass
+
+d = Date()
+d.day = 10
+d.month = 11
+d.year = 2019
+-----
+
+=== Operations on Date
+
+[source,python]
+------
+def is_leap_year(date):
+    return date.year % 4 == 0
+
+
+def get_ndays(date):
+    days_by_month = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+    if is_leap_year(date):
+        days_by_month[1] = 29
+
+    return days_by_month[date.month - 1]
+------
+
+=== Operations on Date (Contd.)
+
+[source,python]
+------
+def next_day(date):
+    date.day += 1
+    if date.day > get_ndays(date):
+        date.day = 1
+        date.month += 1
+        if date.month > 12:
+            date.month = 1
+            date.year += 1
+
+
+def is_earlier(date, other):
+    d1 = (date.year, date.month, date.day)
+    d2 = (other.year, other.month, other.day)
+    return d1 < d2
+------
+
+=== Functions vs Methods
+
+  * Functions were used to perform operations on the `Date` object.
+
+  * These functions accept the date object as argument.
+
+  * But connection between the class and the function is not obvious.
+
+  * Methods are functions associated with a particular class
+
+=== Functions vs Methods (Contd.)
+
+[source,python]
+------
+class Date:
+    pass
+
+def is_leap_year(date):
+    return date.year % 4 == 0
+
+d = Date()
+d.day = 10
+d.month = 11
+d.year = 2019
+print(is_leap_year(d))
+------
+
+=== User Defined Methods
+
+  * Methods are defined within as class definition.
++
+[source,python]
+------
+class Date:
+    def is_leap_year(date):
+        return date.year % 4 == 0
+-------
++
+   * Two ways to invoke `is_leap_year()`.
++
+[source,python]
+-------
+d = Date()
+d.day = 10
+d.month = 11
+d.year = 2019
+print(Date.is_leap_year(d))   # Function Syntax
+print(d.is_leap_year())       # Method Syntax
+------
+
+=== The `self`
+
+   * By convention the first argument of a method is called `self`.
+
+[source,python]
+------
+class Date:
+    def is_leap_year(self):
+        return self.year % 4 == 0
+------
+
+=== Try Out
+
+  * Implement `grow()` as a method of the `Rect` class.
+
+[role="two-column"]
+=== Initializing the Object
+
+[role="left"]
+  * The `__init__()` method is a special method that gets invoked
+    after the object is instantiated.
+
+  * It is used to create the initial attributes in the object.
+
+  * When the object is created by invoking the class, the arguments
+    corresponding to the `__init__()` method needs to be passed.
+
+[role="right"]
+[source,python]
+------
+class Date:
+    def __init__(self, day, month, year):
+        self.day = day
+        self.month = month
+        self.year = year
+
+    def is_leap_year(self):
+        return self.year % 4 == 0
+
+
+d1 = Date(10, 11, 2019)
+------
+
+[role="two-column"]
+=== Human Readable Representation
+
+[role="left"]
+   * The `__str__()` method is a special method that is used to return
+     a human readable string representation of the object.
+
+   * This method is invoked whenever a string representation of the
+     object is required.
+
+   * An example is when the object needs to be printed.
+
+[role="right"]
+[source,python]
+------
+class Date:
+    def __init__(self, day, month, year):
+        self.day = day
+        self.month = month
+        self.year = year
+
+    def is_leap_year(self):
+        return self.year % 4 == 0
+
+    def __str__(self):
+        return "{}-{}-{}".format(self.day,
+                                 self.month,
+                                 self.year)
+
+d1 = Date(10, 11, 2019)
+print(d1)
+------
+
+=== Try Out
+
+  * Implement an `__init__()` method for the `Rect` class.
+
+  * Implement a `__str__()` method for the `Rect` class.
+
+[role="two-column"]
+=== Programmatic Representation
+
+[role="left"]
+   * The `__repr__()` method is a special method that is used to return
+     a programmatic representation of the object.
+
+   * The built-in `repr()` will request for a programmatic
+     representation of the object
+
+   * When containers are printed the `repr()` of the objects contained
+     is used.
+
+[role="right"]
+[source,python]
+------
+class Date:
+    ...
+    def __repr__(self):
+        fmt = "Date({}, {}, {})"
+        return fmt.format(repr(self.day),
+                          repr(self.month),
+                          repr(self.year))
+
+d1 = Date(10, 11, 2019)
+d2 = Date(12, 11, 2019)
+print(repr(d1))
+print([d1, d2])
+------
+
+=== Demo
+
+  * Implement `next_day()` as a method.
+
+=== Incrementing Date
+
+[role="right"]
+[source,python]
+------
+class Date:
+    ...
+    def increment(self, ndays):
+        new_date = copy(self)
+        for i in range(ndays):
+             new_date.next_day()
+        return new_date
+
+d1 = Date(10, 11, 2019)
+d2 = d1.increment(2)
+print(d2)
+------
+
+=== Operator Overloading
+
+[role="right"]
+[source,python]
+------
+class Date:
+    ...
+    def __add__(self, ndays):
+        return self.increment(ndays)
+
+d1 = Date(10, 11, 2019)
+d2 = d1 + 2
+print(d2)
+------
+
+=== Reverse Add
+
+[role="right"]
+[source,python]
+------
+class Date:
+    ...
+    def __radd__(self, ndays):
+        return self.__add__(ndays)
+
+d1 = Date(10, 11, 2019)
+d2 = 2 + d1
+print(d2)
+------
+
+[role="two-column"]
+=== Class Attributes
+
+[role="left"]
+  * Variable defined outside of methods become class attributes
+
+  * They are shared by all objects of the classes
+
+  * They can be accessed either through the `class.attribute` or
+    `obj.attribute`
+
+[role="right"]
+[source,python]
+------
+class Point:
+    count = 0
+
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        Point.count += 1
+
+p1 = Point(1, 2)
+p2 = Point(2, 3)
+print(Point.count)
+print(p1.count)
+------
+
+=== Class Methods
+
+   * Python does not offer the ability to have multiple different
+     object initialization functions.
+
+   * This is required, because we might want to create an object using
+     different ways.
+
+   * Class methods are used to define additional methods to create /
+     initialize an object.
+
+[role="two-column"]
+=== Class Methods (Contd.)
+
+[role="left"]
+   * `classmethod` decorator can be used to indicate that a method is
+     a class method.
+
+   * A class method is passed the class as first argument instead of
+     the instance.
+
+[role="right"]
+[source,python]
+------
+class Date:
+    ...
+    @classmethod
+    def today(cls):
+        t = time.localtime()
+        return cls(t[2], t[1], t[0])
+
+d1 = Date.today()
+print(d1)
+------
+
+=== Try Out
+
+  * Implement a class method `from_corners()`, for the `Rect` class.
++
+[source, python]
+------
+def from_corners(cls, x1, y1, x2, y2):
+    x = x1
+    y = y1
+    width = abs(x2 - x1) + 1
+    height = abs(y2 - y1) + 1
+
+    return cls(x, y, width, height)
+------
+
+== Private Members
+
+=== Private Attributes
+
+  * Java, C++ and other OOP languages have a concept of private
+    members.
+
+  * Private members are accessible within the methods of the class,
+    but are not accessible outside the methods of the class.
+
+  * This is not available in Python.
+
+  * But as a convention, members that are not supposed to be accessed
+    outside the class start with a single underscore character.
+
+=== Name Mangling
+
+  * When a member starts with a double underscore, the name of the
+    member is mangled by the Python interpreter.
++
+[source,python]
+-------
+class ABC:
+    def __init__(self, a, b, c):
+        self.a = a
+        self._b = b
+        self.__c = c
+
+x = ABC(10, 20, 30)
+x.a               # 10
+x._b              # 20
+x.__c             # AttributeError
+x._ABC__c         # 30
+-------
+
+=== Try Out
+
+  * Create the class ABC provided above.
+
+  * Try accessing `__c` from outside the object.
+
+  * Add a method `print_c()` and try access `__c` from within the
+    method.
+
+== List / Dictionary Like Objects
+
+=== Building a Dictionary using Lists
+
+[source,python]
+------
+class SuperSlowDictionary:
+    def __init__(self):
+        self._keys = []
+        self._values = []
+
+    def _index(self, key):
+        if key not in self._keys:
+           raise KeyError("invalid key '{}'".format(key))
+        return self._keys.index(key)
+
+    def get(self, key):
+        return self._values[self._index(key)]
+
+    def set(self, key, value):
+        try:
+            self._values[self._index(key)] = value
+        except KeyError:
+            self._keys.append(key)
+            self._values.append(value)
+------
+
+=== Magic Methods
+
+  * The indexing operator and indexed assignment, result in
+    `__getitem__()` and `__setitem__()` being invoked.
++
+[source,python]
+------
+a[1]
+a.__getitem__(1)
+
+a[1] = 10
+a.__setitem__(1, 10)
+------
++
+  * By implementing these we can support indexing and indexed
+    assignment.
+
+=== Using Magic Methods
+
+[source,python]
+-------
+class SuperSlowDictionary:
+    def __init__(self):
+        self._keys = []
+        self._values = []
+
+    def _index(self, key):
+        if key not in self._keys:
+           raise KeyError("invalid key '{}'".format(key))
+        return self._keys.index(key)
+
+    def __getitem__(self, key):
+        return self._values[self._index(key)]
+
+    def __setitem__(self, key, value):
+        try:
+            self._values[self._index(key)] = value
+        except KeyError:
+            self._keys.append(key)
+            self._values.append(value)
+-------
+
+=== Try Out
+
+  * To get the length of the dictionary implement `__len__()`
+
+    - `__len__()` does not take any argument.
+    - `__len__()` method should return the size of the dictionary.
+
+  * Implement indexed deletion using `__delitem__(key)`
+    - `__delitem__()` accepts the key to be deleted as argument.
+    - `__delitem__()` has return value
+
+=== Implementing Iteration
+
+  * When `iter()` is invoked on the dictionary it has to return an
+    iterator.
+
+  * The iterator will loop through each key in the dictionary.
++
+------
+    def __iter__(self):
+        return iter(self._keys)
+------
+
+=== Try Out
+
+  * Modify the `Rect` class to provide x, y, width, height, when
+    accessed using indexing operator `[]`.
++
+[source,python]
+------
+r = Rect(10, 20, 30, 40)
+r[0]  # => 10
+r[1]  # => 20
+r[2]  # => 30
+r[3]  # => 40
+------
+
+== Conclusion
+
+=== Key Takeaways
+
+  * A type specifies what methods are available and the behaviour for
+    those methods.
+
+  * A user defined type is used to represent data, by grouping data
+    represented using existing data types.
+
+  * User defined types also specify methods for the newly define type.
+
+=== Key Takeaways
+
+  * User defined types are created using the `class` keyword.
+
+  * Instances of the class are created by invoking the class like a
+    function.
+
+  * Attributes can be assigned to the object, and they pop into
+    existence.
+
+  * Methods for the object can be defined as part of the class.
+
+=== Key Takeaways
+
+==== Left
+
+  * `__init__()`
+  * `__str__()`
+  * `__repr__()`
+  * `__add__()`
+  * `__radd__()`
+
+==== Right
+
+  * `__getitem__()`
+  * `__setitem__()`
+  * `__delitem__()`
+  * `__len__()`
+  * `__iter__()`
+
