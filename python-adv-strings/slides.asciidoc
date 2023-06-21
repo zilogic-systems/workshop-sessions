@@ -1,0 +1,479 @@
+= Advanced String Handling
+Zilogic Systems
+
+== Introduction
+
+=== Overview
+
+  * How data is stored and transmitted?
+  * Integer Representation
+  * String Representation
+  * Bytes vs Strings
+
+=== Install Fonts
+
+  * These slides includes text in Tamil.
+
+  * Make sure the following text written in Tamil is visible: தமிழ்
+
+  * If not, please install the font
+    https://www.google.com/get/noto/#sans-taml
+
+== Data Representation
+
+=== Data Within a Program
+
+  * Programs represent data using various language data types:
+    - Integers
+    - Strings
+    - Lists
+    - Dictionaries
+
+  * Programs maninuplate the data present in memory
+
+=== Data Representation
+
+  * Though programs manipulate data types
+  
+  * They do not care about how they are represented
+
+  * It is an implementation detail, internal to the programming
+    language
+
+=== Data Representation (Contd.)
+
+  * When data is written to
+    - File
+    - Socket
+    - Serial Port
+    - IPC (Inter Process Communication)
+
+  * The representation is exposed to the external world
+
+  * It becomes important for the purpose of inter-op
+
+[role="two-column"]
+=== File
+
+[role="left"]
+image::figures/example-file.png[align="center"]
+
+[role="right"]
+  * Example of file with 6 bytes
+
+  * Each byte is a 8-bits wide
+
+  * Decimal `0` to `255`
+
+  * Hex `0x00` to `0xFF`
+
+  * Binary `0b0000_0000` to `0b1111_1111`
+
+=== Tip
+
+  * In the diagrams, numbers are represented in hex
+  * Two hex digits constitute one byte
+    - `0x00`
+    - `0xAA`
+    - `0x10`
+    - `0xFF`
+
+=== TCP Socket
+
+image::figures/example-tcp-socket.png[align="center"]
+
+=== UDP Socket
+
+image::figures/example-udp-socket.png[align="center"]
+
+=== Bottom Line
+
+   * When data is stored, transmitted
+
+     - Representation matters
+
+   * Data needs be represented as a string of bytes
+
+     - Bytes is the fundamental unit of storage / transmission
+
+== Example: Integers
+
+=== Integer: 52
+
+   * How can it be represented as bytes?
+
+=== Integer: 52
+
+   * How can it be represented as bytes?
+
+   * One way to do it
++
+image::figures/example-integer-52.png[width="12%"]
++
+  * `52` is in the range `0` to `255`, can be represented using a
+    single byte
+
+  * `0x34` is the hex representation of `52`
+
+=== Integer: 2989
+
+   * How can it be represented as bytes?
+
+   * `2989` is larger than `255`, needs more than one byte
+
+=== Integer: 2989
+
+   * How can it be represented as bytes?
+
+   * `2989` is greater than `255`, needs more than one byte
+
+   * `0x0BAD` is the hex representation of `2989`
++
+image::figures/example-integer-2989.png[width="40%"]
+
+=== Binary Representation
+
+  * Binary Files
+    - Files containing data in binary representation 
+
+  * Are meant to be read and written by programs
+
+  * Examples:
+    - `.png`, `.jpeg`, `.wav`, `.mp3`
+
+=== Converting Integers to Bytes
+
+  * Conversion to binary representation
++
+[source,python]
+------
+import struct
+
+struct.pack("B", 25)    # => "\x19"
+------
++
+  * Bytes to integer can be done using `struct.unpack()`
+
+=== Converting Integers to Bytes (Contd.)
+
+  * Conversion to binary representation
++
+[source,python]
+------
+import struct
+
+struct.pack("<H", 2989)  # => "\xad\x0b"
+struct.pack(">H", 2989)  # => "\x0b\xad"
+------
+
+=== Writing Integers to Files
+
+  * Open the file in binary mode
+  * Write out the bytes
++
+[source,python]
+------
+with open("myfile.dat", "wb") as fp:
+    bytes = struct.pack("<H", 2989)
+    fp.write(bytes)
+------
+
+=== Try Out
+
+  * Write the integer to 2989 to a file.
+
+  * Read it back from the file and convert it back to an integer using
+    `struct.unpack()`
+
+    - The syntax for unpacking `struct.unpack(format, bytes)`
+
+    - `unpack` returns a tuple of unpacked elements
+
+    - In our case the tuple will have only one element.
+
+== String Representation
+
+=== Strings
+
+  * Represent human readable text in a program
+
+  * But computers only work with numbers
+
+  * Encoding
+
+    - Assign a code to each character to be represented
+
+    - Specify a method store the code, as bytes
+
+=== ASCII Encoding
+
+    * Code assigned to English alphabets, numbers, punctuation marks, etc.
+
+    * Easy to convert to bytes, since code size is only 7-bits
+
+image::figures/ascii-encoding.png[align="center"]
+
+=== Beyond English Alphabets
+
+  * Unicode was created to represent characters from all languages
+
+  * Each character, from every language, is assigned a unique 'code
+    point'
+
+  * Needs care while converting to bytes, since code point can be 31-bits
+
+image::figures/utf32-ta-encoding.png[align="center"]
+
+=== UTF-32 Encoding
+
+  * This way of representing Unicode, is called UTF-32 encoding
+
+  * Representing text, in UTF-32, can lead lot of wastage of memory
+
+image::figures/utf32-en-encoding.png[align="center"]
+
+=== UTF-8 Encoding
+
+  * UTF-8 defines a transformation that represents Unicode 1 - 4 bytes
+
+  * Lower code points used frequently are represented using 1 byte
+
+  * Higher code points used less frequently are represented using 4 bytes
+    
+image::figures/utf8-encoding.png[align="center",width="60%"]
+
+=== ASCII vs UTF-8
+
+  * First 127 characters
+    - ASCII and Unicode assign the same code / code points
+
+  * UTF-8
+    - First 127 characters are encoded in a single byte
+
+  * All valid ASCII files, are also valid UTF-8 files
+
+=== Converting Text to Bytes
+
+  * Strings in Python 3 are represented in Unicode
++
+[source,python]
+------
+>>> print("Hello World")
+Hello World
+>>> print("தமிழ்")
+தமிழ்
+------
++
+  * Provides a mechanism to encode to bytes, using various encodings
++
+[source,python]
+-------
+>>> "அ".encode("utf-8")
+b'\xe0\xae\x85'
+-------
+
+=== Different Encodings
+
+[source,python]
+------
+>>> "அ".encode("utf-8")
+b'\xe0\xae\x85'
+
+>>> "அ".encode("utf-32-le")
+b'\x85\x0b\x00\x00'
+
+>>> "அ".encode("utf-32-be")
+b'\x00\x00\x0b\x85'
+------
+
+=== Character Strings vs Byte Strings
+
+  * Byte strings are composed of bytes
+  
+    - Used to represent a sequence of bytes
+
+    - All file and network related code, work with byte strings
+
+  * Characters Strings are composed of Unicode characters
+
+    - Used to represent human readable text
+  
+    - Needs to encoded to bytes before being stored, or sent over the
+      network
+
+=== Writing Strings to Files
+
+  * Open the file in binary mode
+  * Write out the byte string
++
+[source,python]
+------
+with open("myfile.txt", "wb") as fp:
+    bytes = "Welcome to Unicode: தமிழ்".encode("utf-8")
+    fp.write(bytes)
+------
+
+=== Writing Strings to Files (Contd.)
+
+  * Open the file in text mode, with specific encoding
+  * Write out the string
+  * String is automatically encoded
+
+[source,python]
+------
+with open("myfile.txt", "w", encoding="utf-8") as fp:
+    fp.write("Welcome to Unicode: தமிழ்")
+------
+
+=== Writing Strings to Files (Contd.)
+
+  * Open the file in text mode, with default encoding
+  * Automatically encoded to a system default encoding
+  * The encoding is specified by `locale.getpreferredencoding()`
+
+[source,python]
+------
+with open("myfile.txt", "w") as fp:
+    fp.write("Welcome to Unicode: தமிழ்")
+------
+
+=== Try Out
+
+  * Reading string written to `myfile.txt`, as binary data
+
+  * Print the binary data
+
+  * Decode the binary data using UTF-8
+
+  * Print the decoded string
+
+== Conclusion
+
+=== Key Takeaways
+
+  * Data storage and tranmission happens in terms of 8-bit bytes
+
+  * Byte string is data ready for storage / transmission
+
+  * Strings are used to represent human readable characters
+
+    - Strings should be converted to bytes before storage / transmission
+
+    - Use one of the available encoding schemes, to convert strings to
+      bytes
+
+=== Tidbits - 1
+
+  * Bytes were not always 8-bits!
+
+  * The 8-bit microprocessors from Intel, popularized the 8-bit byte
+  
+  * Source: https://en.wikipedia.org/wiki/Byte
+
+=== Tidbits - 2
+
+  * UTF-8 encoding reduced the pain of Unicode transition
+
+  * Since it enables seamless transition from ASCII
+
+  * The UTF-8 encoding was designed by Ken Thompson and Rob Pike
+    - The creators of the Unix operating system
+
+=== Further Reading
+
+  * `struct` Module
+    - https://docs.python.org/3/library/struct.html
+
+  * Processing Text Files in Python 3:
+    - http://python-notes.curiousefficiency.org/en/latest/python3/text_file_processing.html
+
+=== About the Trainer
+
+==== Left
+
+  * Vijay Kumar B. https://www.linkedin.com/in/bravegnu/[LinkedIn]
+  * Open Source and Free Software Enthusiast
+  * Specialize in
+    - Python
+    - Embedded Systems
+    - Linux
+
+==== Right
+
+  * Volunteer
+    - Chennaipy
+    - PyCon India
+    - PySangamam
+
+== Handling Binary Data
+
+=== Byte Order, Size, Alignment
+
+[options="header",width="50%",align="center"]
+|======
+| Character | Byte Order
+| `=`	    | native	
+| `<`	    | little-endian
+| `>`	    | big-endian
+|======
+
+=== Format Characters
+
+[options="header",width="80%",align="center"]
+|======
+| Format    | C Type		| Python Type | Size
+| `x`	    | pad byte	  	| -	      | 1
+| `b`	    | signed char	| int	      | 1
+| `B`	    | unsigned char	| int	      | 1
+| `h`	    | short    		| int	      | 2
+| `H`	    | unsigned short	| int	      | 2
+| `i`	    | int      		| int	      | 4
+| `I`	    | unsigned int	| int	      | 4
+| `s`	    | char[]   		| bytes	      | -
+|======
+
+=== BMP Header
+
+  * File Header
+    - 2 Bytes: `BM` in ASCII
+    - 4 Bytes: size
+    - 4 Bytes: reserved
+    - 4 Bytes: image offset
+
+=== Reading BMP File Header
+
+[source,python]
+------
+import struct
+
+with open("test.bmp", "rb") as fp:
+    hdr = fp.read(14)
+    print(struct.unpack("<2sIxxxxI", hdr))
+------
+
+=== Try Out
+
+  * Image Header
+    - 4 Bytes: size (must be >=40)
+    - 4 Bytes: Width (signed)
+    - 4 Bytes: Height (signed)
+    - 2 Bytes: No. of Color Planes
+    - 2 Bytes: No. of Bits Per Pixel
+
+  * Modify the previous program to print the following information
+    from the image header: Width, Height, Bits Per Pixel
+
+=== Reading BMP Image Header
+
+[source,python]
+------
+import struct
+
+with open("test.bmp", "rb") as fp:
+    hdr = fp.read(14)
+    print(struct.unpack("<2sIxxxxI", hdr))
+
+    ihdr = fp.read(16)
+    print(struct.unpack("<IIIHH", ihdr))
+------
+
