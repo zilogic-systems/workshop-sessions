@@ -1,0 +1,867 @@
+= Python Advanced Constructs
+Zilogic Systems
+
+== Prelude
+
+=== Overview
+
+  * Languages in Python
+  * Advanced Function Calls
+  * Callable Objects
+  * Closures
+  * Decorators
+  * Generators
+  * Context Managers
+
+== Languages in Python
+
+=== Python Language Layers
+
+==== Left
+
+image::figures/languages.png[align="center"]
+
+==== Right
+
+  * Many of the basic constructs in the language are available for use
+    for application developers.
+
+  * Many of the advanced constructs are prone to errors and present
+    primarily for framework developers.
+
+  * Framework developers use these features, to simplify work for
+    application developers.
+
+== Advanced Function Calls
+
+=== Arbitrary Positional Parameters
+
+  * Prefixing `*` to an argument, creates a catch all argument, any
+    argument not accepted by a positional parameter, will be absorbed
+    by the `*args` into a list.
+
+[source,python]
+------
+def abc(a, b, c, *args):
+    print(a, b, c, args)
+
+abc(1, 2, 3)
+abc(1, 2, 3, 4, 5)
+------
+
+=== Keyword only Parameters
+
+  * Parameters after `*args`, are keyword only arguments.
+
+[source,python]
+------
+def abc(a, b, c, *args, d, e):
+    print(a, b, c, args)
+
+abc(1, 2, 3, d=10, e=20)
+abc(a=1, b=2, c=3, d=4, e=5)
+------
+
+=== Arbitrary Keyword Parameters
+
+  * Prefixing `**` to a parameter creates a catch all keyword
+    argument, any argument not accepted by a keyword parameter, will
+    be absorbed by the catch all parameter into a dictionary.
++
+[source,python]
+-------
+def abc(a, b, c, *args, d, e, **kwargs):
+    print(a, b, c, kwargs)
+
+abc(a=10, b=20, c=30)
+abc(a=10, b=20, c=30, d=40, e=50)
+-------
+
+=== Positional Argument Unpacking
+
+  * It is possible to expand and pass a list, to a function by
+    position, by prefixing the sequence argument with a `*`.
++
+[source,python]
+------
+def abc(a, b, c, d):
+   print(a, b, c, d)
+
+l = [2, 3, 4]
+abc(1, *l)       # => abc(1, 2, 3, 4)
+
+l1 = [1, 2]
+l2 = [3, 4]
+abc(*l1, *l2)    # => abc(1, 2, 3, 4)
+
+l = [1, 2]
+abc(*l, 3, 4)    # => abc(1, 2, 3, 4)
+------
+
+=== Keyword Argument Unpacking
+
+  * It is possible to expand and pass a dictionary, to a function by
+    keyword, by prefixing the dictionary argument with a `**`.
++
+[source,python]
+------
+def abc(a, b, c, d):
+   print(a, b, c, d)
+
+kw = {"b": 2, "c": 3, "d":4}
+abc(1, **kw)        # => abc(1, b=2, c=3, d=4)
+
+kw1 = {"a":1, "b":2}
+kw2 = {"c":3, "d":4}
+abc(**kw1, **kw2)   # => abc(a=1, b=2, c=3, d=4)
+
+kw = {"a":1, "b":2}
+abc(**kw, c=3, d=4) # => abc(a=1, b=2, c=3, d=4)
+------
+
+=== Combining Arbitrary Arguments and Unpacking
+
+  * In the following example, `*args` and `**kwargs` in the parameters
+    of `printf` specifies to catch all arguments after `fmt`.
+
+  * When passing them to format `*` and `**` causes the arguments to
+    be unpacked and passed.
+
+  * This allows any combination of arguments passed to one function to
+    be caught and to be passed to another function.
++
+[source,python]
+------
+def printf(fmt, *args, **kwargs):
+    print(fmt.format(*args, **kwargs))
+
+printf("{day}-{month}-{year}", day=10, month=5, year=2021)
+printf("{:02}:{:02} AM", 11, 55)
+------
+
+=== Try Out
+
+  * Write a function that accepts a function, and set of arguments,
+    and invokes the function, with the provided arguments. And returns
+    the value the returned from the function.
+
+  * If the function raises any exception then catch the exception, and
+    return the exception instead.
+
+  * Hint: Catch exceptions using the base of all exceptions
+    `Exception`.
++
+[source,python]
+------
+def add(a, b, c):
+    return a + b + c
+print(trap(add, a=10, b=20, c=30))
+print(trap(int, "35"))
+print(trap(int, "abc"))
+------
+
+== Callable Objects
+
+=== What is a Callable?
+
+  * Callable is an object that can accept arguments and return an
+    object, using the function call syntax.
+
+  * Functions are callables.
+
+  * In Python, class objects are callables - they return an instance
+    of the class.
+
+  * Classes being callables is specific to Python, many languages
+    require special additional syntax to create an instance of class.
+
+=== Defining Custom Callables
+
+  * It is possible to define a custom user-defined callable.
+
+  * That is we can decide what to do when the object is "called".
+
+  * This is done by implementing `__call__()` method.
+
+=== User-defined Callable
+
+  * The following is a user-defined class the implements `__call__()`
+    method.
+
+[source,python]
+------
+class Greeter:
+    def __init__(self, msg):
+        self._msg = msg
+    
+    def __call__(self):
+        print(self._msg)
+------
+
+== Building a Call Tracer
+
+=== Proxying Calls
+
+[source,python]
+------
+class CallTracer:
+    def __init__(self, func):
+        self._func = func
+    
+    def __call__(self, *args, **kwargs):
+        return self._func(*args, **kwargs)
+------
+
+=== Tracing Calls
+
+[source,python]
+------
+class CallTracer:
+    def __init__(self, func):
+        self._func = func
+    
+    def __call__(self, *args, **kwargs):
+        print("Enter:", self._func)
+        ret = self._func(*args, **kwargs)
+        print("Exit:", self._func)
+        return ret
+------
+
+=== Tracking Call Counts
+
+[source,python]
+------
+class CallTracer:
+    def __init__(self, func):
+        self._func = func
+        self.count = 0
+    
+    def __call__(self, *args, **kwargs):
+        print("Enter:", self._func)
+        ret = self._func(*args, **kwargs)
+        print("Exit:", self._func)
+        self.count += 1
+        return ret
+------
+
+=== How are User-defined Callables Useful?
+
+  * The following are a few things that a user-defined callable can do
+    compared to a simple function definition.
+
+    - Can keep track of additional information, that need not be
+      passed to it for every invocation.
+
+    - Can update and preserve state across calls.
+
+=== Try Out
+
+  * Write a callable object that will create accumulate values
+    provided to it, and return the accumulated value.
++
+[source,python]
+------
+accX = Accumulator()
+accY = Accumulator()
+print(accX(1))   # 1
+print(accX(3))   # 4
+print(accY(5))   # 5
+print(accX(2))   # 6
+------
+
+== Closures
+
+=== Introduction
+
+  * Closure
+    - Is a nested function
+    - Accesses variables defined in enclosing scope
+    - Is returned from the enclosing function
++
+[source,python]
+-------
+def make_greeter(msg):
+    def greet():
+        print(msg)
+    return greet
+-------
+
+=== Capturing Variables
+
+==== Left
+
+  * The variables from enclosing scope that are used within the
+    closure are stored within the closure object.
+
+==== Right
+
+[source,python]
+------
+def abc():
+    x = 1
+    y = 5
+    print(locals())
+
+def xyz():
+    x = 1
+    y = 5
+    def foo():
+        print(locals())
+        print(x, y)
+    return foo
+------
+
+=== Closures vs Custom Callables
+
+  * Using of values from outer scope is similar to creating a custom
+    function object, by passing and storing within a user-defined
+    callable object.
++
+[source,python]
+------
+class Greeter:
+    def __init__(self, msg):
+        self._msg = msg
+    
+    def __call__(self):
+        print(self._msg)
+------
+
+=== Tracer
+
+  * Building a call tracer similar to the one discussed in closures
+    section.
+
+  * The first version just proxies calls from the tracer to the traced
+    function.
++
+[source,python]
+------
+def make_tracer(func):
+    def tracer(*args, **kwargs):
+        return func(*args, **kwargs)
+    return tracer
+------
+
+=== Tracer v2
+
+  * In the second version, we print a message before and after the
+    function being traced.
++
+[source,python]
+------
+def make_tracer(func):
+    def tracer(*args, **kwargs):
+        print("Enter:", func)
+        ret = func(*args, **kwargs)
+        print("Exit:", func)
+        return ret
+    return tracer
+------
+
+=== Tracer v3
+
+  * In the third version, we keep track of the number of times the
+    call has been made.
+
+  * Each traced function has a separate instance of count.
++
+[source,python]
+------
+def make_tracer(func):
+    count = 0
+    
+    def tracer(self, *args, **kwargs):
+        nonlocal count
+        count += 1
+        print("Enter:", func)
+        func(*args, **kwargs)
+        print("Exit:", func, count)
+    
+    return tracer
+------
+
+=== Sharing Captured Variables
+
+==== Left
+
+[source,python]
+------
+def make_point(x, y):
+
+    def move():
+        nonlocal x, y
+        x += 1
+        y += 1
+        return x
+
+    def show():
+        print(x, y)
+
+    return (move, show)
+------
+
+==== Right
+
+[source,python]
+------
+# Creates an enclosing scope, and
+# captures x, y
+move1, show1 = make_point(1, 2)
+move1()
+show1()
+
+# Creates another enclosing scope
+# and captures that x, y
+move2, show2 = make_point(10, 20)
+move2()
+show2()
+
+# Each set of captured x and y, work
+# independent of each other
+move1()
+show1()
+------
+
+=== Try Out
+
+  * Rewrite accumulator from the previous section using closures.
+
+  * `make_accumulator()` should return a new accumulator.
+
+[source,python]
+------
+accX = make_accumulator()
+accY = make_accumulator()
+print(accX(1))   # 1
+print(accX(3))   # 4
+print(accY(5))   # 5
+print(accX(2))   # 6
+------
+
+== Decorators
+
+=== What is a Function Decorator?
+
+  * A function decorator, is a function that accepts a function object
+    and returns a function object.
+
+  * They are generally return a different function object, which will
+    replace the original function object.
+
+=== Example: Null Decorator
+
+[source,python]
+------
+def null(f):
+    return f
+
+@null
+def helloworld():
+    print("hello world")
+
+# Equivalent to
+
+def helloworld():
+    print("hello world")
+
+helloworld = null(helloworld)
+------
+
+=== Example: Run All
+
+==== Left
+
+[source,python]
+------
+funcs = []
+def run(f):
+    global funcs
+    funcs.append(f)
+    return f
+
+@run
+def abc():
+    print("abc")
+
+@run
+def xyz():
+    print("xyz")
+
+for f in funcs:
+    f()
+------
+
+==== Right
+
+  * The decorator accumulates the functions, and then executes them
+    later on.
+
+  * The `atexit.register()` is an example of a decorator that does
+    this.
+
+=== Example: Call Tracer
+
+==== Left
+
+[source,python]
+------
+def make_tracer(func):
+    count = 0
+    
+    def tracer(self, *args, **kwargs):
+        nonlocal count
+        count += 1
+        print("Enter:", func)
+        func(*args, **kwargs)
+        print("Exit:", func, count)
+    
+    return tracer
+
+@tracer
+def helloworld():
+    print("hello world")
+------
+
+==== Right
+
+  * This is the previous tracer example.
+
+  * The previous tracer can already be used as a decorator, without
+    changes.
+
+  * It is an example of decorator that returns a different function,
+    that internally invokes the decorated function.
+
+=== Try Out
+
+  * Write a decorator called `highlight` that when applied to a
+    function, will cause its output to highlighted by printing a line
+    of asterisk, before and after the functions output.
++
+------
+@highlight
+def func():
+    print("Hello World")
+    print("Goodbye World")
+
+func()
+------
+
+== Generators
+
+=== Generator Expressions
+
+  * It is possible to create a generator by writing a generator
+    expression.
+
+  * A generator expression is a list comprehension without the square
+    brackets.
+
+  * The result of evaluating a generator expression is a generator
+    object.
+
+  * Which is a type of iterator. It is possible to get subsequent
+    values from it, using next.
++
+[source,python]
+------
+from itertools import count
+
+squares = (i**2 for i in count())
+print(next(squares))
+print(next(squares))
+------
+
+=== Generator Functions
+
+==== Left
+
+  * Another way of creating generators is by writing a generator
+    function.
+
+  * Unlike a regular function a generator function can continue
+    execution after returning, from the point of return.
+
+  * Instead of `return`, we use the `yield` statement, to temporarily
+    return from the function.
+
+==== Right
+
+[source,python]
+------
+def generate():
+    print("first")
+    yield 1
+    print("second")
+    yield 2
+    print("third")
+    yield 3
+    print("fourth")
+------
+
+=== Generator Functions
+
+==== Left
+
+  * Invoking a generator function, does not execute the function,
+    rather creates a generator.
+
+  * Invoking `next()` causes the generator to execute.
+
+==== Right
+
+[source,python]
+------
+def generate():
+    print("first")
+    yield 1
+    print("second")
+    yield 2
+    print("third")
+    yield 3
+    print("fourth")
+------
+
+=== Examples
+
+[source,python]
+-----
+def mymap(func, iterable):
+    for i in iterable:
+       yield func(i)
+
+def myfilter(func, iterable):
+    for i in iterable:
+        if func(i):
+            yield i
+-----
+
+=== How Generators Work?
+
+==== Left
+
+[source,python]
+------
+def generate():
+    x = 1
+    yield x
+    x += 1
+    yield x
+    x += 1
+    yield x
+
+g = generate()
+next(g)
+print(g.gi_frame.f_locals)
+print(g.gi_frame.f_lineno)
+------
+
+==== Right
+
+  * A generator keeps track of the state of the local variables when
+    it executes.
+
+  * It is also keeps track of the point of suspension, so that it can
+    resume from where it left of.
+
+=== Use Cases: Paginating Lists
+
+  * We have written some code that operate with a list of values.
+
+  * Suddenly we have to deal with a very large list of values.
+
+  * We can avoid having the entire list of values at once, transferred
+    over the network, or moved from disk to memory, etc.
+
+  * We can take values as required and process them.
+
+  * This was a how `range()` changed from Python 2 to Python 3. In
+    Python 2, range returned a list.
+
+=== Use Cases: Avoiding Callbacks in Visitor Pattern
+
+  * Generators can also help to avoid the callback patter in some
+    scenarios.
+
+  * Suppose we are writing a filesystem library. We might provide
+    function called `walk()`, that will walk through all the files in
+    the filesystem starting from a directory. `walk()` could provide a
+    callback interface, to invoke a function on each file. Or `walk()`
+    could be implemented instead as a generator.
+
+  * Well this is infact the case with `os.path.walk()` that was
+    available in Python 2.
+
+  * The alternative is `os.walk()` which is a generator.
+
+== Context Managers
+
+=== Example with Mutex
+
+  * A mutex is used for prevent race condition between two threads of
+    execution.
+
+  * Should be locked before using the shared resource. Should be
+    unlocked after using the resource.
++
+[source,python]
+------
+class Mutex:
+    def lock(self):
+        print("locked")
+
+    def unlock(self):
+        print("unlocked")
+------
+
+=== Resource Management
+
+  * A common problem with mutexes, is to miss out the error handling
+    path when releasing the mutex.
++
+[source,python]
+------
+mutex = Mutex()
+
+def read_file():
+    try:
+        mutex.lock()
+        fp = open("db")
+        data = read()
+        close.fp()
+        mutex.unlock()
+    except OSError as e:
+        print("Error reading file: {}".format(e))
+        return
+
+    return data
+------
+
+=== Resource Management
+
+  * The right way to do this to add the `mutex.unlock()` to the
+    finally block.
+
+[source,python]
+------
+def read_file():
+    try:
+        mutex.lock()
+        fp = open("db")
+        data = read()
+        close.fp()
+    except OSError as e:
+        print("Error reading file: {}".format(e))
+        return
+    finally:
+        mutex.unlock()
+    return data
+------
+
+=== Making it a Context Manager
+
+==== Left
+
+[source,python]
+------
+class Mutex:
+    def lock(self):
+        print("locked")
+
+    def unlock(self):
+        print("unlocked")
+
+    def __enter__(self):
+        self.lock()
+
+    def __exit__(self, *exc):
+        self.unlock()
+        return False
+------
+
+==== Right
+
+  * Magic methods `__enter__()` and `__exit__()` are to be implemented
+    to act as context manager.
+
+  * When used with a `with` statement, the `__enter__()` is called
+    before entering the block.
+
+  * And `__exit__()` is called while leaving the block.
+
+=== Using the Context Manager
+
+  * With the context manager protocol implemented, the following code
+    is now possible.
++
+[source,python]
+------
+def read_file():
+    try:
+        with mutex:
+            fp = open("db")
+            data = read()
+            return data
+    except OSError as e:
+        print("Error reading file: {}".format(e))
+        return
+------
+
+=== Enter and Exit
+
+[source,python]
+------
+with open("/etc/passwd") as fp:
+    fp.read()
+------
+
+  * The return value of `__enter__()` is provided in the variable
+    after `as` keyword.
+
+  * The return value of `__exit__()` decides whether the exception if
+    any that occurs within the block, needs to be propagated or not.
+
+=== Limitations
+
+  * While context managers are useful, in some places, it has its own
+    limitations.
+
+  * One of the limitations of context managers is that it adds a level
+    of indentation.
+
+  * When resources are created in a loop, then resource management
+    becomes harder.
+
+  * `ExitStack()` from `contextlib` can be used to overcome the
+    problems.
+
+== Conclusion
+
+=== Summary
+
+  * Languages in Python
+  * Advanced Function Calls
+  * Callable Objects
+  * Closures
+  * Decorators
+  * Generators
+  * Context Managers
+
+=== About the Trainer
+
+==== Left
+
+  * Vijay Kumar B. https://www.linkedin.com/in/bravegnu/[LinkedIn]
+  * Open Source and Free Software Enthusiast
+  * Specialize in
+    - Python
+    - Embedded Systems
+    - Linux
+
+==== Right
+
+  * Volunteer
+    - Chennaipy
+    - PyCon India
+    - PySangamam
