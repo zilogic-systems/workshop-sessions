@@ -1,0 +1,418 @@
+= Introduction to Linux
+Zilogic Systems
+:data-uri:
+
+== Introduction
+
+=== What is GNU/Linux?
+
+ * Operating System
+ * Unix-like
+ * Multi-tasking
+ * Multi-user
+ * Cross-platform
+
+=== Origins of GNU/Linux
+
+ * GNU - Recursive acronym
+ * Development started in 1984 by `Richard Stallman`
+ * Contains a list of packages that can be used alongside a Kernel.
+ * Four Basic Freedoms
+ * In 1990, `Stallman` developed Unix-like Operating System
+ * In 1991, a Finnish student `Linux Torvalds` developed a kernel called `Linux`
+
+=== Identifying Yourself
+
+ * Multi-user operating system
+ * Username & password
+
+== Launch the Terminal
+
+=== The Shell
+
+ * Command-line equivalent of Windows GUI tools
+ * Default shell in Unix called `Bourne` shell
+ * In GNU/Linux, it is called `bash` i.e `Bourne Again Shell`
+ * Shell accepts commands for execution
+ * Provides information like user-name and current working directory
+
+=== Simple Commands
+
+  * `ls` - list the contents of a directory
+  * `cat` - view the contents of a text file
+
+=== Try out
+
+  * Type `ls`, list contents of current directory.
+  * Type `cat fruits.txt`, prints the contents of fruits.
+  * Type `cat -n fruits.txt`, prints the file contents with a line
+    number prefix.
+
+== Shell Commands
+
+=== Command Format
+
+  * General format of a shell command
++
+[source,bash]
+------
+command options arguments
+------
+
+  * Example command to list contents of `.zip` file:
++
+[source,bash]
+------
+$ unzip -l image.zip
+------
+
+  * Option modifies the behaviour of the command.
+  * Single hyphen vs Double hyphen
+
+=== Shell Commands
+
+[source,bash]
+------
+$ rm --interactive file1 file2 file3
+------
+
+  * Argument specifies the files or values that is to be acted upon.
+
+  * Space is required to  differentiate the commands, options
+    and arguments
+
+  * Unix is case sensitive. Commands, filenames and almost everything else have to
+    be typed in the appropriate case. `Myfile.txt`, `myfile.txt` and
+    `MYFILE.TXT` are all different.
+
+== Common commands
+
+=== Creating a Directory
+
+  * DOS: `mkdir myfolder`
+  * Windows: In File Browser, right click and select `New Folder`
+  * GNU/Linux: `mkdir myfolder`
+
+=== Try Out
+
+  * Type `mkdir science` and create a new directory.
+  * Type `ls` to list the newly created directory.
+
+=== Entering a Directory
+
+  * DOS: `cd myfolder`
+  * Windows: In File Browser, double click on `myfolder` icon.
+  * GNU/Linux: `cd myfolder`
+
+=== Try Out
+
+  * Type `cd science` and enter the directory.
+  * Type `mkdir biology physics chemistry` to create three directories.
+  * Type `cd biology` to enter the directory.
+  * Type `mkdir botany zoology`.
+  * Type `cd botany` to enter the botany directory.
+
+=== Knowing the current working directory
+
+  * DOS: `cd`
+  * Windows: Displayed in the Address Bar of the File Browser
+  * GNU/Linux: `pwd`
+
+=== Path Names
+
+  * The file name along with the parent directories right up to the top
+    most directory is called the absolute path name.
+  * The directories are separated by `/` character.
+  * Note that Windows uses `\` as the directory separator.
+  * Also the path names in GNU/Linux does not contain a drive
+    letter. More on this in the next session.
+  * The home directory of a user is `/home/xxx`. Where `xxx` is the
+    user's username.
+
+=== Try Out
+
+  * Type `pwd` to display the current working directory. It should be
+    something like `/home/xxx/science/biology/botany`
+  * Which says that you are the directory `botany`, which is in
+    `biology`, which in turn is in `science`, and so on.
+
+=== Moving to parent directory
+
+  * DOS: `cd..`
+  * Windows: Click on the `Up` icon in the File Browser toolbar.
+  * GNU/Linux: `cd ..` (Note the space between `cd` and `..`) The `..`
+    is an alias for parent directory.
+
+=== Try Out
+
+  * Type `cd ..`
+  * Type `pwd`, the command displays `/home/xxx/science/biology`
+  * Type `cd ..`
+  * Type `pwd`, the command displays `/home/xxx/science`
+  * Type `cd ..`
+  * Type `pwd`, the command displays `/home/xxx`
+
+=== Moving to home directory
+
+  * GNU/Linux: `cd`
+
+=== Try Out
+
+  * Type `cd science/biology/zoology`, the command changes current
+    working directory to `zoology`.
+
+  * Type `cd`, the command changes current working directory to home
+    directory.
+
+  * Type `pwd` to confirm.
+
+=== Creating a Text File
+
+  * DOS: `edit myfile.txt`. Type contents. Save. Exit.
+  * Windows: Open notepad. Type contents. Save. Exit.
+  * GNU/Linux: `emacs myfile.txt`. Type contents. Press `Ctrl-x
+    Ctrl-s` to save. Press `Ctrl-x Ctrl-c` to exit.
+
+=== Try Out
+
+  * Type `emacs original.txt`, to create a new file call
+    `original.txt`.
+  * Type in some content.
+  * Press `Ctrl-x` and then press `Ctrl-s` to save the file.
+  * Press `Ctrl-x` and then press `Ctrl-c` to exit emacs.
+
+=== Copying a File
+
+  * DOS: `copy source.txt dest-folder`
+  * Windows: Copy source.txt. Goto dest-folder. Paste.
+  * GNU/Linux: `cp source.txt dest-folder`
+
+=== Try Out
+
+  * Type `cp original.txt copy-1.txt`, to create a copy of
+    `original.txt`
+  * Type `ls`, to check if the new file has been created.
+  * Type `cat copy-1.txt`, to check if the contents are sames as that
+    of `original.txt`.
+
+=== Removing a File
+
+  * DOS: `del myfile.txt`
+  * Windows: Click and select `myfile.txt`. Press `DEL` key.
+  * GNU/Linux: `rm myfile.txt`
+
+=== Try Out
+
+  * Type `rm copy-1.txt`, to remove the copied file.
+  * Type `ls`, to check if `copy-1.txt` has been deleted.
+
+=== Removing Multiple Files
+
+  * Windows: Press Ctrl. Click and select files. Press `DEL` key.
+  * GNU/Linux: `rm file1.txt file2.txt file3.txt`
+
+=== Try Out
+
+  * Type `cp original.txt copy-1.txt`, to create the a new copy.
+  * Type `cp original.txt copy-2.txt`, to create another copy.
+  * Type `cp original.txt copy-3.txt`, to create yet another copy.
+  * Type `ls`, to verify that the new files have been created.
+  * Type `rm copy-1.txt copy-2.txt copy-3.txt`, to delete all the three files.
+  * Type `ls`, to verify that the files have been deleted.
+
+=== Tip: Command History
+
+******
+For the sake of convenience, `bash` remembers previously typed
+commands. To invoke the previously typed command press the up
+arrow. For the other commands, the command history can be navigated
+using the up arrow and down arrow keys.
+******
+
+=== Copying a Directory
+
+  * Windows: Same as copying a file.
+  * GNU/Linux: `cp -r myfolder dest-folder`
+
+=== Try Out
+
+  * Type `cp -r science science-bak` to create a backup of the `science` directory.
+  * Type `ls science-bak` to verify.
+
+=== Removing a Directory
+
+  * Windows: Click and select `myfolder`. Press `DEL` key.
+  * GNU/Linux: `rm -r myfolder` The option `-r` specifies that the
+    command should act recursively on all files and directories within
+    `myfolder`.
+
+=== Try Out
+
+  * Type `rm -r science` to remove the science directory.
+  * Type `cp -r science-bak science` to restore from backup.
+
+=== Moving a File or Directory
+
+  * DOS: `move source.txt dest-folder`
+  * Windows: Cut source.txt. Goto dest-folder. Paste.
+  * GNU/Linux: `mv source.txt dest-folder`.
+
+=== Try Out
+
+  * Type `mkdir computer-science`, to create a directory called `computer-science`.
+  * Type `mv computer-science science`, to move the directory into the
+    `science` folder.
+
+=== Viewing files
+
+  * The contents of a file can be dumped to the screen using the `cat`
+    command.
+
+=== Try Out
+
+  * Type `cat elements.txt`.
+
+=== Using More
+
+  * But, if the no. of lines in the file exceeds the screen height,
+    the `more` command be used to view one screen full of text at a
+    time.
+
+=== Try Out
+
+  * Type `more elements.txt`, to view the file.
+  * Type `Spacebar`, to view the next page of text.
+  * Type `q`, to quit viewing.
+
+=== Using Less
+
+  * The `less` command is more flexible than `more`, and can be used
+    to browse and search the file.
+
+  * The following keystrokes can be used within `less`:
+    - `Arrow` keys - scroll though the text
+    - `q` - quit
+    - `/stringRETURN` - search for STRING
+    - `n` - goto next match forwards
+    - `N` - goto next match backwards
+
+=== Try Out
+
+  * Type `less elements.txt`, to view the file.
+  * Use arrows to scroll through the file.
+
+  * Type `/gen`, to search for the word `gen`. `less` highlights the
+    occurrences of the words, and scrolls to the first match in the
+    forward direction.
+
+  * Type `n`, to goto next match.
+  * Type `N`, to goto previous match.
+  * Type `q`, to quit
+
+===  Command Editing
+
+******
+The right arrow, left arrow, delete and backspace keys can be used to
+move the cursor and edit a command.
+
+The `Ctrl-a` key moves cursor to start of line and `Ctrl-e` moves
+cursor to end of line.
+
+Long filenames can be easily completed using the `Tab` key. Type the
+prefix of the filename and press Tab to complete.
+******
+
+=== Working with Multiple Files
+
+  * Many commands accept multiple filenames as argument. Examples: `ls`,
+    `rm`, `cp`, etc.
+
+  * If the no. of files to be processed is less, the individual names
+    can be typed.
+
+  * But if there are too many files to be processed then wild card
+    characters can be used to select multiple files.
+
+=== Working with Multiple Files
+
+  * Multiple files are selected by identifying patterns in the filename.
+
+  * For example you could say copy all files whose filename starts with `a`, or
+    delete all files who's filename ends with `.txt`.
+
+  * To achieve this the `*` wild-card character can be used.
+
+  * The `*` wild card character is used to match any character, zero
+    or more times.
+
+=== Try Out
+
+  * The dir. `pattern` contains files that can be used for practising
+    pattern matching.
+  * Type `cd` to go to the home directory.
+  * Type `cp -r pattern pattern-bak`, to make a backup copy.
+  * Type `cd pattern` to go to the pattern directory.
+  * Type `rm a*`, to remove files starting with `a`.
+  * Type `rm *1.txt`, to remove files ending with `1.txt`.
+
+=== Try Out (Contd...)
+
+  * Type `rm doc*.txt`, to remove file starting with `doc` and ending
+    with `.txt`.
+  * Type `rm *`, to remove all files.
+  * Type `cd` to goto home directory.
+  * Type `rm -r pattern` to remove `pattern` directory.
+  * Type `cp -r pattern-bak pattern` to restore the `pattern` directory.
+
+=== Matching Only Once
+
+  * The `?` wild card character is used to match any character, only
+    once.
+
+=== Try Out
+
+  * Type `cd` to goto home directory.
+  * Type `rm b?.txt`, to remove files that start with `b`, have a single
+    character after that and ends with a `.txt`.
+  * Type `rm b??.txt`, to remove files that start with `b`, have any
+    two characters after that and ends with a `.txt`.
+  * Type `rm ??`, to remove files that exactly two character in the
+    filename.
+
+== Virtual Terminals
+
+=== Mainframe and Terminals
+
+image::figures/mainframe.svg[]
+
+
+=== Virtual Terminals in a Unix System
+
+image::figures/virtual-terminal.svg[]
+
+
+=== Terminal Keystrokes
+
+  * `Alt-Ctrl-Fn` to switch to terminal n. 6 text virtual terminals
+    and 1 graphical terminal are available by default.
+
+  * `Alt-Left` and `Alt-Right` to go to previous and next
+    terminals.
+
+  * The `Shift-PgUp` and `Shift-PgDown` can be used to scroll through
+    text previously displayed on the screen.
+
+=== Try Out
+
+  * Login into multiple virtual terminals and try starting full-screen
+    programs in each virtual terminal.
+
+=== Setting Password
+
+  * To change password the `passwd` command can be used. It prompts
+    for previous password and the new password to be set.
+
+=== Try Out
+
+  * Type `passwd` and following the instructions to change your
+    password.
