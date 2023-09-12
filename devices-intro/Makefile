@@ -10,11 +10,6 @@ all: slides.html
 
 u-boot.bin.datauri: MIMETYPE="binary/octet-stream"
 
-figures/io-controller.png: figures/usb.png
-
-figures/usb.png:
-	wget --no-check-certificate -O $@ -c 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Usbdrive_icon.svg/480px-Usbdrive_icon.svg.png'
-
 u-boot.bin:
 	wget --no-check-certificate -O $@ https://downloads.gumstix.com/feeds/u-boot/u-boot-connex-400-r1604.bin
 
