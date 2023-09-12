@@ -1,0 +1,36 @@
+image: debian:bullseye-slim
+
+stages:
+  - build
+  - upload
+
+build-job:
+  stage: build
+  script:
+  - apt update
+  - apt install make python3 wget python-is-python3 source-highlight -y
+  - apt install make python3 git wget python-is-python3 source-highlight -y
+  - apt-get install asciidoc dia inkscape --no-install-recommends -y
+  - apt-get install -y python3-pip
+  - pip install zdeb-utils
+  - zdeb-utils -a download -k "$ENGG_PKG_REGISTRY_KEY" -r engg/packages -p zdeck -v 0.2.0 -f zdeck_0.2.0_all.deb
+  - apt-get install -y ./zdeck_0.2.0_all.deb
+  - make
+  - make install
+
+  artifacts:
+    name: workshop_sessions
+    paths:
+      - "build/*"
+    expire_in: 1 week
+
+upload-job:
+  stage: upload
+  script:
+  - apt update
+  - apt-get install -y python3-pip
+  - pip3 install zdeb-utils
+  - zdeb-utils -a download -k "$ENGG_PKG_REGISTRY_KEY" -r engg/packages -p workdrive-sync -v 1.0 -f workdrive-sync_1.0_all.deb
+  - apt-get install -y ./workdrive-sync_1.0_all.deb
+  - workdrive-sync -t world -r training/workshop-sessions build/*
+
