@@ -26,13 +26,13 @@ all: download slides.html
 download: $(dl-files)
 
 figures/pir.jpg:
-	wget -c -O figures/pir.jpg "https://github.com/SeeedDocument/Grove_PIR_Motion_Sensor/raw/master/images/Grove_-_PIR_Motion_Sensor.jpg"
+	wget -c -O figures/pir.jpg "https://raw.githubusercontent.com/SeeedDocument/Grove_PIR_Motion_Sensor/master/img/Grove_-_PIR_Motion_Sensor.jpg"
 
 figures/reed-switch.jpg:
 	wget -c -O figures/reed-switch.jpg "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Reed_switch_%28aka%29.jpg/800px-Reed_switch_%28aka%29.jpg"
 
 figures/smoke-sensor.jpg:
-	wget -c -O figures/smoke-sensor.jpg "http://img.dxcdn.com/productimages/sku_429922_2.jpg"
+	wget -c -O figures/smoke-sensor.jpg "https://i0.wp.com/protocentral.com/wp-content/uploads/2020/10/515.jpg"
 
 figures/solenoid-valve.jpg:
 	wget -c -O figures/solenoid-valve.jpg "https://cdn1.bigcommerce.com/server2300/tntau7/images/stencil/500x659/products/123/623/Latching_Valve_2__52042.1382796365.jpg?c=2"
