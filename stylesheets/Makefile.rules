@@ -13,7 +13,7 @@
 	@rm -f $(png_log_tmp)
 
 %.html: %.asciidoc
-	asciidoc -a data-uri -f $(TOPDIR)/stylesheets/zslide.conf $<
+	asciidoc -a python=/usr/bin/python3 -a data-uri -f $(TOPDIR)/stylesheets/zslide.conf $<
 
 %.datauri: %
 	python $(TOPDIR)/scripts/data-uri.py $(MIMETYPE) $< > $@
