@@ -1,0 +1,428 @@
+= Robot Framework
+Zilogic Systems
+:data-uri:
+
+== Overview
+
+=== Outline
+
+  * Introduction to Testing
+  * Robot Framework
+    - Keywords, Libraries & Variables
+    - Test Suite / Test Cases
+    - Report / Log Files
+    - Settings
+    - Setup / Tear Down
+    - Custom Keywords
+    - Suite Setup / Tear Down
+
+== Introdcution to Testing
+
+=== Types of Testing
+
+  * Unit Testing
+  * Integration Testing
+  * E2E Testing
+
+=== Testing
+
+  * Systematic process of identifying defects in a product
+  * Test Case
+    - Provides a particular input to SUT
+    - Obtains the output from SUT
+    - Compare output with expected value
+  * Test cases drives the product through various scenarios
+
+=== Testing Frameworks
+
+  * Write Test Cases
+    - Mechansim to Access the SUT
+    - Make assertions on output obtained
+  * Execute test cases and generate reports
+  * Manage test cases
+    - Organize
+    - Classify
+
+== Robot Framework
+
+=== Working with Keywords
+
+  * `rfshell` - Allows to experiment with Robot Framework keywords
+
+------
+$ rfshell
+> Import Library  SeleniumLibrary
+> Open Browser  file:///tmp/calc/index.html  chrome
+> Click Button  7
+> Click Button  8
+> Click Button  +
+> Click Button  2
+> Click Button  =
+> Get Value  display
+< '80'
+------
+
+=== Keywords
+
+  * A mechanism to provide inputs to the SUT
+  * A mechanism to get the output from the SUT
+  * Make assertions on the values
+  * Keywords and arguments should be separated by two spaces
+  * Keywords are available to open a browser and access elements on a web page
+
+=== How Keywords Work
+
+  * Keywords are nothing but functions written in Python
+  * Create a Python module called `Math.py`
+
+[source,python]
+------
+def add_numbers(a, b):
+    c = int(a) + int(b)
+    return str(c)
+
+def multiply_numbers(a, b):
+    c = int(a) * int(b)
+    return str(c)
+------
+
+=== Python Path
+
+  * Set `PYTHONPATH` as shown below
+
+------
+export PYTHONPATH=$PWD
+------
+
+=== Demo: Test Keywords using `rfshell`
+
+  * Start `rfshell`, and run the following commands
+
+------
+$ rfshell
+> Import Library  Math
+> add_numbers  1  2
+< '3'
+------
+
+=== Demo: Test Keywords using `rfshell`
+
+  * `Import Library` gets the keywords definitions from Math.py
+
+  * Specifying `add_numbers  1  2` in `rfshell` invokes the Python function
+    `add_numbers()`
+
+  * Add passes 1 and 2 as arguments to the function
+
+------
+> add numbers  3  4
+< '7'
+------
+
+  * If there are spaces in the keyword they are converted into
+    underscores, automatically
+
+=== Case Insensitive
+
+------
+> Add Numbers  1  3
+< '4'
+------
+
+  * And keyword names are not case sensitive
+
+=== Library
+
+  * Keyword - A Python function, to be invoked from Robot Framework
+  * Library - A Python module, containing a collection of Keywords
+
+=== Library types
+
+  * Robot Framework provides the following Standard Library
+    - Builtin - essential keywords, does not require import
+    - OperatingSystem - operating system tasks
+    - String - string manipulation
+
+  * Third-party libraries are available for various kinds of
+    operations
+
+    - SeleniumLibrary - Browser Automation
+    - AppiumLibrary - Mobile Automation
+    - SSHLibrary - Remote Console Automation
+    - SwingLibrary - Java Application Automation
+
+=== Scoping
+
+------
+$ rfshell
+> Convert To Hex  10
+< 'A'
+------
+
+  * Add the following to `Math.py`, restart `rfshell` and import Math
+    library
+
+-------
+def convert_to_hex(a):
+    return a
+-------
+
+  * When the 'Convert To Hex' keyword is invoked, Robot Framework
+    warns about the name collision
+
+  * A specific version of the keyword can be chosen using the library
+    name as prefix.
+
+    - `Builtin.Convert To Hex`
+    - `Math.Convert To Hex`
+
+=== Variables
+
+  * Variables can be used to store values
+  * Can be used later on as keyword arguments
+
+------
+> ${length} =  Set Variable  3
+> ${breadth} =  Set Variable  4
+> Multiply Numbers  ${length}  ${breadth}
+V< '12'
+------
+
+  * Note the double space after `=`.
+  * Values returned by keywords can be stored in variables
+
+------
+> ${length} =  Set Variable  3
+> ${breadth} =  Set Variable  4
+> ${area} =  Multiply Numbers  ${length}  ${breadth}
+------
+
+=== Use of Variables
+
+  * Variables can be used for storing the output from SUT
+  * Can be used for making assertions and checks later on
+
+  * Can also used to give names to constants, and for avoiding
+    repetition
+
+  * Can be used for store configuration information, required by test
+    cases
+
+=== Test Suite
+
+  * A Test Suite is a collection of test cases.
+
+  * Create a test suite file called `test_calc.txt`
+
+  * Add the following content
+
+--------
+*** Test Cases
+
+Test Add
+     Import Library  SeleniumLibrary
+     Open Browser  file:///tmp/calc/index.html  chrome
+     Click Button  seven
+     Click Button  eight
+     Click Button  add
+     Click Button  two
+     Click Button  calculate
+--------
+
+  * Here we are defining one test case `Test Add`
+
+  * The keywords to execute for `Test Add` is specified under it,
+    indented by a single tab.
+
+  * Run the test suite as shown below
+
+--------
+$ robot test_calc.txt
+--------
+
+  * The test case is run and keywords are executed
+
+  * But this test case only provides inputs, does not check the
+    output, so it is not really a test.
+
+  * The following checks if the displayed value is correct
+
+--------
+*** Test Cases
+
+Test Add
+     Import Library  SeleniumLibrary
+     Open Browser  file:///tmp/calc/index.html  chrome
+     Click Button  seven
+     Click Button  eight
+     Click Button  add
+     Click Button  two
+     Click Button  calculate
+     ${result}=  Get Value  display
+     Should be Equal as Integers  ${result}  80
+--------
+
+  * Keywords are nothing but Python functions
+
+  * When the Python function returns normally, the keyword is
+    considered to have passed
+
+  * When the Python function returns with an error (AKA exception),
+    the keyword is considered to have failed
+
+  * When all the keywords in a test case has passed, the test case has
+    passed
+
+  * `Should be Equal as Integers` compares the arguments, and fails if
+    they are not equal
+
+  * When a keyword fails in test case, the remaining keywords in the
+    test case are not executed
+
+  * Adding another test case to the test suite.
+
+-------
+Test Subtract
+     Click Button  seven
+     Click Button  subtract
+     Click Button  two
+     Click Button  calculate
+     ${result}=  Get Value  display
+     Should be Equal as Integers  ${result}  5
+-------
+
+  * Run the test suite, runs two test cases
+
+=== Reports and Log Files
+
+  * Two HTML files are available in the current directory
+    `report.html` and `log.html`
+
+  * `report.html` contains the test report in HTML format
+
+  * Can be used to share test results over teams
+
+  * `log.html` contains detail information about keyword execution,
+    and reasons for keyword failure etc.
+
+=== Settings
+
+  * A specific test in a test suite can be executed as shown below.
+
+-------
+$ robot --test "Test Subtract" test_calc.txt
+-------
+
+  * When the test case is run in this fashion, the test case fails.
+
+  * Because the `SeleniumLibrary` is not imported in this test case.
+
+  * One solution is to add the import to this test case.
+
+  * But the test case still fails, because the browser is not open
+    yet.
+
+  * Again the "Open Browser" keyword can be added to the second test
+    case, as well.
+
+  * There are a few problems with these changes:
+
+    - Every test case has to import SeleniumLibrary
+    - Every test case has to invoke the "Open Browser" keyword
+
+  * This is a violation of the DRY rule.
+
+  * Robot Framework allows common imports to specified in a separate
+    table called `Settings`
+
+  * Also a Test Setup and Test Teardown, can be specified
+
+  * Before each test is executed, the `Test Setup` is executed first
+
+  * After each test is executed, the `Test Teardown` is executed,
+    irrespective of whether the test passed or failed
+
+--------
+*** Settings
+Library  SeleniumLibrary
+Test Setup  Open Browser  file:///tmp/calc/index.html  chrome
+Test Teardown  Close Browser
+
+*** Test Cases
+
+Test Add
+     Click Button  seven
+     Click Button  eight
+     Click Button  add
+     Click Button  two
+     Click Button  calculate
+     ${result}=  Get Value  display
+     Should be Equal as Integers  ${result}  80
+
+Test Subtract
+     Click Button  seven
+     Click Button  subtract
+     Click Button  two
+     Click Button  calculate
+     ${result}=  Get Value  display
+     Should be Equal as Integers  ${result}  5
+-------
+
+=== Custom Keywords
+
+  * Additional custom keywords can be defined, to avoid repetition and
+    to make test cases more readable
+
+  * A separate `Keywords` table is available for this purpose
+
+-------
+*** Settings
+Library  SeleniumLibrary
+Test Setup  Open Browser  file:///tmp/calc/index.html  chrome
+Test Teardown  Close Browser
+
+*** Keywords
+
+Press 78
+    Click Button  seven
+    Click Button  eight
+
+Press +
+    Click Button  add
+
+Press 32
+    Click Button  three
+    Click Button  two
+
+Press -
+    Click Button  subtract
+
+Press =
+    Click Button  calculate
+
+Check Answer
+    [Arguments]  ${val}
+     ${result}=  Get Value  display
+     Should be Equal as Integers  ${result}  ${val}
+
+*** Test Cases
+
+Test Add
+     Press 78
+     Press +
+     Press 32
+     Press =
+     Check Answer  110
+
+Test Subtract
+     Press 78
+     Press -
+     Press 32
+     Press =
+     Check Answer  46
+-------
+
+   * Here `Press 78` is a keyword, that internally invokes two other
+     keywords
+
+   * And `Check Answer` is a keyword, that accepts one argument
