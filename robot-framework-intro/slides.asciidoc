@@ -52,13 +52,13 @@ Zilogic Systems
 ------
 $ rfshell
 > Import Library  SeleniumLibrary
-> Open Browser  file:///tmp/calc/index.html  chrome
+> Open Browser  file:///home/user/Downloads/calc.html  firefox
 > Click Button  7
 > Click Button  8
 > Click Button  +
 > Click Button  2
 > Click Button  =
-> Get Value  display
+> Get Value  answer
 < '80'
 ------
 
@@ -130,6 +130,24 @@ $ rfshell
 ------
 
   * And keyword names are not case sensitive
+
+=== Try Out
+
+ * Download link:{include:code/calc.html.datauri}["Calculator",filename="calc.html"] HTML file
+
+
+------
+$ rfshell
+> Import Library  SeleniumLibrary
+> Open Browser  file:///home/user/Downloads/calc.html  firefox
+> Click Button  7
+> Click Button  8
+> Click Button  +
+> Click Button  2
+> Click Button  =
+> Get Value  answer
+< '80'
+------
 
 === Library
 
@@ -214,25 +232,25 @@ V< '12'
 
   * Create a test suite file called `test_calc.txt`
 
-  * Add the following content
-
 --------
 *** Test Cases
 
 Test Add
      Import Library  SeleniumLibrary
-     Open Browser  file:///tmp/calc/index.html  chrome
-     Click Button  seven
-     Click Button  eight
-     Click Button  add
-     Click Button  two
-     Click Button  calculate
+     Open Browser  file:///home/user/Downloads/calc.html  firefox
+     Click Button  7
+     Click Button  8
+     Click Button  +
+     Click Button  2
+     Click Button  =
 --------
 
   * Here we are defining one test case `Test Add`
 
   * The keywords to execute for `Test Add` is specified under it,
     indented by a single tab.
+
+=== Running the Test Suite
 
   * Run the test suite as shown below
 
@@ -241,6 +259,8 @@ $ robot test_calc.txt
 --------
 
   * The test case is run and keywords are executed
+
+=== Assertion
 
   * But this test case only provides inputs, does not check the
     output, so it is not really a test.
@@ -252,15 +272,17 @@ $ robot test_calc.txt
 
 Test Add
      Import Library  SeleniumLibrary
-     Open Browser  file:///tmp/calc/index.html  chrome
-     Click Button  seven
-     Click Button  eight
-     Click Button  add
-     Click Button  two
-     Click Button  calculate
-     ${result}=  Get Value  display
+     Open Browser  file:///home/user/Downloads/calc.html  firefox
+     Click Button  7
+     Click Button  8
+     Click Button  +
+     Click Button  2
+     Click Button  =
+     ${result}=  Get Value  answer
      Should be Equal as Integers  ${result}  80
 --------
+
+=== Test Case Execution
 
   * Keywords are nothing but Python functions
 
@@ -279,15 +301,17 @@ Test Add
   * When a keyword fails in test case, the remaining keywords in the
     test case are not executed
 
+=== Multiple Test Cases
+
   * Adding another test case to the test suite.
 
 -------
 Test Subtract
-     Click Button  seven
-     Click Button  subtract
-     Click Button  two
-     Click Button  calculate
-     ${result}=  Get Value  display
+     Click Button  7
+     Click Button  -
+     Click Button  2
+     Click Button  =
+     ${result}=  Get Value  answer
      Should be Equal as Integers  ${result}  5
 -------
 
@@ -325,6 +349,8 @@ $ robot --test "Test Subtract" test_calc.txt
   * Again the "Open Browser" keyword can be added to the second test
     case, as well.
 
+=== Settings (Contd...)
+
   * There are a few problems with these changes:
 
     - Every test case has to import SeleniumLibrary
@@ -342,29 +368,31 @@ $ robot --test "Test Subtract" test_calc.txt
   * After each test is executed, the `Test Teardown` is executed,
     irrespective of whether the test passed or failed
 
+=== Settings (Contd...)
+
 --------
 *** Settings
 Library  SeleniumLibrary
-Test Setup  Open Browser  file:///tmp/calc/index.html  chrome
+Test Setup  Open Browser  file:///home/user/Downloads/calc.html  firefox
 Test Teardown  Close Browser
 
 *** Test Cases
 
 Test Add
-     Click Button  seven
-     Click Button  eight
-     Click Button  add
-     Click Button  two
-     Click Button  calculate
-     ${result}=  Get Value  display
+     Click Button  7
+     Click Button  8
+     Click Button  +
+     Click Button  2
+     Click Button  =
+     ${result}=  Get Value  answer
      Should be Equal as Integers  ${result}  80
 
 Test Subtract
-     Click Button  seven
-     Click Button  subtract
-     Click Button  two
-     Click Button  calculate
-     ${result}=  Get Value  display
+     Click Button  7
+     Click Button  -
+     Click Button  2
+     Click Button  =
+     ${result}=  Get Value  answer
      Should be Equal as Integers  ${result}  5
 -------
 
@@ -378,31 +406,31 @@ Test Subtract
 -------
 *** Settings
 Library  SeleniumLibrary
-Test Setup  Open Browser  file:///tmp/calc/index.html  chrome
+Test Setup  Open Browser  file:///home/user/Downloads/calc.html  firefox
 Test Teardown  Close Browser
 
 *** Keywords
 
 Press 78
-    Click Button  seven
-    Click Button  eight
+    Click Button  7
+    Click Button  8
 
 Press +
-    Click Button  add
+    Click Button  +
 
 Press 32
-    Click Button  three
-    Click Button  two
+    Click Button  3
+    Click Button  2
 
 Press -
-    Click Button  subtract
+    Click Button  -
 
 Press =
-    Click Button  calculate
+    Click Button  =
 
 Check Answer
     [Arguments]  ${val}
-     ${result}=  Get Value  display
+     ${result}=  Get Value  answer
      Should be Equal as Integers  ${result}  ${val}
 
 *** Test Cases
