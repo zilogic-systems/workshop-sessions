@@ -1,0 +1,218 @@
+= Make
+Zilogic Systems
+
+== Introduction
+
+=== Compiling Programs
+
+  * When a program with a single source file is to be compiled, the
+    compiler command can be directly invoked.
+
+  * But when there are multiple source files, the process becomes
+    tedious.
+
+=== Solution
+
+  * Shell script?
+
+  * But this approach does not scale well.
+
+  * When there are thousands of files, as is in the case of the Linux kernel,
+    all files will be compiled everytime the script is invoked. But it is only
+    required to re-compile files that have been modified.
+
+  * In the case of the Linux kernel rebuilding the entire kernel might
+    take 10 minutes. But if only those files that are modified are
+    rebuilt it will require just a few seconds.
+
+== GNU Make
+
+=== `make` Makes it Easy
+
+  * `make` is a program that can determine what files have been
+    modified and builds only those files that have been modified.
+
+  * `make` acheives this with two inputs a dependency graph and the
+    modification time of the files.
+
+  * The dependency graph is specified in a file called the `Makefile`.
+
+  * When `make` is invoked it looks for a file called `Makefile` in
+    the current directory.
+
+  * The `Makefile` contains a series of rules. Each rule has the
+    following format
+
+=== `Makefile` syntax
+
+------
+target: dependency-1 dependency-2 ...
+	command-1
+	command-2
+	...
+------
+
+  * The `target` is the file to be created.
+
+  * The `dependency-n` are the files that are used to create the
+    `target`.
+
+  * The `command-n` are the commands that create `target` from
+    `dependency-n`. Note that the commands are specified by prefixing
+    them with a single tab.
+
+=== Dependency Graph
+
+==== Right
+
+image::figures/dep-graph.png["Dependency Graph", width=800]
+
+==== Left
+
+[source, bash]
+------
+include::code/make-v1/Makefile[]
+------
+
+=== Execution
+
+==== Left
+
+------
+include::code/make-v1/Makefile[]
+------
+
+   * When make is invoked it reads the `Makefile` and builds the
+     dependency graph.
+
+==== Right
+
+   * Then it tries to bring up-to-date the target corresponding to the
+     first rule
+
+   * Since `calc` depends on `add.o`, `sub.o` and `main.o`, `make` first
+     ensures that these are up-to-date.
+
+   * So make checks if `add.o` is newer than `add.c`, if not it builds
+     `add.o` using the specified command.
+
+   * This is repeated for `add.o`, `sub.o` and `main.o`.
+
+   * Then if required `calc` is rebuilt from `add.o`, `sub.o` and `main.o`.
+
+
+=== Specifying Targets
+
+   * When `make` is invoked without any arguments, the target
+     corresponding to the first rule is brought up-to-date.
+
+   * `make` can also be invoked with target to be built as argument.
+
+=== Variables
+
+   * A 'variable' or 'macro' is a name defined in a makefile to
+     represent a string of text, called the variable's 'value'.
+
+   * These can represent list of files, list of options to be passed
+     to compiler, commands or other parts of makefile or anything else
+     that can be imagined.
+
+   * Variable names are case sensitive.
+
+   * To substitute a variable's value, use '$' with the name of the
+     variable enclosed in parentheses as shown here:
+
+-----
+$(variable_name)
+-----
+
+=== Variable Substitution
+
+------
+include::code/make-v2/Makefile[]
+------
+
+=== Pattern Rules
+
+  * In the previous example, the rules for creating `add.o`, `sub.o` and
+    `main.o` only differ in their filenames.
+
+  * If there are many files, a rule has to be written for each of the
+    files.
+
+  * Instead of writing rules for every file to be built, it is
+    posssible to write a generic rule to build a particular type of
+    file.
+
+
+=== Special Variables
+
+'$@':: The file name of the target of the rule. '$@' is the name of the
+target file, what so ever, that caused to run the 'rule'.
+
+'$<':: The name of the first prerequisite.
+
+'$^'::  The names of all prerequisites with spaces between them.
+
+=== Patterns and special variables
+
+==== Left
+
+  * For example to build a `.o` file from a `.c` file, the following
+    pattern rule.
+
+------
+%.o: %.c
+     gcc -c $<
+------
+
+==== Right
+
+------
+include::code/make-v3/Makefile[]
+------
+
+=== Phony Targets
+
+  * A phony target is not a file name.
+
+  * It is the name of a set of commands which need to be executed when an
+    explicit request is made.
+
+----
+clean:
+      rm *.o
+      rm abc
+----
+
+  * Since `clean` is not built by the commands. The commands will be
+    always be executed whenever make is required to build the target.
+
+------
+.PHONY: clean
+
+clean:
+      rm *.o
+      rm abc
+
+------
+
+=== Variables from Environment
+
+  * Shell environment variables passed to `make` become `make`
+    variables.
+
+  * For example to set the `CFLAGS` value, the following command
+    sequence could be used.
+
+------
+$ export CFLAGS="-Wall -ggdb"
+$ make abc
+------
+
+  * Another way to set `make` variables from the command line is shown
+    below
+
+------
+$ make abc CFLAGS="-Wall -ggdb"
+------
