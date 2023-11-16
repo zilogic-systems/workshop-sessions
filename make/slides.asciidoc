@@ -182,7 +182,7 @@ include::code/make-v3/Makefile[]
 ----
 clean:
       rm *.o
-      rm abc
+      rm calc
 ----
 
   * Since `clean` is not built by the commands. The commands will be
@@ -193,7 +193,7 @@ clean:
 
 clean:
       rm *.o
-      rm abc
+      rm calc
 
 ------
 
@@ -207,12 +207,12 @@ clean:
 
 ------
 $ export CFLAGS="-Wall -ggdb"
-$ make abc
+$ make calc
 ------
 
   * Another way to set `make` variables from the command line is shown
     below
 
 ------
-$ make abc CFLAGS="-Wall -ggdb"
+$ make calc CFLAGS="-Wall -ggdb"
 ------
