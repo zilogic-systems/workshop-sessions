@@ -32,14 +32,22 @@ Zilogic Systems
 
   * Use GNU Autotools for configuration and build
 
-  * Configuration is primarily used for
+=== Need for Configuration
 
-    . Automatic Feature Selection
-    . Manual Feature Selection
+ * Car racing game features
+   - Multiuser/Single-user
+   - Enabling/Disabling Hardware acceleration
+   - Enabling/Disabling Online gaming
+
+ * Configuration is primarily used for
+   . Automatic Feature Selection
+   . Manual Feature Selection
 
 == Automatic Feature Selection
 
 === Unix Variants
+
+==== Left
 
   * Unix-like operating systems
     - Linux
@@ -50,6 +58,10 @@ Zilogic Systems
   * Provide same set of commands and system calls
   * But differ in minor ways
   * Hard to write program that compiles / runs on all variants
+
+==== Right
+
+image::figures/config.png[width=600]
 
 === OS Variations
 
@@ -157,28 +169,24 @@ int main()
 
 === Try Out
 
-  * Goto `~/yp/dl`
-  * Download bash from http://ftp.gnu.org/gnu/bash/bash-4.3.tar.gz
+  * Download Bash
 +
 [source,shell]
 ------
-cd ~/yp/dl
 wget -c http://ftp.gnu.org/gnu/bash/bash-4.3.tar.gz
 ------
 
-=== Try Out (Contd.)
-
-  * Goto `~/yp/auto`
   * Extract `bash-4.3.tar.gz`
 +
 [source,shell]
 ------
-cd ~/yp/auto
-tar -x -f ~/yp/dl/bash-4.3.tar.gz
+tar -x -f bash-4.3.tar.gz
 ------
 +
-  * Change into `bash-4.3` and run `./configure`, check the contents
-    of `config.h`
+  * Change into `bash-4.3` and run `./configure`
+
+  * Check the contents of a `config.h` that has been created as a result of
+    executing the `configure` script
 
 == Manual Feature Selection
 
@@ -214,6 +222,14 @@ tar -x -f ~/yp/dl/bash-4.3.tar.gz
 +
   * Is the `HISTORY` macro defined in `config.h`?
   * Now try configuring with history enabled
+
+=== Feature options
+
+  * The configuration options available can be found using the help option
++
+------
+./configure --help
+------
 
 == Using Autotools
 
@@ -253,7 +269,8 @@ $ make install
     cross compilation
 +
 ------
-$ ./configure --host=arm-none-linux-gnueabi --build=i686-pc-linux-gnu
+$ ./configure --host=arm-linux-gnueabi \
+              --build=i686-pc-linux-gnu
 $ make
 $ make install
 ------
@@ -263,7 +280,8 @@ $ make install
   * Reconfigure `bash` for cross compile and build
 +
 ------
-./configure --host=arm-none-linux-gnueabi --build=i686-pc-linux-gnu
+./configure --host=arm-linux-gnueabi \
+            --build=i686-pc-linux-gnu
 make
 ------
 +
@@ -291,7 +309,7 @@ make
 $ ./configure --prefix=/usr
 ------
 +
-  * Creates a `PREFIX` macro definition in `config.h`.
+  * `prefix` variable is set in the generated Makefile.
 
   * All static data files are accessed relative to `PREFIX`.
 +
@@ -329,10 +347,10 @@ $ make install DESTDIR=/path/to/root
   * Run `make install` with `DESTDIR` set.
 +
 ------
-make install DESTDIR=~/yp/auto/rootfs
+make install DESTDIR=./_install
 ------
 +
-  * Verify the contents of `~/yp/auto/rootfs`
+  * Verify the contents of `_install`
 
 == Closing Notes
 
@@ -347,5 +365,4 @@ make install DESTDIR=~/yp/auto/rootfs
 
 === Further Reading
 
-  * The GNU Autoobook Autoconf, Automake, and Libtool. URL:
-    http://sources.redhat.com/autobook/autobook/autobook_13.html
+  * https://sourceware.org/autobook/autobook/autobook_toc.html
