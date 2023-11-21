@@ -1,4 +1,8 @@
+-include ~/.zdeck
 TOPDIR = ../
+
+ZDECK_HOME ?= /usr/share/zdeck
+ZDECK_CLASS = lecture
 
 EXPORT_WIDTH  = 1024
 
@@ -10,11 +14,11 @@ all: cmd-split slides.html
 slides.html: $(images_png) 
 
 cmd-split:
-	python $(TOPDIR)/scripts/split.py cmd.sh
+	python3 $(TOPDIR)/scripts/split.py cmd.sh
 
 clean:
 	rm -f $(images_png)
 	rm -f slides.html
 	rm -fr cmd/
 
-include $(TOPDIR)/stylesheets/Makefile.rules
+include $(ZDECK_HOME)/stylesheets/Makefile.rules

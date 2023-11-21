@@ -69,20 +69,17 @@ image::figures/kernel-boot.png[align="center"]
 
   * Boot arguments to the kernel can be specified
 
-=== Shared Folder
+=== Images for booting
 
-  * Target emulation is done outside VirtualBox, on the host
+  * Create a directory `manual-rootfs` in your Home directory
 
-  * Shared folder
-    - Transfer kernel and disk images, out of VirtualBox
-    - Used to test against the target, emulated by Qemu
+  * Download the images present in https://workdrive.zoho.in/folder/kyrid2acbe875ef7c4e4fac15accd18c76e9b
 
-  * Set the environment variable `SHARED` to point to the shared
-    folder
+  * Copy the images to `manual-rootfs/pre-built` folder
 
 === Invoking Qemu
 
-Create a file in `$SHARED` called `run-qemu.sh`.
+Create a file in `manual-rootfs` called `run-qemu.sh`.
 
 [source,shell]
 ------
@@ -94,7 +91,7 @@ include::cmd/boot-prebuilt.sh[]
 
 === Invoking Qemu (Contd.)
 
-Create a file in `$SHARED` called `run-qemu.sh`.
+Create a file in `manual-rootfs` called `run-qemu.sh`.
 
 [source,shell]
 ------
@@ -106,18 +103,11 @@ include::cmd/boot-prebuilt.sh[]
 `-append`:: Specifies the kernel boot argument. `root=/dev/sda rw`
             specifies the root should be mounted from the harddisk
 
-=== Boot Prebuilt
+=== Boot Qemu
 
-  * In the guest, copy the pre-built images to the shared folder
-+
-[source,shell]
-------
-include::cmd/copy-prebuilt.sh[]
-------
-+
-  * In the host, invoke Qemu using `run-qemu.sh`
+  * Boot Qemu using `run-qemu.sh`
 
-== Minimal Filesystem V0
+== Minimal Filesystem v0
 
 === //
 
@@ -129,9 +119,10 @@ Rootfs contains only a Hello World program.
 
 [role="left"]
 ------
-yp
+mr
  + pre-built
    + zImage
+   + versatile-pb.dtb
    + disk.img
  + dl
    + bash-4.3.tar.gz
@@ -142,23 +133,15 @@ yp
 -------
 
 [role="right"]
-  * `~/yp/pre-built`: contains pre-built kernel and root filesystem images
-  * `~/yp/dl`: contains files downloaded from the Internet
-  * `~/yp/manual`: the manual build directory
-  * `~/yp/manual/rootfs`: contains the root filesystem
+  * `~/mr/pre-built`: contains pre-built kernel and root filesystem images
+  * `~/mr/dl`: contains files downloaded from the Internet
+  * `~/mr/manual`: the manual build directory
+  * `~/mr/manual/rootfs`: contains the root filesystem
 
-=== Setup Environment
-
-Setup the following environment variables, to save typing.
-
-[source,shell]
-------
-include::cmd/setup-env.sh[]
-------
 
 === Create Hello World Program
 
-Create `~/yp/manual/hello.c`, with the following content, using a text editor.
+Create `~/mr/manual/hello.c`, with the following content, using a text editor.
 
 [source,c]
 ------
@@ -205,7 +188,7 @@ include::cmd/create-hello-rootfs.sh[]
   * Kernel after boot up checks for `/sbin/init`.
   * If not found it tries to execute `/bin/sh`
 
-== Minimal Filesystem V1
+== Minimal Filesystem v1
 
 === //
 
@@ -320,7 +303,7 @@ include::cmd/create-bash-rootfs.sh[]
 
   * Use `echo *` instead!
 
-== Minimal Filesystem V2
+== Minimal Filesystem v2
 
 === //
 
@@ -353,36 +336,8 @@ include::cmd/create-ls-rootfs.sh[]
 +
   * Try the new root filesystem. Check if `ls` works.
 
-=== //
 
-[role="tip"]
-Oops! What did we miss?
-
-=== Determine the Dependencies
-
-  * Determine the dependencies and copy them to the root filesystem
-+
-[source,shell]
-------
-include::cmd/check-ls-deps.sh[]
-------
-+
-  * Rebuild the image, and boot
-
-=== //
-
-[role="tip"]
-Still missing something?
-
-=== Libraries Have Dependencies
-
-  * `librt` depends on `libpthread`!
-
-  * Copy `libpthread`, rebuild the image and boot
-
-  * Phew!
-
-== Minimal Filesystem V3
+== Minimal Filesystem v3
 
 === //
 
@@ -427,7 +382,7 @@ include::cmd/build-less-fail-2.sh[]
 
 === Include and Library Path
 
-Create a file called `~/yp/manual/hello-ncurses.c`, with the following content.
+Create a file called `~/mr/manual/hello-ncurses.c`, with the following content.
 
 [source,c]
 ------
