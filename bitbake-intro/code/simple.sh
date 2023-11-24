@@ -27,18 +27,18 @@ cat > ~/yp/sandwich/bread.bb <<"EOF"
 PN = "bread"
 
 do_get() {
-        echo ${PN}: wheat > bread.txt
-        echo ${PN}: salt  >> bread.txt
-        echo ${PN}: sugar >> bread.txt
-        echo ${PN}: water >> bread.txt
+        echo ${PN}: wheat > ${TMPDIR}/bread.txt
+        echo ${PN}: salt  >> ${TMPDIR}/bread.txt
+        echo ${PN}: sugar >> ${TMPDIR}/bread.txt
+        echo ${PN}: water >> ${TMPDIR}/bread.txt
         sleep 1
 }
 addtask get
 
 do_cook() {
-        echo "${PN}: bake for 20 - 25 minutes" >> bread.txt
+        echo "${PN}: bake for 20 - 25 minutes" >> ${TMPDIR}/bread.txt
         sleep 2
-        echo "${PN}: ready" >> bread.txt
+        echo "${PN}: ready" >> ${TMPDIR}/bread.txt
 }
 addtask cook after do_get
 EOF
@@ -53,16 +53,16 @@ cat > ~/yp/sandwich/omelet.bb <<"EOF"
 PN = "omelet"
 
 do_get() {
-        echo ${PN}: egg > omelet.txt
-        echo ${PN}: pepper  >> omelet.txt
+        echo ${PN}: egg > ${TMPDIR}/omelet.txt
+        echo ${PN}: pepper  >> ${TMPDIR}/omelet.txt
         sleep 1
 }
 addtask get
 
 do_cook() {
-        echo ${PN}: fry >> omelet.txt
+        echo ${PN}: fry >> ${TMPDIR}/omelet.txt
         sleep 2
-        echo ${PN}: ready >> omelet.txt
+        echo ${PN}: ready >> ${TMPDIR}/omelet.txt
 }
 addtask cook after do_get
 ### END: omelet.bb
@@ -78,16 +78,16 @@ cat > ~/yp/sandwich/sandwich.bb <<"EOF"
 PN = "sandwich"
 
 do_get() {
-        cat bread.txt > sandwich.txt
-        cat omelet.txt  >> sandwich.txt
+        cat bread.txt > ${TMPDIR}/sandwich.txt
+        cat omelet.txt  >> ${TMPDIR}/sandwich.txt
         sleep 1
 }
 addtask get
 
 do_cook() {
-        echo "${PN}: toast bread and serve" >> sandwich.txt
+        echo "${PN}: toast bread and serve" >> ${TMPDIR}/sandwich.txt
         sleep 2
-        echo "${PN}: ready" >> sandwich.txt
+        echo "${PN}: ready" >> ${TMPDIR}/sandwich.txt
 }
 addtask cook after do_get
 ### END: sandwich.bb
@@ -106,16 +106,16 @@ DEPENDS = "bread omelet"
 do_get[deptask] = "do_cook"
 
 do_get() {
-        cat bread.txt > sandwich.txt
-        cat omelet.txt  >> sandwich.txt
+        cat bread.txt > ${TMPDIR}/sandwich.txt
+        cat omelet.txt  >> ${TMPDIR}/sandwich.txt
         sleep 1
 }
 addtask get
 
 do_cook() {
-        echo "${PN}: toast bread and serve" >> sandwich.txt
+        echo "${PN}: toast bread and serve" >> ${TMPDIR}/sandwich.txt
         sleep 2
-        echo "${PN}: ready" >> sandwich.txt
+        echo "${PN}: ready" >> ${TMPDIR}/sandwich.txt
 }
 addtask cook after do_get
 EOF

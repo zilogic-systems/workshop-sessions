@@ -10,7 +10,7 @@ all: slides.html
 slides.html: simple-split code/simple.sh $(images_png) 
 
 simple-split:
-	python $(TOPDIR)/scripts/split.py code/simple.sh
+	python3 $(TOPDIR)/scripts/split.py code/simple.sh
 
 clean:
 	rm -f $(images_png)

@@ -3,26 +3,20 @@ mkdir -p ~/yp/sandwich/conf
 mkdir -p ~/yp/sandwich/classes
 
 cat > ~/yp/sandwich/setup-bitbake.sh <<"EOF"
+BITBAKE_VER=yocto-4.0
+mkdir -p ~/yp/dl
 pushd ~/yp/dl
-wget -c -O bitbake-1.17.0.tar.gz \
-    https://github.com/openembedded/bitbake/archive/1.17.0.tar.gz
+wget -c -O bitbake-$BITBAKE_VER.tar.gz \
+    https://github.com/openembedded/bitbake/archive/$BITBAKE_VER.tar.gz
 popd
 
-tar -x -f ~/yp/dl/bitbake-1.17.0.tar.gz
+tar -x -f ~/yp/dl/bitbake-$BITBAKE_VER.tar.gz
 
-pushd bitbake-1.17.0
-python setup.py build
-popd
-
-pushd ~/yp/sandwich/bitbake-1.17.0/build/scripts*
+pushd ~/yp/sandwich/bitbake-$BITBAKE_VER/bin
 export PATH=$PWD:$PATH
 popd
 
-pushd ~/yp/sandwich/bitbake-1.17.0/build/lib*
-export PYTHONPATH=$PWD:$PYTHONPATH
-popd
-
-pushd ~/yp/sandwich/bitbake-1.17.0/lib
+pushd ~/yp/sandwich/bitbake-$BITBAKE_VER/lib
 export PYTHONPATH=$PWD:$PYTHONPATH
 popd
 EOF

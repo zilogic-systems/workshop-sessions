@@ -75,16 +75,14 @@ include::code/Makefile.bash[]
 
 === Setting Up BitBake
 
+ * Extract the `yp.tar.xz` archive in your home directory.
+
 [source,shell]
 ------
 include::code/simple/bbsetup.sh[]
 ------
 
   * Downloads BitBake, and unpacks it
-
-  * BitBake is written in Python
-
-  * Python is invoked to build and setup BitBake
 
   * BitBake is not installed in the standard `PATH`
 
