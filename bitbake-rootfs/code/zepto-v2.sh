@@ -3,26 +3,20 @@ mkdir -p ~/yp/zepto-v2/conf
 mkdir -p ~/yp/zepto-v2/classes
 
 cat > ~/yp/zepto-v2/setup-bitbake.sh <<"EOF"
+BITBAKE_VER=yocto-4.0
+mkdir -p ~/yp/dl
 pushd ~/yp/dl
-wget -c -O bitbake-1.17.0.tar.gz \
-    https://github.com/openembedded/bitbake/archive/1.17.0.tar.gz
+wget -c -O bitbake-$BITBAKE_VER.tar.gz \
+    https://github.com/openembedded/bitbake/archive/$BITBAKE_VER.tar.gz
 popd
 
-tar -x -f ~/yp/dl/bitbake-1.17.0.tar.gz
+tar -x -f ~/yp/dl/bitbake-$BITBAKE_VER.tar.gz
 
-pushd bitbake-1.17.0
-python setup.py build
-popd
-
-pushd ~/yp/zepto-v2/bitbake-1.17.0/build/scripts*
+pushd ~/yp/sandwich/bitbake-$BITBAKE_VER/bin
 export PATH=$PWD:$PATH
 popd
 
-pushd ~/yp/zepto-v2/bitbake-1.17.0/build/lib*
-export PYTHONPATH=$PWD:$PYTHONPATH
-popd
-
-pushd ~/yp/zepto-v2/bitbake-1.17.0/lib
+pushd ~/yp/sandwich/bitbake-$BITBAKE_VER/lib
 export PYTHONPATH=$PWD:$PYTHONPATH
 popd
 EOF
@@ -46,6 +40,7 @@ addtask compile after do_configure
 addtask install after do_compile
 addtask rootfs after do_install
 
+do_fetch[network] = "1"
 do_configure[deptask] = "do_install"
 
 PF = "${PN}"
@@ -55,11 +50,10 @@ cat > ~/yp/zepto-v2/classes/autotools.bbclass <<"EOF"
 do_configure() {
 	cd ${PN}-${PV}
         ./configure --prefix=/usr               \
-            --host=arm-none-linux-gnueabi       \
+            --host=arm-linux-gnueabi            \
             --build=i686-pc-linux-gnu           \
-            LDFLAGS=-L${ROOTFS}/usr/lib	        \
-            CPPFLAGS=-I${ROOTFS}/usr/include	\
-
+            LDFLAGS=-L${ROOTFS}/usr/lib         \
+            CPPFLAGS=-I${ROOTFS}/usr/include
 }
 
 do_compile() {
@@ -80,14 +74,14 @@ PV = "4.3"
 inherit autotools
 
 do_fetch() {
-	cd ~/yp/dl; wget -c http://ftp.gnu.org/gnu/bash/bash-4.3.tar.gz
+	cd ~/yp/dl; wget -c http://ftp.gnu.org/gnu/bash/${PN}-${PV}.tar.gz
 }
 
 do_unpack() {
-	tar -x -f ~/yp/dl/bash-4.3.tar.gz
+	tar -x -f ~/yp/dl/${PN}-${PV}.tar.gz
 }
 
-do_install_append() {
+do_install:append() {
 	mkdir -p ${ROOTFS}/bin
 	ln -f -s /usr/bin/bash ${ROOTFS}/bin/bash
 	ln -f -s /usr/bin/bash ${ROOTFS}/bin/sh
@@ -97,16 +91,16 @@ EOF
 
 cat > ~/yp/zepto-v2/coreutils.bb <<"EOF"
 PN = "coreutils"
-PV = "6.7"
+PV = "8.32"
 
 inherit autotools
 
 do_fetch() {
-	cd ~/yp/dl; wget -c http://ftp.gnu.org/gnu/coreutils/coreutils-6.7.tar.bz2
+	cd ~/yp/dl; wget -c http://ftp.gnu.org/gnu/coreutils/${PN}-${PV}.tar.xz
 }
 
 do_unpack() {
-	tar -x -f ~/yp/dl/coreutils-6.7.tar.bz2
+	tar -x -f ~/yp/dl/${PN}-${PV}.tar.xz
 }
 
 EOF

@@ -18,7 +18,7 @@ Zilogic Systems
 
   * Built incrementally, introducing only one feature at a time
 
-== Zepto V1
+== Zepto v1
 
 === Overview
 
@@ -35,7 +35,7 @@ Zilogic Systems
   * Build and install coreutils
   * Verify in `tmp/rootfs`
 
-== Zepto V2
+== Zepto v2
 
 === Issue
 
@@ -63,7 +63,7 @@ Zilogic Systems
 
   * If need be tasks can be redefined, or appended to
 
-== Zepto V3
+== Zepto v3
 
 === Simplify Download
 
@@ -101,7 +101,7 @@ Zilogic Systems
     - `http://www.greenwoodsoftware.com/less/less-458.tar.gz`
   * Specify less depends on ncurses
 
-== Zepto V4
+== Zepto v4
 
 === Overview
 

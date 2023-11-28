@@ -3,26 +3,20 @@ mkdir -p ~/yp/zepto-v3/conf
 mkdir -p ~/yp/zepto-v3/classes
 
 cat > ~/yp/zepto-v3/setup-bitbake.sh <<"EOF"
+BITBAKE_VER=yocto-4.0
+mkdir -p ~/yp/dl
 pushd ~/yp/dl
-wget -c -O bitbake-1.17.0.tar.gz \
-    https://github.com/openembedded/bitbake/archive/1.17.0.tar.gz
+wget -c -O bitbake-$BITBAKE_VER.tar.gz \
+    https://github.com/openembedded/bitbake/archive/$BITBAKE_VER.tar.gz
 popd
 
-tar -x -f ~/yp/dl/bitbake-1.17.0.tar.gz
+tar -x -f ~/yp/dl/bitbake-$BITBAKE_VER.tar.gz
 
-pushd bitbake-1.17.0
-python setup.py build
-popd
-
-pushd ~/yp/zepto-v3/bitbake-1.17.0/build/scripts*
+pushd ~/yp/sandwich/bitbake-$BITBAKE_VER/bin
 export PATH=$PWD:$PATH
 popd
 
-pushd ~/yp/zepto-v3/bitbake-1.17.0/build/lib*
-export PYTHONPATH=$PWD:$PYTHONPATH
-popd
-
-pushd ~/yp/zepto-v3/bitbake-1.17.0/lib
+pushd ~/yp/sandwich/bitbake-$BITBAKE_VER/lib
 export PYTHONPATH=$PWD:$PYTHONPATH
 popd
 EOF
@@ -48,6 +42,7 @@ addtask compile after do_configure
 addtask install after do_compile
 addtask rootfs after do_install
 
+do_fetch[network] = "1"
 do_configure[deptask] = "do_install"
 
 PF = "${PN}"
@@ -59,8 +54,8 @@ python do_fetch() {
         return
 
     try:
-	fetcher = bb.fetch2.Fetch(src_uri, d)
-	fetcher.download()
+        fetcher = bb.fetch2.Fetch(src_uri, d)
+        fetcher.download()
     except bb.fetch2.BBFetchException as e:
         raise bb.build.FuncFailed(e)
 }
@@ -74,8 +69,8 @@ python do_unpack() {
     rootdir = d.getVar('WORKDIR', True)
 
     try:
-	fetcher = bb.fetch2.Fetch(src_uri, d)
-	fetcher.unpack(rootdir)
+        fetcher = bb.fetch2.Fetch(src_uri, d)
+        fetcher.unpack(rootdir)
     except bb.fetch2.BBFetchException as e:
         raise bb.build.FuncFailed(e)
 
@@ -86,21 +81,20 @@ cat > ~/yp/zepto-v3/classes/autotools.bbclass <<"EOF"
 do_configure() {
 	cd ${WORKDIR}/${PN}-${PV}
         ./configure --prefix=/usr               \
-            --host=arm-none-linux-gnueabi       \
+            --host=arm-linux-gnueabi            \
             --build=i686-pc-linux-gnu           \
-            LDFLAGS=-L${ROOTFS}/usr/lib	        \
-            CPPFLAGS=-I${ROOTFS}/usr/include	\
-
+            LDFLAGS=-L${ROOTFS}/usr/lib	    \
+            CPPFLAGS=-I${ROOTFS}/usr/include
 }
 
 do_compile() {
-	cd ${WORKDIR}/${PN}-${PV}
-        make
+    cd ${WORKDIR}/${PN}-${PV}
+    make
 }
 
 do_install() {
-	cd ${WORKDIR}/${PN}-${PV}
-        make install DESTDIR=${ROOTFS}
+    cd ${WORKDIR}/${PN}-${PV}
+    make install DESTDIR=${ROOTFS}
 }
 EOF
 
@@ -112,7 +106,7 @@ SRC_URI = "http://ftp.gnu.org/gnu/bash/bash-4.3.tar.gz"
 
 inherit autotools
 
-do_install_append() {
+do_install:append() {
 	mkdir -p ${ROOTFS}/bin
 	ln -f -s /usr/bin/bash ${ROOTFS}/bin/bash
 	ln -f -s /usr/bin/bash ${ROOTFS}/bin/sh
@@ -121,9 +115,9 @@ EOF
 
 cat > ~/yp/zepto-v3/coreutils.bb <<"EOF"
 PN = "coreutils"
-PV = "6.7"
+PV = "8.32"
 
-SRC_URI = "http://ftp.gnu.org/gnu/coreutils/coreutils-6.7.tar.bz2"
+SRC_URI = "http://ftp.gnu.org/gnu/coreutils/coreutils-${PV}.tar.xz"
 
 inherit autotools
 

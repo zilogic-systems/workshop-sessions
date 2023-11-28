@@ -3,26 +3,20 @@ mkdir -p ~/yp/zepto/conf
 mkdir -p ~/yp/zepto/classes
 
 cat > ~/yp/zepto/setup-bitbake.sh <<"EOF"
+BITBAKE_VER=yocto-4.0
+mkdir -p ~/yp/dl
 pushd ~/yp/dl
-wget -c -O bitbake-1.17.0.tar.gz \
-    https://github.com/openembedded/bitbake/archive/1.17.0.tar.gz
+wget -c -O bitbake-$BITBAKE_VER.tar.gz \
+    https://github.com/openembedded/bitbake/archive/$BITBAKE_VER.tar.gz
 popd
 
-tar -x -f ~/yp/dl/bitbake-1.17.0.tar.gz
+tar -x -f ~/yp/dl/bitbake-$BITBAKE_VER.tar.gz
 
-pushd bitbake-1.17.0
-python setup.py build
-popd
-
-pushd ~/yp/zepto/bitbake-1.17.0/build/scripts*
+pushd ~/yp/sandwich/bitbake-$BITBAKE_VER/bin
 export PATH=$PWD:$PATH
 popd
 
-pushd ~/yp/zepto/bitbake-1.17.0/build/lib*
-export PYTHONPATH=$PWD:$PYTHONPATH
-popd
-
-pushd ~/yp/zepto/bitbake-1.17.0/lib
+pushd ~/yp/sandwich/bitbake-$BITBAKE_VER/lib
 export PYTHONPATH=$PWD:$PYTHONPATH
 popd
 EOF
@@ -38,7 +32,7 @@ WORKDIR = "${TMPDIR}/${PN}/${PV}"
 ROOTFS = "${TMPDIR}/rootfs"
 DISKIMG = "${TMPDIR}/disk.img"
 DL_DIR = "${HOME}/yp/dl"
-TOOLCHAIN_DIR = "/usr/share/gcc-arm-linux"
+TOOLCHAIN_DIR = "/usr/arm-linux-gnueabi"
 BB_NUMBER_THREADS = "2"
 EOF
 
@@ -50,6 +44,7 @@ addtask compile after do_configure
 addtask install after do_compile
 addtask rootfs after do_install
 
+do_fetch[network] = "1"
 do_configure[deptask] = "do_install"
 do_rootfs[rdeptask] = "do_install"
 
@@ -62,8 +57,8 @@ python do_fetch() {
         return
 
     try:
-	fetcher = bb.fetch2.Fetch(src_uri, d)
-	fetcher.download()
+	    fetcher = bb.fetch2.Fetch(src_uri, d)
+	    fetcher.download()
     except bb.fetch2.BBFetchException as e:
         raise bb.build.FuncFailed(e)
 }
@@ -77,8 +72,8 @@ python do_unpack() {
     rootdir = d.getVar('WORKDIR', True)
 
     try:
-	fetcher = bb.fetch2.Fetch(src_uri, d)
-	fetcher.unpack(rootdir)
+	    fetcher = bb.fetch2.Fetch(src_uri, d)
+	    fetcher.unpack(rootdir)
     except bb.fetch2.BBFetchException as e:
         raise bb.build.FuncFailed(e)
 
@@ -89,11 +84,11 @@ cat > ~/yp/zepto/classes/autotools.bbclass <<"EOF"
 do_configure() {
 	cd ${WORKDIR}/${PN}-${PV}
         ./configure --prefix=/usr               \
-            --host=arm-none-linux-gnueabi       \
+            --host=arm-linux-gnueabi            \
             --build=i686-pc-linux-gnu           \
-            LDFLAGS=-L${ROOTFS}/usr/lib	        \
-            CPPFLAGS=-I${ROOTFS}/usr/include	\
-
+            ${CONFIG_OPTS}                      \
+            LDFLAGS=-L${ROOTFS}/usr/lib	    \
+            CPPFLAGS=-I${ROOTFS}/usr/include
 }
 
 do_compile() {
@@ -112,8 +107,8 @@ cat > ~/yp/zepto/coreutils.bb <<"EOF"
 inherit autotools
 
 PN = "coreutils"
-PV = "6.7"
-SRC_URI = "http://ftp.gnu.org/gnu/coreutils/coreutils-6.7.tar.bz2"
+PV = "8.32"
+SRC_URI = "http://ftp.gnu.org/gnu/coreutils/coreutils-8.32.tar.xz"
 EOF
 
 cat > ~/yp/zepto/bash.bb <<"EOF"
@@ -123,7 +118,7 @@ PN = "bash"
 PV = "4.3"
 SRC_URI = "ftp://ftp.gnu.org/gnu/bash/bash-4.3.tar.gz"
 
-do_install_append() {
+do_install:append() {
 	mkdir -p ${ROOTFS}/bin
 	ln -f -s /usr/bin/bash ${ROOTFS}/bin/bash
 	ln -f -s /usr/bin/bash ${ROOTFS}/bin/sh
@@ -134,8 +129,9 @@ cat > ~/yp/zepto/ncurses.bb <<"EOF"
 inherit autotools
 
 PN = "ncurses"
-PV = "5.9"
-SRC_URI = "http://ftp.gnu.org/gnu/ncurses/ncurses-5.9.tar.gz"
+PV = "6.2"
+SRC_URI = "http://ftp.gnu.org/gnu/ncurses/ncurses-6.2.tar.gz"
+CONFIG_OPTS += "--without-progs --disable-ext-funcs --without-cxx"
 EOF
 
 cat > ~/yp/zepto/less.bb <<"EOF"
@@ -162,11 +158,11 @@ do_compile() {
 
 do_install() {
     mkdir -p ${ROOTFS}/lib
-    cp ${TOOLCHAIN_DIR}/arm-none-linux-gnueabi/libc/lib/libc.so.6 ${ROOTFS}/lib
-    cp ${TOOLCHAIN_DIR}/arm-none-linux-gnueabi/libc/lib/ld-linux.so.3 ${ROOTFS}/lib
-    cp ${TOOLCHAIN_DIR}/arm-none-linux-gnueabi/libc/lib/libdl.so.2 ${ROOTFS}/lib
-    cp ${TOOLCHAIN_DIR}/arm-none-linux-gnueabi/libc/lib/librt.so.1 ${ROOTFS}/lib
-    cp ${TOOLCHAIN_DIR}/arm-none-linux-gnueabi/libc/lib/libpthread.so.0 ${ROOTFS}/lib
+    cp ${TOOLCHAIN_DIR}/lib/libc.so.6 ${ROOTFS}/lib
+    cp ${TOOLCHAIN_DIR}/lib/ld-linux.so.3 ${ROOTFS}/lib
+    cp ${TOOLCHAIN_DIR}/lib/libdl.so.2 ${ROOTFS}/lib
+    cp ${TOOLCHAIN_DIR}/lib/librt.so.1 ${ROOTFS}/lib
+    cp ${TOOLCHAIN_DIR}/lib/libpthread.so.0 ${ROOTFS}/lib
 }
 EOF
 
