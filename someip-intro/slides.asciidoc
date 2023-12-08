@@ -1,0 +1,136 @@
+= SOME/IP Introduction
+Zilogic Systems <training@zilogic.com>
+
+== Background
+
+=== Communication between controllers in Automotives
+
+ * Various controllers communicating with each other
+ * CAN Bus - limited bandwidth
+ * High bandwidth requirements like Video, Audio & OTA
+ * Ethernet is a high bandwidth medium
+
+=== Overview
+
+ * Ethernet uses the TCP/IP stack layer for communication
+
+ * Remote Procedure Calls(RPC) using traditional Request-Response model not
+   sufficient
+
+ * Requirements for Notification of certain events to the Clients (i.e
+   controllers)
+
+ * Subscription/Notification Mechanism is required
+
+ * Higher level protocol required in the Application layers of the TCP/IP stack
+   to address these requirements.
+
+== SOME/IP Introduction
+
+=== What is SOME/IP?
+
+ * Scalabale service-Oriented middlewarE over IP
+ * Designed for Automotive use cases
+ * Three main parts to SOME/IP:
+   ** On-wire format
+   ** Protocol
+   ** Service Discovery
+
+== On-Wire format
+
+=== SOME/IP Message format
+
+ * Consists of messages sent between devices in a particular format.
+
+ * SOME/IP Message has two parts: **Header** and **Payload**
+
+=== SOME/IP Message format
+
+image::figures/on-wire.jpg[align="center"]
+
+=== Header fields
+
+ * `Service ID` : unique identifier for each service
+ * `Method ID` : 0-32767 for methods, 32768-65535 for events
+ * `Length` : length of payload in byte
+ * `Client ID` : unique identifier for the calling client inside the ECU; has to be unique in the overall vehicle
+ * `Session ID` : identifier for session handling; has to be incremented for each call
+ * `Protocol Version` : 0x01
+ * `Interface Version` : major version of the service interface
+
+=== Message Type
+
+[options="header",width="50%",align="center"]
+|======
+| TYPE | VALUE
+| REQUEST | 0x00
+| REQUEST_NO_RETURN	    | 0x01
+| NOTIFICATION | 0x02
+| RESPONSE | 0x80
+|======
+
+=== Return Code
+
+[options="header",width="50%",align="center"]
+|======
+| TYPE | VALUE
+| E_OK	    | 0x00
+| E_NOT_OK  | 0x01
+| E_WRONG_INTERFACE_VERSION | 0x08
+| E_MALFORMED_MESSAGE | 0x09
+| E_WRONG_MESSAGE_TYPE | 0x0A
+|======
+
+== SOME/IP Protocol
+
+=== Overview
+
+ * Transport bindings used are either UDP or TCP
+ * Communication patterns are
+   ** Publish/Subscribe
+   ** Request/Response
+
+=== Transport Bindings - UDP
+
+ * SOME/IP Messages are not fragmented (partial)
+ * Multiple SOME/IP messages can be sent in a single UDP message
+ * Maximum size of SOME/IP message using UDP is 1400
+
+=== Transport Bindings - TCP
+
+ * SOME/IP Message greater than 1400 must use TCP
+
+=== SOME/IP Protocol
+
+image::figures/protocol.jpg[align="center"]
+
+=== SOME/IP Protocol
+
+ * REQUEST/RESPONSE mechanism is for Remote Procedure Calls(RPC)
+ * PUBLISH/SUBSCRIBE pattern is for events.
+ * Events are grouped in an Event Group.
+ * Subscription happens only to event groups and not to an individual event.
+
+== SOME/IP Service Discovery
+
+=== SOME/IP SD - Overview
+
+ * Subscription to a service happens through SOME/IP SD.
+
+ * This layer is used to locate service instances and detect if service
+   instances are running
+
+ * Each device broadcasts offer messages containing all the services which are
+   offered by it
+
+=== SOME/IP SD structure
+
+image::figures/service-discovery.jpg[align="center"]
+
+=== SOME/IP-SD - Relationship to other layers
+
+image::figures/sd-dependency.png[align="center"]
+
+=== Reference
+
+ . https://github.com/COVESA/vsomeip/wiki/vsomeip-in-10-minutes
