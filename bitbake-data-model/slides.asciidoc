@@ -258,7 +258,7 @@ bb =. "bit"
 === Appending after Finalize
 
 ------
-a_append = b
+a:append = b
 ------
 
 On Assignment:
@@ -308,7 +308,7 @@ os = "windows linux macosx"
 [source,python]
 ------
 # Conf
-os_append = " freebsd"
+os:append = " freebsd"
 
 # Recipe
 os ?= "windows linux macosx"
