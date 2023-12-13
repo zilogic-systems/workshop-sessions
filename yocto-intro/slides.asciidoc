@@ -44,10 +44,9 @@ image::figures/oe-logo.png[style="left",align="center"]
 
 == Introduction to Yocto
 
-[style="two-column"]
 === What is Yocto
 
-[style="right"]
+==== Right
 
  * Is an Umbrella project, involves developing build tools to
    facilitate building of custom distribution for the embedded devices.
@@ -55,7 +54,11 @@ image::figures/oe-logo.png[style="left",align="center"]
  * More than a build system, it focuses on complete build cycle
    involving compiling, debugging, testing on simulated hardware.
 
+==== Left
+
 image::figures/yocto-project-transp.png[style="left",align="center"]
+
+image::figures/key-dev-elements.png[style="left",align="center"]
 
 === Yocto's Unique Features
 
@@ -175,14 +178,24 @@ image::figures/poky-repo-cropped.png[style="right",align="center"]
 
 |====
 | *Name*| *Version*
-|Sumo   | 2.5 (Yet to be released)
-|Rocko  | 2.4
-|Pyro   | 2.3
-|Morty  | 2.2
-|krogoth| 2.1
-|Jethro | 2.0
-|Fido   | 1.8
-|==== 
+|Scarthhap   | 5.0
+|Nanbield  | 4.3
+|Mickledore| 4.2
+|Kirkstone   | 4.0
+|Dunfell  | 3.1
+|====
+
+=== Release Timeline
+
+image::figures/releases.png[style="left",align="center"]
+
+=== Yocto Project Structure
+
+image::figures/yocto-structure.png[style="left",align="center"]
+
+=== Poky layers
+
+image::figures/poky-layers.png[style="left",align="center"]
 
 == Yocto Architecture
 
@@ -284,3 +297,14 @@ class. Checks the build outputs for
 * The package feeds can also be exposed as a repo through web server,
   so the packages in the target system can be updated at run-time.
 
+
+=== References
+
+ . https://docs.yoctoproject.org/4.0.14/overview-manual/yp-intro.html
+
+== Credits
+
+=== Photo Credits
+
+ . https://bootlin.com/doc/training/yocto/yocto-slides.pdf (pg 36)
+ . https://bootlin.com/doc/training/yocto/yocto-slides.pdf (pg 41)
