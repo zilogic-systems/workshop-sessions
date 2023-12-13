@@ -113,11 +113,11 @@ Yocto develops several projects to improve build infrastructure
 
  * Autobuilder - build and test automation tool
 
- * ADT - Plugins for Eclipse/Anjuta IDE
+ * eSDK - Extensible SDK for developing applications and images
 
- * Pseudo, cross-prelink - tools required to improve build
+ * Pseudo - tools required to improve build
 
- * Hob & Toaster - UI tools to manage Yocto build and their results
+ * Toaster - UI tools to manage Yocto build and their results
 
  * Documentation - Detailed manuals to use Yocto for various embedded
    build scenarios.
