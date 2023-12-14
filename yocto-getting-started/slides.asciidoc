@@ -166,7 +166,7 @@ $ cat tmp/deploy/images/qemuarm/core-image-minimal-qemuarm.manifest
 
 [source,shell]
 ------
-$ ./runqemu.sh
+$ runqemu qemuarm
 ------
 
 === Customizing the Build
