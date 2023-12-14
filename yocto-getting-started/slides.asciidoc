@@ -159,9 +159,6 @@ $ cat tmp/deploy/images/qemuarm/core-image-minimal-qemuarm.manifest
 
 === Booting Image with QEMU
 
- * Copy the zImage to shared folder $SHARED and
-   core-image-minimal-qemuarm.ext4 as disk.img in $SHARED
-
  * Now we can boot our new images using qemu arm as shown
 
 [source,shell]
