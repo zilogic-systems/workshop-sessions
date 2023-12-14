@@ -22,9 +22,8 @@ Zilogic Systems <training@zilogic.com>
 ----
 $ cd ~/yp/dl
 $ wget -c \
-  http://downloads.yoctoproject.org/releases/yocto/yocto-1.8/\
-  poky-fido-13.0.0.tar.bz2
-$ cd ~/yp 
+  https://downloads.yoctoproject.org/releases/yocto/yocto-4.0/poky-00cfdde791a0176c134f31e5a09eff725e75b905.tar.bz2
+$ cd ~/yp
 $ mkdir -p yocto-project
 ----
 
