@@ -22,7 +22,7 @@ Zilogic Systems <training@zilogic.com>
 
 [source,shell]
 ------
-$ yocto-layer create zepto-fs
+$ bitbake-layers create-layer ~/yp/poky/meta-zepto-fs
 ------
 
  * It prompts for various options which you can leave to default and
@@ -283,14 +283,11 @@ $ vim tmp-glibc/deploy/images/qemuarm/core-image-tiny-qemuarm.rootfs.manifest
 
 === Booting the Tiny-FS Image
 
- * Copy the zImage to shared folder $SHARED and
-   core-image-tiny-qemuarm.ext4 as disk.img in $SHARED
-
  * Now we can boot our new images using qemu arm as shown
 
 [source,shell]
 ------
-$ ./runqemu.sh
+$ runqemu qemuarm
 ------
 
 === Bare Minimal local.conf
@@ -307,12 +304,11 @@ DISTRO = "poky"
 CONF_VERSION = "1"
 ------
 
- * Below lines can be added to local.conf to modify that to build
+ * Below line can be added to local.conf to modify that to build
    faster
 
 -----
 SSTATE_DIR = "/opt/sstate-cache"
-BB_NUMBER_THREADS = "3"
 -----
 
 === Adding More Layers
