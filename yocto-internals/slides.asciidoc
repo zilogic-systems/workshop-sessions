@@ -31,11 +31,9 @@ Zilogic Systems <training@zilogic.com>
  * Even if main and appended recipes are placed in different layers,
    bitbake can resolve them.
 
- * One example we could find is
-   _packagegroup-core-tools-profile.bbappend_ in
-   _meta-yocto-bsp/recipes-core/packagegroups_ just adds two packages
-   to RDEPENDS, whose main recipe _packagegroup-core-tools-profile.bb_
-   is available in _meta/recipes-core/packagegroups_
+ * One example we could find is _busybox_%.bbappend_ in
+   _meta-poky/recipes-core/busybox_, whose main recipe _busybox_1.35.0.bb_ is
+   available in _meta/recipes-core/busybox_
 
 === Folders Structure for Build
 
@@ -45,18 +43,18 @@ Zilogic Systems <training@zilogic.com>
  * For each package we would find a folder inside target architecture
    folder.
 
- * In our build the target architecture is _armv5e-oe-linux-gnueabi_
+ * In our build the target architecture is _qemuarm-poky-linux-gnueabi_
 
  * The package build directory is available in
 
 -------
-   armv5e-oe-linux-gnueabi/${PN}/${PV}-${PR}
+   qemuarm-poky-linux-gnueabi/${PN}/${PV}-${PR}
 -------
 
  * The source is unpacked and patched in
 
 ------
-   armv5e-oe-linux-gnueabi/${PN}/${PV}-${PR}/${PN}-${PV}
+   qemuarm-poky-linux-gnueabi/${PN}/${PV}-${PR}/${PN}-${PV}
 ------
 
 === Folders for Package Creation
@@ -126,7 +124,7 @@ PREFERRED_VERSION_linux-yocto ?= "3.19%"
 
 [source,shell]
 -----
-ls build/tmp/work/armv5e-poky-linux-gnueabi/bash/4.3-r1/
+ls build/tmp/work/qemuarm-poky-linux-gnueabi/packagegroup-core-boot/1.0-r17/
 -----
 
  * The state-cache creates a map for the input parameters and caches
