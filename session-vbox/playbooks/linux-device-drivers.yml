@@ -1,0 +1,147 @@
+- name: Linux Device Drivers workshop
+  hosts: localhost
+  tasks:
+
+  - apt_repository: repo="deb [trusted=yes] https://pike.zilogic.com/zdrive/debian/repo/ wheezy main" update_cache=yes
+  - apt_repository: repo="deb http://http.debian.net/debian jessie-backports main" state=present update_cache=yes
+  - apt: name={{ item }} state=latest install_recommends=no
+    with_items:
+    - diffutils
+    - task-lxde-desktop
+    - policykit-1
+    - file
+    - iceweasel
+    - build-essential
+    - gcc-arm
+    - gcc-arm-linux
+    - chromium
+    - bc
+    - u-boot-tools
+    - libncurses5-dev
+    - python-pip
+    - xz-utils
+    - bzip2
+    - lzop
+    - device-tree-compiler
+    - minicom
+
+    # Install TFTP
+    - xinetd
+    - tftpd
+
+    # ccache for caching kernel build
+    - ccache
+
+    # Images required for TFTP boot
+    - vybrid-ldd
+
+    # Install patches
+    - buildroot-vybrid
+
+    # Setup DHCP Server
+    - dnsmasq
+
+    # Install editor
+    - mg
+
+    # Install packages required for Lab X
+    - python3
+    - python3-yaml
+    - python3-gi
+    - libgtk-3-0
+    - libgtk-3-bin
+    - libgtk-3-common
+    - libgtk-3-dev
+    - python3-twisted
+    - slirp
+
+  - get_url:
+      url: https://www.kernel.org/pub/linux/kernel/v4.x/linux-4.4.39.tar.xz
+      dest: /usr/share/buildroot-vybrid/linux-4.4.39.tar.xz
+
+  - file: >
+      path=/tftpboot
+      state=directory
+      mode=1777
+
+  # Copy resources to TFTP folder
+  - copy: >
+      src=/usr/share/buildroot-ldd-vybrid/images/uImage
+      dest=/tftpboot/uImage
+      owner=vagrant
+      group=vagrant
+      mode=644
+
+  - copy: >
+      src=/usr/share/buildroot-ldd-vybrid/images/vf500-colibri-zkit-base.dtb
+      dest=/tftpboot/colibri.dtb
+      owner=vagrant
+      group=vagrant
+      mode=644
+
+  - copy: >
+      src=/usr/share/buildroot-ldd-vybrid/images/uRamdisk
+      dest=/tftpboot/uRamdisk
+      owner=vagrant
+      group=vagrant
+      mode=644
+
+  - copy: >
+      src=/usr/bin/ccache
+      dest=/usr/local/bin/ccache
+      owner=root
+      group=root
+      mode=755
+
+  # Setup TFTP Server
+  - copy: >
+      src=files/xinetd.d/tftp
+      dest=/etc/xinetd.d/tftp
+      owner=root group=root mode=644
+    notify:
+      - restart xinetd
+
+  - copy: >
+      src=files/dnsmasq.conf
+      dest=/etc/dnsmasq.conf
+      owner=root
+      group=root
+      mode=644
+
+  - copy: >
+      src=files/interfaces
+      dest=/etc/network/interfaces
+      owner=root
+      group=root
+      mode=644
+
+  # Create symlinks for using ccache
+  - file: >
+      dest=/usr/local/bin/{{ item }}
+      src=ccache
+      state=link
+      owner=root
+      group=root
+    with_items:
+      - gcc
+      - g++
+      - cc
+      - c++
+      - arm-none-linux-gnueabi-c++
+      - arm-none-linux-gnueabi-cc
+      - arm-none-linux-gnueabi-gcc
+      - arm-none-linux-gnueabi-g++
+
+# usermod
+  # Add user account with groups dialout and kvm
+  - user: >
+      name=vagrant
+      groups=dialout,vboxsf
+      append=yes
+
+  # Clean up apt cache
+  - command: apt-get clean
+
+  handlers:
+    - name: restart xinetd
+      service: name=xinetd state=restarted
