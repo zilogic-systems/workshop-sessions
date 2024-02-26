@@ -17,12 +17,12 @@ def img_to_data(mime, path):
         raise FileNotFoundError
     with open(path, 'rb') as fp:
         data = fp.read()
-        data64 = u''.join(base64.encodestring(data).splitlines())
+        data64 = u''.join(base64.encodestring(data).decode("utf-8").splitlines())
         return u'data:%s;base64,%s' % (mime, data64)
 
 
 def usage(argv):
-    print 'Usage: %s <mime-type> <path-to-file>' % argv[0]
+    print('Usage: %s <mime-type> <path-to-file>' % argv[0])
 
 
 if __name__ == '__main__':
@@ -34,7 +34,7 @@ if __name__ == '__main__':
         sys.exit(1)
 
     try:
-        print img_to_data(mimetype, path)
+        print(img_to_data(mimetype, path))
     except FileNotFoundError:
-        print 'File not found!'
+        print('File not found!')
         sys.exit(2)
