@@ -17,3 +17,4 @@ clean:
 	rm -f slides.html
 
 include $(ZDECK_HOME)/stylesheets/Makefile.rules
+include $(TOPDIR)/stylesheets/Makefile.zdeck.rules

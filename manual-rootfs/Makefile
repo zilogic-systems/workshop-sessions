@@ -22,3 +22,4 @@ clean:
 	rm -fr cmd/
 
 include $(ZDECK_HOME)/stylesheets/Makefile.rules
+include $(TOPDIR)/stylesheets/Makefile.zdeck.rules
