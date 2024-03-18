@@ -1,3 +1,4 @@
+TOPDIR = ../
 -include ~/.zdeck
 
 ZDECK_HOME ?= /usr/share/zdeck
