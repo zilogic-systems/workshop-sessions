@@ -168,7 +168,7 @@ git rebase master
     merges
 
   * Thumb-rule:
-    - Use rebase for local topic branches
+    - Use rebase for local feature branches
     - Use merge published development / bug-fix branches
 
 === Merge vs Rebase
@@ -217,14 +217,16 @@ image::figures/merge-vs-rebase-8.png[align="center",width="20%"]
 
   * Series of activities need to complete a task
 
-  * Centralized Workflow
-    - small team of trusted developers
-
-  * Forking Workflow
-    - allows collaboration among a larger group of developers
-    - provides a mechanism for reviewing changes
+  * Types:
+    - Centralized Workflow
+    - Feature Branch Workflow
+    - Forking Workflow
 
 == Centralized Workflow
+
+=== Overview
+
+  * Small team of trusted developers
 
 === Everyone Clones Central Repo
 
@@ -262,8 +264,77 @@ image::figures/central-5.png[width="50%",align="center"]
 
 image::figures/central-push-complete.png[width="10%",align="center"]
 
+== Feature Branch Workflow
+
+=== Overview
+
+  * Untrusted small team of developers
+
+  * Feature development takes place in a dedicated feature branch
+
+[role="two-column"]
+=== Getting Started
+
+[role="left"]
+image::figures/feature-workflow.png[]
+
+[role="right"]
+
+  * For each project a Git repo is created
+
+  * An issue tracker, and wiki is also created
+
+  * The `master` branch is protected.
+
+  * Only the Maintainer has write access to the `master` branch
+
+
+=== User Clones Central Repo
+
+image::figures/feature-clone.png[width="50%",align="center"]
+
+=== Feature Branch and Commit
+
+image::figures/gh-tree-1.png[width="30%",align="center"]
+
+=== Feature Branch Push
+
+image::figures/feature-push.png[width="50%",align="center"]
+
+=== Create Pull Request
+
+image::figures/feature-pr-create.png[width="50%",align="center"]
+
+  * User creates a Pull Request (PR) after pushing feature branch
+
+  * Pull Request indicates that a set of commits, is ready for inclusion
+
+=== Review Feedback
+
+image::figures/feature-review.png[width="50%",align="center"]
+
+  * Maintainer fetches the changes and reviews the changes
+
+  * Provides feedback, if not satisfied, user can commit to feature branch, and push
+
+=== Review Feedback
+
+image::figures/gh-tree-2.png[width="30%",align="center"]
+
+=== Close PR
+
+image::figures/feature-pr-close.png[width="25%",align="center"]
+
+  * Maintainer merges the changes and pushes to his repo
+
+  * Closes Pull Request
 
 == Forking Workflow
+
+=== Overview
+
+  * Allows collaboration among a larger group of developers
+  * Provides a mechanism for reviewing changes
 
 [role="two-column"]
 === Getting Started
@@ -292,15 +363,15 @@ image::figures/gh-2.png[width="50%",align="center"]
   * Creates a new project `user/proj`, clones the project into the Git
     repo
 
-=== Topic Branch and Commit
+=== Feature Branch and Commit
 
 image::figures/gh-2.png[width="50%",align="center"]
 
   * This project is writable by the user
 
-  * User now clones his Git repo, and publishes topic branch
+  * User now clones his Git repo, and publishes feature branch
 
-=== Topic Branch and Commit (Contd.)
+=== Feature Branch and Commit (Contd.)
 
 image::figures/gh-tree-1.png[width="25%",align="center"]
 
@@ -318,7 +389,7 @@ image::figures/gh-4.png[width="50%",align="center"]
 
   * Owner fetches the changes and reviews the changes
 
-  * Provides feedback, if not satisfied, user can commit to topic
+  * Provides feedback, if not satisfied, user can commit to feature
     branch, and push
 
 === Review Feedback
@@ -335,7 +406,7 @@ image::figures/gh-5.png[width="50%",align="center"]
 
 === Merge Options
 
-  * GitHub allows topic branch to be merged from UI
+  * GitHub allows feature branch to be merged from UI
 
   * Automatic merge options, on GitHub
     - Merge

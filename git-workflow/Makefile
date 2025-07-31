@@ -3,7 +3,7 @@ TOPDIR = ../
 
 ZDECK_HOME ?= /usr/share/zdeck
 ZDECK_CLASS = lecture
-ZDECK_DIA_EXPORT_WIDTH=800
+ZDECK_DIA_EXPORT_WIDTH=1600
 
 images_dia = $(wildcard figures/*.dia)
 images_png = $(images_dia:.dia=.png)
