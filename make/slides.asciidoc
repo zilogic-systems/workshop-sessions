@@ -32,7 +32,7 @@ Zilogic Systems
   * `make` is a program that can determine what files have been
     modified and builds only those files that have been modified.
 
-  * `make` acheives this with two inputs a dependency graph and the
+  * `make` achieves this with two inputs a dependency graph and the
     modification time of the files.
 
   * The dependency graph is specified in a file called the `Makefile`.
@@ -141,14 +141,14 @@ include::code/make-v2/Makefile[]
     files.
 
   * Instead of writing rules for every file to be built, it is
-    posssible to write a generic rule to build a particular type of
+    possible to write a generic rule to build a particular type of
     file.
 
 
 === Special Variables
 
 '$@':: The file name of the target of the rule. '$@' is the name of the
-target file, what so ever, that caused to run the 'rule'.
+target file, that triggered this 'rule'.
 
 '$<':: The name of the first prerequisite.
 
@@ -216,3 +216,17 @@ $ make calc
 ------
 $ make calc CFLAGS="-Wall -ggdb"
 ------
+
+=== Implicit Rules
+
+  * `make` already knows how to build common file types
+
+  * you don't always have to write the pattern rule yourself.
+
+  * For example, `make` has a built-in rule to build a `.o` file from
+    a `.c` file, roughly equivalent to the rule we just wrote.
+
+  * Try it: remove the `%.o: %.c` rule from the `Makefile` and run
+    `make` again.
+
+  * It still works! `make` used its built-in pattern rule instead.

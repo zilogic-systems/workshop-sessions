@@ -8,5 +8,5 @@ calc: $(OBJS)
 	gcc $(CFLAGS) -c $<
 
 clean:
-	rm *.o
-	rm calc
+	rm -f *.o
+	rm -f calc

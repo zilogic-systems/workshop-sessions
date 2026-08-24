@@ -1,5 +1,5 @@
 OBJS = add.o sub.o main.o
-CFLAGS = -Wall
+#CFLAGS = -Wall
 
 calc: $(OBJS)
 	gcc -o $@ $^
@@ -10,5 +10,5 @@ calc: $(OBJS)
 .PHONY: clean
 
 clean:
-	rm *.o
-	rm calc
+	rm -f *.o
+	rm -f calc
