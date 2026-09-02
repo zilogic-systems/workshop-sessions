@@ -1,0 +1,415 @@
+= Signal Handling
+Zilogic Systems <training@zilogic.com>
+
+== Introduction
+
+=== Introduction
+
+  * Signals are notifications sent to the process, to inform the
+    process of important events.
+
+  * The operating system stops the normal flow of execution of the
+    process, and executes a signal handler.
+
+  * There are various signals available, one for each type of
+    event. Each signal is given a number.
+
+  * The reasons for which a signal is generated are
+    1. errors
+    2. external events
+    3. explicit requests
+
+=== Errors
+
+  * Errors occur when a program does something invalid.
+
+  * When a user invokes a system call, and an error occurs during the
+    execution of the system call, the user is notified through the
+    return value and `errno`.
+
+  * Errors can also occur without the program invoking a syscall,
+    example dividing a number by zero, or accessing a memory location
+    that is not allocated to the process.
+
+  * Such errors are notified to the process using signals.
+
+=== External Events
+
+  * External events that might be useful to a process are also
+    notified through signals
+
+  * Examples:
+
+    1. Termination of a child process.
+    2. Availability of data in a network connection.
+    3. Expiration of a timer.
+
+=== Explicit Requests
+
+  * System calls are available to send a particular signal to a
+    process.
+
+  * This can be used as a limited form of inter-process communication
+    mechanism.
+
+  * Signals are also generated when the user presses `Ctl-C` and
+    `Ctl-Z` in the terminal.
+
+== Signal Handling
+
+=== When a signal occurs
+
+    1. the signal is ignored.
+    2. the signal's default action is executed.
+    3. the user's signal handling function is executed.
+
+=== Default action for a signal
+
+    1. for fatal signals, terminate the process
+    2. for harmless signals, ignore the signal
+    3. stop the process
+    4. continue the process
+    5. Terminate and Core Dump
+
+=== Core dump
+
+  * For signals that terminates the process because of programmer
+    errors, like divide by zero, and NULL pointer dereferencing, the
+    process' memory contents are stored in a file called the core
+    file.
+
+  * A debugger can be used to examine the contents of the core file,
+    and find out where exactly the problem occured.
+
+=== Standard Signals
+
+  * Each signal is given a number.
+
+  * The signal number can vary from one system on another, so names
+    are defined for the numbers as preprocessor macros. The numbers
+    should not be used directly.
+
+  * The macros are defined in `signal.h`.
+
+=== Some Program Error Signals
+
+|===
+|Signal|Default|Comment
+
+|`SIGFPE`|Core|Floating point exception
+|`SIGILL`|Core|Illegal instruction
+|`SIGSEGV`|Core|Invalid access to memory
+|`SIGABRT`|Core|Raised by `abort()`
+|===
+
+=== Some Termination Signals
+
+|===
+|Signal| Default|Comment
+
+|`SIGTERM`|Term|Terminate the process
+|`SIGINT`| Term|User typed `Ctrl-c`
+|===
+
+=== Some Termination Signals
+
+|===
+|Signal| Default|Comment
+
+|`SIGQUIT`|Core|Same as SIGINT, but dumps core. User typed `Ctrl-\`
+|`SIGKILL`|Term|Cannot be handled or ignored.
+|===
+
+=== Some Job Control Signals
+
+|===
+|Signal | Default| Comment
+
+|`SIGCHLD`|Ignored|Child process terminated
+|`SIGCONT`|Cont|Continue if stopped
+|`SIGSTOP`|Stop|Stops the process
+|===
+
+== Sending Signals
+
+=== Using Terminal
+
+  * Signals can be sent from the terminal by pressing specific key
+    combinations.
+
+`Ctrl-C`:: Raises `SIGINT`.
+
+`Ctrl-Z`:: Raises `SIGSTOP`.
+
+`Ctrl-\`:: Raises `SIGQUIT`.
+
+=== Using Commands
+
+  * Signal can be raised from the command line.
+
+  * The `kill` command can be used to raise any signal. The general
+    format of the command is
++
+[source,sh]
+------
+kill [-s signal] pid
+------
+
+  * If the signal is not specified the `TERM` signal is used.
+
+  * The signal can be specified by its name or number. The name is
+    same as the macro name without the `SIG` prefix.
+
+  * The `fg` command raises the `SIGCONT` signal.
+
+=== Using Syscalls
+
+  * Signal can be raised using the `kill()` syscall.
+
+[source,c]
+------
+#include <signal.h>
+
+ret = kill(pid, sig);
+
+int ret;
+pid_t pid;
+int sig;
+------
+
+  * `pid` is the process ID of the process to which the signal is to be sent.
+  * `sig` is the signal to be sent.
+  * Signals can be sent between processes that belong to the same user.
+
+== Signal Handlers
+
+=== Modifying the Signal Handler
+
+  * The user can specify how a particular signal should be handled
+    using the `signal()` syscall.
+
+[source,c]
+------
+#include <signal.h>
+prev_action = signal(signum, action);
+
+int signum;
+sighandler_t action;
+sighandler_t prev_action;
+------
+
+  * `signum` is the signal whose handler is to be modified.
+  * `action` is a pointer to the signal handling function.
+
+=== `action()` prototype
+
+  * The `action` is a pointer to a function with the following
+    prototype.
+
+[source,c]
+------
+void action(int signum);
+------
+
+  * The `action` can also be one of `SIG_IGN` and `SIG_DFL`, to ignore
+    the signal, or to restore the default handler, respectively.
+
+  * The function returns the previous signal handler, or `SIG_ERR` if
+    an error occurs.
+
+  * The handler for `SIGKILL` and `SIGSTOP` cannot be modified, from
+    the default handler.
+
+=== Writing Signal Handlers
+
+  *  Two basic strategies for signal handling
+     . Set a global flag, and return. The global flag can be checked in
+       the main program and appropriate action can be taken.
+     . Perform cleanup and terminate the program.
+
+=== Global Flag
+
+  * It is not a good idea to do lot of work in the signal handler.
+
+  * The signal handler is executing by interrupting another piece of
+    code.
+
+  * If the interrupted code was modifying some data item, and the same
+    data item is also modified by the signal handler, the result can
+    be unpredictable.
+
+  * The following example, shows what can happen when the signal
+    handler and main program modify the same variable.
+
+=== Global variable access: Example 1
+
+=== Global variable access: Example 2
+
+
+=== Global Flag (Contd...)
+
+  * There are many functions that use global or static data, examples
+    - buffered I/O, malloc, syscalls, etc.
+
+  * All syscalls modify the global variable `errno` when an error
+    occurs, and are succeptible to the above mentioned issue.
+
+  * For these reasons it is always better to just set a flag in the
+    signal handler, and perform actual handling in the main program.
+
+  * But accessing flags and clearing them can happen in multiple
+    instructions, between which a signal can be delivered.
+
+=== `sigprocmask()`
+
+  * To avoid signals being delivered when the flag is being examined
+    and modified, the signal can be blocked.
+
+  * Signals can be blocked and unblocked using `sigprocmask()`.
+
+[source,c]
+------
+#include <signal.h>
+
+ret = sigprocmask(method, &new_sigset, &old_sigset)
+
+int ret;
+int method;
+sigset_t new_sigset;
+sigset_t old_sigset;
+------
+
+=== `sigprocmask()`
+
+  * `method` specifies what is to be done with the set of signals.
+
+  * `new_sigset` specifies the signals to be blocked or unblocked.
+
+  * `old_sigset` is where the previous set of blocked signals is stored.
+
+  * Returns 0 on success and -1 on error and sets `errno` accordingly.
+
+=== method options
+
+  * `SIG_BLOCK` - the specified signals should be added to set the blocked of
+    signals.
+
+  * `SIG_UNBLOCK` - the specified signals should be removed from the set of
+    blocked signals.
+
+  * `SIG_SETMASK` - the only blocked signals are the specified signals.
+
+=== Functions for manipulating Signal sets
+
+[source,c]
+------
+#include <signal.h>
+
+ret = sigemptyset(&set);         /* Removes all signals from the set. */
+ret = sigfillset(&set);          /* Adds all signals to the set. */
+ret = sigaddset(&set, signum);   /* Adds the specified signal to the set. */
+ret = sigdelset(&set, signum);   /* Removes the specified signal to the set. */
+
+sigset_t set;
+int signum
+int ret;
+------
+
+  * Return 0 on success and -1 on error, and sets `errno` accordingly.
+
+=== Terminate the Program
+
+  * Handlers for termination signals are used to perform cleanup
+    operations before terminating the program.
+
+  * All required clean up operations are performed in the handler, and
+    then handler can call `exit()`, to terminate the program.
+
+  * Another method to terminate the program is to reset the signal
+    handler to the default handler and then re-raise the signal to the
+    process itself.
+
+=== Terminate the Program (Contd...)
+
+[source,c]
+------
+void fatal_signal_handler (int sig)
+{
+       /* Clean up actions:
+          - reset terminal modes
+          - kill child processes
+          - remove lock files */
+       ...
+
+       /* Now reraise the signal. */
+       signal(sig, SIG_DFL);
+       kill(getpid(), sig);
+}
+------
+
+  * The advantage of re-raising the signal is that the exit status
+    will correctly indicate an abnormal termination due to a signal,
+    rather than a normal termination.
+
+== Interrupted Syscalls
+
+=== Interrupted Syscalls
+
+  * Syscalls like `read()` and `wait()` can suspend the execution of
+    the process until certain event occurs.
+
+  * Example in the case of `read()` the syscall will suspend the
+    process, and will wait for the data to read from disk to
+    memory.
+
+  * The `wait()` syscall will suspend the process, and will wait for a
+    child process to terminate.
+
+=== Context of Interrupt Syscall
+
+  * A syscall that has suspended the process is executing kernel code.
+
+  * Now if a signal is delivered to a process, and control has to be transfered
+    to the signal handler in user space, and then return to the kernel code.
+
+=== Two options during interruption
+
+  * Two behaviours are available when the kernel code is to be
+    executed.
+
+    1. The syscall is re-invoked with the same arguments, known as
+       restarting the system call.
+
+    2. The syscall returns with error code `EINTR`.
+
+=== `siginterrupt` syscall
+
+  * Most of the syscalls are restarted by default except `poll()` and `select()`
+
+  * The behaviour can be changed on a per signal basis using `siginterrupt()`
+
+[source,c]
+------
+#include <signal.h>
+
+ret = siginterrupt(sig, fail)
+
+int ret, sig, fail;
+------
+
+  * If `fail == 1`, then when the signal `sig` occurs the syscall will
+    return `EINTR`.
+
+  * If `fail == 0`, then when the signal `sig` occurs the syscall will
+    be restarted.
+
+
+=== Example for Interrupted Syscall
+
+=== Signals within Signal Handler
+
+  * When a signal handler is executing, the same signal type will not
+    be delivered, but a different signal type will be delivered.
+
+  * If this will interfere with the normal operation of the signal
+    handler, the other signals has to be blocked.
