@@ -1,0 +1,401 @@
+= CI/CD Introduction
+Zilogic Systems
+
+== Chroot
+
+=== Motivation
+
+ * Want to try/test something without risking your actual filesystem
+ 
+ * e.g. testing an unfamiliar package, running an old distro's tools,
+   repairing a broken system from a rescue environment
+   
+ * Question: "How do I run a process that only sees a different,
+   isolated filesystem?"
+  
+=== What is Chroot?
+
+* A Unix system call that changes the apparent root directory (`/`)
+  for a process and its children
+* The process sees only the files inside the new root, everything
+  outside is invisible to it
+* One of the earliest forms of process isolation (introduced in 1979!)
+* Answers: "How do I run a process in a controlled, isolated
+  filesystem?"
+
+=== Demo: Chroot 
+
+ * Build a sample rootfs using `debootstrap` tool.
+-------
+sudo apt install debootstrap
+sudo debootstrap --arch=amd64 bullseye ./RFS http://deb.debian.org/debian
+-------
+
+ * Run `chroot /path/to/new-root /bin/sh`
+
+ * `chroot` command calls the chroot syscall
+ 
+ * Show `ls /` inside vs outside the chroot
+
+ * Try accessing a file outside the new root, it doesn't exist here
+
+=== Use Cases of Chroot
+
+ * *Rescue / recovery environments*
+
+   ** Boot from a live USB, `chroot` into a broken system's disk to
+   repair it (reinstall a bootloader, fix a config, reset a password)
+
+ * *Building software for a different distro/version*
+
+   ** e.g. build a package against an older glibc without installing
+   an old distro as your main OS
+
+ * *Running 32-bit binaries/tools on a 64-bit host*
+    ** chroot into a 32-bit rootfs to get the right library versions
+
+ * *Safer testing of unfamiliar/untrusted packages*
+
+   ** Try an install script or package without letting it touch your
+   real `/etc`, `/home`, etc.
+   
+== Docker
+
+=== Motivation
+
+ * Want to run and test applications in different, isolated Linux
+   environments without modifying the host system.
+   
+ * Want an app to run identically on your machine, your teammate's
+   machine, and a server with no manual setup, no surprises
+   
+ * Question: "How do I package an app with everything it needs,
+   and isolate it fully from other apps?"
+  
+=== Introduction
+
+ * Utilizes higher levels of Isolation like network, process and
+   storage level isolation
+   
+ * Packages the application and its dependencies into a single
+   portable *image*
+
+ * The image captures exactly what's needed to build and run the app,
+   nothing is left implicit or assumed
+   
+=== Basic Concepts
+
+* *Image*: a read-only template filesystem + dependencies + default
+  command to run
+** Built once, stored, reused (e.g. `debian:bullseye`)
+* *Container*: a running (or stopped) *instance* of an image
+** Same relationship as a *class* and an *object*
+** You can run many containers from the same image
+* *Container ID*: a unique ID assigned to each container when created
+** Used to refer to a specific container in commands
+** Shown in full (64 chars) or short form (first 12 chars)
+* *Registry*: a server that stores and distributes images
+** Docker Hub is the default public registry
+
+
+=== Basic Docker Commands
+
+[cols="2,3", options="header"]
+|===
+|Command |Purpose
+
+|`docker pull <image>`
+|Download an image from a registry
+
+|`docker images`
+|List images available locally
+
+|`docker run <image>`
+|Create and start a container from an image
+
+|`docker ps`
+|List *running* containers
+
+|`docker ps -a`
+|List *all* containers (including stopped)
+
+|`docker stop <container id>`
+|Stop a running container
+
+|`docker rm <container id>`
+|Remove a stopped container
+
+|`docker rmi <image id>`
+|Remove an image
+|===
+
+=== `docker run` Flags Used Later
+
+* `-i` : interactive - keep STDIN open
+* `-t` : allocate a pseudo-terminal (makes the shell usable)
+* `-d` : detached i.e run in background, print container ID
+* `--rm` : automatically remove the container when it exits
+* `--name <name>` : give the container a friendly name instead of
+  using the ID every time
+
+=== Demo: Basic Commands
+
+-------
+docker pull debian:bullseye
+docker images
+docker run -it --name demo debian:bullseye bash
+# (inside container) exit
+docker ps -a
+docker start -ai demo
+docker rm demo
+-------
+
+ * Point out the *container ID* printed/listed at each step
+
+ * Show the same container being stopped, restarted, and removed by ID
+   or name
+
+ * Use `docker build -t <image name> .` for creating custom image using `Dockerfile`.
+ 
+== CI/CD Introduction
+
+=== The Environment Problem
+
+ * Software doesn't run in isolation, it depends on:
+
+   ** *Build-time dependencies:* Compilers, SDKs, build tools,
+       specific language/runtime versions
+   
+   ** *Runtime dependencies:* Libraries, services, OS packages the
+       application needs to run
+
+ * All these dependencies have to be specified precisely for a remote
+   build/test to succeed the same way it did locally
+
+=== A Brief History of "Dependency Hell"
+
+ * *1990s "DLL Hell" (Windows)*
+
+   ** Installing one app would silently overwrite a shared `.dll` that
+   another app depended on, breaking it
+   
+ * *2000s Linux package conflicts*
+
+   ** `apt`/`rpm` dependency resolution wars
+   ** installing package A needed libX v2, but package B needed libX v1
+   
+ * *2010 onward Language-level package dependencies*
+ 
+   ** Python: global packages conflicting across projects led to
+   `virtualenv`
+   
+ * Pattern across all of these: *shared, mutable environments* break
+   as soon as two things need different versions of the same
+   dependency
+
+=== "Works on My Machine" syndrome
+
+ * Classic scenario:
+
+   ** Developer builds and tests locally works fine
+   
+   ** Same code fails on a teammate's machine, or on the build server
+   
+   ** Root cause: an *implicit* dependency (a library version, an env
+      variable, a config file) existed on the dev's machine but wasn't
+      documented or shared
+      
+ * This became such a common failure mode it has its own meme/name in
+   the industry "works on my machine" (WOMM)
+  
+ * *The real issue:* environment was never *specified, only assumed*
+
+=== How to solve this problem?
+
+ * Manually tracking of dependencies and its versions -> Error prone
+   and inefficient
+
+ * Require a process that is:
+   ** *Automatic* - every change is checked
+   ** *Repeatable* - same process runs every time
+   ** *Reliable* - independent of a developer's machine
+   ** *Fast* - problems are detected early
+   
+ * The environment has to be *clearly defined* for the automated build
+   and test to run successfully
+
+=== Reproducible build environment
+
+ * Dependencies
+ * OS + version
+ * Compiler + version
+ * Configuration
+ * Environment variables
+ * Build commands
+
+=== What is CI/CD?
+
+ * *Continuous Integration (CI)*
+   ** Frequently integrate code changes into a shared repository
+   ** Automatically build the software
+   ** Automatically run tests
+   ** Detect integration problems early
+
+ * *Continuous Delivery (CD)*
+   ** Keep tested software in a releasable state
+   ** Automatically create release artifacts
+   ** Make the software ready for deployment/release
+
+
+=== Why environment Matters for CI/CD?
+
+ * CI/CD needs builds/tests to run reliably on a *remote, shared*
+   machine with zero assumptions about what's "already installed"
+   there
+
+ * If the environment isn't fully and explicitly specified, the remote
+   build fails, or worse, silently produces something different from
+   what was tested locally
+   
+ * We've already seen the fix at the single-machine level: chroot and
+   Docker isolate and specify dependencies
+   
+ * CI/CD applies this same idea *automatically*, on every code change,
+   on a remote server
+  
+
+== GitLab CI
+
+=== Overview
+
+  * This tutorial demonstrates how to build a C project using Gitlab CI.
+
+  * A C project that implements the snake game is taken as example, to
+    demonstrate Gitlab CI.
+
+  * The snake project source code is available from the folder `snake/`
+
+
+=== Step 1: Manual Build and Run
+
+Build the curses example locally. There is a dependency on ncurses, ensure
+ncurses library is installed first. The package name on Ubuntu and debian for
+ncurses is `libncurses5-dev`.
+
+------
+make curses-snake
+./curses-snake
+------
+
+=== Step 2: Create a Git Project on Gitlab.com
+
+Login to gitlab.com and create a private project. If you do not have an account
+on gitlab.com, please create on. Clone project to the local system.
+
+------
+git clone https://gitlab.com/your-user-name/snake.git
+------
+
+Copy the project files into the cloned Git repository.
+
+=== Step 3: Install Docker and Gitlab Runner
+
+We will be using Gitlab local CI runner  along with Docker to verify our CI script
+locally. Here a docker container is used to create an isolated build
+environment, where the required build dependencies can be installed. This will
+help making the build more predictable.
+
+Install docker, using the following command.
+
+------
+sudo apt-get install docker.io
+------
+
+Download and install Gitlab local CI Runner, using the following command.
+
+------
+sudo wget -O /etc/apt/sources.list.d/gitlab-ci-local.sources https://gitlab-ci-local-ppa.firecow.dk/gitlab-ci-local.sources
+sudo apt-get update
+sudo apt-get install gitlab-ci-local
+------
+
+=== Step 4: Create a Gitlab CI file
+
+Create a file `.gitlab-ci.yml` with the following content.
+
+------
+build:
+   image: debian:bullseye-slim
+   script:
+   - apt-get update
+   - apt-get install -y build-essential
+   - apt-get install -y libncurses5-dev
+   - make curses-snake
+------
+
+=== Step 4: Create a Gitlab CI file (Contd.)
+
+  * The Gitlab CI file defines a job named "build".
+
+  * The `image` specifies the docker image that should be used as the base image
+    for the build. Here we are using the `debian:bullseye-slim` as the base
+    image.
+
+  * The `script` specifies the list of commands to be executed within the docker
+    image.
+
+  * The first command updates the list of packages available from the Debian
+    repo. This is required for installing packages from the Debian repo.
+
+  * The second command in the `script` installs the package `build-essential`.
+    `build-essential` depends on `gcc` and `make`, and hence these get installed
+    as well.
+
+  * The third command in the `script` installs the package `libncurses5-dev`,
+    that is required for building our package.
+
+=== Step 5: Test the Gitlab CI file
+
+Invoke the Gitlab CI runner to execute the CI script locally. This command
+should be executed from the top-level folder of the project, i.e. `snake`
+directory.
+
+------
+gitlab-ci-local
+------
+
+=== Step 6: Test the Gitlab CI in Remote Runner
+
+Push the files to remote repo and the CI script will be executed automatically
+in the shared cloud runner.
+
+------
+git push origin main
+------
+
+=== Summary
+
+ * CI/CD is about Automation and Repeatablility in a controlled
+   environment.
+
+ * Docker & GitLab CI are example tools used in a CI/CD pipeline.
+ 
+image::figures/gitlab-cicd.png[style="left",align="center",width="100%"]
+
+=== References
+
+ . https://en.wikipedia.org/wiki/DLL_hell
+ . https://docs.gitlab.com/ci/pipelines/
+ . https://docs.docker.com/get-started/docker-overview/
+ 
+== Exercises
+
+=== Try Out
+
+  1. The snake project has a `sdl-snake` target, which runs the game in GUI
+     mode. This target depends on `libsdl1.2-dev`. Try building this locally
+     first.
+
+  2. Modify the CI file to build the `sdl-snake` target instead of the
+     `curses-snake` target. Test the CI file with the local runner and then test
+     the CI file with the remote runner.
