@@ -1,0 +1,351 @@
+= Process Handling
+Zilogic Systems <training@zilogic.com>
+
+== Introduction
+
+=== Process
+
+  * Process is a program in execution.
+  * Includes
+    - code
+    - user data - stack, global variables
+    - system data - fd table, stats, etc.
+
+  * Each process is given a unique identifier called the PID.
+
+=== `getpid()` syscall
+
+  * The process ID of a process is obtained using `getpid()` syscall
++
+[source,c]
+------
+#include <sys/types.h>
+#include <unistd.h>
+
+pid = getpid();
+
+pid_t pid
+------
++
+  * The syscall returns the process ID of the process.
+  * The syscall does not fail.
+
+=== Process
+
+image:figures/process.png["Process", width=600]
+
+== Process creation 
+
+=== Creating Process
+
+  * The method of creating an new identical process is called forking.
+
+
+image:figures/fork.png["Forking", width=600]
+
+=== syscall for creating process
+
+  * The system call to create an identical process is `fork()`.
+
+  * To create a new identical process
+    - the user and system data is copied
+    - the code is read-only and is shared between the two processes
+
+
+=== Parent and Child
+
+  * The process that calls `fork()` is called the parent.
+
+  * The newly created process is called a child of the parent.
+
+=== `fork()` syscall
+
+[source,c]
+------
+#include <sys/types.h>
+#include <unistd.h>
+
+cpid = fork()
+
+pid_t cpid;
+------
+
+  * `fork()` on success returns twice, once in the child and once in
+    the parent.
+    - In the parent, returns the child PID.
+    - In the child, returns 0.
+
+  * `fork()` on failure returns only once with `-1`, and sets errno
+    accordingly.
+
+== Fork Execution
+
+=== Fork Step 1
+
+ * Process invokes `fork()`
+
+image:figures/fork-step-1.png["Step 1", width=450]
+
+=== Fork Step 2
+
+ * Child created, identical except for the return value
+
+image:figures/fork-step-2.png["Step 2", width=1000]
+
+=== Fork Step 3
+
+ * Different code executed based on return value
+
+image:figures/fork-step-3.png["Step 3", width=1000]
+
+=== Executing Another Program
+
+  * `fork()` creates only clones, the code is always the same.
+
+  * The `execv()` system call is used to replace the code, with the
+    code of another program.
+
+=== `execv()` syscall
+
+[source,c]
+------
+#include <unistd.h>
+
+ret = execv(path, argv)
+
+char *path;
+char *argv[];
+int ret;
+------
+
+  * The `path` specifies the location of the executable.
+
+  * The `argv` specifies an array of arguments passed on to the
+    program.
+
+  * Does not return on success.
+
+  * Returns `-1` on failure, and sets errno accordingly.
+
+=== `argv`
+
+  * `argv[0]` is required and should be name of the program.
+
+  * The array is to be terminated by a `NULL` pointer.
+
+  * Appears as the second argument of `main()`, in the new program.
+
+=== `exec()` variants
+
+  * `execv()` is just one variant of the `exec()` family of functions.
+
+  * The `exec()` family will have either a `v` suffix or a `l` suffix.
+
+  * `v` denotes `argv`.
+
+  * `l` denotes list i.e comma-separated
+
+  * The `exec()` family may or may not have a `p` suffix followed by an 'l' or 'v'
+
+  * `p` suffix denotes that the first argument is the name of a program, which
+    has to be searched in directories specified by the `PATH` variable.
+
+=== `exec()` variants (Contd...)
+
+`execvp(cmd, argv)`::
+Searches for the `cmd` in directies mentioned in `PATH`. The arguments
+are specified in the array `argv`.
+
+`execl(path, arg0, ...)`::
+Executes the program specified by `path`. The arguments are specified
+as a variable argument list.
+
+`execlp(cmd, arg0, ...)`::
+Searches for the `cmd` in directories mentioned in `PATH`. The
+arguments are specified as a variable argument list.
+
+=== After execution of `exec()`
+
+  * After an `exec()`,
+    - the code is replaced by the code of the new program.
+    - the user data is re-initialized.
+    - some of the system data is retained. (the file descriptor table)
+
+  * `exec()` family is usually used along with a `fork()` to spawn a
+    different program.
+
+== File I/O and Forking
+
+=== File I/O and Forking
+
+  * For every file opened in the system, there is one entry in the
+    file table.
+
+  * The file table is a system global table.
+
+  * The file table contains flags, offset and pointer to the file
+    information.
+
+  * The file descriptor table is per process.
+
+  * It is indexed by the fd no., and contains a pointer to file table
+    entry.
+
+=== File Table
+
+image::figures/file-table.png["File Table", width=1000]
+
+=== File Descriptor table
+
+  * The file descriptor table is replicated during forks and preserved
+    across execs.
+
+  * The file descriptor table contains pointers to the same file table
+    entries.
+
+=== File Descriptor Table after Fork
+
+image::figures/file-table-fork.png["File Descriptor Table after Fork", width=750]
+
+  * Since the position pointer is in the file table, reads and writes
+    get interleaved.
+
+  * The file is closed and the file table entry is freed only after
+    all file descriptors corresponding to the entry is closed.
+
+=== Buffered I/O and Forking
+
+image::figures/buffered-io-fork.png["Buffered I/O and Forking", width=600]
+
+=== Buffered I/O and Forking
+
+  * The user data is replicated during forks.
+
+  * If there is data in the buffer that has not yet been written out,
+    the buffer will get replicated.
+
+  * When the buffer is flushed data will be printed twice, once in the
+    parent and once in the child.
+
+== Death of a Process
+
+=== Death of a Process
+
+  * The process can terminate in two ways
+    1. Normal Termination
+    2. Abnormal Termination
+
+  * Normal termination occurs when the process returns from main or
+    calls the `exit()` function.
+
+  * Abnormal termination occurs when the process receives certain
+    fatal signals. Signals are tiny messages sent by the kernel to a
+    process, or between two processes.
+
+=== Death of a Parent
+
+  * When the parent process terminates before the child terminates,
+    the child is adopted by init.
+
+=== Death of a Child
+
+  * When a child dies the parent is notified through a signal.
+
+  * All the memory associated with the process is freed, except the
+    process table entry which contains the exit status.
+
+  * The child is now said to be in a zombie state.
+
+  * These processes are marked with `<defunct>` in `ps`.
+
+=== Death of a Child (Contd...)
+
+  * The parent is supposed to read the exit status of the child, and
+    then the process table entry will be freed.
+
+  * The `wait()` syscall reads the exit status of the child, and frees
+    the process table entry.
+
+  * if parent dies without calling wait, zombie childs are also freed
+    by init.
+
+=== `wait()` syscall
+
+[source,c]
+------
+#include <sys/wait.h>
+
+pid = wait(&stat);
+
+pid_t pid;
+int stat;
+------
+
+   * The `wait()` syscall blocks until a process exits.
+
+   * Stores the exit status in `stat`.
+
+   * Returns the process ID on success.
+
+   * Returns `-1` on error, error code `ECHILD` is set when no child available.
+
+=== Macros
+
+   * Macros can be used to extract various information from `stat`.
++
+[source,sh]
+------
+WIFEXITED(stat_val)
+
+       Evaluates to a non-zero value if status was returned for a child
+       process that terminated normally.
+
+WEXITSTATUS(stat_val)
+
+       If  the  value  of  WIFEXITED(stat_val)  is non-zero, this macro
+       evaluates to the low-order 8 bits of the  status  argument  that
+       the  child process passed to _exit() or exit(), or the value the
+       child process returned from main().
+
+WIFSIGNALED(stat_val)
+
+       Evaluates to a non-zero value if status was returned for a child
+       process  that terminated due to the receipt of a signal that was
+       not caught (see <signal.h>).
+------
+
+=== Macros (Contd...)
+
+[source,sh]
+------
+WTERMSIG(stat_val)
+
+       If the value of WIFSIGNALED(stat_val) is non-zero, this macro
+       evaluates to the number of the signal that caused the
+       termination of the child process.
+
+WIFSTOPPED(stat_val)
+
+       Evaluates to a non-zero value if status was returned for a child
+       process that is currently stopped.
+
+WSTOPSIG(stat_val)
+
+       If the value of WIFSTOPPED(stat_val) is non-zero, this macro
+       evaluates to the number of the signal that caused the child
+       process to stop.
+
+WIFCONTINUED(stat_val)
+
+       Evaluates to a non-zero value if status was returned for a child
+       process that has continued from a job control stop.
+------
+
+== `watch` program
+
+=== Implemenation of `watch`
+
+[source,c]
+------
+include::code/mywatch.c[]
+------
