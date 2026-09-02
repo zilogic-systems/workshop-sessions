@@ -1,0 +1,242 @@
+= Unix Programming Intro
+Zilogic Systems <training@zilogic.com>
+
+== Introduction
+
+=== Role of Unix Kernel
+
+==== Left
+
+image::figures/kernel-role.png["Role of Unix Kernel", width=600]
+
+==== Right
+
+  * `Runs programs:` like giving each app its turn on the CPU.
+
+  * `Manages memory:` like giving each app its own desk space.
+
+  * `Talks to hardware:` like handling the keyboard, screen, and disk.
+
+  * `Handles files:` like opening, reading, and saving documents.
+
+=== System Calls
+
+==== Left
+ 
+image::figures/syscalls.png["System Calls", width=750]
+
+==== Right
+
+  * A `system call` is how a user program asks the operating system to do privileged work.
+
+  * System calls are part of the operating system kernel, and deal
+    with low level operations on files, processes and other resources.
+
+=== Library Functions vs. System Calls
+
+==== Left
+
+image::figures/library-func.png["Library Functions vs. System Calls", width=750]
+
+==== Right
+
+  * Library functions become part of the program during run-time or
+    compile-time.
+
+  * Some library functions internally invoke a system call to acheive
+    their functionality. Ex: `printf()` and `malloc()`.
+
+  * Some library functions do not invoke any system call. Ex:
+    `strcmp()` and `sin()`
+
+== System Calls
+
+=== System Call Conventions
+
+  * System calls usually return an integer. `0` indicates success,
+    `-1` indicates failure.
+
+  * When an error occurs the corresponding error code is stored in a
+    global variable `errno`.
+
+  * The error code can be converted to a human readable form using
+    `strerror()` declared in `string.h`.
++
+[source,c]
+------
+error_string = strerror(errno);
+------
+
+=== System Call Conventions
+
+  * The `error` function can be used to print error messages.
++
+[source,c]
+------
+error(exit_status, errno, user_error_msg);
+------
+
+  * if `exit_status` is non-zero, the program is terminated.
+  * if `errno` is non-zero, the error string is printed after
+    `user_error_msg`.
+
+=== Getting Help
+
+  * All system calls are documented in man pages.
+
+  * Man pages are divided into sections. The important sections are
+    given below.
+
+------
+Section 1 - shell command
+Section 2 - system calls
+Section 3 - library functions
+Section 5 - file formats
+Section 7 - miscellaneous info, tables - ex: ASCII,
+------
+
+=== Getting Help (Contd...)
+
+  * If there is a shell command and syscall with the same name, the
+    man page for the shell command will be displayed. The man page is
+    selected based on the section no.
+
+  * The section can also be specified while invoking `man`.
+
+  * For example there is a `read` shell command and a `read`
+    syscall. To get the syscall man page.
++
+[source,sh]
+------
+man 2 write
+------
+
+  * Searching the man page can be done using `apropos` command
++
+[source,sh]
+------
+apropos malloc
+------
+
+=== Debugging tools
+
+  * `strace` - trace system calls made by a program.
+
+[source,sh]
+------
+strace ls
+strace -c ls
+------
+
+  *  `ltrace` - trace library calls made by a program.
+
+[source,sh]
+------
+ltrace ls
+ltrace -c ls
+------
+
+== User library
+
+=== User libraries
+
+ * Common features can be packed as an archive that can be shared across many
+   applications.
+
+ * Archives are collection/grouping of files into a single file
+
+ * On compile-time, any application can link to any these archives and use the
+   features present in the archive
+
+ * These archives are called `libraries`, analogous to a `library of books`
+
+ * These `libraries` can be of types `shared` or `static`
+
+=== Static libraries
+
+ * These libraries are compiled as part of the application during compile-time.
+
+ * Code is duplicated from the library and packed along with the application.
+
+ * Similar to a bookstore where you can buy and take a copy of a book to your
+   home.
+
+=== Creating a Static library
+
+ * Object files are archived to create static library
+
+[source,sh]
+------
+gcc -c <source files>
+------
+
+ * Intermediate object files can be archived as follows
+
+[source,sh]
+------
+$ ar -rc <lib-name.a> <object files>
+------
+
+=== Using a Static Library
+
+[source,sh]
+------
+$ gcc main.c -L <library path> -l<name>
+$ ./a.out
+------
+
+
+=== Shared libraries
+
+ * The code from these libraries are not copied to the application during
+   compile-time.
+
+ * Only references to the functions in the library are added during compile-time.
+
+ * Actual code in library is called during run-time
+
+ * Similar to a physical library of books where books cannot be owned and can
+   only be borrowed from.
+
+=== Creating a Shared library
+
+ * -fPIC flag to `gcc` needs to be specified for Dynamic linking
+ * `PIC` stands for `Position Independent Code`
+ * It can be stored anywhere in the memory
+
+[source,sh]
+------
+$ gcc -fPIC *.c --shared -o <libname.so>
+------
+
+=== Using a Shared library
+
+[source,sh]
+------
+$ gcc main.c -L <library path> -l<name>
+$ LD_LIBRARY_PATH=<library path> ./a.out
+------
+
+=== `ldd` command
+
+ * Can be used to find the shared libraries linked to an executable file.
++
+[source,sh]
+------
+$ ldd <exectuable>
+------
+
+=== Difference between Static and Shared libraries
+
+
+[options="header",align="center"]
+|======
+|Static library|Shared library
+
+| Linked at compile time| Loaded at run time     
+| Bigger executable    | Smaller executable     
+| Code copied into each app| One copy can be shared by multiple apps       
+| Uses more memory     | Uses less memory      
+| Easier to deploy as one standalone app     | Needs the .so file available at run time   
+
+|=====
