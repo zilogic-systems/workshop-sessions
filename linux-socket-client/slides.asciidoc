@@ -1,0 +1,387 @@
+= Building Network Clients
+Zilogic Systems <training@zilogic.com>
+
+== Clients and Servers Basics
+
+=== Network Sockets
+
+  * An interface between the application and the transport layer.
+
+  * It is also an endpoint in a communication link between two
+    processes.
+
+=== Server
+
+  * Server is a process that provides services to other processes.
+
+  * Example: Apache web server, bind DNS server, postfix mail server
+
+=== Client
+
+  * Client is a process that requests the service of server.
+
+  * Example: Firefox web browser, Thunderbird mail client
+
+=== Protocol
+
+  * Protocol is a common agreement between clients and servers, on how
+    data is to be transmitted, and interpreted.
+
+  * Example: The mail protocol (POP) says that a client should
+    authenticate itself using the `USER <username>` and `PASS
+    <password>` commands. The list of emails can be obtained using the
+    `LIST` command. The email can be retrieved using the the `RETR`
+    command followed by the email no. This set of commands and the
+    order in which it should be invoked constitutes the mail protocol.
+
+
+=== Reliability - TCP vs UDP
+
+TCP guarantees that the message sent will reach the receiver, unless
+there is a serious problem in the communication path, in which case
+the sender will be notified of the issue.
+
+UDP does not ensure that the message sent will reach the receiver. It
+also does not notify the sender when the message sent is not
+delivered. A single message could also be received by the receiver
+twice!
+
+=== Connection - TCP vs UDP
+
+TCP is connection oriented. A connection has to be established before
+data transaction can take place, similar to the telephone/mobile
+system. This is a direct consequence of the protocol being reliable.
+
+UDP is not connection oriented. No connection has to be established
+before sending data.
+
+=== Ordering - TCP vs UDP
+
+TCP ensures that messages sent by the sender, are received in the same
+order by the receiver.
+
+With UDP messages sent can be received out of order.
+
+=== Data Interface to Application - TCP vs UDP
+
+With TCP, the receiver has no indication two messages were sent with
+separate transmit syscalls. The transmission is said to be stream
+oriented. The data sent and received is perceived as a sequence of
+bytes.
+
+In UDP, each message sent is to be received by the receiver by
+separate receive syscalls. The tranmission is said to be message
+oriented. The data is sent and received as messages.
+
+=== Applications
+
+UDP's characteristics make it suitable for realtime multimedia
+streaming. Since it is light weight it used in embedded system
+protocols like TFTP and SNMP.
+
+=== Creating Sockets
+
+  * To create a socket, the `socket()` system call can be used.
++
+[source,c]
+------
+#include <sys/types.h>
+#include <sys/socket.h>
+
+fd = socket(proto_family, type, protocol);
+
+int proto_family;
+int type;
+int protocol;
+int fd;
+------
+
+  * The `proto_family` specifies the protocol stack to be used for
+    communication - IP, IPX, AppleTalk, ... It is specified using
+    macros `PF_INET`, `PF_IPX`, `PF_APPLETALK`.
+
+  * The `type` specifies the transport mechanism to be used. It is one
+    of `SOCK_STREAM` or `SOCK_DGRAM` for IP. `SOCK_STREAM` says that a
+    reliable, connection based, byte stream transmission is
+    required. `SOCK_DGRAM` says that a unreliable, connection-less,
+    message based transmission is required.
+
+=== Protocols
+
+  * If there are more than one transport protocols that can provide a
+    particular transmission `type`, then `protocol` specifies protocol
+    number of the transport protocol. If `protocol == 0` then the
+    default protocol for the specified transmission type is used.
+
+  * In case of TCP/IP, there is only one protocol that provides
+    `SOCK_STREAM` -- TCP. It is the default.
+
+  * There is also only one protocol that provides `SOCK_DGRAM` --
+    UDP. It is the default.
+
+  * The syscall returns a file descriptor on success, or -1 on
+    failure. `errno` is set to indicate what error occurred.
+
+  * Once a socket is created an interface is available to the
+    transport layer.
+
+  * In the case of `SOCK_STREAM` the socket cannot be used till it is
+    connected to a server.
+
+=== Socket Created
+
+image::figures/socket-created.png["Socket Created", width=1000]
+
+== TCP Socket Operations
+
+=== Connecting to a Server
+
+  * Connecting is a must for TCP sockets.
+
+  * It is more like a mobile phone. To talk to another person, first
+    the phone connects to the other phone.
+
+    - The user has to enter the other mobile no. and press call.
+    - The phone tries to connect to the other mobile.
+    - Various exceptional conditions can occur
+      . The mobile no. is incorrect.
+      . The mobile is not reachable.
+      . The mobile is busy, i.e. connected to another mobile.
+      . The mobile is free, but the user does not pick the phone.
+    - Or the user accepts the call, and the connection is made.
+    - Both the users can talk till either end terminates the connection.
+
+=== `connect()` syscall
+
+  * To connect to a server the `connect()` syscall can be used.
++
+[source,c]
+------
+#include <sys/socket.h>
+
+ret = connect(fd, (struct sockaddr *)&addr, sizeof(addr));
+
+int fd;
+struct sockaddr_in addr;
+------
+
+   * `fd` is the local socket to be connected.
+   * `addr` is an inet socket address structure, that specifies the
+     server IP and port to connect to.
+   * The socket address structure pointer should be cast to a
+     pointer to the generic socket address type.
+
+=== Socket Connected
+
+image::figures/socket-connected.png["Socket Connected", width=1000]
+
+=== Connect failures
+
+   * On failure `connect()` returns -1 and sets `errno` accordingly.
+
+   * `connect()` can fail for a number of reasons, just as a mobile
+     phone.
+
+   * If the IP address of the server is incorrect. The error code is
+     set to `ENETUNREACH`, meaning "Network is unreachable".
+
+   * If the server cannot be reached or server does not respond within
+     a timeout period, the error code is set to `ETIMEDOUT`.
+
+   * For a complete list of possible errors, see the `connect()` man
+     page.
+
+=== Sending and Receiving Data
+
+   * Since the socket is represented by a file descriptor. It can be
+     treated just like a file after the connection has been
+     established.
+
+=== `read()` syscall
+
+   * To receive data the `read()` syscall can be used.
++
+[source,c]
+------
+ret = read(fd, buf, len);
+
+int fd;
+void *buf;
+size_t len;
+ssize_t ret;
+------
+
+   * If `ret > 0`, data received from peer.
+   * If `ret == 0`, connection has been closed by peer.
+   * If `ret == -1`, network error has occurred.
+
+=== `write()` syscall
+
+   * To send data the `write()` syscall can be used.
++
+[source,c]
+------
+ret = write(fd, buf, len);
+
+int fd;
+char *buf;
+size_t len;
+ssize_t ret;
+------
+
+   * If `ret > 0`, data sent to peer.
+   * If `ret == -1`, network error has occured.
+   * The invoking process receives `SIGPIPE`, if the connection has
+     been closed by peer.
+
+=== Terminating the Connection
+
+  * When the client or the server wants to terminate the connection,
+    the `close()` syscall can be used.
+
+  * This is analogous to pressing the `On Hook` button in the mobile
+    phone.
+
+  * What happens when one end closes the connection is indicated in
+    the previous section.
+
+== Example Protocols
+
+=== Daytime
+
+  * ASCII protocol
+  * The client connects to the server, the servers provides the day
+    and time as an ascii string and closes the connection.
+  * The protocol is defined in the document RFC867.
+
+[source,bash]
+------
+include::code/simple-daytime.c[]
+------
+
+[source,bash]
+------
+include::code/daytime.c[]
+------
+
+=== HTTP
+
+  * ASCII protocol
+  * For each transaction a separate connection.
+    - client connects to server
+    - client sends request
+    - server responds with web page
+    - connection is closed
+  * Simplest HTTP request
+
+------
+GET <path-to-file>
+------
+
+  * Server responds with the file contents.
+
+=== Program to download a file through HTTP.
+
+[source,bash]
+------
+include::code/download.c[]
+------
+
+== UDP Socket Operations
+
+=== UDP socket
+
+  * UDP sockets do not require a connection.
+
+  * They are similar to letters. To send a some message to another
+    person.
+
+    - The message is written in a letter.
+    - The destination address is specified.
+    - The letter is posted.
+
+  * Each time a message is to be sent, the above process is
+    repeated. Even if the message is to be sent to the same person.
+
+
+=== Sending Datagrams
+
+  * To send a datagram the `sendto()` syscall is to be used.
++
+[source,c]
+------
+ret = sendto(fd, buf, buflen, flags,
+             (struct sockaddr *)to_addrp,
+             sizeof(*to_addrp))
+
+int fd;
+void *buf;
+size_t buflen;
+int flags;
+struct sockaddr_in *to_addrp;
+------
+
+  * `fd` is the socket to be used to send data.
+  * `buf` is the buffer to be sent.
+  * `buflen` is the size of the buffer.
+  * `flags` tell the underlying protocol to behave in a certain
+    way. We will not discuss this further. If no flags are required,
+    `0` can be passed.
+  * `to_addrp` is a pointer to the destination socket address, cast
+    to a pointer of the generic addresss type.
+
+  * The function returns the number of characters sent. On error it
+    returns `-1` and sets `errno` appropriately.
+
+=== Receiving Datagrams
+
+  * To receive a datagram the `recvfrom()` syscall is to be used.
++
+[source,c]
+------
+ret = recvfrom(fd, buf, buflen, flags,
+	       (struct sockddr *)&from_addr,
+	       &from_len));
+int fd;
+void *buf;
+size_t buflen;
+int flags;
+struct sockaddr_in from_addr;
+socklen_t from_len;
+------
+
+  * The arguments are same as `sendto()`.
+  * If the fifth argument is not `NULL`, the address of the sender is stored.
+
+  * `from_len` specifies the size of the address structure passed. The
+    syscall modifies `from_len` to the actual sizeof the structure
+    returned. In case of IP, both the passed structure and returned
+    structure size are the same.
+
+  * There are some protocols in which the size of the address
+    structure, varies with the address. The `from_len` argument is
+    useful in those protocols.
+
+=== Dashboard Protocol
+
+  * The Dashboard protocol is used to control the dashboard of a
+    vehicle.
+
+  * The protocol uses UDP.
+
+  * The Dashboard message have the following format:
+
+[source,bash]
+------
+<dial><value>
+------
+
+  * `dial` - 'S' for Speed and 'F' for Fuel
+  * `value` - value for the specified dial.
+
+=== Program to set the fuel dial
+
+[source,bash]
+------
+include::code/fuel.c[]
+------
