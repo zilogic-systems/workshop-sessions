@@ -1,0 +1,197 @@
+= Advanced I/O
+Zilogic Systems <training@zilogic.com>
+
+== Advanced I/O control
+
+=== Blocking and Non blocking
+
+ * Usually syscalls and I/O operations are blocking
+ * Until the I/O operation completed theuser application is blocked
+ * O_NONBLOCK is used as an option with open for non blocking I/O
+ * I/O operation would return errno if data is not there or buffer not available
+ * ON failure the errno is set as EAGAIN
+
+
+=== Ioctl
+
+ * Allows to perform I/O operations other than the specified syscalls
+
+[source, c]
+-----------------------------------------------
+int ioctl (int filedes,int request, ...);
+-----------------------------------------------
+
+ * returns -1 on error and values based on request if succeeds
+ * it takes the request/command and the data pointer corresponding to request
+ * different ioctls can be obtained from ioctl_list man page
+
+=== accesing IO devices and using ioctls
+
+[source,c]
+------
+include::code/sound.c[]
+------
+
+=== I/O Multiplexing
+
+ * Two perform a multiple blocking operation at a time we have problem
+ 
+ * it can be done by forking the process for each blocing I/O which
+   would increase synchronization complexities
+ 
+ * it can be done by polling in the nonbloking mode
+ 
+ * it can also be done using asynchronous I/o signals SIGPOLL/SIGIO
+   they have certain limitation they would operate only on
+   streams/terminals/sockets,only one signal per process & they differ
+   based on BSD/SVR4.
+ 
+ * a better way is to perform I/O multiplexing
+
+=== Select
+
+[source,c]
+------------------------------------------------------------------------------------------------
+int select (int maxfdp1,fd_set *readfs,fd_set *writefds,fd_set *exceptfds,struct timeval *tvptr);
+------------------------------------------------------------------------------------------------
+
+ * return -1 on error,count of rady descriptors or zero on timeout
+ * it takes takes max number of fds it has to check
+ * it takes fdset to check for read,write and exceptions
+
+note::
+fdset is a array of bits for each fd
+
+ * time for it has to wait for the fd to be ready 
+
+[source,c]
+---------------------
+struct timeval{
+       long tv_sec;
+       long tv_usec;
+}
+---------------------
+
+[source,c]
+----------------------------------------------------------------
+tvptr == NULL				wait forever
+tvptr->tv_sec==0 && tvptr->tv_usec ==0	dont wait
+tvptr->tv_sec !=0 || tvptr->tv_usec!=0  wait for specified time
+----------------------------------------------------------------
+
+*MACROS*
+---------------------------------------------------------------
+FD_ZERO(fd_set *fdset);		clear all fds
+FD_SET(int fd,fd_set *fdset);	set specified fd to fdset
+FD_CLR(int fd,fd_set *fdset);	unset a specified fd to fdset 
+FD_ISSET(int fd,fd_set *fdset);	check whether fd is ready
+---------------------------------------------------------------
+
+NOTE::
+
+if all fdset are NULL then this can be used as higher precision timer
+
+=== Remote Shell Server
+
+[source,c]
+------
+include::code/rsh_server.c[]
+------
+
+=== Remote Shell Client
+
+[source,c]
+------
+include::code/rsh_client.c[]
+------
+
+=== Memory Map
+
+[source,c]
+-----------------------------------------------------------------------------
+caddr_t mmap(caddr_t addr,size_t len,int prot,int flag,int filedes,off_t off)
+-----------------------------------------------------------------------------
+
+ * addr  - to specify the starting address of the mapped region,0 to allow system to choose
+ * len	- length of the area to be mapped
+ * prot	- protection specified for a region
+
+[options="header",width="50%",align="center"]
+|====
+| prot | description
+
+|PROT_READ  |	read permission
+|PROT_WRITE |	write permission
+|PROT_EXEC  |	execute permission
+|PROT_NONE  |	cannot be accessed
+|====
+
+Note :: protection specified has to match the open mode of the file.
+
+ * flag	can take below given values
+
+[options="header",width="50%",align="center"]
+|====
+|flag | description
+
+|MAP_FIXED   |	mapped region should equal the addr argument passed
+|MAP_SHARED  |	changes to mapped region would reflect in file also
+|MAP_PRIVATE |	creates a copy of file and the modification region is written to new file
+|====
+
+ * off	- specify the offset in the file
+
+[source,c]
+------------------------------------
+int munmap(caddr_t addr,size_t len)
+------------------------------------
+
+NOTE:: the file should have data/holes already in the region to be
+mapped(cannot mmap empty file)
+
+=== Shared memory using map - Sender
+
+[source,c]
+------
+include::code/mmap_send.c[]
+------
+
+=== Shared memory using map - Receiver
+
+[source,c]
+------
+include::code/mmap_recv.c[]
+------
+
+=== Sync & Fsync
+
+ * Data written to I/O devices are not written immediately they are
+   queued in a buffer cache and written by the kernel in a
+   sequence.this is also called as delayed write
+ 
+ * kernel does an I/O operation whenever buffer is full or empty
+
+[source,c]
+------------------
+void sync(void)
+------------------
+
+ * sync function queues the modified buffers for a I/O operaion and
+   returns without waiting for IO operation to take place
+ 
+ * sync is called every 30 seconds by update daemon automatically
+ 
+ * if some io operations has to happen immediately
+
+[source,c]
+-----------------------
+int fsync(int filedes);
+-----------------------
+
+ * this function queues the I/O operation os specified file waits
+   until I/O operation takes place
+
+
+
+
+
