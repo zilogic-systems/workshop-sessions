@@ -1,0 +1,396 @@
+= IPC
+Zilogic Systems <training@zilogic.com>
+
+== Why IPC?
+
+=== The Problem: Processes Are Isolated
+
+* Each process runs independently, with its own private memory.
+* One process cannot directly read or write another process's
+  variables.
+* This is by design - it keeps processes from accidentally (or
+  maliciously) interfering with each other.
+
+=== But Processes Need to Cooperate
+
+* Real software constantly needs processes to work together:
+** A shell pipeline: `grep "error" file | wc -l`
+** A client process talking to a server process
+** A logging process collecting messages from many applications
+* Since processes can't just share variables, the OS must provide
+  a way for them to talk to each other.
+
+=== The Solution: IPC
+
+* IPC (Inter-Process Communication) refers to OS-provided
+  mechanisms that let processes exchange data or coordinate work.
+* Think of it as different "channels" the OS sets up between
+  processes.
+
+=== Two Kinds of Problems IPC Solves
+
+* **Data exchange** - moving bytes/messages from one process to
+  another.
+* **Coordination** - making sure processes don't clash while using
+  shared data, or signalling that data is ready.
+* Pipes, message queues, and shared memory mainly solve data
+  exchange; semaphores mainly solve coordination.
+
+
+== Pipes
+
+=== Pipes
+
+  * A pipe is a in-memory kernel buffer (FIFO), that can be written to
+    and read from using two file descriptors.
+
+  * Pipes are uni-directional. Data can be transferred through the
+    pipe only in one direction.
+
+  * When a process writes to the pipe, the data is stored in the FIFO.
+
+  * When a process reads from the pipe, the data is removed from the
+    FIFO.
+
+=== Pipes
+
+  * When a process writes to the pipe, and no space is available in
+    the FIFO, the process is blocked till space becomes
+    available. That is, the other process reads from the FIFO.
+
+  * When a process reads from the pipe, and no data is available in
+    the FIFO, the process is blocked till data becomes available. That
+    is, the other process writes to the FIFO.
+
+=== `pipe()` syscall
+
+  * A pipe can be created using `pipe()` system call.
++
+[source,c]
+------
+ret = pipe(fd)
+
+int fd[2];
+int ret;
+------
+
+  * The pipe is created and the read fd is available in `fd[0]`, the
+    write fd is available in `fd[1]`.
+
+=== Pipe basic demo
+
+[source,bash]
+------
+include::code/pipe-basic.c[]
+------
+
+== Message Queue
+
+=== Message Queue
+
+  * A message queue can be modeled as linked list of
+    messages. Messages can be added to and removed from the queue.
+
+  * Message is a chunk of bytes. The maximum size of the message, and
+    the no. of outstanding messages in a queue can be defined during
+    the creation of the message queue.
+
+  * Message queues are uni-directional. Messages can be transferred
+    through the message queue only in one direction.
+
+=== Message Queue
+
+  * Messages can be added to the queue by opening the message queue
+    for writing.
+
+  * Messages can be removed from the queue by opening the message
+    queue for reading.
+
+  * Just as with pipes, processes are blocked, when the queue is full
+    or empty.
+
+  * Messages queues also allows the user to specify priority to
+    messages. A higher priority message is read before any of the
+    lower priority message in the queue.
+
+=== `mq_open()` syscall
+
+  * A message queue is created using `mq_open()`.
++
+[source,c]
+------
+fd = mq_open(name, flags);
+
+mqd_t fd;
+char * name;
+int flags;
+------
+
+  * Each message queue is uniquely identified by a name. The name
+    should start with a `/`. The name of the message queue to be
+    opened should be passed as argument to `mq_open()`.
+
+  * The `flags` is similar to that of the `open()`
+    syscall. `O_RDONLY`, `O_WRONLY` can be used to indicate the
+    direction of message transfer.
+
+=== `mq_open()` syscall
+
+  * `mq_open` returns the message queue descriptor on success and `-1`
+    on failure. In Linux, the message queue descriptor is nothing but
+    a file descriptor.
+
+  * Additional `O_CREAT` can be used to create the message queue, if
+    it is not already present.
+
+  * When `O_CREAT` is used `mq_open()` accepts two other arguments -
+    `mode` and `attr`.
+
+=== `mq_open()` syscall
+
+[source,c]
+------
+fd = mq_open(name, flags | O_CREAT, mode, attr);
+
+char * name;
+int flags;
+mqd_t fd;
+mode_t mode;
+struct mq_attr * attr;
+------
+
+  * Just as with files, the `mode` specifies the read/write permission
+    for user, group and others. Note that execute permission is not
+    allowed on message queues.
+
+  * The `attr` specifies the message queue attributes, like the
+    maximum size of a message, the maximum no. of messages in a queue,
+    etc.
+
+[source,c]
+------
+struct mq_attr {
+       long mq_flags;       /* Flags: 0 or O_NONBLOCK */
+       long mq_maxmsg;      /* Max. # of messages on queue */
+       long mq_msgsize;     /* Max. message size (bytes) */
+       long mq_curmsgs;     /* # of messages currently in queue */
+};
+------
+
+  * The user can explicitly specify during open whether the accesses
+    to message queue should block using the `O_NONBLOCK` flag in the
+    `flag` argument.
+
+  * The message queue can be made non-blocking by setting `O_NONBLOCK`
+    is `mq_flags`. When such a message queue is opened, the message
+    will be non-blocking irrespective of whether `O_NONBLOCK` is
+    specified in the `open()` syscall.
+
+=== `mq_send()` and `mq_receive`
+
+  * `mq_send()` and `mq_receive` is used to send data to and receive
+    data from the message queue.
+
+[source,c]
+------
+ret = mq_send(fd, msg, len, prio);
+sret = mq_receive(fd, msg, len, &prio);
+
+mqd_t fd;
+char * msg;
+size_t len;
+unsinged prio;
+int ret;
+ssize_t sret;
+------
+
+  * The message queue can be closed using `mq_close()` syscall. The
+    message queue can be deleted using `mq_unlink()` syscall.
+
+=== Message queue send
+
+[source,bash]
+------
+include::code/mq-send-basic.c[]
+------
+
+=== Message queue receive
+
+[source,bash]
+------
+include::code/mq-receive-basic.c[]
+------
+
+== Shared Memory
+
+=== Shared Memory
+
+  * When two processes perform memory mapped I/O on the same file
+    (with `MAP_SHARED`), we have shared memory.
+
+  * A file can be memory mapped using `mmap()` syscall.
+
+=== `mmap()` syscall
+
+[source,c]
+------
+vaddr = mmap(addr, len, prot, flags, fd, offset);
+
+void * vaddr;
+void * addr;
+size_t len;
+int prot;
+int flags;
+int fd;
+off_t offset;
+------
+
+  * `fd` specifies the file to be mapped.
+  * `len` specifies the no. of bytes to mapped.
+  * `offset` specifies the starting position of the file to be mapped.
+  * `addr` specifies the virtual address to use for the mapping. When
+    specified as `NULL` the kernel chooses an available virtual memory
+    address for the mapping.
+
+  * The `prot` specifies, whether the mapping should be executable
+    `PROT_EXEC`, readable `PROT_READ` and writable `PROT_WRITE`.
+
+  * The `flags` specifies, whether the mapping is shared `MAP_SHARED`
+    or private `MAP_PRIVATE`. `MAP_SHARED` is used implement shared
+    memory.
+
+  * `mmap()` returns the alloted virtual address on success and
+    `MAP_FAILED` on failure.
+
+=== `munmap()` syscall
+
+  * The mapping can be released using the `munmap()` syscall.
++
+[source,c]
+------
+ret = munmap(addr, len)
+
+void * addr;
+int len;
+int ret;
+------
+
+=== Implementation of `cat`
+
+[source,bash]
+------
+include::code/mmio-cat.c[]
+------
+
+=== Memory mapped wall
+
+[source,bash]
+------
+include::code/shm-gfx.c[]
+------
+
+=== Send messages to the wall
+
+[source,bash]
+------
+include::code/shm-app.c[]
+------
+
+== Semaphores
+
+=== Semaphores
+
+  * Semaphores can be used for mutual exclusion or signalling.
+
+  * Semaphore is an integer variable, that is incremented or
+    decremented using syscalls.
+
+  * Incrementing a semaphore is called a post operation, and
+    decrementing a semaphore is called a wait operation.
+
+  * When the semaphore is 0, the wait operation will block, until
+    some other process increments the semaphore using a post operation.
+
+=== Mutex
+
+  * Code regions where a shared memory is accessed is called critical
+    region.
+
+  * When two processes enter the critical region simulatenously we get
+    a race condition.
+
+  * Race condition can be avoided by allowing sequential access to the
+    shared memory, using a binary semaphore.
+
+  * Before accessing the shared memory the semaphore is decremented
+    and after the process is done with the shared memory, the
+    semaphore is incremented.
+
+=== Signalling
+
+  * One other problem with memory mapped I/O is that the receiver, has
+    no indication that data is available for reading.
+
+  * If such signalling is required, semaphores can be used.
+
+  * The semaphore is initialized to 0. The receiving process
+    decrements the semaphore, and gets blocked.
+
+  * The sender, puts up the data in the shared memory, and signals the
+    receiver by incrementing the semaphore.
+
+=== `sem_init` syscall
+
+  * The semaphore is represented using the `sem_t` datatype.
+
+  * The semaphore should be accessible to multiple processes, and is
+    put up in a shared memory. The shared memory can be initialized
+    using `sem_init()`.
+
+[source,bash]
+------
+ret = sem_init(sem, shared, value)
+
+sem_t * sem;
+int shared;
+unsigned value;
+int ret;
+------
+
+  * `sem` is the pointer to the semaphore to be initialized.
+
+  * `shared` specifies whether the semaphore is shared between threads
+    of the same process (`0`), or between multiple processes (`1`).
+
+  * `value` is the initial value of the semaphore.
+
+  * `sem_init()` returns `0` on success and `-1` on failure.
+
+=== `sem_post()` and `sem_wait()`
+
+  * The semaphore can be incremented using `sem_post()` and can be
+    decremented using `sem_wait()`.
+
+[source,bash]
+------
+ret = sem_post(sem);
+ret = sem_wait(sem);
+
+sem_t sem;
+int ret;
+------
+
+=== Memory mapped wall with semaphore signalling
+
+[source,bash]
+------
+include::code/sem-gfx.c[]
+------
+
+=== Sending messages to the wall.
+
+[source,bash]
+------
+include::code/sem-app.c[]
+------
+
