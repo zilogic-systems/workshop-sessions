@@ -1,0 +1,305 @@
+= Sockets Introduction
+Zilogic Systems <training@zilogic.com>
+
+== Network Stacks
+
+=== Protocol Families
+
+image::figures/protocol-families.png["Protocol Families", width=1000]
+
+== Network Byte Order
+
+=== Big Endian and Little Endian
+
+image::figures/endianness.png["Big Endian and Little Endian"]
+
+=== Endianness Issues
+
+image::figures/endian-issues.png["Endianess Issues", width=1200]
+
+=== Network Byte Order
+
+image::figures/network-order.png["Network Byte Order", width=1000]
+
+=== Converting Byte Order
+
+  * To convert a 16 bit integer from host order to network order and
+    vice-versa.
++
+[source,c]
+------
+net  = htons(host);
+host = ntohs(net);
+
+uint16_t host;
+uint32_t net;
+------
+
+  * To convert a 32 bit integer from host order to network order and
+    vice-versa.
++
+[source,c]
+------
+net  = htonl(host);
+host = ntohl(net);
+
+uint32_t host;
+uint32_t net;
+------
+
+== Data Types
+
+=== Exact Width Integer Types
+
+  * The `stdint.h` header file defines exact width integer types.
+
+  * With `char`, `int`, `short` and `long` the C standard does not
+    specify the exact width. It only specifies a minimum size.
+
+=== Normal data types
+
+[options="header",width="50%",align="center"]
+|===
+|Data Type| Minimum Size
+
+|char| 8 bits
+|short| 16 bits
+|int| 16 bits
+|long| 32 bits
+|===
+
+=== Exact Width Data types
+
+  * But while working with network code, it is necessary to create
+    variables with exact widths.
+
+  * The following data types are defined in `stdint.h` to exactly
+    specify the integer width. These are defined as part of the C99
+    standard.
+
+=== Exact Width Data types -Unsigned
+
+[options="header",width="50%",align="center"]
+|===
+|Data Type| Minimum Size| Signing
+
+|uint8_t| 8 bits| Unsigned
+|uint16_t| 16 bits| Unsigned
+|uint32_t| 32 bits| Unsigned
+|uint64_t| 64 bits| Unsigned
+|===
+
+=== Exact Width Data types - Signed
+
+[options="header",width="50%",align="center"]
+|===
+|Data Type| Minimum Size| Signing
+
+|int8_t| 8 bits| Signed
+|int16_t| 16 bits| Signed
+|int32_t| 32 bits| Signed
+|int64_t| 64 bits| Signed
+|===
+
+=== Endianness
+
+[cols="2,1,1", options="header"]
+|===
+|Data Type |Size |Endianness Matters?
+
+|char / uint8_t
+|1 byte
+|No
+
+|uint16_t
+|2 bytes
+|Yes
+
+|uint32_t
+|4 bytes
+|Yes
+
+|uint64_t
+|8 bytes
+|Yes
+
+|char[] / Byte Buffer
+|Sequence of 1-byte elements
+|No
+|===
+
+== Representing Addresses
+
+=== `sockaddr_in` struct
+
+  * Address Families - `AF_INET`, `AF_INET6`, `AF_IPX`, `AF_APPLETALK` ...
+
+  * `sockaddr_in` is used to represent a IP socket address and a port
+    no.
++
+[source,c]
+------
+#include <netinet/in.h>
+
+struct sockaddr_in {
+    short          sin_family;
+    struct in_addr sin_addr;
+    unsigned short sin_port;
+};
+
+------
+
+   * Note that the address and the port in the structure is should
+     always be in network byte order.
+
+
+=== IP Address
+
+[source,c]
+------
+struct in_addr {
+    uint32_t s_addr;
+};
+------
+
+   * `struct in_addr` is used to represent a IP address.
+
+   * The IP address is represented by a structure containing a single
+     32 bit integer. 
+
+
+=== `sockaddr_in` struct
+
+   * There is one socket address structure for each supported protocol
+     family. Each is named as `socket_xyz`, where `xyz` is the unique
+     short name for the protocol family.
+
+   * Functions that accept socket address structures as argument,
+     should be capable of accepting address structure of any protocol
+     family.
+
+   * One way to do this, is to define the function as accepting
+     `void*`. But the socket API predates ANSI C in which void
+     pointers was introduced.
+
+
+=== Generic Socket Address Structure
+
+   * The socket API has a generic socket address structure, that is
+     used as the argument for all functions that accept socket address
+     structures.
+
+   * The generic socket address structure is defined as follows.
+
+------
+struct sockaddr {
+    short sa_family;
+    char  sa_data[14];
+}
+------
+
+== Resolving Hostname To Address
+
+=== Resolving Hostname To Address
+
+  * `gethostbyname()` is used to resolve hostnames to addresses.
+
+  * The system uses a database to keep track of the mapping between host names
+    and IP addresses. The database could reside in a file or could be
+    provided by a DNS server.
++
+[source,c]
+------
+#include <netdb.h>
+
+entry = gethostbyname(hostname);
+
+char *hostname;
+struct hostent *entry;
+------
+
+  * `gethostbyname()` returns a host entry structure corresponding to
+    the `hostname`, is retrieved from the database.
+
+=== The host entry structure
+
+[source,c]
+------
+struct hostent {
+       char *h_name;
+
+       int h_addrtype;
+       int h_length;
+
+       char **h_addr_list;
+       char *h_addr;
+
+       char **h_aliases;
+};
+------
+
+  * `h_name` - the official name of the host.
+  * `h_addrtype` - address type `AF_INET` or `AF_INET6`.
+  * `h_length` - length of the address in bytes.
+  * `h_addr_list` - array of address that correspond to the hostname,
+    terminated by `NULL`. Routers will have more than one address, one
+    on each network they are connected to.
+  * For `AF_INET`, the addresses are `struct in_addr` structures.
+  * `h_addr` - first address in the list, synonym for `h_addr_list[0]`.
+  * `h_aliases` - array of alternative names for the host, terminated
+    by `NULL`.
+
+
+=== Dotted Decimal Format
+
+  * When an IP address is to be printed, it is better to print it in a
+    dotted decimal notation.
+
+  * The function `inet_ntoa()` converts an IP address to a human
+    readable string.
++
+[source,c]
+------
+#include <arpa/inet.h>
+
+str_addr = inet_ntoa(address);
+
+struct in_addr address;
+char *str_addr;
+------
+
+  * `address` is the IP address represented as `in_addr` structure
+  * The function returns a pointer to a statically allocated buffer,
+    that contains the string representation of the IP address.
+
+=== Dotted Decimal Format
+
+  * A string in dotted decimal format can be converted to an IP
+    address using `inet_aton()`.
+
+  * This is useful when a host IP input by the user is to be converted
+    to an IP address.
++
+[source,c]
+------
+#include <arpa/inet.h>
+
+ret = inet_aton(str_addr, &address);
+
+char *str_addr;
+struct in_addr address;
+int ret;
+------
+
+  * `str_addr` is the string that contains the IP address in dotted
+    decimal notation
+  * `address` is the structure in which result is to be stored.
+  * Returns 0 if the address is invalid.
+
+=== Get the IP for a hostname
+
+[source,c]
+------
+include::code/getip.c[]
+------
+
