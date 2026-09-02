@@ -1,0 +1,280 @@
+= Building Network Servers
+Zilogic Systems <training@zilogic.com>
+
+== TCP Server
+
+=== TCP Server Operations
+
+  * In a TCP client, after a socket is created the client tries to connect to
+    a server.
+
+  * But a TCP server, listens on a socket and waits for a connection.
+
+  * The TCP server must wait on a known port.
+
+  * When a connection comes in and the TCP server accepts the
+    connection, a new socket is created which is connected to the
+    client. 
+
+  * The server can continue to listen for more requests in the socket
+    associated with the standard port.
+
+=== Running a TCP Server
+
+  * Running a TCP server involves 3 steps, after socket creation.
+    . Associate the socket with a standard port.
+    . Inform the network layer that this is a server socket.
+    . Accept each incoming connection request.
+
+=== Associating to Standard Port
+
+  * The socket can be associated with a specific port no. using the
+    `bind()` system call.
++
+[source,c]
+------
+#include <sys/types.h>
+#include <sys/socket.h>
+
+ret = bind(sockfd, (struct sockaddr *)&myaddr, sizeof(myaddr));
+
+int sockfd;
+struct sockaddr_in myaddr;
+int ret;
+------
+
+  * `sockfd` is the socket that is to be bound to the specified port.
+  * `myaddr` specifies the port no. The IP address part is set to the
+     macro `IPADDR_ANY`.
+  * On error `bind()` returns -1 and sets errno accordingly.
+
+=== Associating to Standard Port
+
+  * Ports less than 1024, are standard ports and only processes with
+    superuser privileges can bind to those ports. If a non-superuser
+    process tries to bind to those ports bind, returns with an error.
+
+=== Listening at Port
+
+image::figures/listen.png["Listening at Port"]
+
+=== Connection Request
+
+image::figures/request.png["Connection Request"]
+
+=== Connected to a client
+
+image::figures/connected.png["Connected"]
+
+=== Converting to a Server Socket
+
+  * To notify the network layer that we would like to listen on the
+    socket for incoming connection requests, the `listen()` syscall
+    can be used.
++
+[source,c]
+------
+#include <sys/socket.h>
+
+ret = listen(sockfd, backlog)
+
+int sock_fd;
+int backlog;
+int ret;
+------
+
+  * `sockfd` is the socket that has to be converted to a server
+    socket.
+  * `backlog` is the maximum no. of pending connection requests.
+  * On error `listen()` returns -1 and sets `errno` accordingly.
+
+=== Accepting Incoming Connections
+
+[source,c]
+------
+#include <sys/types.h>
+#include <sys/socket.h>
+
+newfd = accept(sockfd, (struct sockaddr *)client_addr, &len)
+
+int sockfd;
+struct sockaddr_in client_addr;
+int len;
+int newfd;
+------
+
+  * `sockfd` is the server socket from which we would like to accept
+    connections.
+
+  * `client_addr` is the socket address of the client that has
+    connected to the server.
+
+  * `len` specifies the size of the address structure passed. The
+    syscall modifies `len` to the actual sizeof the structure
+    returned. In case of IP, both the passed structure and returned
+    structure size are the same.
+
+  * `accept()` returns the newly created socket fd, through which the
+    client can be contacted.
+
+  * `accept()` returns `-1` if error occurred and sets `errno`
+    accordingly.
+
+== Server implementations
+
+=== Inetd
+
+  * Some servers are occasionally used, but needs to be running in the
+    system. Example the printer daemon.
+
+  * This wastes system memory and other resources.
+
+  * Inetd is a server that listens on various sockets and if a
+    connection request is received it accepts the connection and forks
+    and executes the server program to handle the connection.
+
+  * Before executing the program `inetd` maps the `stdin`, `stdout`
+    and `stderr` of the child to socket file descriptor.
+
+  * `/etc/inetd.conf` is the configuration file for `inetd`.
+
+  * It specifies what ports should be listened and the server program
+    to spawned for each port.
+
+  * Sample line in `inetd.conf`.
+
+[source,bash]
+------
+# <service_name> <sock_type> <proto> <flags> <user> <server_path> <args>
+www		 stream	     tcp     nowait  root   /usr/bin/httpd httpd
+------
+
+  * Since `inetd` takes care of all the networking part, it is very
+    easy to write a server that runs under `inetd`.
+
+  * The server can talk to the client by read/writing to standard
+    input/standard output.
+
+  * The server program does not need to know anything about networking!
+
+=== Web Server
+
+  * The 1.1 version of the HTTP protcol, the basic GET request and
+    response is as follows.
+
+[source,bash]
+------
+C GET /index.html HTTP/1.1 <1>
+C Host: www.zilogic.com <2>
+S HTTP/1.1 200 OK <3>
+S Content-Type: text/html <4>
+S <5>
+S <index.html file contents>
+------
+
+<1> This is the GET request from the client. It has the request name,
+the file, HTTP protocol version.
+
+<2> The client specifies the host it is contacting.
+
+<3> The status line from the servers. It has the HTTP protocol
+version, status code, and message. `200` is success.
+
+<4> The server then specifies the content type. Whether it is jpeg
+image, plain text or HTML file.
+
+<5> Blank line, followed by file contents.
+
+=== Hello Web Server
+
+[source,bash]
+------
+include::code/web-hello/webserver.c[]
+------
+
+=== Simple Web Server
+
+[source,bash]
+------
+include::code/web-simple/webserver.c[]
+------
+
+=== Standalone Web Server
+
+[source,bash]
+------
+include::code/web-full/webserver.c[]
+------
+
+== UDP Server
+
+=== UDP Server
+
+ * The only difference from a UDP client is that a UDP server binds
+   itself to a standard port.
+
+=== IP Messenger
+
+ * When an IP messenger program starts up it sends a broadcast packet,
+   called a scan packet. All systems running the IP messenger send a
+   response to the scan packet. This way IP messenger is able to build
+   the list of other IP messengers available on the network.
+
+ * To implement receiving of messages, two features have to be
+   supported.
+
+   . Responding to scan queries.
+   . Receiving messages and sending acknowledgement.
+
+ * Bit 0 of the type field, is a flag that indicates whether the
+   packet is a scan packet or not.
+
+ * If a scan packet is received, the scan response should be sent,
+   with type `3` and the username in the message part.
+
+ * If any other packet is received, then message is printed and
+   acknowledgement should be sent, with type `33` and the received
+   packet seq. no in the message part.
+
+
+=== IP Messenger
+
+[source,bash]
+------
+include::code/ipmsg/ipmsg.c[]
+------
+
+=== Difference between TCP & UDP
+
+[cols="1,1,1",options="header"]
+|===
+|API/Concept |TCP Server |UDP Server
+
+|socket()
+|Required
+|Required
+
+|bind()
+|Required
+|Required
+
+|listen()
+|Required
+|Not required
+
+|accept()
+|Required
+|Not required
+
+|Data Transfer
+|recv()/send()
+|recvfrom()/sendto()
+
+|Communication
+|Connection-oriented
+|Connectionless
+
+|Socket Usage
+|One listening socket + one connected socket per client
+|One socket handles all clients
+|===
