@@ -1,0 +1,341 @@
+= Buffered I/O
+Zilogic Systems <training@zilogic.com>
+
+== Problem
+
+=== Execution times for various block sizes
+
+[source,sh]
+------
+$ time ./mycp largefile anotherfile 1
+
+real	0m2.318s
+user	0m0.092s
+sys	0m2.224s
+$ time ./mycp largefile anotherfile 16
+
+real	0m0.169s
+user	0m0.008s
+sys	0m0.152s
+$ time ./mycp largefile anotherfile 1024
+
+real	0m0.013s
+user	0m0.000s
+sys	0m0.016s
+------
+
+=== Problem
+
+ * System call is a costly process
+ * Involves context-switch to Kernel code
+
+== Solution: Buffered I/O
+
+=== User-Buffered I/O
+
+  * Standard I/O library, part of the C Library provides buffering to
+    improve performace.
+
+  * Enables the programmer to think in terms of characters,
+    lines and records, instead of blocks of data.
+
+  * Handles partial reads/writes.
+
+=== Buffering in C Library
+
+image:figures/buffering.png["Buffering in C Library"]
+
+=== Classification of I/O Mechanism
+
+image:figures/classification.png["Classification of I/O Mechanism", width=1200]
+
+=== File Streams
+
+  * For unbuffered I/O, the file descriptor was used to refer to an
+    open file.
+
+  * For buffered I/O, a pointer to the typedef structure `FILE` is
+    used to refer to an open file.
+
+  * The structure contains information about the underlying file
+    descriptor, that is being buffered, and other members to maintain
+    the buffer.
+
+  * Open files are called file streams in standard I/O library.
+
+=== Types of File stream buffering
+
+  * File streams are classified as fully buffered, line buffered and
+    no buffered.
+
+  * Fully buffered - buffer is flushed when end of buffer is reached.
+
+  * Line buffered - buffer is flushed when end of line or end of buffer
+    reached.
+
+  * No Buffered - buffer is flushed immediately whenever there is a
+    read/write operation. `stderr` is no-buffered io.
+
+  * Buffer can be flushed using `fflush()` library function.
+
+  * Buffer size or buffers can be altered using `setvbuf()` function.
+
+=== Opening Files
+
+  * `fopen()` is used to open a file
++
+[source,c]
+------
+#include <stdio.h>
+
+fp = fopen(path, mode);
+
+char *path;
+char *mode;
+FILE *fp;
+------
+
+  * `path` specifies the file to be opened.
+  * on success, returns a pointer to `FILE`.
+  * on failure, returns `NULL` and sets `errno` to the error code.
+
+=== `mode` argument
+
+  * `mode` string specifies whether the file is to opened for reading
+    or writing.
+      - `r` - file opened for reading
+      - `w` - file opened for writing. If file exists, it is
+        truncated. If file does not exist, it is created.
+      - `r+` - file opened for reading and writing.
+      - `w+` - file opened for reading and writing. If file exists, it
+        is truncated. If file does not exists, it is created.
+
+=== Closing Files
+
+  * `fclose()` flushes any pending data and closes file.
++
+[source,c]
+------
+#include <stdio.h>
+
+ret = fclose(fp)
+
+FILE *fp;
+int ret
+------
+
+  * `fp` specifies the file stream to be closed
+  * on success, returns `0`
+  * on failure, returns `EOF` and sets `errno` to the error code.
+
+=== Standard Streams
+
+[source,c]
+------
+#include <stdio.h>
+
+FILE *stdin;
+FILE *stdout;
+FILE *stderr;
+------
+
+  * Every process has three streams opened by default, standard input,
+    standard output and standard error. These can be accessed using
+    `FILE *`, `stdin`, `stdout` and `stderr`.
+
+  * When user types a data, it is received and buffered by terminal
+    driver till EOL and sent to stdin of the application on EOL.
+
+  * The stdout is flushed out when, stdin is read by the application.
+
+== Character I/O
+
+=== `fgetc()`
+
+  * `fgetc()` can be used to read a single character from a stream.
+
+[source,c]
+------
+#include <stdio.h>
+
+ch = fgetc(fp);
+
+FILE *fp;
+int ch;
+------
+
+  * `fp` is the file stream to read from.
+  * on success, returns the character read from the stream.
+  * on failure or end-of-file, returns `EOF`.
+
+=== `fputc()`
+
+  * `fputc()` can be used to write a single character to a stream.
+
+[source,c]
+------
+#include <stdio.h>
+
+ret = fputc(ch, fp)
+
+FILE *fp;
+int ch;
+int ret
+------
+
+  * `fp` is the file stream to which the character is to be written.
+  * `ch` is the character to be written.
+  * on success, returns the character written.
+  * on failure, returns `EOF`.
+
+=== `tr` implementation
+
+== EOF and Errors
+
+=== Checking Errors
+
+  * `ferror()` is used to check for error in a file stream
++
+[source,c]
+------
+#include <stdio.h>
+
+ret = ferror(fp);
+
+FILE *fp;
+int ret;
+------
+
+  * `fp` is the file stream to check
+  * returns true if error occurred, false if error did not occur
+
+=== Checking EOF
+
+[source,c]
+------
+#include <stdio.h>
+
+ret = feof(fp);
+
+FILE *fp;
+int ret;
+------
+
+  * `fp` is the file stream to check
+  * returns true if end-of-file occured, false if error did not occur
+
+== Line I/O
+
+=== `fgets()`
+
+  * Used to read a single line from a stream
++
+[source,c]
+------
+#include <stdio.h>
+
+ret = fgets(str, size, fp)
+char *str;
+int size;
+FILE *fp;
+char *ret;
+------
+
+  * `str` - buffer in which the `'\0'` terminated line to be stored
+  * `size` - size of the buffer.
+  * `fp` - stream from which the line is to be read.
+  * on success, returns a pointer to the buffer.
+  * on failure or end-of-file, returns `NULL`.
+
+=== `fputs()`
+
+  * Used to write a single line to a stream
++
+[source,c]
+------
+#include <stdio.h>
+
+ret = fputs(str, fp)
+char *str,
+FILE *fp;
+int ret;
+------
+
+  * `str` is the string to be written to the file.
+  * `fp` is the file stream to which the string is to be written.
+  * on success, returns a non-negative number.
+  * on failure, returns `EOF`.
+
+=== `head` implementation
+
+[source,c]
+------
+include::code/myhead/myhead.c[]
+------
+
+=== Binary I/O
+
+  * In memory representation of complex data structures can be stored
+    and retreived from files using `fwrite()` and `fread()`
+
+  * Because of difference in word size, alignment requirements,
+    endianess, etc, data written this way in one system cannot be used
+    in another system.
+
+[source,c]
+------
+#include <stdio.h>
+
+ret = fread(buf, size, nr, fp);
+ret = fwrite(buf, size, nr, fp);
+
+void *buf;
+size_t size;
+size_t nr;
+FILE *fp;
+size_t ret;
+------
+
+  * `buf` is the pointer to the data to be written, in case of read,
+    and the pointer to the buffer in which the data is stored, in case
+    of write.
+  * `size` is the size of each data item.
+  * `nr` is  the no. of data items.
+  * `fp` is the file stream to read or write.
+  * on success, returns the no. of records read or written.
+  * on failure, returns lesser no. of records than specified.
+
+=== Example to write binary data
+
+
+=== Example to read binary data
+
+== Common Pitfalls
+
+=== fgetc pitfall
+
+[source,c]
+------
+include::code/getchar-pitfall/getchar.c[]
+------
+
+=== EOF pitfall
+
+[source,c]
+------
+include::code/eof-pitfall/eof.c[]
+------
+
+=== scanf pitfall
+
+[source,c]
+------
+include::code/scanf-pitfall/scanf.c[]
+------
+
+=== format string pitfall
+
+[source,c]
+------
+include::code/format-pitfall/format.c[]
+------
