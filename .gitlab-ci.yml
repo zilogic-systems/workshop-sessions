@@ -1,9 +1,9 @@
 build:
-  image: debian:bullseye-slim
+  image: debian:trixie-slim
   script:
   - apt-get update
   - apt-get install -y python3-pip
-  - pip install zdeb-utils
+  - pip install --break-system-packages zdeb-utils
   - zdeb-utils -a download -k "$ENGG_PKG_REGISTRY_KEY" -r engg/packages -p zdeck -v 0.2.0 -f zdeck_0.2.0_all.deb
   - zdeb-utils -a download -k "$ENGG_PKG_REGISTRY_KEY" -r engg/packages -p workdrive-sync -v 2.0 -f workdrive-sync_2.0_all.deb
   - apt-get install -y ./zdeck_0.2.0_all.deb ./workdrive-sync_2.0_all.deb
