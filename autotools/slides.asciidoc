@@ -173,17 +173,17 @@ int main()
 +
 [source,shell]
 ------
-wget -c http://ftp.gnu.org/gnu/bash/bash-4.3.tar.gz
+wget -c http://ftp.gnu.org/gnu/bash/bash-5.3.tar.gz
 ------
 
-  * Extract `bash-4.3.tar.gz`
+  * Extract `bash-5.3.tar.gz`
 +
 [source,shell]
 ------
-tar -x -f bash-4.3.tar.gz
+tar -x -f bash-5.3.tar.gz
 ------
 +
-  * Change into `bash-4.3` and run `./configure`
+  * Change into `bash-5.3` and run `./configure`
 
   * Check the contents of a `config.h` that has been created as a result of
     executing the `configure` script
