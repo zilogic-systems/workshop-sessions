@@ -125,8 +125,8 @@ mr
    + versatile-pb.dtb
    + disk.img
  + dl
-   + bash-4.3.tar.gz
-   + coreutils-8.32.tar.xz
+   + bash-5.3.tar.gz
+   + coreutils-9.12.tar.xz
  + manual
    + rootfs
    + disk.img
@@ -199,7 +199,7 @@ Rootfs contains only the shell.
 
   * Very very minimal system -- kernel boots up and runs the shell
 
-  * Download bash from http://ftp.gnu.org/gnu/bash/bash-4.3.tar.gz
+  * Download bash source using the following command:
 +
 [source,shell]
 ------

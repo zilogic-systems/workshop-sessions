@@ -4,6 +4,7 @@ set -e -x -u
 
 SHARED=~/mr/shared
 
+mkdir -p $SHARED 
 cd $SHARED
 cat <<EOF > run-qemu.sh
 ### START: boot-prebuilt.sh
@@ -30,6 +31,8 @@ bash run-qemu.sh
 ROOTFS=~/mr/manual/rootfs
 DISKIMG=~/mr/manual/disk.img
 ### END: setup-env.sh
+
+mkdir -p $ROOTFS
 
 cat > ~/mr/manual/hello.c <<EOF
 /* ### START: hello.c */
@@ -67,18 +70,20 @@ cd $SHARED
 bash run-qemu.sh
 ### END: boot-hello-rootfs.sh
 
+mkdir -p ~/mr/dl
+
 ### START: download-bash.sh
 cd ~/mr/dl
-wget -c http://ftp.gnu.org/gnu/bash/bash-4.3.tar.gz
+wget -c http://ftp.gnu.org/gnu/bash/bash-5.3.tar.gz
 ### END: download-bash.sh
 
 ### START: unpack-bash.sh
 cd ~/mr/manual
-tar -x -f ~/mr/dl/bash-4.3.tar.gz
+tar -x -f ~/mr/dl/bash-5.3.tar.gz
 ### END: unpack-bash.sh
 
 ### START: configure-bash.sh
-cd bash-4.3
+cd bash-5.3
 ./configure --prefix=/usr                \
             --host=arm-linux-gnueabi \
             --build=i686-pc-linux-gnu
@@ -108,8 +113,6 @@ mkdir ~/mr/manual/rootfs/lib
 TOOLCHAIN="/usr/arm-linux-gnueabi"
 cp $TOOLCHAIN/lib/libc.so.6 \
    ~/mr/manual/rootfs/lib
-cp $TOOLCHAIN/lib/libdl.so.2 \
-   ~/mr/manual/rootfs/lib
 ### END: cp-bash-deps.sh
 
 ### START: copy-ld.sh
@@ -134,10 +137,10 @@ bash run-qemu.sh
 
 ### START: build-coreutils.sh
 cd ~/mr/dl
-wget -c http://ftp.gnu.org/gnu/coreutils/coreutils-8.32.tar.xz
+wget -c http://ftp.gnu.org/gnu/coreutils/coreutils-9.12.tar.xz
 cd ~/mr/manual
-tar -x -f ~/mr/dl/coreutils-8.32.tar.xz
-cd coreutils-8.32
+tar -x -f ~/mr/dl/coreutils-9.12.tar.xz
+cd coreutils-9.12
 ./configure --prefix=/usr                 \
             --host=arm-linux-gnueabi \
             --build=i686-pc-linux-gnu
@@ -186,10 +189,10 @@ qemu-system-arm                 \
 set +e
 ### START: build-less-fail.sh
 cd ~/mr/dl
-wget -c http://www.greenwoodsoftware.com/less/less-458.tar.gz
+wget -c http://www.greenwoodsoftware.com/less/less-710.tar.gz
 cd ~/mr/manual
-tar -x -f ~/mr/dl/less-458.tar.gz
-cd less-458
+tar -x -f ~/mr/dl/less-710.tar.gz
+cd less-710
 ./configure --prefix=/usr                 \
             --host=arm-linux-gnueabi \
             --build=i686-pc-linux-gnu
@@ -259,7 +262,7 @@ arm-linux-gnueabi-gcc hello-ncurses.c \
 ### END: build-hello-ncurses-2.sh
 
 ### START: build-less.sh
-cd ~/mr/manual/less-458
+cd ~/mr/manual/less-710
 ./configure --prefix=/usr                 \
             --host=arm-linux-gnueabi \
             --build=i686-pc-linux-gnu     \
