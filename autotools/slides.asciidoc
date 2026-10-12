@@ -1,4 +1,4 @@
-= Cross Compiling Apps
+= Autotools
 Zilogic Systems
 :data-uri:
 
@@ -12,15 +12,16 @@ Zilogic Systems
 
 === Root Filesystem
 
-  * Contains the top level directories of the system
-    - `bin`
-    - `lib`
-    - `etc`
-    - `tmp`
-    - `var`
+  * Contains the top level directories of the system: `bin`, `lib`, `etc`, `usr`, `var`, `sbin`
 
-  * Contains the first user space application, usually `init`
-  * And all its dependencies
+  * Contains the first user space application, usually `init` and all its
+    dependencies
+
+  * Other user-space application files are distributed across these directories
+    during their installation.
+
+  * Applications are built and installed using a simple build framework called
+    `Autotools`.
 
 == Autotools Intro
 
@@ -28,9 +29,13 @@ Zilogic Systems
 
   * Many free software packages are written in C
 
-  * Distributed as source and needs to be built
+  * Need to be distributed as source and built by the user
 
   * Use GNU Autotools for configuration and build
+
+  * `Autotools` provides a simple, quick and easy way to manage and package
+    source code so users can compile and install software.
+
 
 === Need for Configuration
 
@@ -212,6 +217,10 @@ tar -x -f bash-5.3.tar.gz
 
   * These are recorded into `config.h` as well.
 
+  * The available options depend on the application.
+
+  * Use `./configure --help` to see the options supported by that project.
+
 === Try Out
 
   * Configure bash with history disabled
@@ -289,9 +298,9 @@ make
 
 === Program Prefix
 
-  * In a manual build, programs assume to be installed in `/usr/local`
+  * In a manual build, programs are assumed to be installed in `/usr/local`
 
-  * When the program wants to access it's data file, it does as
+  * When the program wants to access its data file, it does as
 +
 ------
     fd = open("/usr/local/share/vlc/icon.png");
@@ -360,9 +369,9 @@ make install DESTDIR=./_install
 
   * Autotools allows for automatic and manual feature selection.
 
-  * Autotools supports cross-compilation through manual feature
-    selection.
+  * Autotools supports cross-compilation through its configuration options.
 
 === Further Reading
 
   * https://sourceware.org/autobook/autobook/autobook_toc.html
+  * https://opensource.com/article/19/7/introduction-gnu-autotools
