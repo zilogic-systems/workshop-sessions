@@ -30,8 +30,8 @@ image::figures/qemu.png[align="center"]
 image::figures/gumstix.jpg[align="center"]
 
 [role="right"]
-  * Supported ARM SoCs include Exynos4210, PXA255, PXA270, OMAP2420,
-    LM3S811
+
+  * Supported ARM SoCs include Exynos4210, STM32, i.MX6, i.MX7, LM3S811
 
   * Versatile Platform Baseboard -- an extensible system from ARM,
     will be used for development
@@ -71,15 +71,16 @@ image::figures/kernel-boot.png[align="center"]
 
 === Images for booting
 
-  * Create a directory `manual-rootfs` in your Home directory
+  * Create a directory `mr` in your Home directory
 
-  * Download the images present in https://workdrive.zoho.in/folder/kyrid2acbe875ef7c4e4fac15accd18c76e9b
+  * Download the image `qemu-prebuilt-images.zip` present in the shared download
+    link or pendrive.
 
-  * Copy the images to `manual-rootfs/pre-built` folder
+  * Copy the images to `mr` folder
 
 === Invoking Qemu
 
-Create a file in `manual-rootfs` called `run-qemu.sh`.
+Create a file in `mr` directory called `run-qemu.sh`.
 
 [source,shell]
 ------
@@ -91,7 +92,7 @@ include::cmd/boot-prebuilt.sh[]
 
 === Invoking Qemu (Contd.)
 
-Create a file in `manual-rootfs` called `run-qemu.sh`.
+Create a file in `mr` directory called `run-qemu.sh`.
 
 [source,shell]
 ------
@@ -107,6 +108,8 @@ include::cmd/boot-prebuilt.sh[]
 
   * Boot Qemu using `run-qemu.sh`
 
+  * Press `Ctrl-Alt-3` to see the console prompt.
+
 == Minimal Filesystem v0
 
 === //
@@ -120,28 +123,27 @@ Rootfs contains only a Hello World program.
 [role="left"]
 ------
 mr
- + pre-built
-   + zImage
-   + versatile-pb.dtb
-   + disk.img
+ + zImage
+ + versatile-pb.dtb
+ + disk.img
  + dl
    + bash-5.3.tar.gz
    + coreutils-9.12.tar.xz
- + manual
-   + rootfs
-   + disk.img
+ + build
+ + rootfs
+
 -------
 
 [role="right"]
-  * `~/mr/pre-built`: contains pre-built kernel and root filesystem images
+  * `~/mr/`: contains pre-built kernel and root filesystem images
   * `~/mr/dl`: contains files downloaded from the Internet
-  * `~/mr/manual`: the manual build directory
-  * `~/mr/manual/rootfs`: contains the root filesystem
+  * `~/mr/build`: contains the source files for building and installing into the rootfs
+  * `~/mr/rootfs`: contains the manually built root filesystem
 
 
 === Create Hello World Program
 
-Create `~/mr/manual/hello.c`, with the following content, using a text editor.
+Create `~/mr/build/hello.c`, with the following content, using a text editor.
 
 [source,c]
 ------
@@ -250,7 +252,7 @@ include::cmd/link-bash.sh[]
 === Determine the Dependencies
 
   * The `bash` executable requires certain libraries to execute --
-    `libc.so.6` and `libdl.so.2`.
+    `libc.so.6`.
 +
 [source,shell]
 -----
@@ -382,7 +384,7 @@ include::cmd/build-less-fail-2.sh[]
 
 === Include and Library Path
 
-Create a file called `~/mr/manual/hello-ncurses.c`, with the following content.
+Create a file called `~/mr/build/hello-ncurses.c`, with the following content.
 
 [source,c]
 ------
