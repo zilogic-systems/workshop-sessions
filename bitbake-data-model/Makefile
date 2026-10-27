@@ -1,12 +1,16 @@
 TOPDIR = ../
+-include ~/.zdeck
 
-EXPORT_WIDTH  = 1024
+ZDECK_HOME ?= /usr/share/zdeck
+ZDECK_CLASS = lecture
+
+EXPORT_WIDTH  = 1600
 
 images_dia = $(wildcard figures/*.dia)
 images_png = $(images_dia:.dia=.png)
 
-images_svg = $(wildcard figures/*.svg)
-images_png += $(images_svg:.svg=.png)
+#images_svg = $(wildcard figures/*.svg)
+#images_png += $(images_svg:.svg=.png)
 
 all: slides.html
 
@@ -18,4 +22,5 @@ clean:
 	rm -f $(images_png)
 	rm -f slides.html
 
-include $(TOPDIR)/stylesheets/Makefile.rules
+include $(ZDECK_HOME)/stylesheets/Makefile.rules
+include $(TOPDIR)/stylesheets/Makefile.zdeck.rules

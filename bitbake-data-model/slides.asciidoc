@@ -27,7 +27,7 @@ a hash map
 
 === Recipe Data (Contd.)
 
-  * Variable defintions and function definitions have different syntax
+  * Variable definitions and function definitions have different syntax
 
   * But internally they are stored in the same way
 
@@ -63,7 +63,7 @@ a hash map
 
 === Recipe Processing
 
-image::figures/datastore-no-finalize.png[align="center"]
+image::figures/datastore-no-finalize.png[width="80%",align="center"]
 
 === Config Parsing
 
@@ -71,7 +71,7 @@ image::figures/conf-parsing.png[width="25%",align="center"]
 
 === Recipe Parsing
 
-image::figures/recipe-parsing.png[width="22%",align="center"]
+image::figures/recipe-parsing.png[width="25%",align="center"]
 
 === Pro Tip
 
@@ -86,13 +86,13 @@ image::figures/recipe-parsing.png[width="22%",align="center"]
 
 === Recipe Processing with Finalize
 
-image::figures/datastore.png[align="center"]
+image::figures/datastore.png[width="80%",align="center"]
 
 == Assignment Operators
 
 === Per Recipe Data Store
 
-image::figures/per-recipe-data-store.png[width="60%",align="center"]
+image::figures/per-recipe-data-store.png[width="35%",align="center"]
 
 === Default Value
 
@@ -274,7 +274,7 @@ for append in a[_append_list]:
     a = a + append
 -----
 
-No spaces are added, if required should be provided a part of the
+No spaces are added, if required, spaces should be provided a part of the
 value
 
 === Example
