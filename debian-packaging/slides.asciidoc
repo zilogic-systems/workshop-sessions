@@ -69,7 +69,7 @@ dpkg: dependency problems prevent removal of def:
  abc depends on def.
 ------
 
-=== Disecting a Package
+=== Dissecting a Package
 
   * Debian packages use the "archive" format
   * Extracting contents of "archive".
@@ -143,7 +143,7 @@ image::figures/repo-structure.png[align="center"]
 
 Commands are available for the following operations
 
-  * Adding a repostiory
+  * Adding a repository
 
   * Updating the local APT cache
 
@@ -153,18 +153,19 @@ Commands are available for the following operations
 
 === Adding a Repo
 
-  * Repository can be added using `add-apt-repository` command
+  * Repository can be added in `/etc/apt/sources.list.d`
+
   * Repository information should be specified as
 +
 ------
 deb <repo-url> <distro> <component>...
 ------
 +
-  * Add the local repository of packages
+  * Create a APT repository source file in `/etc/apt/sources.list.d/myrepo.list`
+    with the following contents:
 +
 ------
-$ cd ~/yp/repos/myrepo
-$ sudo add-apt-repository  "deb file://$PWD wheezy main"
+deb [trusted=yes] file:///home/user/yp/repos/myrepo trixie main
 ------
 
 === Using the Repo
@@ -205,7 +206,7 @@ $ mkdir myrepo2
   * Create a repository configuration file ` conf/distributions`
 +
 ------
-Codename: wheezy
+Codename: trixie
 Architectures: i386 amd64
 Components: main
 ------
@@ -213,46 +214,68 @@ Components: main
   * Create the repository
 +
 ------
-$ reprepro --outdir ./myrepo2 includedeb wheezy mypkgs/*.deb
+$ reprepro --outdir ./myrepo2 includedeb trixie mypkgs/*.deb
 ------
 
 == Building a RootFS
+
+=== Linux Ecosystem: The Open-Source Software Kitchen
+
+How software is built, stored, and served in the open-source world.
+
+[cols="1,2,2", options="header"]
+|===
+| Component | Kitchen Analogy | Technical Role
+| Package
+| 🍽️ The Prepared Dish
+| The finished installable app — built from a recipe, includes binaries, icons, and configs.
+| Repository
+| 📚 The Public Pantry
+| An online library storing thousands of packages.
+| Distribution
+| 🍱 The Full Meal
+| A complete Linux OS assembled from curated packages — served ready-to-use (Ubuntu, Debian).
+| Package Manager
+| 🤖 The Robot Chef
+| A tool like apt that fetches packages and all their dependencies, then installs them automatically.
+|===
+
 
 === Install into RootFS
 
   * `dpkg` and `apt-get` install packages into system root
 
-  * `multistrap` installs packages into a directory
+  * `debootstrap` installs packages into a directory
+
+  * It supports selecting the target architecture and Debian release.
 
   * Can be used for creating root filesystem from pre-built packages
 
-=== Multistrap
+=== Create an ARM64 RootFS
 
-`multistrap` requires a configuration file that specifies
+Install `debootstrap`:
 
-  * the APT repo location
-  * the packages to install
+[source,shell]
+----
+$ sudo apt install debootstrap
+----
 
-Create a file called `~/yp/multistrap/multistrap.conf`
+Create a minimal ARM64 rootfs for Debian 13 (Trixie):
 
-[source,conf]
-------
-[General]
-noauth=true
-bootstrap=Packages
+[source,shell]
+----
+$ sudo debootstrap \
+    --arch=arm64 \
+    --foreign \
+    --variant=minbase \
+    trixie \
+    rootfs \
+    https://deb.debian.org/debian
+----
 
-[Packages]
-packages=bash coreutils
-source=copy:////home/vagrant/yp/multistrap/myrepo
-suite=mydistro
-omitdebsrc=true
-------
+Inspect the resulting root filesystem:
 
-=== Multistrap (Contd.)
-
-Invoke `multistrap`, to install the packages
-
--------
-$ mkdir rootfs
-$ /usr/sbin/multistrap -a arm -d rootfs -f multistrap.conf
--------
+[source,shell]
+----
+$ ls rootfs/
+----

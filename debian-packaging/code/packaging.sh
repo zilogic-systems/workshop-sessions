@@ -71,8 +71,8 @@ mkdir -p ~/yp/repos/conf
 pushd ~/yp/repos
 
 cat > conf/distributions << EOF
-Codename: wheezy
-Architectures: i386 amd64
+Codename: trixie
+Architectures: i386 amd64 arm64
 Components: main
 EOF
 
@@ -90,10 +90,12 @@ done
 
 popd
 
+cp ~/yp/packaging/def_*.deb ~/yp/repos/mypkgs/
+
 pushd ~/yp/repos
 rm -fr myrepo/*
 rm -fr db
-reprepro --outdir ./myrepo includedeb wheezy mypkgs/*.deb
+reprepro --outdir ./myrepo includedeb trixie mypkgs/*.deb
 rm -fr conf
 rm -fr db
 popd
