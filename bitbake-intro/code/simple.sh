@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e -x -u
+set -e -x 
 
 source sandwich.sh
 
@@ -78,8 +78,8 @@ cat > ~/yp/sandwich/sandwich.bb <<"EOF"
 PN = "sandwich"
 
 do_get() {
-        cat bread.txt > ${TMPDIR}/sandwich.txt
-        cat omelet.txt  >> ${TMPDIR}/sandwich.txt
+        cat ${TMPDIR}/bread.txt > ${TMPDIR}/sandwich.txt
+        cat ${TMPDIR}/omelet.txt  >> ${TMPDIR}/sandwich.txt
         sleep 1
 }
 addtask get
@@ -106,8 +106,8 @@ DEPENDS = "bread omelet"
 do_get[deptask] = "do_cook"
 
 do_get() {
-        cat bread.txt > ${TMPDIR}/sandwich.txt
-        cat omelet.txt  >> ${TMPDIR}/sandwich.txt
+        cat ${TMPDIR}/bread.txt > ${TMPDIR}/sandwich.txt
+        cat ${TMPDIR}/omelet.txt  >> ${TMPDIR}/sandwich.txt
         sleep 1
 }
 addtask get

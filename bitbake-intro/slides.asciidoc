@@ -4,7 +4,7 @@ Zilogic Systems
 
 == Integration Build
 
-=== Makefile to Build Bash
+=== Makefile to build Bash
 
 [source,Makefile]
 ------
@@ -40,7 +40,7 @@ include::code/Makefile.bash[]
 
   * Example: extracting bash source tar ball
 
-  * Make is not designed to handle multiple output files in a rule
+  * Make is not designed to handle such multiple output files in a rule
 
 === Build Variable / Rule Changes
 

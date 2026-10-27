@@ -3,7 +3,7 @@ mkdir -p ~/yp/sandwich/conf
 mkdir -p ~/yp/sandwich/classes
 
 cat > ~/yp/sandwich/setup-bitbake.sh <<"EOF"
-BITBAKE_VER=yocto-4.0
+BITBAKE_VER=yocto-6.0
 mkdir -p ~/yp/dl
 pushd ~/yp/dl
 wget -c -O bitbake-$BITBAKE_VER.tar.gz \
@@ -39,18 +39,18 @@ cat > ~/yp/sandwich/bread.bb <<"EOF"
 PN = "bread"
 
 do_get() {
-        echo ${PN}: wheat > bread.txt
-        echo ${PN}: salt  >> bread.txt
-        echo ${PN}: sugar >> bread.txt
-        echo ${PN}: water >> bread.txt
+        echo ${PN}: wheat > ${TMPDIR}/bread.txt
+        echo ${PN}: salt  >> ${TMPDIR}/bread.txt
+        echo ${PN}: sugar >> ${TMPDIR}/bread.txt
+        echo ${PN}: water >> ${TMPDIR}/bread.txt
         sleep 1
 }
 addtask get
 
 do_cook() {
-        echo "${PN}: bake for 20 - 25 minutes" >> bread.txt
+        echo "${PN}: bake for 20 - 25 minutes" >> ${TMPDIR}/bread.txt
         sleep 2
-        echo "${PN}: ready" >> bread.txt
+        echo "${PN}: ready" >> ${TMPDIR}/bread.txt
 }
 addtask cook
 EOF

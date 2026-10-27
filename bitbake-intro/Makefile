@@ -1,4 +1,8 @@
+-include ~/.zdeck
 TOPDIR = ../
+
+ZDECK_HOME ?= /usr/share/zdeck
+ZDECK_CLASS = lecture
 
 EXPORT_WIDTH  = 1024
 
@@ -17,4 +21,5 @@ clean:
 	rm -f slides.html
 	rm -fr code/simple
 
-include $(TOPDIR)/stylesheets/Makefile.rules
+include $(ZDECK_HOME)/stylesheets/Makefile.rules
+include $(TOPDIR)/stylesheets/Makefile.zdeck.rules
