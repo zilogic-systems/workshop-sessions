@@ -19,6 +19,12 @@ Zilogic Systems <training@zilogic.com>
    meta/recipes-core/packagegroups/ is a fair example for a simple
    packagegroup.
 
+[source,shell]
+-------
+$ cat layers/openembedded-core/meta/recipes-core/\
+packagegroups/packagegroup-core-eclipse-debug.bb
+-------
+
 === Extending and Overriding Recipes
 
  * If already existing recipe has to be just modified for few
@@ -32,8 +38,14 @@ Zilogic Systems <training@zilogic.com>
    bitbake can resolve them.
 
  * One example we could find is _busybox_%.bbappend_ in
-   _meta-poky/recipes-core/busybox_, whose main recipe _busybox_1.35.0.bb_ is
+   _meta-poky/recipes-core/busybox_, whose main recipe _busybox_*.bb_ is
    available in _meta/recipes-core/busybox_
+
+[source,shell]
+------
+$ cat layers/meta-yocto/meta-poky/recipes-core/busybox/busybox_%.bbappend
+$ cat layers/openembedded-core/meta/recipes-core/busybox/busybox_*.bb
+------
 
 === Folders Structure for Build
 
@@ -43,19 +55,65 @@ Zilogic Systems <training@zilogic.com>
  * For each package we would find a folder inside target architecture
    folder.
 
- * In our build the target architecture is _qemuarm-poky-linux-gnueabi_
+ * In our build the target architecture is _qemuarm64-poky-linux_
 
  * The package build directory is available in
 
 -------
-   qemuarm-poky-linux-gnueabi/${PN}/${PV}-${PR}
+   qemuarm64-poky-linux/${PN}/${PV}
 -------
 
  * The source is unpacked and patched in
 
 ------
-   qemuarm-poky-linux-gnueabi/${PN}/${PV}-${PR}/${PN}-${PV}
+   qemuarm64-poky-linux/${PN}/${PV}/sources
 ------
+
+=== Why Different Folders under `tmp/work`?
+
+[options="header",cols="2,3,3"]
+|===
+| Folder | Architecture type | What lives here
+
+| `x86_64-linux`
+| build host
+| `*-native` tools and cross compilers, run on the host
+  (e.g. `arm-linux-gnueabi`, `qemu-system-native`)
+
+| `all-poky-linux`
+| `all`
+| Architecture independent recipes like
+scripts and data only (e.g. `ca-certificates`, `update-rc.d`)
+
+| `cortexa57-poky-linux`
+| arm64
+| Code that depends only on the target CPU (`busybox`, `bash`, `glibc`)
+
+| `qemuarm64-poky-linux`
+| arm64
+| Machine specific recipes: kernel, bootloader, images
+(`linux-yocto`, `core-image-*`)
+|===
+
+=== Why does this split matter?
+
+ * Same CPU architecture, different machine: `cortexa57` packages are built once
+   and reused.
+
+ * Native and `all` output is shared by every machine in the build directory
+
+ * Same split in the sstate cache and in `tmp/deploy/rpm/` (one package feed
+   folder per architecture)
+
+ * So building images for another machine will build only the machine specific
+   recipes, re-using all other recipe builds.
+
+[source,sh]
+----
+$ bitbake -e busybox     | grep ^PACKAGE_ARCH=   # cortexa57
+$ bitbake -e linux-yocto | grep ^PACKAGE_ARCH=   # qemuarm64
+$ ls tmp/work/cortexa57-poky-linux/busybox/
+----
 
 === Folders for Package Creation
 
@@ -65,7 +123,7 @@ Zilogic Systems <training@zilogic.com>
    is analyzed and segregated in _packages-split_ as development, doc
    and debug packages.
 
- * Metadata for building packages are available in _packagedata_
+ * Metadata for building packages are available in _pkgdata_
    folder.
 
 === Folders for Build Logs
@@ -76,6 +134,11 @@ Zilogic Systems <training@zilogic.com>
  * We can find the details on build steps involved in building the
    package in file _log.task_order_
 
+ * The tasks are specified in the file in the following format:
+
+--------
+<timestamp> <task name> (<pid>): <log file name>.<pid>
+--------
 
 == Machine
 
@@ -99,37 +162,53 @@ Zilogic Systems <training@zilogic.com>
 
 ------
 KERNEL_IMAGETYPE = "zImage"
-SERIAL_CONSOLE = "115200 ttyAMA0"
+SERIAL_CONSOLES ?= "115200;ttyAMA0 115200;hvc0"
 MACHINE_FEATURES = "alsa bluetooth usbgadget"
 PREFERRED_PROVIDER_virtual/kernel ?= "linux-yocto"
 PREFERRED_VERSION_linux-yocto ?= "3.19%"
 ------
 
  * We can find a sample machine configuration file in
-   _meta-yocto-bsp/conf/machine/edgerouter.conf_
+   _layers/openembedded-core/meta/conf/machine/qemuarm64.conf_
 
-=== Advantages of State Cache
+== Shared State Cache
 
- * Yocto creates hash map of the build environment of each task and
-   archives the build artifact of the recipe in sstate-cache.
+=== How State Cache is used?
 
- * When we try to build again if the hash map generated for the task
-   matched what already in exist state cache, the archived artifact is
-   restored in the new build directory by setscene task.
+ * Each task gets a _signature_ (a hash) computed from its inputs:
+   recipe, variables, and the tasks it depends on.
 
- * We can find mostly _*setscene_ tasks in the build log.
+ * _Same signature as before:_ the saved output is restored.
 
- * We can see that for our builds, we don't have source unpacked,
-   rather stages are populated from state-cache
+ * _Signature changed:_ the task runs again and the new output is saved.
+
+
+=== Setscene tasks
+
+--------
+signature matches    ->  do_<task>_setscene  (restore from sstate-cache)
+signature differs    ->  do_<task>           (run the task)
+--------
+
+ * The build log shows many _*_setscene_ tasks, these are restores from
+   the cache.
+
+ * Since the work was restored, the source is not even unpacked, hence no
+   configure or compile tasks are executed.
 
 [source,shell]
 -----
-ls build/tmp/work/qemuarm-poky-linux-gnueabi/packagegroup-core-boot/1.0-r17/
+ls build/tmp/work/qemuarm64-poky-linux/packagegroup-core-boot/1.0/
 -----
 
- * The state-cache creates a map for the input parameters and caches
-   the out of the task using hashmap as the signature.
+=== Advantage of State Cache
 
- * For ex if packages are first built as rpm and then we it build as
-   deb, Yocto can pull data from cache until the install stage and
-   just run only packaging commands for deb.
+ * First build the packages as rpm, then rebuild them as deb.
+
+--------
+PACKAGE_CLASSES = "package_deb"
+--------
+
+ * Everything up to packaging is restored from the cache.
+
+ * Only the deb packaging task runs again.
