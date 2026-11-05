@@ -14,33 +14,41 @@ Zilogic Systems <training@zilogic.com>
    be sufficient and it may require us to write recipes for huge list
    of packages.
 
-
-[style="two-column"]
 === Solution
 
-[style="right"]
+==== Right
+
  * To address these issues developers of bitbake had developed recipes
    for many open-source projects and supportive infrastructure to
    create different file-system images.
 
  * Bitbake developers grouped these recipes in meta layers and this
-   complete build infrastructure is called as open-embedded build
+   complete build infrastructure is called as OpenEmbedded build
    system.
+
+==== Left
 
 image::figures/oe-logo.png[style="left",align="center"]
 
-=== History of Yocto
+=== History of Yocto Project
 
- * Poky & Angstrom are two embedded distribution which were built
-   using open-embedded build system.
+ * OpenEmbedded started around 2003 as a build system for
+   embedded Linux distributions.
 
- * Poky was a build system used by OpenedHand Project, After Intel
-   taking over the OpenedHand project, Poky was adopted by Linux
-   Foundation for its Yocto Project.
+ * BitBake was separated from OpenEmbedded as an independent
+   task execution engine around 2004.
 
- * Yocto's goal was to provide complete development and test
-   environment to the embedded Linux developers and vendor neutral
-   collaboration environment.
+ * The Yocto Project was launched by the Linux Foundation in 2011.
+
+ * Yocto Project and OpenEmbedded work closely together:
+
+ ** OpenEmbedded maintains BitBake and OpenEmbedded Core (OE-Core).
+
+ ** Yocto Project provides reference distribution metadata,
+    documentation, QA infrastructure and project governance.
+
+ * Poky is the Yocto Project reference distribution.
+
 
 == Introduction to Yocto
 
@@ -71,11 +79,11 @@ image::figures/key-dev-elements.png[style="left",align="center"]
    on the build artifacts, for their size, dependency, quality and
    licenses.
 
- * Application developer's centric tools and workflow.
+ * Application developer-centric tools and workflow.
+
+ * Reproducible builds and efficient build acceleration using State Caches.
  
 === Yocto Over Pre-built Distros
-
-[style="right"]
 
   * Allows building a custom rootfs from source for small footprint
     devices.
@@ -83,16 +91,16 @@ image::figures/key-dev-elements.png[style="left",align="center"]
   * Building with desired tool-chain.
   
   * Allows building software components for processor specific
-    support. Ex: Compiling X with Processor specific graphic
+    support. Ex: Compiling X11 with Processor specific graphic
     accelerators.
 
   * Supports handling open source and proprietary licensed software
     build.
 
-[style="two-column"]
 === Yocto Over Buildroot
 
-[style="right"]
+==== Right
+
   * Supports list of well tested open source software.
 
   * Allows building a managed rootfs with deb/rpm/ipk packages.
@@ -102,6 +110,8 @@ image::figures/key-dev-elements.png[style="left",align="center"]
   * Well organized as layers and easily extendable
 
   * Allows testing software on emulators without a real target device.
+
+==== Left
 
 image::figures/yocto-environment.png[style="left",align="center"]
 
@@ -115,7 +125,7 @@ Yocto develops several projects to improve build infrastructure
 
  * eSDK - Extensible SDK for developing applications and images
 
- * Pseudo - tools required to improve build
+ * Pseudo - Provides a fake root environment required to improve build
 
  * Toaster - UI tools to manage Yocto build and their results
 
@@ -124,11 +134,10 @@ Yocto develops several projects to improve build infrastructure
 
  * Yocto project components are maintained in git repo
    https://git.yoctoproject.org/
-///////
-[style="two-column"]
+
 === Poky
 
-[style="right"]
+==== Right
 
  * Poky is an independent open source project, Yocto uses Poky as its
    reference system.
@@ -137,57 +146,70 @@ Yocto develops several projects to improve build infrastructure
    releases, which when built, provides Poky reference distribution by
    default.
 
- * Over openembedded build system, Poky builds SDK and debugger as IDE
+ * Over OpenEmbedded build system, Poky builds SDK and debugger as IDE
    plugins, integrates QEMU for target simulation.
+
+==== Left
 
 image::figures/Poky-Logo.jpg[style="left",align="center"]
 
 === OpenEmbedded
 
- * Openembedded is an independent project for embedded Linux build
+ * OpenEmbedded is an independent project for embedded Linux build
    system.
 
- * Openembedded Classic is a massive project which has thousands of
+ * OpenEmbedded Classic is a massive project which has thousands of
    recipes and hundreds of target boards.
 
  * Which has become a much bloated and hard to maintain.
 
- * Yocto and Openembedded share bitbake and a specific metadata(set of
-   recipes) called openembedded-core.
+ * Yocto and OpenEmbedded share bitbake and a specific metadata(set of
+   recipes) called OpenEmbedded-core.
 
- * Over openembedded community, Yocto ensures that oe-core meta-data
+ * Over OpenEmbedded community, Yocto ensures that oe-core meta-data
    are well-tested and inter-operable with platforms supported by
    Yocto.
 
- * Openembedded maintains bitbake and other recipes in
+ * OpenEmbedded maintains bitbake and other recipes in
    http://cgit.openembedded.org/
 
  * New changes in bitbake and openembedded-core layers are merged
-   first into open-embedded repository and later pulled by Poky repo.
+   first into OpenEmbedded repository and later pulled by Poky repo.
 
-[style="two-column"]
+
 === OE Vs Poky Repo
 
+==== Right
+
 image::figures/oe-repo-cropped.png[style="left",align="center"]
+
+==== Left
+
 image::figures/poky-repo-cropped.png[style="right",align="center"]
-////////
 
 === Yocto Releases
 
-* Yocto get released twice in a year.
+ * Two releases are normally made each year.
+
+ * One release every two years becomes an LTS release.
 
 |====
-| *Name*| *Version*
-|Scarthhap   | 5.0
-|Nanbield  | 4.3
-|Mickledore| 4.2
-|Kirkstone   | 4.0
-|Dunfell  | 3.1
+| *Codename* | *Version* | *Status*
+| Wrynose    | 6.0 | LTS - until Apr 2030
+| Whinlatter | 5.3 | EOL
+| Walnascar  | 5.2 | EOL
+| Styhead    | 5.1 | EOL
+| Scarthgap  | 5.0 | LTS - until Apr 2028
 |====
+
 
 === Release Timeline
 
-image::figures/releases.png[style="left",align="center"]
+image::figures/releases.png[style="left",align="center", width=2000]
+
+   * From Yocto 5.3 onward, the traditional combined Poky repository workflow
+     changed to a new multi-repository setup, managed using a new tool called
+     `bitbake-setup`.
 
 === Yocto Project Structure
 
@@ -203,9 +225,14 @@ image::figures/poky-layers.png[style="left",align="center"]
 
 image::figures/yocto-environment.png[style="left",align="center"]
 
+  * `Inputs:` source code and build configuration.
+
+  * `Build process:` Yocto fetches, builds, packages, and checks the software.
+
+  * `Outputs:` deployable Linux images, package feeds, and SDKs.
+
 === User Configurations
 
-[style="right"]
  * User can configure the build parameters through configuration
    files.
 
@@ -229,8 +256,8 @@ image::figures/yocto-environment.png[style="left",align="center"]
  * Machine Layer - has configurations and recipes related to target
    board and processor.
 
- * Image - handles list of packages to be installed into the rootfs
-   and type of the rootfs to be built.
+ * Image - Recipe that contains the list of packages to be installed into the
+   rootfs and type of the rootfs to be built.
 
 === Build Process
 
@@ -242,7 +269,7 @@ Build process involves
 
 * Generating tasks list and scheduling them.
 
-* Executing independent tasks parallely in separate threads.
+* Executing independent tasks parallely in separate processes.
 
 * Archiving logs, manifests, packages and images in respective
   folders.
@@ -269,14 +296,12 @@ Build process involves
 
 === Quality Assurance Checks
 
-Can run through various quality assurance process through INSANE
-class. Checks the build outputs for
+  * Can run various quality assurance processes through INSANE class.
 
-  * build time and run-time dependencies
-
-  * arch specific verification of ELF type, endianness and bit size.
-  
-  * incompatible licenses
+  * Checks the build outputs for
+    ** build time and run-time dependencies
+    ** arch specific verification of ELF type, endianness and bit size.
+    ** incompatible licenses
 
 === Package Feed and Images Tasks
 
@@ -289,8 +314,7 @@ class. Checks the build outputs for
 * The target specific packages available in package feed, can be
   installed into the rootfs.
 
-* Type of rootfs can be controlled be through image specific
-  variables.
+* Type of rootfs can be controlled through image specific variables.
 
 * The image specific manifest files are created for further analysis.
 
@@ -300,11 +324,16 @@ class. Checks the build outputs for
 
 === References
 
- . https://docs.yoctoproject.org/4.0.14/overview-manual/yp-intro.html
+ . https://docs.yoctoproject.org/wrynose/
+ . https://docs.yoctoproject.org/wrynose/overview-manual/
+ . https://docs.yoctoproject.org/wrynose/ref-manual/
+ . https://docs.yoctoproject.org/bitbake/
+ . Embedded Linux Development Using Yocto Project - Fourth Edition : Otavio
+   Salvador, Daiane Angolini
 
 == Credits
 
 === Photo Credits
 
- . https://bootlin.com/doc/training/yocto/yocto-slides.pdf (pg 36)
- . https://bootlin.com/doc/training/yocto/yocto-slides.pdf (pg 41)
+ . https://bootlin.com/doc/training/yocto/yocto-slides.pdf (pg 35)
+ . https://bootlin.com/doc/training/yocto/yocto-slides.pdf (pg 40)
