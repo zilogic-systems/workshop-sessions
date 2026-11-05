@@ -14,7 +14,7 @@ Zilogic Systems <training@zilogic.com>
 
 === Creating Our Own Meta Layer
 
- * The better practise while working with yocto, is creating your own
+ * The better practice while working with yocto, is creating your own
    layer to hold your changes.
 
  * We can run the below command to create a layer called meta-zepto-fs
@@ -22,13 +22,12 @@ Zilogic Systems <training@zilogic.com>
 
 [source,shell]
 ------
-$ bitbake-layers create-layer ~/yp/poky/meta-zepto-fs
+$ bitbake-layers create-layer ~/bitbake-builds/poky-wrynose/layers/meta-zepto-fs
 ------
 
- * It prompts for various options which you can leave to default and
-   this creates a directory meta-zepto-fs in the current directory.
+ * This creates a directory `meta-zepto-fs` in the layers directory.
 
- * We can find the layer.conf file inside the conf folder of
+ * We can find the `layer.conf` file inside the `conf` folder of
    meta-zepto-fs.
 
 === Need for Custom Image
@@ -37,7 +36,7 @@ $ bitbake-layers create-layer ~/yp/poky/meta-zepto-fs
    should be provided through a variable IMAGE_INSTALL through a
    recipe or conf file.
 
- * core-image-minimal.bb was packing-in lots of packages into rootfs
+ * `core-image-minimal.bb` was packing-in lots of packages into rootfs
 
  * for our zepto-fs, we need only three packages bash, coreutils and
    less. It is better to create our own recipe to build rootfs image.
@@ -49,10 +48,11 @@ $ bitbake-layers create-layer ~/yp/poky/meta-zepto-fs
 
 [source,shell]
 ------
-$ cat meta/recipes-core/images/core-image-minimal.bb
+$ cat ~/bitbake-builds/poky-wrynose/layers/openembedded-core\
+/meta/recipes-core/images/core-image-minimal.bb
 ------
 
- * It defines IMAGE_INSTALL & inherits core-image class
+ * It defines `IMAGE_INSTALL` & inherits `core-image` class
 
  * Yocto provides core-image class which can be inherited, to use
    already defined definitions to build rootfs image.
@@ -128,30 +128,18 @@ $ bitbake-layers add-layer <path to the layer>
 $ bitbake-layers show-recipes
 ------
  
-=== High Level Configuration of the Build
-
- * At-last the configurations for the current build has to be updated
-   to the `build/conf/local.conf`
-
- * For our build we may need to provide two information 
-   - target MACHINE for which this build performed and 
-   - the DISTRO build policy to which adhered
-
- * We are going to build the rootfs for the qemu emulated arm target,
-   which can be specified as `MACHINE = "qemuarm"`
-
 === Package Classes and Types
 
  * By default the distribution is built using rpm, but support for deb
    and opkg exists.
  
- * `opkg` is light-weigt packaging format, which is maintained by
+ * `opkg` is light-weight packaging format, which is maintained by
    yocto currently.
 
  * we can override that by declaring the 
 
 ----
-PACKAGE_CLASSES="package_deb"
+PACKAGE_CLASSES = "package_deb"
 ----
 
  * If wanted to add any image specific features, like kinds of
@@ -166,24 +154,21 @@ IMAGE_FEATURES = "doc-pkgs"
 
 === Customization on Distribution Level
 
- * If we want to different package management to be chosen, different
-   init system to be chosen. These are defined to be the policy of the
-   distribution.
-
- * For ex. Below command would configure yocto to build debian
-   packages.
-
-----
-PACKAGE_CLASSES = "package_deb"
-DISTRO_FEATURES_append = " sysvinit"
-VIRTUAL-RUNTIME_init_manager = "sysvinit"
-VIRTUAL-RUNTIME_dev_manager = "udev" 
-----
+ * Toolchain: `poky` uses glibc, `poky-tiny` uses `musl`
+ * Graphical backends: X11, Wayland, DirectFB
+ * GPU capabilities: OpenGL, Vulkan
+ * Initialization manager i.e systemd or sysvinit selected using `INIT_MANAGER`
+   ** `poky` uses `sysvinit` as default the initialization manager
+ * `DISTRO_FEATURES` define the various features that play a role in the
+   inclusion and the configuration of packages. Example: bluetooth, wifi, alsa,
+   x11
+ * To omit a default feature for a custom distribution, list it in
+   `DISTRO_FEATURES_OPTED_OUT`.
 
 === Creating Our Own Distribution
 
  * By yocto convention, we may need to create a _distribution_ which has
-   information about the policies to be adhered whiling building the
+   information about the policies to be adhered while building the
    individual components.
 
   * Distro configurations are more about how the packages are
@@ -195,8 +180,7 @@ VIRTUAL-RUNTIME_dev_manager = "udev"
   * Whether QT like UI components has to be compiled with X11 support
     or directfb support.
 
-  * Certain distro features can depend on HW related
-    features.
+  * Certain distro features can depend on HW related features. Example: Wifi
 
 === Creating Our Own Distribution
 
@@ -204,17 +188,21 @@ VIRTUAL-RUNTIME_dev_manager = "udev"
     layer
 
   * Inside the meta-zepto-fs/conf create a directory distro and file
-    zebian.conf inside it. Write below given distro descriptions to
-    it.
+    zebian.conf inside it.
+
+  * Custom distributions are usually extended from existing distributions like
+    `poky`.
 
 [source,shell]
 ------
 $ cd ..
 $ vim meta-zepto-fs/conf/distro/zebian.conf
 
+require conf/distro/poky.conf
+
 DISTRO = "zebian"
 DISTRO_VERSION = "1.0"
-PACKAGE_CLASSES = "package_deb"
+DISTRO_FEATURES_OPTED_OUT = "wayland vulkan opengl"
 ------
 
 === Adding Our Distro to local.conf
@@ -222,17 +210,32 @@ PACKAGE_CLASSES = "package_deb"
  * Since we don't have big policies thought out for our new
    distribution, we can just choose a packaging method for our distro.
 
- * Can edit the conf/local.conf to build our new distro as shown below
+ * Append the Distro to `local.conf`
 
 [source,shell]
 ------
 $ vim conf/local.conf
 
-
-MACHINE = "qemuarm"
 DISTRO = "zebian"
-CONF_VERSION = "1"
 ------
+
+=== Customize the Config Fragments
+
+ * Since we are using a custom distribution, the default configuration fragment
+   for selecting the poky distribution should be disabled
+
+[source,shell]
+--------
+$ bitbake-config-build disable-fragment distro/poky
+--------
+
+ * Disable root-login related features as there is no getty package in our tiny
+   zebian distro.
+
+[source,shell]
+--------
+$ bitbake-config-build disable-fragment core/yocto/root-login-with-empty-password
+--------
 
 === Adding Our Layer to Yocto
 
@@ -244,7 +247,7 @@ CONF_VERSION = "1"
 [source,shell]
 ------
 $ cd build
-$ bitbake-layers add-layer ../meta-zepto-fs
+$ bitbake-layers add-layer ~/bitbake-builds/poky-wrynose/layers/meta-zepto-fs
 ------
 
  * We can find that our layer is added into bblayers.conf
@@ -267,9 +270,6 @@ $ bitbake core-image-tiny
  * The build should get completed in fewer minutes as it tries to
    reuse state-cache
 
- * Build the core-image-tiny image and it would get built on
-   `tmp-glibc`
-
  * Test the new distro on the target.
 
 === Checking Our Tiny-FS Image
@@ -278,7 +278,7 @@ $ bitbake core-image-tiny
 
 [source,shell]
 ---------
-$ vim tmp-glibc/deploy/images/qemuarm/core-image-tiny-qemuarm.rootfs.manifest
+$ cat tmp/deploy/images/qemuarm64/core-image-tiny-qemuarm64.rootfs.manifest
 ---------
 
 === Booting the Tiny-FS Image
@@ -287,35 +287,14 @@ $ vim tmp-glibc/deploy/images/qemuarm/core-image-tiny-qemuarm.rootfs.manifest
 
 [source,shell]
 ------
-$ runqemu qemuarm
+$ runqemu snapshot nographic
 ------
-
-=== Bare Minimal local.conf
-
- * The yocto expects the version of the current configuration to be
-   provided using CONF_VERSION
-
-[source,shell]
-------
-S vim conf/local.conf
-
-MACHINE = "qemuarm"
-DISTRO = "poky"
-CONF_VERSION = "1"
-------
-
- * Below line can be added to local.conf to modify that to build
-   faster
-
------
-SSTATE_DIR = "/opt/sstate-cache"
------
 
 === Adding More Layers
 
  * The recipes provided by default layers of Yocto is less.
 
- * Recipes for BSP is provided by SOC vendors through separate meta
+ * Recipes for BSP are provided by SOC vendors through separate meta
    layer.
 
  * Further packages which are not part of Yocto can be obtained from
@@ -326,8 +305,8 @@ SSTATE_DIR = "/opt/sstate-cache"
  * The recipes which are defined in multiple added layers are called
    overlayed recipes.
 
- * The overlayed recipe in layer, which has higher BB_FILE_PRIORITY
+ * The overlayed recipe in layer, which has higher BBFILE_PRIORITY
    value, would be considered for build.
 
- * So provding a higher priority value to local layers would make us
+ * So providing a higher priority value to local layers would make us
    to build our recipes over upstream recipes.
