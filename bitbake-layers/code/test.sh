@@ -23,23 +23,23 @@ PN = "burger"
 DEPENDS = "omelet"
 
 do_get() {
-        echo ${PN}: bun > burger.txt
-        echo ${PN}: cheese >> burger.txt
-        cat omelet.txt  >> burger.txt
+        echo ${PN}: bun > ${TMPDIR}/burger.txt
+        echo ${PN}: cheese >> ${TMPDIR}/burger.txt
+        cat ${TMPDIR}/omelet.txt  >> ${TMPDIR}/burger.txt
         sleep 1
 }
 
 do_cook() {
-        echo "${PN}: toast bread and serve" >> burger.txt
+        echo "${PN}: toast bread and serve" >> ${TMPDIR}/burger.txt
         sleep 2
-        echo "${PN}: ready" >> burger.txt
+        echo "${PN}: ready" >> ${TMPDIR}/burger.txt
 }
 EOF
 
 cat > ~/yp/lunch/meta-burger/omelet.bbappend <<"EOF"
 
 do_get() {
-        echo ${PN}: less pepper > omelet.txt
-        echo ${PN}: egg >> omelet.txt
+        echo ${PN}: less pepper > ${TMPDIR}/omelet.txt
+        echo ${PN}: egg >> ${TMPDIR}/omelet.txt
 }
 EOF

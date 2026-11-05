@@ -6,12 +6,12 @@ Zilogic Systems
 
 === Overview
 
-  * Layers are powerful feature of BitBake
+  * Layers are a powerful feature of BitBake
 
-  * It allows related meta data to be clumped together
+  * It allows related metadata to be clumped together
 
   * Along with BitBake's other features, layers
-    can extend / override meta data in other layers
+    can extend / override metadata in other layers
 
 === Use Case: Recipe Collection
 
@@ -35,7 +35,7 @@ Zilogic Systems
     applicable to all users
 
   * A mechanism is required to modify a layer, without directly
-    changing it's source
+    changing its source
 
   * A local custom layer, is used for this purpose
 
@@ -119,7 +119,7 @@ mkdir meta-burger
 
 === Adding a Layer Conf
 
-  * Create `conf/layer.conf`
+  * Create `meta-burger/conf/layer.conf`
 +
 ------
 BBPATH .= ":${LAYERDIR}"
@@ -140,16 +140,16 @@ PN = "burger"
 DEPENDS = "omelet"
 
 do_get() {
-        echo ${PN}: bun > burger.txt
-        echo ${PN}: cheese >> burger.txt
-        cat omelet.txt  >> burger.txt
+        echo ${PN}: bun > ${TMPDIR}/burger.txt
+        echo ${PN}: cheese >> ${TMPDIR}/burger.txt
+        cat ${TMPDIR}/omelet.txt  >> ${TMPDIR}/burger.txt
         sleep 1
 }
 
 do_cook() {
-        echo "${PN}: toast bread and serve" >> burger.txt
+        echo "${PN}: toast bread and serve" >> ${TMPDIR}/burger.txt
         sleep 2
-        echo "${PN}: ready" >> burger.txt
+        echo "${PN}: ready" >> ${TMPDIR}/burger.txt
 }
 ------
 
@@ -197,8 +197,8 @@ BBLAYERS = "            \
 +
 ------
 do_get() {
-        echo ${PN}: less pepper > omelet.txt
-        echo ${PN}: egg >> omelet.txt
+        echo ${PN}: less pepper > ${TMPDIR}/omelet.txt
+        echo ${PN}: egg >> ${TMPDIR}/omelet.txt
 }
 ------
 +
