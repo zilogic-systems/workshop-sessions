@@ -10,83 +10,77 @@ Zilogic Systems <training@zilogic.com>
 
 [source,shell]
 ----
- $ sudo apt-get install --no-install-recommends
-            build-essential patch \
- 	    diffstat git gawk chrpath \
-            cpio texinfo libsdl-dev vim
+$ sudo apt-get install build-essential chrpath cpio debianutils diffstat file gawk \
+gcc git iputils-ping libacl1 libcrypt-dev locales python3 python3-git \
+python3-jinja2 python3-pexpect python3-pip python3-subunit python3.13-venv socat texinfo unzip \
+wget xz-utils zstd
 ----
 
- * Create a project directory and download Yocto
+ * Install the `bitbake-setup` command-line tool in a Python virtual environment
 
 [source,shell]
 ----
-$ cd ~/yp/dl
-$ wget -c \
-  https://downloads.yoctoproject.org/releases/yocto/yocto-4.0/poky-00cfdde791a0176c134f31e5a09eff725e75b905.tar.bz2
-$ cd ~/yp
-$ mkdir -p yocto-project
+$ python3 -m venv --clear ~/bitbake-setup-venv
+$ . ~/bitbake-setup-venv/bin/activate
+$ pip install bitbake-setup
 ----
 
 === Setting Up Yocto (1)
 
- * Unpack the poky build environment as
+ * To start using `bitbake-setup`, run:
 
 [source,shell]
 ------
-$ tar -x -f ~/yp/dl/poky-fido-13.0.0.tar.bz2
-$ cd poky-fido-13.0.0
-$ ls
+$ bitbake-setup init
 ------
 
- * Extracted folder has bitbake, meta layers, scripts & oe-init
-   scripts
-
- * Set up the yocto build environment by sourcing _oe-init-build-env_
-   script file with your project name as argument.
-
-[source,shell]
-------
-$ source oe-init-build-env
-------
+ * Select `poky-wrynose` as the Configuration Template.
+ * Select `poky` as the bitbake configuration.
+ * Select `machine/qemuarm64` as the Target machine.
+ * Select `distro/poky` as the Target distribution.
 
 === Setting Up Yocto (2)
 
- * The script creates and switches to a build directory, in which the
-   further builds would be performed.
+==== Left
 
- * To start building, We should provide the target board (machine) for
-   which the kernel and rootfs has to be built by Poky.
+image::figures/dir-layout.png[align="center"]
 
- * For our experiment we are going to use an arm target board emulated
-   through QEMU.
+==== Right
 
- * Which can be configured by exporting a shell variable as shown
-   below.
+  . Shared configuration applied across all setups in this workspace
+  . BitBake Setup directory named after your configuration choices
+  . BitBake build directory with configuration files and build artifacts
+  . Script for setting-up the build environment
+  . Version-controlled copy of the specific configuration used
+  . Cloned layer repositories
+
+=== Setting Up Yocto (3)
+
+ * Set up the yocto build environment by sourcing _init-build-env_ script file.
 
 [source,shell]
 ------
-$ export MACHINE=qemuarm
+$ source ~/bitbake-builds/poky-wrynose/build/init-build-env
 ------
+
+ * The script initializes the BitBake build environment and switches to the
+   build directory.
+
+ * For our experiment we are going to use an arm target board emulated through
+   QEMU, which we have selected as the Target Machine type during `bitbake-setup
+   init`.
 
 === Need for Configuration File
 
- * There are configurations other than MACHINE, which may need to be
-   passed to the poky build environment. 
+ * There are configurations other than MACHINE & DISTRO, which may need to be
+   passed to the poky build environment.
 
  * Passing all required configurations through environment variables
    would be inconvenient.
 
  * And also the Poky accepts only limited configurations through
    environment variables.
-//////
- * The list of whitelisted variables, that can be passed to bitbake
-   recipes, can be obtained from below command.
 
-[source,shell]
-----
-$ echo $BB_ENV_EXTRAWHITE
-----
-/////////
  * To manage this, Poky provides a mechanism of passing configurations
    through file.
 
@@ -110,13 +104,41 @@ $ vim build/conf/local.conf
    state and download directories
 
  * We can reuse the download dir and state-cache made available by us
-   in /opt by adding below information to the
+   in ${HOME} by adding below information to the
    build/conf/local.conf
 
 ------
-DL_DIR = "/opt/downloads"
-SSTATE_DIR = "/opt/sstate-cache"
+DL_DIR = "${HOME}/downloads"
+SSTATE_DIR = "${HOME}/sstate-cache"
 ------
+
+=== Top-level Build Configuration
+
+ * Recent Yocto releases introduced a concept called `Configuration fragments`
+   which is used to do a high level configuration of the build using the
+   `bitbake-config-build` tool.
+
+ * Configuration Fragments define top level build configuration features that
+   can be independently enabled and disabled using standard tooling.
+
+[source,shell]
+------
+$ bitbake-config-build list-fragments
+$ bitbake-config-build enable-fragment <feature>
+$ bitbake-config-build disable-fragment <feature>
+------
+
+=== Enable Root login with empty password
+
+ * By default, user/root login is not supported in Yocto builds.
+
+ * This can be enabled by enabling the following configuration fragment:
+
+[source,shell]
+------
+$ bitbake-config-build enable-fragment core/yocto/root-login-with-empty-password
+------
+
 
 === Building Minimal Rootfs
 
@@ -143,27 +165,27 @@ $ bitbake core-image-minimal
    reuse state-cache
 
  * After successful completion of the build the kernel image and
-   rootfs images would be available in the tmp/deploy/images/qemuarm
+   rootfs images would be available in the tmp/deploy/images/qemuarm64
 
 [source,shell]
 --------------
-$ ls tmp/deploy/images/qemuarm/
+$ ls tmp/deploy/images/qemuarm64/
 --------------
 
  * The list of packages in rootfs can be read from manifest file.
 
 [source,shell]
 --------------
-$ cat tmp/deploy/images/qemuarm/core-image-minimal-qemuarm.manifest
+$ cat tmp/deploy/images/qemuarm64/core-image-minimal-qemuarm64.rootfs.manifest
 --------------
 
 === Booting Image with QEMU
 
- * Now we can boot our new images using qemu arm as shown
+ * The generated qemuarm64 image can be booted using runqemu.
 
 [source,shell]
 ------
-$ runqemu qemuarm
+$ runqemu snapshot nographic
 ------
 
 === Customizing the Build
@@ -217,8 +239,17 @@ IMAGE_INSTALL += <package>
 
 === Need for Layer
 
-* Any changes made in build/conf/local.conf is temporary and it cannot
-  me maintained, shared or version controlled.
+ * Any changes made in build/conf/local.conf is temporary and it cannot me
+   maintained, shared or version controlled.
 
-* Better practise is to maintain all our permanent changes in separate
-  layer, which can be maintained in version control system.
+ * `local.conf` is suitable for local experiments and build-specific settings.
+
+ * Better practise is to maintain all our permanent changes in separate layer,
+   which can be maintained in version control system.
+
+=== References
+
+ . https://docs.yoctoproject.org/ref-manual/system-requirements.html
+ . https://docs.yoctoproject.org/bitbake/2.18/bitbake-user-manual/bitbake-user-manual-environment-setup.html
+ . Embedded Linux Development Using Yocto Project - Fourth Edition : Otavio
+   Salvador, Daiane Angolini
