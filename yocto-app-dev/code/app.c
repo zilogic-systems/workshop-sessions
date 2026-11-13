@@ -1,4 +1,5 @@
 #include <panel.h>
+#include <string.h>
 
 #define NLINES 10
 #define NCOLS 40

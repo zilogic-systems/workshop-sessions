@@ -21,7 +21,7 @@
 
 [source,shell]
 ----
-bitbake -c populate_sdk core_image_tiny
+bitbake -c populate_sdk core-image-tiny
 ----
 
 * Debugging and testing tools can be enabled by adding below in
@@ -29,7 +29,7 @@ bitbake -c populate_sdk core_image_tiny
 
 [source,shell]
 ----
-EXTRA_IMAGE_FEATURES = "tools-debug tools-profile tools-testapps debug-tweaks"
+EXTRA_IMAGE_FEATURES += "dbg-pkgs dev-pkgs tools-debug tools-profile tools-sdk tools-testapps"
 ----
 
 * Built SDK would be found in `tmp/deploy/sdk` as a shell script which
@@ -41,13 +41,19 @@ EXTRA_IMAGE_FEATURES = "tools-debug tools-profile tools-testapps debug-tweaks"
 
 [source,shell]
 ----
-source environment-setup-armv5e-poky-linux-gnueabi
+source environment-setup-cortexa57-poky-linux
 ----
 
 * Then the applications can be cross compiled using this toolchain.
 
 ----
-$ arm-poky-linux-gnueabi-gcc
+$ aarch64-poky-linux-gcc
+----
+
+ * Programs can be compiled using the following command:
+
+----
+${CC} hello-world.c -o hello-world
 ----
 
 === Development to Integration Workflow
@@ -113,7 +119,7 @@ $ arm-poky-linux-gnueabi-gcc
 
 [source,shell]
 ------
-$ yocto-layer create app
+$ bitbake-layers create-layer ~/bitbake-builds/poky-wrynose/layers/meta-app
 ------
 
 === Recipes for In-layer Sources
@@ -127,8 +133,7 @@ $ yocto-layer create app
 [source,shell]
 -----
 $ cd meta-app/
-$ mkdir -p recipes-core/helloworld
-$ mkdir -p recipes-core/heloworld/files 
+$ mkdir -p recipes-core/helloworld/files
 -----
 
 === Recipes for In-layer Sources Contd.
@@ -164,8 +169,8 @@ $ vim helloworld.bb
 
 [source,shell]
 -----
-PN="helloworld"
-SRC_URI="file://helloworld.c"
+PN = "helloworld"
+SRC_URI = "file://helloworld.c"
 -----
 
  * Fetcher can look for source files in the `files` folder residing in
@@ -176,15 +181,15 @@ SRC_URI="file://helloworld.c"
 === Recipes for In-layer Sources Contd.
 
    where the fetcher can fetch the file, from files folder to the
-   `WORKDIR`.
+   `UNPACKDIR`.
 
  * The location of the source file has to be specified to the build
-   stage, by explcitily pointing the `S` variable to the `WORKDIR`
+   stage, by explcitily pointing the `S` variable to the `UNPACKDIR`
    where the file was downloaded.
 
 [source,shell]
 -----
-S = "${WORKDIR}"
+S = "${UNPACKDIR}"
 -----
 
 === Recipes for In-layer Sources Contd.
@@ -211,7 +216,7 @@ do_install() {
 
  * It has unix file hierarchical directories like /usr/bin, /usr/lib..
 
- * Yocto defines variables for `/usr/bin`,  `/usr/lib`, `etc` paths in variables
+ * Yocto defines variables for `/usr/bin`,  `/usr/lib`, `/etc` paths in variables
    `${bindir}`, `${libdir}`, `${sysconfdir}` etc.
 
  * Necessary folder can be created inside `${D}` using `install -d`
@@ -239,7 +244,7 @@ LIC_FILES_CHKSUM =
 
 [source,shell]
 -----
-PN="helloworld"
+PN = "helloworld"
 
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = \
@@ -247,10 +252,10 @@ LIC_FILES_CHKSUM = \
 
 SRC_URI = "file://helloworld.c"
 
-S = "${WORKDIR}"
+S = "${UNPACKDIR}"
 
 do_compile() {
-        ${CC} helloworld.c -o helloworld
+        ${CC} ${LDFLAGS} helloworld.c -o helloworld
 }
 
 do_install() {
@@ -281,8 +286,7 @@ inherit core-image
 
 [source,shell]
 ------
-$ cd ../build
-$ bitbake-layers add-layer ../meta-app
+$ bitbake-layers add-layer ~/bitbake-builds/poky-wrynose/layers/meta-app/
 ------
 
  * Build the image with hello world 
@@ -291,6 +295,8 @@ $ bitbake-layers add-layer ../meta-app
 -----
 $ bitbake core-image-tiny
 -----
+
+ * Boot the image with `runqemu snapshot nographic` command to test the `helloworld` binary.
 
 == Make Based App
 
@@ -301,7 +307,6 @@ $ bitbake core-image-tiny
 [source,shell]
 ------
 cd meta-app
-mkdir -p recipes-core/mainapp
 mkdir -p recipes-core/mainapp/files
 ------
 
@@ -346,7 +351,7 @@ LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
 SRC_URI = "file://app.c \
 	   file://Makefile"
-S = "${WORKDIR}"
+S = "${UNPACKDIR}"
 DEPENDS = "ncurses"
 do_configure[noexec] = "1"
 do_clean[noexec] = "1"
@@ -386,8 +391,6 @@ EXTERNALSRC = " path "
 EXTERNALSRC_BUILD = " path "
 -----
 
-
-
 === Create External Source
 
 * Create externhello directory in home directory
@@ -422,20 +425,20 @@ $ vim recipes-core/externhello/externhello.bb
 
 [source,shell]
 -----
-PN="externhello"
+PN = "externhello"
 
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = \
 "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
 
 inherit externalsrc
-EXTERNALSRC = "/home/vagrant/externhello"
-EXTERNALSRC_BUILD = "/home/vagrant/externhello"
+EXTERNALSRC = "${HOME}/externhello"
+EXTERNALSRC_BUILD = "${HOME}/externhello"
 
-S = "${WORKDIR}"
+S = "${UNPACKDIR}"
 
 do_compile() {
-        ${CC} hello.c -o externhello
+        ${CC} ${LDFLAGS} hello.c -o externhello
 }
 
 do_install() {
@@ -458,3 +461,120 @@ IMAGE_INSTALL += " externhello"
 inherit core-image
 -----
 
+== devtool
+
+=== devtool: Workflow Helper
+
+ * `devtool` is a command line helper which automates the edit, build and test
+   cycle for a single recipe.
+
+ * It builds on the `externalsrc` mechanism we wrote by hand in the previous
+   section, but sets everything up for us.
+
+ * It is available once the Yocto build environment is set up.
+
+=== devtool modify
+
+ * Extract the source of an existing recipe into an editable workspace.
+
+[source,shell]
+----
+$ devtool modify helloworld
+$ devtool status
+----
+
+ * The source is placed in `build/workspace/sources/helloworld`.
+
+ * devtool creates a `workspace` layer, adds it to `bblayers.conf`, and
+   generates a bbappend with `EXTERNALSRC` pointing to that source.
+
+[source,shell]
+----
+$ bitbake-layers show-layers
+----
+
+=== Edit and Build
+
+ * Edit the source directly in the workspace, for example change the message
+   printed by `helloworld.c`.
+
+ * Rebuild only this recipe, not the whole image.
+
+[source,shell]
+----
+$ devtool build helloworld
+----
+
+ * To test the change on the target, rebuild the image and boot it.
+
+[source,shell]
+----
+$ bitbake core-image-tiny
+$ runqemu snapshot nographic
+----
+
+=== devtool deploy-target
+
+ * A running target can be updated directly with the newly built files, without
+   rebuilding the image or rebooting.
+
+[source,shell]
+----
+$ devtool deploy-target helloworld root@192.168.7.2
+----
+
+ * devtool copies the files over the network using `ssh` and `scp`, and installs
+   them on the target.
+
+ * The change can be verified immediately by running `helloworld` on the target.
+
+NOTE: `deploy-target` cannot be tried out on our `core-image-tiny`, as the tiny
+image does not have the necessary requirements present in the rootfs.
+
+
+=== devtool finish
+
+ * Once the change is tested, commit it in the workspace source.
+
+[source,shell]
+----
+$ cd workspace/sources/helloworld
+$ git add helloworld.c
+$ git commit -m "Change greeting"
+----
+
+ * Write the change back to the layer, giving the layer path as the destination.
+
+[source,shell]
+----
+$ devtool finish helloworld ~/bitbake-builds/poky-wrynose/layers/meta-app
+----
+
+=== devtool finish (Contd...)
+
+ * `finish` also removes the workspace override, so the recipe in the original
+   layer is used again.
+
+ * `finish` updates the original layer with a patch file and appends the patch
+   file in the `SRC_URI`
+
+ * `devtool reset helloworld` discards the workspace changes without updating
+   the layer.
+
+=== Adding a new recipe
+
+ * `devtool` simplifies adding a new recipe for an existing remote project
+
+[source,shell]
+----
+$ devtool add https://github.com/OSSystems/bbexample
+----
+
+ * New recipes are created under `build/workspace/recipes/bbexample` directory.
+
+ * To transfer the recipe to the target layer, run the following command:
+
+[source,shell]
+----
+$ devtool finish bbexample ~/bitbake-builds/poky-wrynose/layers/meta-app
+----
