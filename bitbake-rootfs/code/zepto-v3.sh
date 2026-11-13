@@ -1,9 +1,12 @@
+set -a
+source versions.sh
+set +a
+
 mkdir -p ~/yp/zepto-v3
 mkdir -p ~/yp/zepto-v3/conf
 mkdir -p ~/yp/zepto-v3/classes
 
-cat > ~/yp/zepto-v3/setup-bitbake.sh <<"EOF"
-BITBAKE_VER=yocto-4.0
+cat <<"EOF" | envsubst '$BITBAKE_VER' > ~/yp/zepto-v3/setup-bitbake.sh
 mkdir -p ~/yp/dl
 pushd ~/yp/dl
 wget -c -O bitbake-$BITBAKE_VER.tar.gz \
@@ -98,11 +101,11 @@ do_install() {
 }
 EOF
 
-cat > ~/yp/zepto-v3/bash.bb <<"EOF"
+cat <<"EOF" | envsubst '$BASH_VER' > ~/yp/zepto-v3/bash.bb
 PN = "bash"
-PV = "4.3"
+PV = "$BASH_VER"
 
-SRC_URI = "http://ftp.gnu.org/gnu/bash/bash-4.3.tar.gz"
+SRC_URI = "http://ftp.gnu.org/gnu/bash/bash-${PV}.tar.gz"
 
 inherit autotools
 
@@ -113,9 +116,10 @@ do_install:append() {
 }
 EOF
 
+cat <<"EOF" | envsubst '$COREUTILS_VER' > ~/yp/zepto-v3/coreutils.bb
 cat > ~/yp/zepto-v3/coreutils.bb <<"EOF"
 PN = "coreutils"
-PV = "8.32"
+PV = "$COREUTILS_VER"
 
 SRC_URI = "http://ftp.gnu.org/gnu/coreutils/coreutils-${PV}.tar.xz"
 

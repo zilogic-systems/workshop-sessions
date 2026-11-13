@@ -1,0 +1,5 @@
+bitbake-ver: yocto-6.0
+bash-ver: "5.3"
+coreutils-ver: "9.12"
+less-ver: "710"
+ncurses-ver: "6.2"

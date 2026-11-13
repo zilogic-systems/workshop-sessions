@@ -1,9 +1,12 @@
+set -a
+source versions.sh
+set +a
+
 mkdir -p ~/yp/zepto-v2
 mkdir -p ~/yp/zepto-v2/conf
 mkdir -p ~/yp/zepto-v2/classes
 
-cat > ~/yp/zepto-v2/setup-bitbake.sh <<"EOF"
-BITBAKE_VER=yocto-4.0
+cat <<"EOF" | envsubst '$BITBAKE_VER' > ~/yp/zepto-v2/setup-bitbake.sh
 mkdir -p ~/yp/dl
 pushd ~/yp/dl
 wget -c -O bitbake-$BITBAKE_VER.tar.gz \
@@ -67,9 +70,9 @@ do_install() {
 }
 EOF
 
-cat > ~/yp/zepto-v2/bash.bb <<"EOF"
+cat <<"EOF" | envsubst '$BASH_VER' > ~/yp/zepto-v2/bash.bb
 PN = "bash"
-PV = "4.3"
+PV = "$BASH_VER"
 
 inherit autotools
 
@@ -89,9 +92,10 @@ do_install:append() {
 
 EOF
 
+cat <<"EOF" | envsubst '$COREUTILS_VER' > ~/yp/zepto-v2/coreutils.bb
 cat > ~/yp/zepto-v2/coreutils.bb <<"EOF"
 PN = "coreutils"
-PV = "8.32"
+PV = "$COREUTILS_VER"
 
 inherit autotools
 

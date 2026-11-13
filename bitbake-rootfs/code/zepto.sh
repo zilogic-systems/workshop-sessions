@@ -1,9 +1,12 @@
+set -a
+source versions.sh
+set +a
+
 mkdir -p ~/yp/zepto
 mkdir -p ~/yp/zepto/conf
 mkdir -p ~/yp/zepto/classes
 
-cat > ~/yp/zepto/setup-bitbake.sh <<"EOF"
-BITBAKE_VER=yocto-4.0
+cat <<"EOF" | envsubst '$BITBAKE_VER' > ~/yp/zepto/setup-bitbake.sh
 mkdir -p ~/yp/dl
 pushd ~/yp/dl
 wget -c -O bitbake-$BITBAKE_VER.tar.gz \
@@ -103,20 +106,20 @@ do_install() {
 }
 EOF
 
-cat > ~/yp/zepto/coreutils.bb <<"EOF"
+cat <<"EOF" | envsubst '$COREUTILS_VER' > ~/yp/zepto/coreutils.bb
 inherit autotools
 
 PN = "coreutils"
-PV = "8.32"
-SRC_URI = "http://ftp.gnu.org/gnu/coreutils/coreutils-8.32.tar.xz"
+PV = "$COREUTILS_VER"
+SRC_URI = "http://ftp.gnu.org/gnu/coreutils/coreutils-${PV}.tar.xz"
 EOF
 
-cat > ~/yp/zepto/bash.bb <<"EOF"
+cat <<"EOF" | envsubst '$BASH_VER' > ~/yp/zepto/bash.bb
 inherit autotools
 
 PN = "bash"
-PV = "4.3"
-SRC_URI = "ftp://ftp.gnu.org/gnu/bash/bash-4.3.tar.gz"
+PV = "$BASH_VER"
+SRC_URI = "ftp://ftp.gnu.org/gnu/bash/bash-${PV}.tar.gz"
 
 do_install:append() {
 	mkdir -p ${ROOTFS}/bin
@@ -125,21 +128,21 @@ do_install:append() {
 }
 EOF
 
-cat > ~/yp/zepto/ncurses.bb <<"EOF"
+cat <<"EOF" | envsubst '$NCURSES_VER' > ~/yp/zepto/ncurses.bb
 inherit autotools
 
 PN = "ncurses"
-PV = "6.2"
-SRC_URI = "http://ftp.gnu.org/gnu/ncurses/ncurses-6.2.tar.gz"
+PV = "$NCURSES_VER"
+SRC_URI = "http://ftp.gnu.org/gnu/ncurses/ncurses-${PV}.tar.gz"
 CONFIG_OPTS += "--without-progs --disable-ext-funcs --without-cxx"
 EOF
 
-cat > ~/yp/zepto/less.bb <<"EOF"
+cat <<"EOF" | envsubst '$LESS_VER' > ~/yp/zepto/less.bb
 inherit autotools
 
 PN = "less"
-PV = "458"
-SRC_URI = "http://www.greenwoodsoftware.com/less/less-458.tar.gz"
+PV = "$LESS_VER"
+SRC_URI = "http://www.greenwoodsoftware.com/less/less-${PV}.tar.gz"
 DEPENDS = "ncurses"
 
 EOF
@@ -160,14 +163,12 @@ do_install() {
     mkdir -p ${ROOTFS}/lib
     cp ${TOOLCHAIN_DIR}/lib/libc.so.6 ${ROOTFS}/lib
     cp ${TOOLCHAIN_DIR}/lib/ld-linux.so.3 ${ROOTFS}/lib
-    cp ${TOOLCHAIN_DIR}/lib/libdl.so.2 ${ROOTFS}/lib
-    cp ${TOOLCHAIN_DIR}/lib/librt.so.1 ${ROOTFS}/lib
-    cp ${TOOLCHAIN_DIR}/lib/libpthread.so.0 ${ROOTFS}/lib
 }
 EOF
 
 cat > ~/yp/zepto/core-image-minimal.bb <<"EOF"
 PN = "core-image-minimal"
+PV = "1.0"
 RDEPENDS = "libc bash coreutils less"
 
 do_rootfs() {

@@ -1,9 +1,12 @@
+set -a
+source versions.sh
+set +a
+
 mkdir -p ~/yp/zepto-v1
 mkdir -p ~/yp/zepto-v1/conf
 mkdir -p ~/yp/zepto-v1/classes
 
-cat > ~/yp/zepto-v1/setup-bitbake.sh <<"EOF"
-BITBAKE_VER=yocto-4.0
+cat <<"EOF" | envsubst '$BITBAKE_VER' > ~/yp/zepto-v1/setup-bitbake.sh
 mkdir -p ~/yp/dl
 pushd ~/yp/dl
 wget -c -O bitbake-$BITBAKE_VER.tar.gz \
@@ -46,31 +49,32 @@ do_configure[deptask] = "do_install"
 PF = "${PN}"
 EOF
 
+cat <<"EOF" | envsubst '$BASH_VER' > ~/yp/zepto-v1/bash.bb
 cat > ~/yp/zepto-v1/bash.bb <<"EOF"
 PN = "bash"
 
 do_fetch() {
-	cd ~/yp/dl; wget -c http://ftp.gnu.org/gnu/bash/bash-4.3.tar.gz
+	cd ~/yp/dl; wget -c http://ftp.gnu.org/gnu/bash/bash-$BASH_VER.tar.gz
 }
 
 do_unpack() {
-	tar -x -f ~/yp/dl/bash-4.3.tar.gz
+	tar -x -f ~/yp/dl/bash-$BASH_VER.tar.gz
 }
 
 do_configure() {
-	cd bash-4.3
+	cd bash-$BASH_VER
         ./configure --prefix=/usr           \
             --host=arm-linux-gnueabi   \
             --build=i686-pc-linux-gnu
 }
 
 do_compile() {
-	cd bash-4.3
+	cd bash-$BASH_VER
         make
 }
 
 do_install() {
-	cd bash-4.3
+	cd bash-$BASH_VER
         make install DESTDIR=${ROOTFS}
 	mkdir -p ${ROOTFS}/bin
 	ln -f -s /usr/bin/bash ${ROOTFS}/bin/bash
@@ -78,31 +82,31 @@ do_install() {
 }
 EOF
 
-cat > ~/yp/zepto-v1/coreutils.bb <<"EOF"
+cat <<"EOF" | envsubst '$COREUTILS_VER' > ~/yp/zepto-v1/coreutils.bb
 PN = "coreutils"
 
 do_fetch() {
-	cd ~/yp/dl; wget -c http://ftp.gnu.org/gnu/coreutils/coreutils-8.32.tar.xz
+	cd ~/yp/dl; wget -c http://ftp.gnu.org/gnu/coreutils/coreutils-$COREUTILS_VER.tar.xz
 }
 
 do_unpack() {
-	tar -x -f ~/yp/dl/coreutils-8.32.tar.xz
+	tar -x -f ~/yp/dl/coreutils-$COREUTILS_VER.tar.xz
 }
 
 do_configure() {
-	cd coreutils-8.32
+	cd coreutils-$COREUTILS_VER
         ./configure --prefix=/usr           \
             --host=arm-linux-gnueabi   \
             --build=i686-pc-linux-gnu
 }
 
 do_compile() {
-	cd coreutils-8.32
+	cd coreutils-$COREUTILS_VER
         make
 }
 
 do_install() {
-	cd coreutils-8.32
+	cd coreutils-$COREUTILS_VER
         make install DESTDIR=${ROOTFS}
 	mkdir -p ${ROOTFS}/bin
 }

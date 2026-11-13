@@ -1,5 +1,6 @@
 = Rootfs with BitBake
 Zilogic Systems
+include::code/versions.adoc[]
 
 == Intro to Zepto
 
@@ -96,10 +97,10 @@ Zilogic Systems
   * Setup bitbake first
   * Setup `BBPATH`
   * Add a recipe for ncurses
-    - `http://ftp.gnu.org/gnu/ncurses/ncurses-5.9.tar.gz`
+    - +http://ftp.gnu.org/gnu/ncurses/ncurses-{ncurses-ver}.tar.gz+
   * Add a recipe for less
-    - `http://www.greenwoodsoftware.com/less/less-458.tar.gz`
-  * Specify less depends on ncurses
+    - +http://www.greenwoodsoftware.com/less/less-{less-ver}.tar.gz+
+  * Specify "less" depends on "ncurses"
 
 == Zepto v4
 
