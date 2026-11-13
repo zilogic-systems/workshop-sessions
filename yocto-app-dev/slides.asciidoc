@@ -195,7 +195,7 @@ S = "${WORKDIR}"
 [source,shell]
 -----
 do_compile() {
-        ${CC} helloworld.c -o helloworld
+        ${CC} ${LDFLAGS} helloworld.c -o helloworld
 }
 
 do_install() {
@@ -242,10 +242,10 @@ LIC_FILES_CHKSUM =
 PN="helloworld"
 
 LICENSE = "MIT"
-LIC_FILES_CHKSUM =
+LIC_FILES_CHKSUM = \
 "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
 
-SRC_URI="file://helloworld.c"
+SRC_URI = "file://helloworld.c"
 
 S = "${WORKDIR}"
 
@@ -323,13 +323,13 @@ cp ~/Downloads/app.c recipes-core/mainapp/files
 vim recipes-core/mainapp/files/Makefile
 ----
 
-[source,shell]
+[source,makefile]
 ------
 compile:
-	${CC} app.c -lncurses -lpanel -o mainapp
+    ${CC} ${LDFLAGS} app.c -lncurses -lpanel -o mainapp
 install:
-	install -d ${DESTDIR}/usr/bin
-	install -m 0755 mainapp ${DESTDIR}/usr/bin
+    install -d ${DESTDIR}/usr/bin
+    install -m 0755 mainapp ${DESTDIR}/usr/bin
 ------
 
 === Add Recipe
@@ -394,8 +394,8 @@ EXTERNALSRC_BUILD = " path "
 
 [source,shell]
 -----
-$mkdir ~/externhello
-$vim ~/externhello/hello.c
+$ mkdir ~/externhello
+$ vim ~/externhello/hello.c
 -----
 
 [source,c]
@@ -425,7 +425,7 @@ $ vim recipes-core/externhello/externhello.bb
 PN="externhello"
 
 LICENSE = "MIT"
-LIC_FILES_CHKSUM =
+LIC_FILES_CHKSUM = \
 "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
 
 inherit externalsrc
