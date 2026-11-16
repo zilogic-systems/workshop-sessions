@@ -2,13 +2,10 @@
 
 == Using SDK
 
-=== SDK / ADT for Developers 
+=== SDK for Developers
 
 * Yocto SDK has toolchain and the dependency libraries which can be
   used by application developers to build their applications.
-
-* Yocto also provides an plugin called ADT, which allows to developers
-  to use the yocto toolchain in eclipse IDE.
 
 * SDK provides also tools using which developers can test, debug and
   introspect the application.
@@ -56,13 +53,6 @@ $ aarch64-poky-linux-gcc
 ${CC} hello-world.c -o hello-world
 ----
 
-=== Development to Integration Workflow
-
-* If the developer had his code developed, built with SDK and tested
-  in the target board.
-
-* Next is to get integrated into the rootfs for next release adding it
-  to Yocto build system.
 
 == Adding Packages to Yocto Build System
 
@@ -80,16 +70,6 @@ ${CC} hello-world.c -o hello-world
 * Do reduce the Yocto build overhead, we can use the build
   sstate-cache, which would be available from the Yocto's previous
   build.
-
-=== SDK Release
-
-* The Yocto build team can deliver below to the application developers
-  - SDK
-  - Poky build system
-  - sstate-cache
-
-* The application developers can easily integrate and test their
-  layers with Yocto.
 
 === Application Build Types
 
@@ -578,3 +558,32 @@ $ devtool add https://github.com/OSSystems/bbexample
 ----
 $ devtool finish bbexample ~/bitbake-builds/poky-wrynose/layers/meta-app
 ----
+
+=== Extensible SDK (eSDK)
+
+ * The standard SDK gives only the toolchain and libraries.
+
+ * The eSDK adds `devtool` and a minimal build system, so developers can add and
+   modify recipes and rebuild images from the SDK itself, without the full Poky
+   tree.
+
+ * It is built like the SDK, but with the `populate_sdk_ext` task.
+
+[source,shell]
+----
+$ bitbake -c populate_sdk_ext core-image-tiny
+----
+
+ * The installer is placed in `tmp/deploy/sdk`, with `-toolchain-ext` in its
+   filename.
+
+=== eSDK Release
+
+ * The eSDK contains the following:
+   - Essential binaries required for `bitbake` & `devtool` commands
+   - Standard SDK components, including the cross-toolchain and sysroots
+   - Shared state cache objects
+   - Yocto Project metadata
+
+ * This helps the application developers to easily integrate and test their
+   layers with the Yocto configuration.
