@@ -1,0 +1,38 @@
+- name: Kernel Porting workshop
+  hosts: localhost
+  tasks:
+
+  - apt_repository: repo="deb [trusted=yes] http://pike.zilogic.com/zdrive/debian/repo/ wheezy main" update_cache=yes
+  - apt_repository: repo="deb http://http.debian.net/debian jessie-backports main" state=present update_cache=yes
+  - apt: name={{ item }} state=latest install_recommends=no
+    with_items:
+    - diffutils
+    - task-lxde-desktop
+    - policykit-1
+    - file
+    - qemu-system-arm
+    - iceweasel
+    - build-essential
+    - gcc-arm
+    - gcc-arm-linux
+    - chromium
+    - bc
+    - u-boot-tools
+    - libncurses5-dev
+    - imagemagick
+    - python-pip
+    - xz-utils
+    - bzip2
+    # required for websockify.
+    - python-numpy
+    - device-tree-compiler
+
+  - apt: name={{ item }} state=latest install_recommends=no
+    with_items:
+    - kp-qemu-system-arm
+    - kp-resources
+
+ # python-autobahn needs to be installed from backports
+  - apt: name=kp-webui state=latest default_release=jessie-backports
+
+  - pip: name=websockify

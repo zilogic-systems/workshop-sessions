@@ -1,0 +1,3 @@
+Host *
+  ServerAliveInterval 60
+  UserKnownHostsFile /dev/null
